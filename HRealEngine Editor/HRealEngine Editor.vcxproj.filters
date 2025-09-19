@@ -166,6 +166,9 @@
     <None Include="assets\fonts\Story_Script\StoryScript-Regular.ttf">
       <Filter>assets\fonts\Story_Script</Filter>
     </None>
+    <None Include="assets\scenes\2dphysics.hrs">
+      <Filter>assets\scenes</Filter>
+    </None>
     <None Include="assets\scenes\Example.hrs">
       <Filter>assets\scenes</Filter>
     </None>

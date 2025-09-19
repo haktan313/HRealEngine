@@ -182,6 +182,7 @@
     <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Thin.ttf" />
     <None Include="assets\fonts\Story_Script\OFL.txt" />
     <None Include="assets\fonts\Story_Script\StoryScript-Regular.ttf" />
+    <None Include="assets\scenes\2dphysics.hrs" />
     <None Include="assets\scenes\Example.hrs" />
     <None Include="assets\scenes\sadadas.hrs" />
     <None Include="assets\scenes\suprize.hrs" />
