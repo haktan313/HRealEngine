@@ -23,6 +23,13 @@ namespace HRealEngine
             sceneRef->OnComponentAdded<T>(*this, component);
             return component;
         }
+        template <typename T, typename... Args>
+        T& AddOrReplaceComponent(Args&&... args)
+        {
+            T& component = sceneRef->GetRegistry().emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
+            sceneRef->OnComponentAdded<T>(*this, component);
+            return component;
+        }
         template <typename T>
         T& GetComponent()
         {
@@ -40,6 +47,7 @@ namespace HRealEngine
         }
 
         UUID GetUUID() { return GetComponent<EntityIDComponent>().ID; }
+        const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
         
         operator bool() const { return entityHandle != entt::null; }
         operator entt::entity() const { return entityHandle; }

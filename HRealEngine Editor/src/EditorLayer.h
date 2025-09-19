@@ -34,9 +34,14 @@ namespace HRealEngine
         void OpenScene();
         void OpenScene(const std::filesystem::path& path);
         void SaveSceneAs();
+        void SaveScene();
+
+        void SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path);
 
         void OnScenePlay();
         void OnSceneStop();
+
+        void OnDuplicateEntity();
 
         void UIToolbar();
 
@@ -50,6 +55,8 @@ namespace HRealEngine
         OrthCameraController orthCameraControllerRef;
         Ref<Framebuffer> framebufferRef;
         Ref<Scene> activeSceneRef;
+        Ref<Scene> editorSceneRef;
+        std::filesystem::path editorScenePath;
         int m_GizmoType = -1; // -1: none, 0: translate, 1: rotate, 2: scale
         SceneHierarchyPanel sceneHierarchyPanelRef;
         ContentBrowserPanel contentBrowserPanelRef;

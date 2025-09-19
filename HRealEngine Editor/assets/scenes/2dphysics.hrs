@@ -1,10 +1,67 @@
 Scene: Untitled
 Entities:
+  - Entity: 8820226750914397380
+    TagComponent:
+      Tag: zemin
+    TransformComponent:
+      Position: [0, -2.096508, 0]
+      Rotation: [0.011326636, -0.022760348, 0.002233298]
+      Scale: [8.299993, 0.10000006, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 10585805704628204280
+    TagComponent:
+      Tag: aaa
+    TransformComponent:
+      Position: [0.10188726, 1.756867, 0]
+      Rotation: [0, 0, 0.0022333558]
+      Scale: [0.99998814, 0.99998814, 1]
+    SpriteRendererComponent:
+      Color: [0.7900356, 0.0534188, 0.0534188, 1]
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 8699832407536647932
+    TagComponent:
+      Tag: aaa
+    TransformComponent:
+      Position: [-2.6000547, 0.7497276, 0]
+      Rotation: [0, 0, 0.0022333558]
+      Scale: [0.99998814, 0.99998814, 1]
+    SpriteRendererComponent:
+      Color: [0.7900356, 0.0534188, 0.0534188, 1]
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 11521485255455545417
     TagComponent:
       Tag: aaa
     TransformComponent:
-      Position: [0.10922376, -1.5280747, 0]
+      Position: [2.2216606, 0.20912585, 0]
       Rotation: [0, 0, 0.0022333558]
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
@@ -23,11 +80,11 @@ Entities:
     TagComponent:
       Tag: zemin
     TransformComponent:
-      Position: [0, -2.096508, 0]
-      Rotation: [0.011326636, -0.022760348, 0.002233298]
-      Scale: [8.299993, 0.10000006, 1]
+      Position: [-0.0031170032, -0.8452482, 0.014169606]
+      Rotation: [0.011645551, -0.02259915, -0.25916106]
+      Scale: [8.299997, 0.100000024, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.19467838, 0.8967972, 0.45453727, 1]
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false

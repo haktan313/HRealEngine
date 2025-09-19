@@ -20,6 +20,8 @@ namespace HRealEngine
         Scene();
         ~Scene();
 
+        static Ref<Scene> Copy(Ref<Scene> other);
+
         Entity CreateEntity(const std::string& name = std::string());
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
         void DestroyEntity(Entity entity);
@@ -32,6 +34,7 @@ namespace HRealEngine
         void OnUpdateRuntime(Timestep deltaTime);
         void OnViewportResize(uint32_t width, uint32_t height);
         Entity GetPrimaryCameraEntity();
+        void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
     private:

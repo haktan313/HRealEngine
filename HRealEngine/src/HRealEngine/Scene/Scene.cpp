@@ -36,6 +36,56 @@ namespace HRealEngine
     Scene::~Scene()
     {
     }
+
+    template<typename Component>
+    static void CopyComponent(entt::registry& dst, entt::registry& src, std::unordered_map<UUID, entt::entity>& entityMap)
+    {
+        auto view = src.view<Component>();
+        for (auto e : view)
+        {
+            UUID uuid = src.get<EntityIDComponent>(e).ID;
+            entt::entity dstEntt = entityMap.at(uuid);
+
+            auto& component = src.get<Component>(e);
+            dst.emplace_or_replace<Component>(dstEntt, component); 
+        }
+    }
+    template<typename Component>
+    static void CopyComponentIfExist(Entity dst, Entity src)
+    {
+        if (src.HasComponent<Component>())
+            dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+    }
+
+    Ref<Scene> Scene::Copy(Ref<Scene> other)
+    {
+        Ref<Scene> newScene = CreateRef<Scene>();
+        newScene->viewportWidth = other->viewportWidth;
+        newScene->viewportHeight = other->viewportHeight;
+
+        std::unordered_map<UUID, entt::entity> entityMap;
+        auto& srcRegistry = other->registry;
+        auto& dstRegistry = newScene->registry;
+
+        auto idView = srcRegistry.view<EntityIDComponent>();
+        for (auto e : idView)
+        {
+            UUID uuid = srcRegistry.get<EntityIDComponent>(e).ID;
+            const auto& name = srcRegistry.get<TagComponent>(e).Tag;
+            Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
+            entityMap[uuid] = (entt::entity)newEntity;
+        }
+
+        CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
+        
+        return newScene;
+    }
+
     Entity Scene::CreateEntity(const std::string& name)
     {
         return CreateEntityWithUUID(UUID(), name);
@@ -203,6 +253,18 @@ namespace HRealEngine
                 return Entity{entity, this};
         }
         return {};
+    }
+
+    void Scene::DuplicateEntity(Entity entity)
+    {
+        Entity newEntity = CreateEntity(entity.GetName());
+        
+        CopyComponentIfExist<TransformComponent>(newEntity, entity);
+        CopyComponentIfExist<CameraComponent>(newEntity, entity);
+        CopyComponentIfExist<SpriteRendererComponent>(newEntity, entity);
+        CopyComponentIfExist<NativeScriptComponent>(newEntity, entity);
+        CopyComponentIfExist<Rigidbody2DComponent>(newEntity, entity);
+        CopyComponentIfExist<BoxCollider2DComponent>(newEntity, entity);
     }
 
     bool Scene::DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale)

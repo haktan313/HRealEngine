@@ -51,7 +51,6 @@ namespace HRealEngine
         m_Particle.Position = { 0.0f, 0.0f };*/
 
         activeSceneRef = CreateRef<Scene>();
-
         m_EditorCamera = EditorCamera(30.f, 1.778f/*1920/1080*/, 0.1f, 1000.f);
         
         /*
@@ -419,8 +418,15 @@ namespace HRealEngine
                 OpenScene();
             break;
         case HR_KEY_S:
-            if (bControlPressed && bShiftPressed)
-                SaveSceneAs();
+            if (bControlPressed)
+                if (bShiftPressed)
+                    SaveSceneAs();
+                else
+                    SaveScene();
+            break;
+        case HR_KEY_D:
+            if (bControlPressed)
+                OnDuplicateEntity();
             break;
             
         case HR_KEY_Q:
@@ -435,6 +441,7 @@ namespace HRealEngine
         case HR_KEY_R:
             m_GizmoType = ImGuizmo::OPERATION::SCALE;
             break;
+
         }
         return false;
     }
@@ -452,6 +459,8 @@ namespace HRealEngine
         activeSceneRef = CreateRef<Scene>();
         activeSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         sceneHierarchyPanelRef.SetContext(activeSceneRef);
+
+        editorScenePath = std::filesystem::path();
     }
 
     void EditorLayer::OpenScene()
@@ -463,6 +472,9 @@ namespace HRealEngine
 
     void EditorLayer::OpenScene(const std::filesystem::path& path)
     {
+        if (m_SceneState != SceneState::Editor)
+            OnSceneStop();
+        
         if (path.extension().string() != ".hrs")
         {
             LOG_CORE_ERROR("Could not load {0} - not a .hrs file", path.filename().string());
@@ -472,9 +484,12 @@ namespace HRealEngine
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
-            activeSceneRef = newScene;
-            activeSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            sceneHierarchyPanelRef.SetContext(activeSceneRef);
+            editorSceneRef = newScene;
+            editorSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            sceneHierarchyPanelRef.SetContext(editorSceneRef);
+
+            activeSceneRef = editorSceneRef;
+            editorScenePath = path;
         }
     }
 
@@ -483,21 +498,51 @@ namespace HRealEngine
         std::string filePath = FileDialogs::SaveFile("HRE Scene (*.hrs)\0*.hrs\0");
         if (!filePath.empty())
         {
-            SceneSerializer serializer(activeSceneRef);
-            serializer.Serialize(filePath);
+            SerializeScene(activeSceneRef, filePath);
+            editorScenePath = filePath;
         }
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        if (!editorScenePath.empty())
+            SerializeScene(activeSceneRef, editorScenePath);
+        else
+            SaveSceneAs();
+    }
+
+    void EditorLayer::SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path)
+    {
+        SceneSerializer serializer(sceneRef);
+        serializer.Serialize(path.string());
     }
 
     void EditorLayer::OnScenePlay()
     {
         m_SceneState = SceneState::Runtime;
+        
+        activeSceneRef = Scene::Copy(editorSceneRef);
         activeSceneRef->OnRuntimeStart();
+        
+        sceneHierarchyPanelRef.SetContext(activeSceneRef);
     }
 
-    void EditorLayer::OnSceneStop()
+    void EditorLayer::OnSceneStop() 
     {
         m_SceneState = SceneState::Editor;
+        
         activeSceneRef->OnRuntimeStop();
+        activeSceneRef = editorSceneRef;
+        
+        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+    }
+
+    void EditorLayer::OnDuplicateEntity()
+    {
+        if (m_SceneState != SceneState::Editor)
+            return;
+        if (sceneHierarchyPanelRef.GetSelectedEntity())
+            activeSceneRef->DuplicateEntity(sceneHierarchyPanelRef.GetSelectedEntity());
     }
 
     void EditorLayer::UIToolbar()
