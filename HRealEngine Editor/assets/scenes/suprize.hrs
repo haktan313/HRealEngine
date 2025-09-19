@@ -1,0 +1,29 @@
+Scene: Untitled
+Entities:
+  - Entity: 12312312312
+    TagComponent:
+      Tag: Camer
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 12312312312
+    TagComponent:
+      Tag: JOSEEEE
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]

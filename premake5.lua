@@ -1,0 +1,209 @@
+workspace "HRealEngine"
+    architecture "x64"
+    configurations { "Debug", "Release", "Dist" }
+    startproject "HRealEngine Editor"
+
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+IncludeDir = {}
+IncludeDir["GLFW"] = "HRealEngine/vendor/GLFW/include"
+IncludeDir["Glad"] = "HRealEngine/vendor/Glad/include"
+IncludeDir["ImGui"] = "HRealEngine/vendor/imgui"
+IncludeDir["glm"] = "HRealEngine/vendor/glm"
+IncludeDir["stb_image"] = "HRealEngine/vendor/stb_image"
+IncludeDir["entt"] = "HRealEngine/vendor/entt/include"
+IncludeDir["yaml-cpp"] = "HRealEngine/vendor/yaml-cpp/include"
+IncludeDir["ImGuizmo"] = "HRealEngine/vendor/ImGuizmo"
+
+include "HRealEngine/vendor/GLFW"
+include "HRealEngine/vendor/Glad"
+include "HRealEngine/vendor/imgui"
+include "HRealEngine/vendor/yaml-cpp"
+
+project "HRealEngine"
+    location "HRealEngine"
+    kind "StaticLib"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    files {
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp",
+        "%{IncludeDir.ImGui}/backends/imgui_impl_glfw.cpp",
+        "%{IncludeDir.ImGui}/backends/imgui_impl_opengl3.cpp",
+        "%{prj.name}/vendor/glm/glm/**.hpp",
+        "%{prj.name}/vendor/glm/glm/**.inl",
+
+       "%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+       "%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp"
+    }
+
+    includedirs {
+        "%{prj.name}/src",
+        "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.ImGui}/backends",
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir['yaml-cpp']}",
+        "%{IncludeDir.ImGuizmo}"
+    }
+
+    defines { "YAML_CPP_STATIC_DEFINE" }
+
+    links{
+        "GLFW", "opengl32.lib", "Glad", "ImGui", "yaml-cpp"
+    }
+    
+    buildoptions { "/utf-8" }
+
+    filter "system:windows"
+        systemversion "latest"
+        
+        defines {
+            "HREALENGINE_PLATFORM_WINDOWS", 
+            "HREALENGINE_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
+        }
+
+    filter "configurations:Debug"
+        defines { "HREALENGINE_DEBUG" }
+        runtime "Debug"
+        --buildoptions "/MDd"
+        buildoptions "/MTd"
+        symbols "on"
+    
+    filter "configurations:Release"
+        defines { "HREALENGINE_RELEASE" }
+        runtime "Release"
+        --buildoptions "/MD"
+         buildoptions "/MT"
+        optimize "on"
+        
+    filter "configurations:Dist"
+        defines { "HREALENGINE_DIST" }
+        runtime "Release"
+        --buildoptions "/MD"
+        buildoptions "/MT"
+        optimize "on"
+
+project "Sandbox"
+    location "Sandbox"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+    
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    
+    files { "%{prj.name}/src/**.h", "%{prj.name}/src/**.cpp", "%{prj.name}/assets/**" }
+    
+    includedirs {
+        "HRealEngine/vendor/spdlog/include",
+        "HRealEngine/src",
+        "%{IncludeDir.glm}",
+        "HRealEngine/vendor",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir['yaml-cpp']}"
+    }
+    
+    buildoptions { "/utf-8" }
+
+    defines { "YAML_CPP_STATIC_DEFINE" }
+    
+    links { "HRealEngine", "yaml-cpp" }
+    
+    buildoptions { "/utf-8" }
+    
+    filter "system:windows"
+        staticruntime "On"
+        systemversion "latest"
+        
+        defines { "HREALENGINE_PLATFORM_WINDOWS" }
+        
+    filter "configurations:Debug"
+        defines { "HREALENGINE_DEBUG" }
+        runtime "Debug"
+        --buildoptions "/MDd"
+        buildoptions "/MTd"
+        symbols "on"
+        
+    filter "configurations:Release"
+        defines { "HREALENGINE_RELEASE" }
+        runtime "Release"
+        --buildoptions "/MD"
+        buildoptions "/MT"
+        optimize "on"
+        
+    filter "configurations:Dist"
+        defines { "HREALENGINE_DIST" }
+        runtime "Release"
+        --buildoptions "/MD"
+        buildoptions "/MT"
+        optimize "on"
+
+
+project "HRealEngine Editor"
+    location "HRealEngine Editor"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+    
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    
+    files { "%{prj.name}/src/**.h", "%{prj.name}/src/**.cpp", "%{prj.name}/assets/**" }
+    
+    includedirs {
+        "HRealEngine/vendor/spdlog/include",
+        "HRealEngine/src",
+        "%{IncludeDir.glm}",
+        "HRealEngine/vendor",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir['yaml-cpp']}"
+    }
+    
+    buildoptions { "/utf-8" }
+    
+    defines { "YAML_CPP_STATIC_DEFINE" }
+    
+    links { "HRealEngine", "yaml-cpp" }
+    
+    buildoptions { "/utf-8" }
+    
+    filter "system:windows"
+        staticruntime "On"
+        systemversion "latest"
+        
+        defines { "HREALENGINE_PLATFORM_WINDOWS" }
+        
+    filter "configurations:Debug"
+        defines { "HREALENGINE_DEBUG" }
+        runtime "Debug"
+        --buildoptions "/MDd"
+        buildoptions "/MTd"
+        symbols "on"
+        
+    filter "configurations:Release"
+        defines { "HREALENGINE_RELEASE" }
+        runtime "Release"
+        --buildoptions "/MD"
+        buildoptions "/MT"
+        optimize "on"
+        
+    filter "configurations:Dist"
+        defines { "HREALENGINE_DIST" }
+        runtime "Release"
+        --buildoptions "/MD"
+        buildoptions "/MT"
+        optimize "on"
