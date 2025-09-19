@@ -13,11 +13,13 @@ IncludeDir["stb_image"] = "HRealEngine/vendor/stb_image"
 IncludeDir["entt"] = "HRealEngine/vendor/entt/include"
 IncludeDir["yaml-cpp"] = "HRealEngine/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "HRealEngine/vendor/ImGuizmo"
+IncludeDir["Box2D"] = "HRealEngine/vendor/Box2D/include"
 
 include "HRealEngine/vendor/GLFW"
 include "HRealEngine/vendor/Glad"
 include "HRealEngine/vendor/imgui"
 include "HRealEngine/vendor/yaml-cpp"
+include "HRealEngine/vendor/Box2D"
 
 project "HRealEngine"
     location "HRealEngine"
@@ -54,13 +56,14 @@ project "HRealEngine"
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.entt}",
         "%{IncludeDir['yaml-cpp']}",
-        "%{IncludeDir.ImGuizmo}"
+        "%{IncludeDir.ImGuizmo}",
+        "%{IncludeDir.Box2D}"
     }
 
     defines { "YAML_CPP_STATIC_DEFINE" }
 
     links{
-        "GLFW", "opengl32.lib", "Glad", "ImGui", "yaml-cpp"
+        "GLFW", "opengl32.lib", "Glad", "ImGui", "yaml-cpp", "Box2D"
     }
     
     buildoptions { "/utf-8" }

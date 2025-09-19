@@ -17,3 +17,6 @@
 [submodule "HRealEngine/vendor/ImGuizmo/ImGuizmo"]
 	path = HRealEngine/vendor/ImGuizmo/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "HRealEngine/vendor/box2d"]
+	path = HRealEngine/vendor/box2d
+	url = https://github.com/TheCherno/box2d.git
