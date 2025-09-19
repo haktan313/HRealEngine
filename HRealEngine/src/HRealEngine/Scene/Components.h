@@ -3,17 +3,25 @@
 #pragma once
 #include <string>
 #include "SceneCamera.h"
-#include "ScriptableEntity.h"
+#include "glm/glm.hpp"
+#include "HRealEngine/Core/UUID.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "HRealEngine/Renderer/Texture.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "glm/glm.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "HRealEngine/Renderer/Texture.h"
 
 namespace HRealEngine
 {
+
+    struct EntityIDComponent
+    {
+        UUID ID;
+
+        EntityIDComponent() = default;
+        EntityIDComponent(const EntityIDComponent&) = default;
+    };
     struct TransformComponent
     {
         glm::vec3 Position {0.0f, 0.0f, 0.0f};
@@ -68,6 +76,7 @@ namespace HRealEngine
         //CameraComponent(const glm::mat4& projection, bool bPrimaryCamera = false) : Camera(projection), PrimaryCamera(bPrimaryCamera) {}
     };
 
+    class ScriptableEntity;
     struct NativeScriptComponent
     {
         ScriptableEntity* Instance = nullptr;

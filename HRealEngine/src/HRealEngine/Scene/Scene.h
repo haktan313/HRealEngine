@@ -5,6 +5,7 @@
 #include <string>
 #include "glm/glm.hpp"
 #include "HRealEngine/Core/Timestep.h"
+#include "HRealEngine/Core/UUID.h"
 #include "HRealEngine/Renderer/EditorCamera.h"
 
 class b2World;
@@ -20,6 +21,7 @@ namespace HRealEngine
         ~Scene();
 
         Entity CreateEntity(const std::string& name = std::string());
+        Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
         void DestroyEntity(Entity entity);
         entt::registry& GetRegistry() { return registry; }
 

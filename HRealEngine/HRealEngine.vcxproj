@@ -154,6 +154,7 @@
     <ClInclude Include="src\HRealEngine\Core\Logger.h" />
     <ClInclude Include="src\HRealEngine\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\HRealEngine\Core\Timestep.h" />
+    <ClInclude Include="src\HRealEngine\Core\UUID.h" />
     <ClInclude Include="src\HRealEngine\Core\Window.h" />
     <ClInclude Include="src\HRealEngine\Debug\Instrumentor.h" />
     <ClInclude Include="src\HRealEngine\Events\AppEvent.h" />
@@ -620,6 +621,7 @@
     <ClCompile Include="src\HRealEngine\Core\Layer.cpp" />
     <ClCompile Include="src\HRealEngine\Core\LayerStack.cpp" />
     <ClCompile Include="src\HRealEngine\Core\Logger.cpp" />
+    <ClCompile Include="src\HRealEngine\Core\UUID.cpp" />
     <ClCompile Include="src\HRealEngine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Buffers.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Camera.cpp" />

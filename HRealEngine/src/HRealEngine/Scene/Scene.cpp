@@ -2,6 +2,7 @@
 //Scene.cpp
 #include "Scene.h"
 #include "Components.h"
+#include "ScriptableEntity.h"
 #include "Entity.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 
@@ -37,12 +38,19 @@ namespace HRealEngine
     }
     Entity Scene::CreateEntity(const std::string& name)
     {
+        return CreateEntityWithUUID(UUID(), name);
+    }
+
+    Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
+    {
         Entity entity = {registry.create(),this};
+        entity.AddComponent<EntityIDComponent>(uuid);
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
         tag.Tag = name.empty() ? "Entity" : name;
         return entity;
     }
+
     void Scene::DestroyEntity(Entity entity)
     {
         registry.destroy(entity);
@@ -244,7 +252,11 @@ namespace HRealEngine
     template <typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {
-        //static_assert(false, "Unsupported component type added to entity");
+        static_assert(false, "Unsupported component type added to entity");
+    }
+    template<>
+    void Scene::OnComponentAdded<EntityIDComponent>(Entity entity, EntityIDComponent& component)
+    {
     }
     template<>
     void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)

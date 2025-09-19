@@ -1,11 +1,10 @@
+
 #include "SceneSerializer.h"
-
 #include <fstream>
-
 #include "Components.h"
 #include "yaml-cpp/emitter.h"
 #include <yaml-cpp/yaml.h>
-
+#include "Entity.h"
 #include "yaml-cpp/node/parse.h"
 
 namespace YAML
@@ -123,8 +122,10 @@ namespace HRealEngine
 
     static void SerializeEntity(YAML::Emitter& out, Entity entity)
     {
+        HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TagComponent>(), "Entity has no tag component");
+        
         out << YAML::BeginMap;
-        out << YAML::Key << "Entity" << YAML::Value << "12312312312";//todo entity ID
+        out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();//todo entity ID
         
         if (entity.HasComponent<TagComponent>())
         {
@@ -251,12 +252,13 @@ namespace HRealEngine
             for (auto entity : entities)
             {
                 uint64_t uuid = entity["Entity"].as<uint64_t>();
+                
                 std::string name;
                 auto tagComponent = entity["TagComponent"];
                 if (tagComponent)
                     name = tagComponent["Tag"].as<std::string>();
 
-                Entity deserializedEntity = sceneRef->CreateEntity(name);
+                Entity deserializedEntity = sceneRef->CreateEntityWithUUID(uuid,name);
                 if (auto transformComponent = entity["TransformComponent"])
                 {
                     auto& transform = deserializedEntity.GetComponent<TransformComponent>();

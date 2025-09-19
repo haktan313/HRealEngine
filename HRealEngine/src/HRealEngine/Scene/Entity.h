@@ -3,7 +3,9 @@
 #pragma once
 #include <entt.hpp>
 
+#include "Components.h"
 #include "Scene.h"
+#include "HRealEngine/Core/UUID.h"
 
 namespace HRealEngine
 {
@@ -37,6 +39,8 @@ namespace HRealEngine
             sceneRef->GetRegistry().remove<T>(entityHandle);
         }
 
+        UUID GetUUID() { return GetComponent<EntityIDComponent>().ID; }
+        
         operator bool() const { return entityHandle != entt::null; }
         operator entt::entity() const { return entityHandle; }
         operator uint32_t() const { return (uint32_t)entityHandle; }
