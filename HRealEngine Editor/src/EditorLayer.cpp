@@ -463,12 +463,6 @@ namespace HRealEngine
 
     void EditorLayer::OpenScene(const std::filesystem::path& path)
     {
-        /*activeSceneRef = CreateRef<Scene>();
-        activeSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
-                    
-        SceneSerializer serializer(activeSceneRef);
-        serializer.Deserialize(path.string());*/
         if (path.extension().string() != ".hrs")
         {
             LOG_CORE_ERROR("Could not load {0} - not a .hrs file", path.filename().string());
@@ -497,11 +491,13 @@ namespace HRealEngine
     void EditorLayer::OnScenePlay()
     {
         m_SceneState = SceneState::Runtime;
+        activeSceneRef->OnRuntimeStart();
     }
 
     void EditorLayer::OnSceneStop()
     {
         m_SceneState = SceneState::Editor;
+        activeSceneRef->OnRuntimeStop();
     }
 
     void EditorLayer::UIToolbar()

@@ -7,6 +7,8 @@
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Renderer/EditorCamera.h"
 
+class b2World;
+
 namespace HRealEngine
 {
     class Entity;
@@ -20,6 +22,9 @@ namespace HRealEngine
         Entity CreateEntity(const std::string& name = std::string());
         void DestroyEntity(Entity entity);
         entt::registry& GetRegistry() { return registry; }
+
+        void OnRuntimeStart();
+        void OnRuntimeStop();
         
         void OnUpdateEditor(Timestep deltaTime, EditorCamera& camera);
         void OnUpdateRuntime(Timestep deltaTime);
@@ -30,6 +35,8 @@ namespace HRealEngine
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
+
+        b2World* m_PhysicsWorld = nullptr;
         
         entt::registry registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;
