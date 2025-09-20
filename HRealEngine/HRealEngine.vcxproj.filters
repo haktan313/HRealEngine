@@ -105,6 +105,9 @@
     <ClInclude Include="src\HRealEngine\Core\Timestep.h">
       <Filter>src\HRealEngine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\HRealEngine\Core\UUID.h">
+      <Filter>src\HRealEngine\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\HRealEngine\Core\Window.h">
       <Filter>src\HRealEngine\Core</Filter>
     </ClInclude>
@@ -168,6 +171,9 @@
     <ClInclude Include="src\HRealEngine\Renderer\Texture.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\HRealEngine\Renderer\UniformBuffer.h">
+      <Filter>src\HRealEngine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\HRealEngine\Renderer\VertexArray.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
@@ -213,13 +219,13 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
-      <Filter>src\Platform\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Platform\Windows\WindowsPlatformUtils.h">
       <Filter>src\Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
@@ -1499,6 +1505,9 @@
     <ClCompile Include="src\HRealEngine\Core\Logger.cpp">
       <Filter>src\HRealEngine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\HRealEngine\Core\UUID.cpp">
+      <Filter>src\HRealEngine\Core</Filter>
+    </ClCompile>
     <ClCompile Include="src\HRealEngine\ImGui\ImGuiLayer.cpp">
       <Filter>src\HRealEngine\ImGui</Filter>
     </ClCompile>
@@ -1541,11 +1550,11 @@
     <ClCompile Include="src\HRealEngine\Renderer\Texture.cpp">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\HRealEngine\Renderer\VertexArray.cpp">
+    <ClCompile Include="src\HRealEngine\Renderer\UniformBuffer.cpp">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\HRealEngine\Scene\Components.cpp">
-      <Filter>src\HRealEngine\Scene</Filter>
+    <ClCompile Include="src\HRealEngine\Renderer\VertexArray.cpp">
+      <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\HRealEngine\Scene\Entity.cpp">
       <Filter>src\HRealEngine\Scene</Filter>
@@ -1578,6 +1587,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">

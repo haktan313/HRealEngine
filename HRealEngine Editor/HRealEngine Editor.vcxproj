@@ -78,12 +78,14 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor\glm;..\HRealEngine\vendor;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor;..\HRealEngine\vendor\glm;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;..\HRealEngine\vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 /MTd %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -96,15 +98,16 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor\glm;..\HRealEngine\vendor;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor;..\HRealEngine\vendor\glm;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;..\HRealEngine\vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 /MT %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -118,15 +121,16 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor\glm;..\HRealEngine\vendor;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\HRealEngine\vendor\spdlog\include;..\HRealEngine\src;..\HRealEngine\vendor;..\HRealEngine\vendor\glm;..\HRealEngine\vendor\entt\include;..\HRealEngine\vendor\yaml-cpp\include;..\HRealEngine\vendor\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 /MT %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -148,56 +152,6 @@
     <ClCompile Include="src\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="src\Panels\SceneHierarchyPanel.cpp" />
     <ClCompile Include="src\ParticleSystem.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\fonts\Bitcount\BitcountGridDouble-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf" />
-    <None Include="assets\fonts\Bitcount\OFL.txt" />
-    <None Include="assets\fonts\Bitcount\README.txt" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Black.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Bold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-ExtraBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-ExtraLight.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Light.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Medium.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Regular.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-SemiBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble-Thin.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Black.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Bold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-ExtraBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-ExtraLight.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Light.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Medium.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Regular.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-SemiBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Thin.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Black.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Bold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-ExtraBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-ExtraLight.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Light.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Medium.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Regular.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-SemiBold.ttf" />
-    <None Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Thin.ttf" />
-    <None Include="assets\fonts\Story_Script\OFL.txt" />
-    <None Include="assets\fonts\Story_Script\StoryScript-Regular.ttf" />
-    <None Include="assets\scenes\2dphysics.hrs" />
-    <None Include="assets\scenes\Example.hrs" />
-    <None Include="assets\scenes\sadadas.hrs" />
-    <None Include="assets\scenes\suprize.hrs" />
-    <None Include="assets\scenes\test.hrs" />
-    <None Include="assets\shaders\FlatColor.glsl" />
-    <None Include="assets\shaders\Texture.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="assets\game\textures\RPGpack_sheet_2X.png" />
-    <Image Include="assets\textures\Checkerboard.png" />
-    <Image Include="assets\textures\StartButton.png" />
-    <Image Include="assets\textures\fileIcon.png" />
-    <Image Include="assets\textures\folderIcon.png" />
-    <Image Include="assets\textures\joseMourinho.png" />
-    <Image Include="assets\textures\stopButton.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HRealEngine\HRealEngine.vcxproj">
