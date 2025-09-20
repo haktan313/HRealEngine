@@ -30,6 +30,8 @@ namespace HRealEngine
         bool OnKeyPressed(KeyPressedEvent& event);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& event);
 
+        void OnOverlayRender();
+
         void NewScene();
         void OpenScene();
         void OpenScene(const std::filesystem::path& path);
@@ -69,6 +71,7 @@ namespace HRealEngine
         glm::vec2 m_ViewportBounds[2];
         bool m_ViewportFocused = false;
         bool m_ViewportHovered = false;
+        bool m_ShowPhysicsColliders = false;
 
         Ref<Texture2D> joseMourinhoTextureRef;
         Ref<Texture2D> checkBoardTextureRef;

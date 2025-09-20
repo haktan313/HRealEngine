@@ -195,6 +195,8 @@ namespace HRealEngine
             m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, activeSceneRef.get());
             LOG_CORE_INFO("Pixel data = {0}", pixelData);
         }
+
+        OnOverlayRender();
         
         framebufferRef->Unbind();
     }
@@ -312,6 +314,10 @@ namespace HRealEngine
         ImGui::Text("Quads: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+        ImGui::End();
+
+        ImGui::Begin("Settings");
+        ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -461,6 +467,41 @@ namespace HRealEngine
             if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(HR_KEY_LEFT_ALT))
                 sceneHierarchyPanelRef.SetSelectedEntity(m_HoveredEntity);
         return false;
+    }
+
+    void EditorLayer::OnOverlayRender()
+    {
+        if (m_SceneState == SceneState::Runtime)
+        {
+            Entity cameraEntity = activeSceneRef->GetPrimaryCameraEntity();
+            Renderer2D::BeginScene(cameraEntity.GetComponent<CameraComponent>().Camera, cameraEntity.GetComponent<TransformComponent>().GetTransform());
+        }else
+            Renderer2D::BeginScene(m_EditorCamera);
+
+        if (m_ShowPhysicsColliders)
+        {
+            {
+                auto view = activeSceneRef->GetRegistry().view<BoxCollider2DComponent, TransformComponent>();
+                for (auto entity : view)
+                {
+                    auto [boxCollider, transform] = view.get<BoxCollider2DComponent, TransformComponent>(entity);
+                    glm::mat4 colliderTransform = transform.GetTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(boxCollider.Offset, 0.001f)) *
+                        glm::scale(glm::mat4(1.0f), glm::vec3(boxCollider.Size * 2.0f, 1.0f));
+                    Renderer2D::DrawRect(colliderTransform, { 0.f, 1.f, 0.f, 1.f });
+                }
+            }
+            {
+                auto view = activeSceneRef->GetRegistry().view<CircleCollider2DComponent, TransformComponent>();
+                for (auto entity : view)
+                {
+                    auto [circleCollider, transform] = view.get<CircleCollider2DComponent, TransformComponent>(entity);
+                    glm::mat4 colliderTransform = transform.GetTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(circleCollider.Offset, 0.001f)) *
+                        glm::scale(glm::mat4(1.0f), glm::vec3(circleCollider.Radius * 2.0f));
+                    Renderer2D::DrawCircle(colliderTransform, { 0.f, 1.f, 0.f, 1.f }, 0.05f);
+                }
+            }
+        }
+        Renderer2D::EndScene();
     }
 
     void EditorLayer::NewScene()

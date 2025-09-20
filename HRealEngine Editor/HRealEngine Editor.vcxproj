@@ -200,8 +200,9 @@
     <Content Include="assets\scenes\sadadas.hrs" />
     <Content Include="assets\scenes\suprize.hrs" />
     <Content Include="assets\scenes\test.hrs" />
-    <Content Include="assets\shaders\Circle_Texture2D.glsl" />
-    <Content Include="assets\shaders\Quad_Texture2D.glsl" />
+    <Content Include="assets\shaders\Circle_Shader2D.glsl" />
+    <Content Include="assets\shaders\Line_Shader2D.glsl" />
+    <Content Include="assets\shaders\Quad_Shader2D.glsl" />
     <Content Include="assets\textures\Checkerboard.png" />
     <Content Include="assets\textures\fileIcon.png" />
     <Content Include="assets\textures\folderIcon.png" />

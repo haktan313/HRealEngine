@@ -1,14 +1,53 @@
 Scene: Untitled
 Entities:
-  - Entity: 8820226750914397380
+  - Entity: 9756729186957125387
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [-1.3523598, 1.2842369, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRendererComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.005
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 585178917991249139
+    TagComponent:
+      Tag: camera
+    TransformComponent:
+      Position: [0, 0, 5.5762186]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 11815319910955465353
     TagComponent:
       Tag: zemin
     TransformComponent:
-      Position: [0, -2.096508, 0]
-      Rotation: [0.011326636, -0.022760348, 0.002233298]
-      Scale: [8.299993, 0.10000006, 1]
+      Position: [-0.0031170032, -0.8452482, 0.014169606]
+      Rotation: [0.011645551, -0.02259915, -0.25916106]
+      Scale: [8.299997, 0.100000024, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.19467838, 0.8967972, 0.45453727, 1]
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
@@ -19,11 +58,11 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 10585805704628204280
+  - Entity: 11521485255455545417
     TagComponent:
       Tag: aaa
     TransformComponent:
-      Position: [0.10188726, 1.756867, 0]
+      Position: [2.2216606, 0.20912585, 0]
       Rotation: [0, 0, 0.0022333558]
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
@@ -57,11 +96,11 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 11521485255455545417
+  - Entity: 10585805704628204280
     TagComponent:
       Tag: aaa
     TransformComponent:
-      Position: [2.2216606, 0.20912585, 0]
+      Position: [0.10188726, 1.756867, 0]
       Rotation: [0, 0, 0.0022333558]
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
@@ -76,60 +115,21 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 11815319910955465353
+  - Entity: 8820226750914397380
     TagComponent:
       Tag: zemin
     TransformComponent:
-      Position: [-0.0031170032, -0.8452482, 0.014169606]
-      Rotation: [0.011645551, -0.02259915, -0.25916106]
-      Scale: [8.299997, 0.100000024, 1]
+      Position: [0, -2.096508, 0]
+      Rotation: [0.011326636, -0.022760348, 0.002233298]
+      Scale: [8.299993, 0.10000006, 1]
     SpriteRendererComponent:
-      Color: [0.19467838, 0.8967972, 0.45453727, 1]
+      Color: [1, 1, 1, 1]
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 585178917991249139
-    TagComponent:
-      Tag: camera
-    TransformComponent:
-      Position: [0, 0, 5.5762186]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      PrimaryCamera: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.7853982
-        PerspectiveNear: 0.01
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-  - Entity: 9756729186957125387
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [-1.3523598, 1.2842369, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    CircleRendererComponent:
-      Color: [1, 1, 1, 1]
-      Thickness: 1
-      Fade: 0.005
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    CircleCollider2DComponent:
-      Offset: [0, 0]
-      Radius: 0.5
       Density: 1
       Friction: 0.5
       Restitution: 0

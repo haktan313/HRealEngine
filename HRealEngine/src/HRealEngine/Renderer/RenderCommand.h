@@ -28,6 +28,14 @@ namespace HRealEngine
         {
             rendererAPI->DrawIndexed(vertexArray, IndexCount);
         }
+        inline static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+        {
+            rendererAPI->DrawLines(vertexArray, vertexCount);
+        }
+        inline static void SetLineWidth(float width)
+        {
+            rendererAPI->SetLineWidth(width);
+        }
         
     private:
         static RendererAPI* rendererAPI;
