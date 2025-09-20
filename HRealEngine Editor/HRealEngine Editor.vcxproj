@@ -161,6 +161,54 @@
       <Project>{88F1A057-74BE-FB62-9DD7-E90A890331F1}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\fonts\Bitcount\BitcountGridDouble-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf" />
+    <Content Include="assets\fonts\Bitcount\OFL.txt" />
+    <Content Include="assets\fonts\Bitcount\README.txt" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Black.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Bold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-ExtraBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-ExtraLight.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Light.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Medium.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Regular.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-SemiBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble-Thin.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Black.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Bold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-ExtraBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-ExtraLight.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Light.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Medium.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Regular.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-SemiBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Cursive-Thin.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Black.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Bold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-ExtraBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-ExtraLight.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Light.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Medium.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Regular.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-SemiBold.ttf" />
+    <Content Include="assets\fonts\Bitcount\static\BitcountGridDouble_Roman-Thin.ttf" />
+    <Content Include="assets\fonts\Story_Script\OFL.txt" />
+    <Content Include="assets\fonts\Story_Script\StoryScript-Regular.ttf" />
+    <Content Include="assets\game\textures\RPGpack_sheet_2X.png" />
+    <Content Include="assets\scenes\2dphysics.hrs" />
+    <Content Include="assets\scenes\Example.hrs" />
+    <Content Include="assets\scenes\sadadas.hrs" />
+    <Content Include="assets\scenes\suprize.hrs" />
+    <Content Include="assets\scenes\test.hrs" />
+    <Content Include="assets\shaders\Circle_Texture2D.glsl" />
+    <Content Include="assets\shaders\Quad_Texture2D.glsl" />
+    <Content Include="assets\textures\Checkerboard.png" />
+    <Content Include="assets\textures\fileIcon.png" />
+    <Content Include="assets\textures\folderIcon.png" />
+    <Content Include="assets\textures\joseMourinho.png" />
+    <Content Include="assets\textures\StartButton.png" />
+    <Content Include="assets\textures\stopButton.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

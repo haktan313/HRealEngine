@@ -11,6 +11,7 @@
 
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
+#include "box2d/b2_circle_shape.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
 
@@ -79,9 +80,11 @@ namespace HRealEngine
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         
         return newScene;
     }
@@ -142,6 +145,22 @@ namespace HRealEngine
                 fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
                 body->CreateFixture(&fixtureDef);
             }
+            if (entity.HasComponent<CircleCollider2DComponent>())
+            {
+                auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
+
+                b2CircleShape shape;
+                shape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+                shape.m_radius = cc2d.Radius * transform.Scale.x;
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &shape;
+                fixtureDef.density = cc2d.Density;
+                fixtureDef.friction = cc2d.Friction;
+                fixtureDef.restitution = cc2d.Restitution;
+                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+                body->CreateFixture(&fixtureDef);
+            }
         }
     }
 
@@ -155,12 +174,22 @@ namespace HRealEngine
     void Scene::OnUpdateEditor(Timestep deltaTime, EditorCamera& camera)
     {
         Renderer2D::BeginScene(camera);
-        auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-        for (auto entity : group)
         {
-            auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-            //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-            Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+            auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            for (auto entity : group)
+            {
+                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+                Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+            }
+        }
+        {
+            auto view = registry.view<TransformComponent, CircleRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+            }
         }
         Renderer2D::EndScene();
     }
@@ -218,12 +247,23 @@ namespace HRealEngine
         
         if (!mainCamera)
             return;
+        
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
-        auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-        for (auto entity : group)
         {
-            auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-            Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+            auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            for (auto entity : group)
+            {
+                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+            }
+        }
+        {
+            auto view = registry.view<TransformComponent, CircleRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+            }
         }
         Renderer2D::EndScene();
     }
@@ -262,9 +302,11 @@ namespace HRealEngine
         CopyComponentIfExist<TransformComponent>(newEntity, entity);
         CopyComponentIfExist<CameraComponent>(newEntity, entity);
         CopyComponentIfExist<SpriteRendererComponent>(newEntity, entity);
+        CopyComponentIfExist<CircleRendererComponent>(newEntity, entity);
         CopyComponentIfExist<NativeScriptComponent>(newEntity, entity);
         CopyComponentIfExist<Rigidbody2DComponent>(newEntity, entity);
         CopyComponentIfExist<BoxCollider2DComponent>(newEntity, entity);
+        CopyComponentIfExist<CircleCollider2DComponent>(newEntity, entity);
     }
 
     bool Scene::DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale)
@@ -354,5 +396,12 @@ namespace HRealEngine
     void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
     {
     }
-    
+    template<>
+    void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
+    {
+    }
 }

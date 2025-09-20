@@ -11,19 +11,23 @@
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj.filters" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine.sln" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj.filters" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/FlatColor.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Circle_Texture2D.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Texture.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Texture2D.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/EditorCamera.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/EditorCamera.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Components.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Components.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/Glad/Glad.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/Glad/Glad.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/Glad/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/Glad/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/premake5.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/yaml-cpp.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/yaml-cpp.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +41,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Texture.glsl" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://28" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Texture2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -255,6 +260,7 @@
       <workItem from="1758298408219" duration="15376000" />
       <workItem from="1758373458301" duration="10213000" />
       <workItem from="1758384499623" duration="903000" />
+      <workItem from="1758385423079" duration="7236000" />
     </task>
     <servers />
   </component>

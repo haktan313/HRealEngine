@@ -153,6 +153,16 @@ namespace HRealEngine
             out << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << sprite.Color.r << sprite.Color.g << sprite.Color.b << sprite.Color.a << YAML::EndSeq;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<CircleRendererComponent>())
+        {
+            auto& circle = entity.GetComponent<CircleRendererComponent>();
+            out << YAML::Key << "CircleRendererComponent";
+            out << YAML::BeginMap;
+            out << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << circle.Color.r << circle.Color.g << circle.Color.b << circle.Color.a << YAML::EndSeq;
+            out << YAML::Key << "Thickness" << YAML::Value << circle.Thickness;
+            out << YAML::Key << "Fade" << YAML::Value << circle.Fade;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<CameraComponent>())
         {
             out << YAML::Key << "CameraComponent";
@@ -196,6 +206,19 @@ namespace HRealEngine
             out << YAML::Key << "Restitution" << YAML::Value << bc2d.Restitution;
             out << YAML::Key << "RestitutionThreshold" << YAML::Value << bc2d.RestitutionThreshold;
             
+            out << YAML::EndMap;
+        }
+        if (entity.HasComponent<CircleCollider2DComponent>())
+        {
+            out << YAML::Key << "CircleCollider2DComponent";
+            out << YAML::BeginMap;
+            auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
+            out << YAML::Key << "Offset" << YAML::Value << cc2d.Offset;
+            out << YAML::Key << "Radius" << YAML::Value << cc2d.Radius;
+            out << YAML::Key << "Density" << YAML::Value << cc2d.Density;
+            out << YAML::Key << "Friction" << YAML::Value << cc2d.Friction;
+            out << YAML::Key << "Restitution" << YAML::Value << cc2d.Restitution;
+            out << YAML::Key << "RestitutionThreshold" << YAML::Value << cc2d.RestitutionThreshold;
             out << YAML::EndMap;
         }
         
@@ -293,6 +316,13 @@ namespace HRealEngine
                     auto& sprite = deserializedEntity.AddComponent<SpriteRendererComponent>();
                     sprite.Color = spriteRendererComponent["Color"].as<glm::vec4>();
                 }
+                if (auto circleRendererComponent = entity["CircleRendererComponent"])
+                {
+                    auto& circle = deserializedEntity.AddComponent<CircleRendererComponent>();
+                    circle.Color = circleRendererComponent["Color"].as<glm::vec4>();
+                    circle.Thickness = circleRendererComponent["Thickness"].as<float>();
+                    circle.Fade = circleRendererComponent["Fade"].as<float>();
+                }
                 if (auto rb2dComponent = entity["Rigidbody2DComponent"])
                 {
                     auto& rb2d = deserializedEntity.AddComponent<Rigidbody2DComponent>();
@@ -308,6 +338,16 @@ namespace HRealEngine
                     bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
                     bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
                     bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+                }
+                if (auto circleCollider2DComponent = entity["CircleCollider2DComponent"])
+                {
+                    auto& cc2d = deserializedEntity.AddComponent<CircleCollider2DComponent>();
+                    cc2d.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+                    cc2d.Radius = circleCollider2DComponent["Radius"].as<float>();
+                    cc2d.Density = circleCollider2DComponent["Density"].as<float>();
+                    cc2d.Friction = circleCollider2DComponent["Friction"].as<float>();
+                    cc2d.Restitution = circleCollider2DComponent["Restitution"].as<float>();
+                    cc2d.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
                 }
             }
         }
