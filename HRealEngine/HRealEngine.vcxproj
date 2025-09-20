@@ -176,6 +176,7 @@
     <ClInclude Include="src\HRealEngine\Renderer\Shader.h" />
     <ClInclude Include="src\HRealEngine\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\HRealEngine\Renderer\Texture.h" />
+    <ClInclude Include="src\HRealEngine\Renderer\UniformBuffer.h" />
     <ClInclude Include="src\HRealEngine\Renderer\VertexArray.h" />
     <ClInclude Include="src\HRealEngine\Scene\Components.h" />
     <ClInclude Include="src\HRealEngine\Scene\Entity.h" />
@@ -191,9 +192,9 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLUniformBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
-    <ClInclude Include="src\Platform\Windows\WindowsPlatformUtils.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -636,8 +637,8 @@
     <ClCompile Include="src\HRealEngine\Renderer\Shader.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Texture.cpp" />
+    <ClCompile Include="src\HRealEngine\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\VertexArray.cpp" />
-    <ClCompile Include="src\HRealEngine\Scene\Components.cpp" />
     <ClCompile Include="src\HRealEngine\Scene\Entity.cpp" />
     <ClCompile Include="src\HRealEngine\Scene\Scene.cpp" />
     <ClCompile Include="src\HRealEngine\Scene\SceneCamera.cpp" />
@@ -649,6 +650,7 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLUniformBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />

@@ -5,6 +5,9 @@
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "VertexArray.h"
+#include "UniformBuffer.h"
+
+#include <glm/gtc/type_ptr.hpp>
 #include "glm/ext/matrix_transform.hpp"
 
 namespace HRealEngine
@@ -42,6 +45,13 @@ namespace HRealEngine
         glm::vec4 QuadVertexPositions[4];
         
         Renderer2D::Statistics stats;
+
+        struct CameraData
+        {
+            glm::mat4 ViewProjectionMatrix;
+        };
+        CameraData CameraBuffer;
+        Ref<UniformBuffer> CameraUniformBuffer;
     };
     static Renderer2DData s_Data;
     
@@ -84,11 +94,10 @@ namespace HRealEngine
         int32_t samplers[s_Data.MaxTextureSlots];
         for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
             samplers[i] = i;
-
-        //s_Data.TextureShader = Shader::Create("assets/shaders/FlatColor.glsl");
+        
         s_Data.TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-        s_Data.TextureShader->Bind();
-        s_Data.TextureShader->SetIntArray("u_textureSamplers", samplers, s_Data.MaxTextureSlots);
+        /*s_Data.TextureShader->Bind();
+        s_Data.TextureShader->SetIntArray("u_textureSamplers", samplers, s_Data.MaxTextureSlots);*/
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
@@ -96,6 +105,8 @@ namespace HRealEngine
         s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f};
         s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f};
         s_Data.QuadVertexPositions[3] = {-0.5f,  0.5f, 0.0f, 1.0f};
+
+        s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
     }
 
     void Renderer2D::Shutdown()
@@ -107,26 +118,31 @@ namespace HRealEngine
         s_Data.TextureShader->Bind();
         s_Data.TextureShader->SetMat4("u_ViewProjectionMatrix", camera.GetViewProjectionMatrix());
 
-        s_Data.QuadIndexCount = 0;
-        s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-        s_Data.TextureSlotIndex = 1;
+        StartBatch();
     }
 
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
-        s_Data.TextureShader->Bind();
-        s_Data.TextureShader->SetMat4("u_ViewProjectionMatrix", camera.GetViewProjectionMatrix());
+        /*s_Data.TextureShader->Bind();
+        s_Data.TextureShader->SetMat4("u_ViewProjectionMatrix", camera.GetViewProjectionMatrix());*/
+        s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
-        s_Data.QuadIndexCount = 0;
-        s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-        s_Data.TextureSlotIndex = 1;
+        StartBatch();
     }
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
-        s_Data.TextureShader->Bind();
-        s_Data.TextureShader->SetMat4("u_ViewProjectionMatrix", camera.GetProjectionMatrix() * glm::inverse(transform));
+        /*s_Data.TextureShader->Bind();
+        s_Data.TextureShader->SetMat4("u_ViewProjectionMatrix", camera.GetProjectionMatrix() * glm::inverse(transform));*/
+        s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetProjectionMatrix() * glm::inverse(transform);
+        s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
+        StartBatch();
+    }
+
+    void Renderer2D::StartBatch()
+    {
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
         s_Data.TextureSlotIndex = 1;
@@ -142,9 +158,15 @@ namespace HRealEngine
     void Renderer2D::Flush()
     {
         if (s_Data.QuadIndexCount == 0)
-            return; 
+            return;
+
+        uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+        s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
+        
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
             s_Data.TextureSlots[i]->Bind(i);
+
+        s_Data.TextureShader->Bind();
         RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
         s_Data.stats.DrawCalls++;
     }
@@ -152,9 +174,7 @@ namespace HRealEngine
     void Renderer2D::FlushAndReset()
     {
         EndScene();
-        s_Data.QuadIndexCount = 0;
-        s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-        s_Data.TextureSlotIndex = 1;
+        StartBatch();
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)

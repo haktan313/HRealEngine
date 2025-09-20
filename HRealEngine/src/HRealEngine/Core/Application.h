@@ -12,10 +12,21 @@
 
 namespace HRealEngine
 {
+	struct AppCommandLineArgs
+	{
+		int Count = 0;
+		char** Args = nullptr;
+
+		const char* operator[](int index) const
+		{
+			HREALENGINE_CORE_DEBUGBREAK(index < Count);
+			return Args[index];
+		}
+	};
 	class HREALENGINE_API Application
 	{
 	public:
-		Application(const std::string& name = "HRealEngine App");
+		Application(const std::string& name = "HRealEngine App", AppCommandLineArgs args = AppCommandLineArgs());
 		virtual ~Application();
 
 		void Run();
@@ -29,9 +40,13 @@ namespace HRealEngine
 		inline Window& GetWindow() { return *windowRef; }
 		ImGuiLayer* GetImGuiLayer() { return imGuiLayerRef; }
 		inline static Application& Get() { return *InstanceOfApp; }
+
+		AppCommandLineArgs GetCommandLineArgs() const { return commandLineArgs; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& eventRef);
 		bool OnWindowResize(WindowResizeEvent& eventRef);
+
+		AppCommandLineArgs commandLineArgs;
 		std::unique_ptr<Window> windowRef;
 		ImGuiLayer* imGuiLayerRef;
 		bool bRunning = true;
@@ -41,5 +56,5 @@ namespace HRealEngine
 		float lastFrameTime = 0.0f;
 		
 	};
-	Application* CreateApplication(); 
+	Application* CreateApplication(AppCommandLineArgs args); 
 }

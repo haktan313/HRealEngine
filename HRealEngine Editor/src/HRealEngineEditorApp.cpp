@@ -11,7 +11,7 @@ namespace HRealEngine
 	class HRealEngineEditorApp : public Application
 	{
 	public:
-		HRealEngineEditorApp() : Application("HRealEngine Editor")
+		HRealEngineEditorApp(AppCommandLineArgs args) : Application("HRealEngine Editor", args)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -21,8 +21,8 @@ namespace HRealEngine
 		}
 	};
 
-	Application* CreateApplication()
+	Application* CreateApplication(AppCommandLineArgs args)
 	{
-		return new HRealEngineEditorApp();
+		return new HRealEngineEditorApp(args); 
 	}
 }

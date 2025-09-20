@@ -11,7 +11,8 @@ namespace HRealEngine
 {
 	Application* Application::InstanceOfApp = nullptr;
 
-	Application::Application(const std::string& name)
+	Application::Application(const std::string& name, AppCommandLineArgs args)
+		: commandLineArgs(args)
 	{
 		HREALENGINE_CORE_DEBUGBREAK(!InstanceOfApp, "App already exist!");
 		InstanceOfApp = this;

@@ -19,6 +19,7 @@ namespace HRealEngine
         static void BeginScene(const OrthCamera& camera);
         static void BeginScene(const EditorCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void StartBatch();
         static void EndScene();
         static void Flush();
 

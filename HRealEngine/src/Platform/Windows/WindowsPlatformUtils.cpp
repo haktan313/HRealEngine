@@ -1,12 +1,13 @@
+
 #include "HRpch.h"
-#include "WindowsPlatformUtils.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
+#include "HRealEngine/Core/Application.h"
+
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
-#include "HRealEngine/Core/Application.h"
 
 namespace HRealEngine
 {

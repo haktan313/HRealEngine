@@ -51,6 +51,15 @@ namespace HRealEngine
         m_Particle.Position = { 0.0f, 0.0f };*/
 
         activeSceneRef = CreateRef<Scene>();
+
+        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        if (commandLineArgs.Count > 1)
+        {
+            auto scenePath = commandLineArgs[1];
+            SceneSerializer serializer(activeSceneRef);
+            serializer.Deserialize(scenePath);
+        }
+        
         m_EditorCamera = EditorCamera(30.f, 1.778f/*1920/1080*/, 0.1f, 1000.f);
         
         /*
@@ -560,8 +569,8 @@ namespace HRealEngine
 
         float size = ImGui::GetWindowHeight() - 4.0f;
         Ref<Texture2D> icon = m_SceneState == SceneState::Editor ? iconPlayRef : iconStopRef;
-        //ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-        ImGui::SetCursorPosX(.0f);
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+        //ImGui::SetCursorPosX(.0f);
         if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
         {
             if (m_SceneState == SceneState::Editor)

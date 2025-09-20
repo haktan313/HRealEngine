@@ -323,7 +323,8 @@ namespace HRealEngine
     template<>
     void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
     {
-        component.Camera.SetViewportSize(viewportWidth, viewportHeight);
+        if (viewportWidth > 0 && viewportHeight > 0)
+            component.Camera.SetViewportSize(viewportWidth, viewportHeight);
     }
     template<>
     void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
