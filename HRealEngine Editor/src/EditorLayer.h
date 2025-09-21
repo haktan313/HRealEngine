@@ -41,6 +41,7 @@ namespace HRealEngine
         void SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path);
 
         void OnScenePlay();
+        void OnSceneSimulate();
         void OnSceneStop();
 
         void OnDuplicateEntity();
@@ -50,7 +51,8 @@ namespace HRealEngine
         enum class SceneState
         {
             Editor = 0,
-            Runtime = 1
+            Runtime = 1,
+            Simulate = 2
         };
         SceneState m_SceneState = SceneState::Editor;
         
@@ -79,6 +81,7 @@ namespace HRealEngine
 
         Ref<Texture2D> iconPlayRef;
         Ref<Texture2D> iconStopRef;
+        Ref<Texture2D> iconSimulateRef;
         
         Ref<SubTexture2D> textureStairs;
         Ref<SubTexture2D> textureTree;

@@ -10,20 +10,13 @@
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Circle_Texture2D.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Circle_Shader2D.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Texture2D.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
@@ -41,7 +34,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://40" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://56" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -260,7 +253,7 @@
       <workItem from="1758298408219" duration="15376000" />
       <workItem from="1758373458301" duration="10213000" />
       <workItem from="1758384499623" duration="903000" />
-      <workItem from="1758385423079" duration="10770000" />
+      <workItem from="1758385423079" duration="20738000" />
     </task>
     <servers />
   </component>

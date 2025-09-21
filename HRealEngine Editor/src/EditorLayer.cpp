@@ -50,7 +50,9 @@ namespace HRealEngine
         m_Particle.VelocityVariation = { 3.0f, 1.0f };
         m_Particle.Position = { 0.0f, 0.0f };*/
 
-        activeSceneRef = CreateRef<Scene>();
+        //activeSceneRef = CreateRef<Scene>();
+        editorSceneRef = CreateRef<Scene>();
+        activeSceneRef = editorSceneRef;
 
         auto commandLineArgs = Application::Get().GetCommandLineArgs();
         if (commandLineArgs.Count > 1)
@@ -95,6 +97,7 @@ namespace HRealEngine
         */
         iconPlayRef = Texture2D::Create("assets/textures/StartButton.png");
         iconStopRef = Texture2D::Create("assets/textures/stopButton.png");
+        iconSimulateRef = Texture2D::Create("assets/textures/SimulateButton.png");
         sceneHierarchyPanelRef.SetContext(activeSceneRef);
     }
 
@@ -170,7 +173,7 @@ namespace HRealEngine
         //Renderer2D::BeginScene(orthCameraControllerRef.GetCamera());
         //activeSceneRef->OnUpdateRuntime(timestep);
         //activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
-        if (m_SceneState == SceneState::Runtime)
+        /*if (m_SceneState == SceneState::Runtime)
             activeSceneRef->OnUpdateRuntime(timestep);
         else if (m_SceneState == SceneState::Editor)
         {
@@ -178,8 +181,33 @@ namespace HRealEngine
                 orthCameraControllerRef.OnUpdate(timestep);
             m_EditorCamera.OnUpdate(timestep);
             activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
-        }
+        }*/
         //Renderer2D::EndScene();
+
+        switch (m_SceneState)
+        {
+            case SceneState::Editor:
+            {
+                if (m_ViewportFocused)
+                    orthCameraControllerRef.OnUpdate(timestep);
+                m_EditorCamera.OnUpdate(timestep);
+                activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
+                break;
+            }
+            case SceneState::Runtime:
+            {
+                activeSceneRef->OnUpdateRuntime(timestep);
+                break;
+            }
+            case SceneState::Simulate:
+            {
+                if (m_ViewportFocused)
+                    orthCameraControllerRef.OnUpdate(timestep);
+                m_EditorCamera.OnUpdate(timestep);
+                activeSceneRef->OnUpdateSimulation(timestep, m_EditorCamera);
+                break;
+            }
+        }
 
         auto [mx, my] = ImGui::GetMousePos();
         mx -= m_ViewportBounds[0].x;
@@ -474,6 +502,8 @@ namespace HRealEngine
         if (m_SceneState == SceneState::Runtime)
         {
             Entity cameraEntity = activeSceneRef->GetPrimaryCameraEntity();
+            if (!cameraEntity)
+                return;
             Renderer2D::BeginScene(cameraEntity.GetComponent<CameraComponent>().Camera, cameraEntity.GetComponent<TransformComponent>().GetTransform());
         }else
             Renderer2D::BeginScene(m_EditorCamera);
@@ -485,8 +515,12 @@ namespace HRealEngine
                 for (auto entity : view)
                 {
                     auto [boxCollider, transform] = view.get<BoxCollider2DComponent, TransformComponent>(entity);
-                    glm::mat4 colliderTransform = transform.GetTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(boxCollider.Offset, 0.001f)) *
-                        glm::scale(glm::mat4(1.0f), glm::vec3(boxCollider.Size * 2.0f, 1.0f));
+                    glm::vec3 pos = transform.Position + glm::vec3(boxCollider.Offset, 0.001f);
+                    glm::vec3 scale = transform.Scale * glm::vec3(boxCollider.Size * 2.0f, 1.0f);
+                    glm::vec3 rotation = transform.Rotation;
+                    glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0f), pos) *
+                        glm::rotate(glm::mat4(1.0f), rotation.z, { 0.0f, 0.0f, 1.0f }) *
+                        glm::scale(glm::mat4(1.0f), scale);
                     Renderer2D::DrawRect(colliderTransform, { 0.f, 1.f, 0.f, 1.f });
                 }
             }
@@ -569,6 +603,8 @@ namespace HRealEngine
 
     void EditorLayer::OnScenePlay()
     {
+        if (m_SceneState == SceneState::Simulate)
+            OnSceneStop();
         m_SceneState = SceneState::Runtime;
         
         activeSceneRef = Scene::Copy(editorSceneRef);
@@ -577,11 +613,27 @@ namespace HRealEngine
         sceneHierarchyPanelRef.SetContext(activeSceneRef);
     }
 
+    void EditorLayer::OnSceneSimulate()
+    {
+        if (m_SceneState == SceneState::Runtime)
+            OnSceneStop();
+        m_SceneState = SceneState::Simulate;
+
+        activeSceneRef = Scene::Copy(editorSceneRef);
+        activeSceneRef->OnSimulationStart();
+
+        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+    }
+
     void EditorLayer::OnSceneStop() 
     {
+        if (m_SceneState == SceneState::Runtime)
+            activeSceneRef->OnRuntimeStop();
+        else if (m_SceneState == SceneState::Simulate)
+            activeSceneRef->OnSimulationStop();
+        
         m_SceneState = SceneState::Editor;
         
-        activeSceneRef->OnRuntimeStop();
         activeSceneRef = editorSceneRef;
         
         sceneHierarchyPanelRef.SetContext(activeSceneRef);
@@ -608,16 +660,35 @@ namespace HRealEngine
 
         ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
+        bool bToolbarEnabled = (bool)activeSceneRef;
+        ImVec4 tintColor = ImVec4(1,1,1,1);
+        if (!bToolbarEnabled)
+            tintColor.w = 0.5f;
+
         float size = ImGui::GetWindowHeight() - 4.0f;
-        Ref<Texture2D> icon = m_SceneState == SceneState::Editor ? iconPlayRef : iconStopRef;
-        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-        //ImGui::SetCursorPosX(.0f);
-        if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1)))
         {
-            if (m_SceneState == SceneState::Editor)
-                OnScenePlay();
-            else if (m_SceneState == SceneState::Runtime)
-                OnSceneStop();
+            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? iconPlayRef : iconStopRef;
+            ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+            if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
+                && bToolbarEnabled)
+            {
+                if (m_SceneState == SceneState::Editor)
+                    OnScenePlay();
+                else if (m_SceneState == SceneState::Runtime)
+                    OnSceneStop();
+            }
+        }
+        ImGui::SameLine();
+        {
+            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? iconSimulateRef : iconStopRef;
+            if (ImGui::ImageButton("##simulate", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
+                && bToolbarEnabled)
+            {
+                if (m_SceneState == SceneState::Editor)
+                    OnSceneSimulate();
+                else if (m_SceneState == SceneState::Simulate)
+                    OnSceneStop();
+            }
         }
         ImGui::PopStyleVar(2);
         ImGui::PopStyleColor(3);

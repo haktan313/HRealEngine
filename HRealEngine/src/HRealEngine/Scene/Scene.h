@@ -29,8 +29,12 @@ namespace HRealEngine
 
         void OnRuntimeStart();
         void OnRuntimeStop();
+
+        void OnSimulationStart();
+        void OnSimulationStop();
         
         void OnUpdateEditor(Timestep deltaTime, EditorCamera& camera);
+        void OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera);
         void OnUpdateRuntime(Timestep deltaTime);
         void OnViewportResize(uint32_t width, uint32_t height);
         Entity GetPrimaryCameraEntity();
@@ -40,6 +44,9 @@ namespace HRealEngine
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
+        void OnPhysics2DStart();
+        void OnPhysics2DStop();
+        void RenderScene(EditorCamera& camera);
 
         b2World* m_PhysicsWorld = nullptr;
         
