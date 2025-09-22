@@ -207,6 +207,7 @@
     <Content Include="assets\textures\fileIcon.png" />
     <Content Include="assets\textures\folderIcon.png" />
     <Content Include="assets\textures\joseMourinho.png" />
+    <Content Include="assets\textures\SimulateButton.png" />
     <Content Include="assets\textures\StartButton.png" />
     <Content Include="assets\textures\stopButton.png" />
   </ItemGroup>

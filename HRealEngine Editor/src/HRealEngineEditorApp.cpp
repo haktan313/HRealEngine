@@ -11,18 +11,18 @@ namespace HRealEngine
 	class HRealEngineEditorApp : public Application
 	{
 	public:
-		HRealEngineEditorApp(AppCommandLineArgs args) : Application("HRealEngine Editor", args)
+		HRealEngineEditorApp(const ApplicationSpecification& spec) : Application(spec)
 		{
 			PushLayer(new EditorLayer());
-		}
-		~HRealEngineEditorApp()
-		{
-
 		}
 	};
 
 	Application* CreateApplication(AppCommandLineArgs args)
 	{
-		return new HRealEngineEditorApp(args); 
+		ApplicationSpecification spec;
+		spec.Name = "HRealEngine Editor";
+		spec.CommandLineArgs = args;
+		
+		return new HRealEngineEditorApp(spec); 
 	}
 }

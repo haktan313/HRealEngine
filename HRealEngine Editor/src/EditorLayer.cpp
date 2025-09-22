@@ -54,7 +54,7 @@ namespace HRealEngine
         editorSceneRef = CreateRef<Scene>();
         activeSceneRef = editorSceneRef;
 
-        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
             auto scenePath = commandLineArgs[1];
@@ -99,6 +99,7 @@ namespace HRealEngine
         iconStopRef = Texture2D::Create("assets/textures/stopButton.png");
         iconSimulateRef = Texture2D::Create("assets/textures/SimulateButton.png");
         sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        Renderer2D::SetLineWidth(4.f);
     }
 
     void EditorLayer::OnDetach()
@@ -315,6 +316,10 @@ namespace HRealEngine
                 {
                     OpenScene();
                 }
+                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                {
+                    SaveScene();
+                }
                 if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                 {
                     SaveSceneAs();
@@ -437,7 +442,8 @@ namespace HRealEngine
     void EditorLayer::OnEvent(EventBase& eventRef)
     {
         orthCameraControllerRef.OnEvent(eventRef);
-        m_EditorCamera.OnEvent(eventRef);
+        if (m_SceneState == SceneState::Editor)
+            m_EditorCamera.OnEvent(eventRef);
 
         EventDispatcher dispatcher(eventRef);
         dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -446,7 +452,7 @@ namespace HRealEngine
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
     {
-        if (event.GetRepeatCount() > 0)
+        if (event.IsRepeating())
             return false;
         bool bControlPressed = Input::IsKeyPressed(HR_KEY_LEFT_CONTROL) || Input::IsKeyPressed(HR_KEY_RIGHT_CONTROL);
         bool bShiftPressed = Input::IsKeyPressed(HR_KEY_LEFT_SHIFT) || Input::IsKeyPressed(HR_KEY_RIGHT_SHIFT);
@@ -531,8 +537,17 @@ namespace HRealEngine
                     auto [circleCollider, transform] = view.get<CircleCollider2DComponent, TransformComponent>(entity);
                     glm::mat4 colliderTransform = transform.GetTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(circleCollider.Offset, 0.001f)) *
                         glm::scale(glm::mat4(1.0f), glm::vec3(circleCollider.Radius * 2.0f));
-                    Renderer2D::DrawCircle(colliderTransform, { 0.f, 1.f, 0.f, 1.f }, 0.05f);
+                    Renderer2D::DrawCircle(colliderTransform, { 0.f, 1.f, 0.f, 1.f }, 0.01f);
                 }
+            }
+        }
+
+        if (Entity selectedEntity = sceneHierarchyPanelRef.GetSelectedEntity())
+        {
+            if (selectedEntity.HasComponent<TransformComponent>())
+            {
+                TransformComponent transformComponent = selectedEntity.GetComponent<TransformComponent>();
+                Renderer2D::DrawRect(transformComponent.GetTransform(), glm::vec4(1.0f,0.5f,0.0f,1.0f));
             }
         }
         Renderer2D::EndScene();

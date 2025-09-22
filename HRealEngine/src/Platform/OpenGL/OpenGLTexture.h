@@ -22,8 +22,9 @@ namespace HRealEngine
         virtual uint32_t GetWidth() const override { return widthRef; }
         virtual uint32_t GetHeight() const override { return heightRef; }
         virtual uint32_t GetRendererID() const override { return rendererID; }
+        virtual const std::string& GetPath() const override { return filePath; }
 
-        virtual bool operator==(const Texture& other) const override {return rendererID == ((OpenGLTexture2D&)other).rendererID; }
+        virtual bool operator==(const Texture& other) const override {return rendererID == other.GetRendererID(); }
     private:
         bool m_IsLoaded = false;
         std::string filePath;

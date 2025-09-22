@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <xhash>
+#include <cstdio>
 
 namespace HRealEngine
 {
@@ -21,14 +21,17 @@ namespace HRealEngine
 
 namespace std
 {
+    template<typename T> struct hash;
+    
     template<>
     struct hash<HRealEngine::UUID>
     {
         std::size_t operator()(const HRealEngine::UUID& uuid) const
         {
-            std::hash<uint64_t> hasherDummy;
+            /*std::hash<uint64_t> hasherDummy;
             uint64_t id = (uint64_t)uuid;
-            return hasherDummy(id);
+            return hasherDummy(id);*/
+            return (uint64_t)uuid;
         }
     };
 }

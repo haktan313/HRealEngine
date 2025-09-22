@@ -11,6 +11,11 @@
 
 namespace HRealEngine
 {
+    float Time::GetTime()
+    {
+        return glfwGetTime();
+    }
+
     std::string FileDialogs::OpenFile(const char* filter)
     {
         OPENFILENAMEA ofn;

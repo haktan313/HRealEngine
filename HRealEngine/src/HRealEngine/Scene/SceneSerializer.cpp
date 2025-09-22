@@ -150,7 +150,10 @@ namespace HRealEngine
             auto& sprite = entity.GetComponent<SpriteRendererComponent>();
             out << YAML::Key << "SpriteRendererComponent";
             out << YAML::BeginMap;
-            out << YAML::Key << "Color" << YAML::Value << YAML::Flow << YAML::BeginSeq << sprite.Color.r << sprite.Color.g << sprite.Color.b << sprite.Color.a << YAML::EndSeq;
+            out << YAML::Key << "Color" << YAML::Value << sprite.Color;
+            if (sprite.Texture)
+                out << YAML::Key << "TexturePath" << YAML::Value << sprite.Texture->GetPath();
+            out << YAML::Key << "TilingFactor" << YAML::Value << sprite.TilingFactor;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<CircleRendererComponent>())
@@ -315,6 +318,10 @@ namespace HRealEngine
                 {
                     auto& sprite = deserializedEntity.AddComponent<SpriteRendererComponent>();
                     sprite.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+                    if (spriteRendererComponent["TexturePath"])
+                        sprite.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                    if (spriteRendererComponent["TilingFactor"])
+                        sprite.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {

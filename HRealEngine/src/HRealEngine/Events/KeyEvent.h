@@ -19,17 +19,17 @@ namespace HRealEngine
 	class HREALENGINE_API KeyPressedEvent : public KeyEventBase
 	{
 	public:
-		KeyPressedEvent(int keyCode, int repeatCountRef) : KeyEventBase(keyCode), repeatCount(repeatCountRef) {}
-		inline int GetRepeatCount() const { return repeatCount; }
+		KeyPressedEvent(int keyCode, bool bIsRepeate = false) : KeyEventBase(keyCode), mbIsRepeating(bIsRepeate) {}
+		inline bool IsRepeating() const { return mbIsRepeating; }
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << GetKeyCode() << " (repeat count: " << repeatCount << ")";
+			ss << "KeyPressedEvent: " << GetKeyCode() << "(repeat = " << mbIsRepeating << ")";
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int repeatCount;
+		bool mbIsRepeating;
 	};
 
 	class HREALENGINE_API KeyReleasedEvent : public KeyEventBase

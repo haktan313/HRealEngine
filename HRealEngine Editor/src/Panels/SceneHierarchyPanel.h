@@ -21,6 +21,9 @@ namespace HRealEngine
         void DrawEntityNode(Entity entity);
         void DrawComponents(Entity entity);
         
+        template<typename Component>
+        void ShowAddComponentEntry(const std::string& name);
+        
         Ref<Scene> m_Context;
         Entity m_SelectedEntity;
     };

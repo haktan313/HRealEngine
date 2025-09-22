@@ -2,22 +2,26 @@
 //Application.cpp
 #include "HRpch.h"
 #include "Application.h"
+#include <filesystem>
 #include "Core.h"
-#include "GLFW/glfw3.h"
 #include "HRealEngine/Renderer/Renderer.h"
 #include "HRealEngine/Core/Timestep.h"
+#include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
 {
 	Application* Application::InstanceOfApp = nullptr;
 
-	Application::Application(const std::string& name, AppCommandLineArgs args)
-		: commandLineArgs(args)
+	Application::Application(const ApplicationSpecification& specification)
+		: m_ApplicationSpecification(specification)
 	{
 		HREALENGINE_CORE_DEBUGBREAK(!InstanceOfApp, "App already exist!");
 		InstanceOfApp = this;
 		
-		windowRef = std::unique_ptr<Window>(Window::Create(WindowSettings(name)));
+		if (!m_ApplicationSpecification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_ApplicationSpecification.WorkingDirectory);
+		
+		windowRef = std::unique_ptr<Window>(Window::Create(WindowSettings(m_ApplicationSpecification.Name)));
 		windowRef->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -32,7 +36,7 @@ namespace HRealEngine
 	{
 		while (bRunning)
 		{
-			float time = (float)glfwGetTime();//Platform::GetTime();
+			float time = Time::GetTime();
 			Timestep timestep = time - lastFrameTime;
 			lastFrameTime = time;
 

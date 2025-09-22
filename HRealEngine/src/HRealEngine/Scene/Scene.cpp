@@ -404,7 +404,7 @@ namespace HRealEngine
     template <typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {
-        static_assert(false, "Unsupported component type added to entity");
+        static_assert(sizeof(T) == 0);
     }
     template<>
     void Scene::OnComponentAdded<EntityIDComponent>(Entity entity, EntityIDComponent& component)

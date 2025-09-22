@@ -220,54 +220,12 @@ namespace HRealEngine
             ImGui::OpenPopup("AddComponent");
         if (ImGui::BeginPopup("AddComponent"))
         {  
-            if (!m_SelectedEntity.HasComponent<CameraComponent>())
-            {
-                if (ImGui::MenuItem("Camera"))
-                {
-                    m_SelectedEntity.AddComponent<CameraComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
-            if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
-            {
-                if (ImGui::MenuItem("Sprite Renderer"))
-                {
-                    m_SelectedEntity.AddComponent<SpriteRendererComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
-            if (!m_SelectedEntity.HasComponent<CircleRendererComponent>())
-            {
-                if (ImGui::MenuItem("Circle Renderer"))
-                {
-                    m_SelectedEntity.AddComponent<CircleRendererComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
-            if (!m_SelectedEntity.HasComponent<Rigidbody2DComponent>())
-            {
-                if (ImGui::MenuItem("Rigidbody 2D"))
-                {
-                    m_SelectedEntity.AddComponent<Rigidbody2DComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
-            if (!m_SelectedEntity.HasComponent<BoxCollider2DComponent>())
-            {
-                if (ImGui::MenuItem("Box Collider 2D"))
-                {
-                    m_SelectedEntity.AddComponent<BoxCollider2DComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
-            if (!m_SelectedEntity.HasComponent<CircleCollider2DComponent>())
-            {
-                if (ImGui::MenuItem("Circle Collider 2D"))
-                {
-                    m_SelectedEntity.AddComponent<CircleCollider2DComponent>();
-                    ImGui::CloseCurrentPopup();
-                }
-            }
+            ShowAddComponentEntry<CameraComponent>("Camera Component");
+            ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
+            ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
+            ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
+            ShowAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
+            ShowAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
             ImGui::EndPopup();
         }
 
@@ -400,5 +358,17 @@ namespace HRealEngine
             ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);
             ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.1f, 0.0f, 100.0f);
         });
+    }
+    template<typename Component>
+    void SceneHierarchyPanel::ShowAddComponentEntry(const std::string& name)
+    {
+        if (!m_SelectedEntity.HasComponent<Component>())
+        {
+            if (ImGui::MenuItem(name.c_str()))
+            {
+                m_SelectedEntity.AddComponent<Component>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
     }
 }

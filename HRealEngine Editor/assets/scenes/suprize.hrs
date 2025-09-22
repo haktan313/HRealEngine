@@ -2,6 +2,17 @@ Scene: Untitled
 Entities:
   - Entity: 12312312312
     TagComponent:
+      Tag: JOSEEEE
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\textures\joseMourinho.png
+      TilingFactor: 1
+  - Entity: 12312312312
+    TagComponent:
       Tag: Camer
     TransformComponent:
       Position: [0, 0, 0]
@@ -18,12 +29,3 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 12312312312
-    TagComponent:
-      Tag: JOSEEEE
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [10, 10, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]

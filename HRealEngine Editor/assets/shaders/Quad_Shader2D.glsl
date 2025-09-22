@@ -95,6 +95,8 @@ void main()
         case 30: texColor *= texture(u_textureSamplers[30], Input.texCoord * Input.tilingFactor); break;
         case 31: texColor *= texture(u_textureSamplers[31], Input.texCoord * Input.tilingFactor); break;
     }
+    if(texColor.a < 0.0)
+        discard;
     v_color = texColor;
     objectID = v_EntityIDOut;
 }

@@ -23,10 +23,16 @@ namespace HRealEngine
 			return Args[index];
 		}
 	};
+	struct ApplicationSpecification
+	{
+		std::string Name = "HRealEngine Application";
+		std::string WorkingDirectory;
+		AppCommandLineArgs CommandLineArgs;
+	};
 	class HREALENGINE_API Application
 	{
 	public:
-		Application(const std::string& name = "HRealEngine App", AppCommandLineArgs args = AppCommandLineArgs());
+		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
 
 		void Run();
@@ -41,12 +47,12 @@ namespace HRealEngine
 		ImGuiLayer* GetImGuiLayer() { return imGuiLayerRef; }
 		inline static Application& Get() { return *InstanceOfApp; }
 
-		AppCommandLineArgs GetCommandLineArgs() const { return commandLineArgs; }
+		const ApplicationSpecification& GetSpecification() const { return m_ApplicationSpecification; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& eventRef);
 		bool OnWindowResize(WindowResizeEvent& eventRef);
 
-		AppCommandLineArgs commandLineArgs;
+		ApplicationSpecification m_ApplicationSpecification;
 		std::unique_ptr<Window> windowRef;
 		ImGuiLayer* imGuiLayerRef;
 		bool bRunning = true;
