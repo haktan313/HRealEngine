@@ -1,10 +1,8 @@
 
-//HRealEngineEditorApp.cpp
+
 #include "HRealEngine.h"
-#include "HRealEngine/Core/EntryPoint.h"
 #include "EditorLayer.h"
-#include "imgui/imgui.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include <imgui/imgui.h>
 
 namespace HRealEngine
 {

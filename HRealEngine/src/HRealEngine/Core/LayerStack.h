@@ -1,5 +1,5 @@
 
-//LayerStack.h
+
 #pragma once
 #include "Core.h"
 #include "Layer.h"
@@ -9,7 +9,7 @@ namespace HRealEngine
 	class HREALENGINE_API LayerStack
 	{
 	public:
-		LayerStack();
+		LayerStack() = default;
 		~LayerStack();
 
 		void PushLayer(Layer* layer);
@@ -17,11 +17,11 @@ namespace HRealEngine
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		std::vector<Layer*>::iterator begin() { return layers.begin(); }
-		std::vector<Layer*>::iterator end() { return layers.end(); }
+		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
+		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
 	private:
-		std::vector<Layer*> layers;
-		unsigned int layerInsertIndex = 0;
+		std::vector<Layer*> m_Layers;
+		unsigned int m_LayerInsertIndex = 0;
 	};
 }
 

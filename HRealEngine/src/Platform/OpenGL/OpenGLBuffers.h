@@ -1,7 +1,7 @@
 
-//OpenGLBuffers.h
+
 #pragma once
-#include <cstdint>
+
 #include "HRealEngine/Renderer/Buffers.h"
 
 namespace HRealEngine
@@ -11,31 +11,31 @@ namespace HRealEngine
     public:
         OpenGLVertexBuffer(float* vertices, uint32_t size);
         OpenGLVertexBuffer(uint32_t size);
-        virtual ~OpenGLVertexBuffer() override;
+        ~OpenGLVertexBuffer() override;
 
-        virtual void Bind() const override;
-        virtual void Unbind() const override;
+        void Bind() const override;
+        void Unbind() const override;
 
-        virtual const BufferLayout& GetLayout() const override { return layoutRef; }
-        virtual void SetLayout(const BufferLayout& layout) override { layoutRef = layout; }
+        const BufferLayout& GetLayout() const override { return m_Layout; }
+        void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-        virtual void SetData(const void* data, uint32_t size) override;
+        void SetData(const void* data, uint32_t size) override;
     private:
-        uint32_t rendererID;
-        BufferLayout layoutRef;
+        uint32_t m_RendererID;
+        BufferLayout m_Layout;
     };
 
     class OpenGLIndexBuffer : public IndexBuffer
     {
     public:
         OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
-        virtual ~OpenGLIndexBuffer() override;
+        ~OpenGLIndexBuffer() override;
 
-        virtual void Bind() const override;
-        virtual void Unbind() const override;
-        virtual uint32_t GetCount() const override { return countRef; }
+        void Bind() const override;
+        void Unbind() const override;
+        uint32_t GetCount() const override { return m_Count; }
     private:
-        uint32_t rendererID;
-        uint32_t countRef;
+        uint32_t m_RendererID;
+        uint32_t m_Count;
     };
 }

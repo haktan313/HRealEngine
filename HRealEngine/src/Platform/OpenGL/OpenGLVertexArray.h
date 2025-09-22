@@ -1,9 +1,6 @@
 
-//OpenGLVertexArray.h
-#pragma once
-#include <memory>
-#include <vector>
 
+#pragma once
 #include "HRealEngine/Renderer/VertexArray.h"
 
 namespace HRealEngine
@@ -14,17 +11,17 @@ namespace HRealEngine
         OpenGLVertexArray();
         virtual ~OpenGLVertexArray();
 
-        virtual void Bind() const override;
-        virtual void Unbind() const override;
+        void Bind() const override;
+        void Unbind() const override;
 
-        virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
-        virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
+        void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+        void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
 
-        virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const override { return vertexBuffers;}
-        virtual const Ref<IndexBuffer>& GetIndexBuffer() const override{ return indexBufferRef;}
+        const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const override { return m_VertexBuffers;}
+        const Ref<IndexBuffer>& GetIndexBuffer() const override{ return m_IndexBuffer;}
     private:
-        std::vector<Ref<VertexBuffer>> vertexBuffers;
-        Ref<IndexBuffer> indexBufferRef;
-        uint32_t rendererID;
+        std::vector<Ref<VertexBuffer>> m_VertexBuffers;
+        Ref<IndexBuffer> m_IndexBuffer;
+        uint32_t m_RendererID, m_VertexBufferIndex;
     };
 }

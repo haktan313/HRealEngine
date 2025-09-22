@@ -1,21 +1,15 @@
 
-//Renderer2D.cpp
+
+#include "HRpch.h"
 #include "Renderer2D.h"
-#include <array>
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "VertexArray.h"
 #include "UniformBuffer.h"
+#include "HRealEngine/Camera/Camera.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Camera.h"
-#include "Camera.h"
-#include "Camera.h"
-#include "Camera.h"
-#include "Camera.h"
-#include "Camera.h"
-#include "glm/ext/matrix_transform.hpp"
+#include <glm/ext/matrix_transform.hpp>
 
 namespace HRealEngine
 {
@@ -55,34 +49,8 @@ namespace HRealEngine
         static const uint32_t MaxVertices = MaxQuads * 4;
         static const uint32_t MaxIndices = MaxQuads * 6;
         static const uint32_t MaxTextureSlots = 32; 
-        
-        Ref<VertexArray> QuadVertexArray;
-        Ref<VertexBuffer> QuadVertexBuffer;
-        Ref<Shader> QuadShader;
-
-        Ref<VertexArray> CircleVertexArray;
-        Ref<VertexBuffer> CircleVertexBuffer;
-        Ref<Shader> CircleShader;
-
-        Ref<VertexArray> LineVertexArray;
-        Ref<VertexBuffer> LineVertexBuffer;
-        Ref<Shader> LineShader;
 
         Ref<Texture2D> WhiteTexture;
-
-        uint32_t QuadIndexCount = 0;
-        QuadVertex* QuadVertexBufferBase = nullptr;
-        QuadVertex* QuadVertexBufferPtr = nullptr;
-        
-        uint32_t CircleIndexCount = 0;
-        CircleVertex* CircleVertexBufferBase = nullptr;
-        CircleVertex* CircleVertexBufferPtr = nullptr;
-
-        uint32_t LineVertexCount = 0;
-        LineVertex* LineVertexBufferBase = nullptr;
-        LineVertex* LineVertexBufferPtr = nullptr;
-        float LineWidth = 2.0f;
-
         std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1; //0 = white texture
 
@@ -96,11 +64,41 @@ namespace HRealEngine
         };
         CameraData CameraBuffer;
         Ref<UniformBuffer> CameraUniformBuffer;
+        
+        //Quad
+        Ref<VertexArray> QuadVertexArray;
+        Ref<VertexBuffer> QuadVertexBuffer;
+        Ref<Shader> QuadShader;
+
+        uint32_t QuadIndexCount = 0;
+        QuadVertex* QuadVertexBufferBase = nullptr;
+        QuadVertex* QuadVertexBufferPtr = nullptr;
+
+        //Circle
+        Ref<VertexArray> CircleVertexArray;
+        Ref<VertexBuffer> CircleVertexBuffer;
+        Ref<Shader> CircleShader;
+
+        uint32_t CircleIndexCount = 0;
+        CircleVertex* CircleVertexBufferBase = nullptr;
+        CircleVertex* CircleVertexBufferPtr = nullptr;
+
+        //Line
+        Ref<VertexArray> LineVertexArray;
+        Ref<VertexBuffer> LineVertexBuffer;
+        Ref<Shader> LineShader;
+
+        uint32_t LineVertexCount = 0;
+        LineVertex* LineVertexBufferBase = nullptr;
+        LineVertex* LineVertexBufferPtr = nullptr;
+        float LineWidth = 2.0f;
+        
     };
     static Renderer2DData s_Data;
     
     void Renderer2D::Init()
     {
+        //Quad
         s_Data.QuadVertexArray = VertexArray::Create();
         s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
         
@@ -132,10 +130,9 @@ namespace HRealEngine
         s_Data.QuadVertexArray->SetIndexBuffer(squareIndexBufferRef);
         delete[] quadIndices;
 
-        
+        //Circle        
         s_Data.CircleVertexArray = VertexArray::Create();
         s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
-        
         s_Data.CircleVertexBuffer->SetLayout({
             {"v_WorldPosition", ShaderDataType::Float3, false},
             {"v_LocalPosition", ShaderDataType::Float3, false},
@@ -148,9 +145,8 @@ namespace HRealEngine
         s_Data.CircleVertexArray->SetIndexBuffer(squareIndexBufferRef);
         s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
 
-
+        //Line
         s_Data.LineVertexArray = VertexArray::Create();
-
         s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
         s_Data.LineVertexBuffer->SetLayout({
             {"v_Position", ShaderDataType::Float3, false},
@@ -160,7 +156,7 @@ namespace HRealEngine
         s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
         s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 
-        
+        //Textures
         s_Data.WhiteTexture = Texture2D::Create(1, 1);
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
@@ -172,8 +168,6 @@ namespace HRealEngine
         s_Data.QuadShader = Shader::Create("assets/shaders/Quad_Shader2D.glsl");
         s_Data.CircleShader = Shader::Create("assets/shaders/Circle_Shader2D.glsl");
         s_Data.LineShader = Shader::Create("assets/shaders/Line_Shader2D.glsl");
-        /*s_Data.QuadShader->Bind();
-        s_Data.QuadShader->SetIntArray("u_textureSamplers", samplers, s_Data.MaxTextureSlots);*/
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 

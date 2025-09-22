@@ -1,6 +1,5 @@
 #pragma once
 #include "Scene.h"
-#include "HRealEngine/Core/Core.h"
 
 namespace HRealEngine
 {

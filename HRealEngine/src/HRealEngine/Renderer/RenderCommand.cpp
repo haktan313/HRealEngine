@@ -1,9 +1,10 @@
 
-//RenderCommand.cpp
+
+#include "HRpch.h"
 #include "RenderCommand.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace HRealEngine
 {
-    RendererAPI* RenderCommand::rendererAPI = new OpenGLRendererAPI;
+    Scope<RendererAPI> RenderCommand::m_RendererAPI = RendererAPI::Create();
 }

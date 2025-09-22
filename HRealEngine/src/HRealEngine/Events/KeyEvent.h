@@ -1,7 +1,4 @@
-
-//KeyEvent.h
 #pragma once
-
 #include "EventBase.h"
 
 namespace HRealEngine
@@ -9,27 +6,27 @@ namespace HRealEngine
 	class HREALENGINE_API KeyEventBase : public EventBase
 	{
 	public:
-		inline int GetKeyCode() const { return keyCodeRef; }
+		int GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(KeyboardEvents | InputEvents)
 	protected:
-		KeyEventBase(int keyCode) : keyCodeRef(keyCode) {}
-		int keyCodeRef;
+		KeyEventBase(int keyCode) : m_KeyCode(keyCode) {}
+		int m_KeyCode;
 	};
 
 	class HREALENGINE_API KeyPressedEvent : public KeyEventBase
 	{
 	public:
-		KeyPressedEvent(int keyCode, bool bIsRepeate = false) : KeyEventBase(keyCode), mbIsRepeating(bIsRepeate) {}
-		inline bool IsRepeating() const { return mbIsRepeating; }
+		KeyPressedEvent(int keyCode, bool bIsRepeate = false) : KeyEventBase(keyCode), m_bIsRepeating(bIsRepeate) {}
+		bool IsRepeating() const { return m_bIsRepeating; }
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << GetKeyCode() << "(repeat = " << mbIsRepeating << ")";
+			ss << "KeyPressedEvent: " << GetKeyCode() << "(repeat = " << m_bIsRepeating << ")";
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		bool mbIsRepeating;
+		bool m_bIsRepeating;
 	};
 
 	class HREALENGINE_API KeyReleasedEvent : public KeyEventBase

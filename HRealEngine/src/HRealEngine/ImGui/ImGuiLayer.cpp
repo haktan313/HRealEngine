@@ -1,22 +1,20 @@
 
-//ImGuiLayer.cpp
-#include "HRpch.h"
-#include "ImGuiLayer.h"
-#include "imgui.h"
-#include "HRealEngine/Core/Application.h"
-#include "GLFW/glfw3.h"
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
 
+#include "HRpch.h"
+
+#include "ImGuiLayer.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include "ImGuizmo.h"
+
+#include "GLFW/glfw3.h"
+#include "HRealEngine/Core/Application.h"
+
 
 namespace HRealEngine
 {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
-	{
-
-	}
-	ImGuiLayer::~ImGuiLayer()
 	{
 
 	}
@@ -50,11 +48,11 @@ namespace HRealEngine
 
 	void ImGuiLayer::OnEvent(EventBase& eventRef)
 	{
-		if (!bBlockEvents)
+		if (!m_bBlockEvents)
 			return;
 		ImGuiIO& io = ImGui::GetIO();
-		eventRef.bHandled |= io.WantCaptureMouse;
-		eventRef.bHandled |= io.WantCaptureKeyboard;
+		eventRef.m_bHandled |= io.WantCaptureMouse;
+		eventRef.m_bHandled |= io.WantCaptureKeyboard;
 	}
 
 	void ImGuiLayer::OnAttach()

@@ -1,5 +1,5 @@
 
-//RenderCommand.h
+
 #pragma once
 #include "RendererAPI.h"
 
@@ -8,36 +8,36 @@ namespace HRealEngine
     class RenderCommand
     {
     public:
-        inline static void Init()
+        static void Init()
         {
-            rendererAPI->Init();
+            m_RendererAPI->Init();
         }
-        inline static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+        static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
         {
-            rendererAPI->SetViewport(x, y, width, height);
+            m_RendererAPI->SetViewport(x, y, width, height);
         }
-        inline static void SetClearColor(const glm::vec4& color)
+        static void SetClearColor(const glm::vec4& color)
         {
-            rendererAPI->SetClearColor(color);
+            m_RendererAPI->SetClearColor(color);
         }
-        inline static void Clear()
+        static void Clear()
         {
-            rendererAPI->Clear();
+            m_RendererAPI->Clear();
         }
-        inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t IndexCount = 0)
+        static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t IndexCount = 0)
         {
-            rendererAPI->DrawIndexed(vertexArray, IndexCount);
+            m_RendererAPI->DrawIndexed(vertexArray, IndexCount);
         }
-        inline static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+        static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
         {
-            rendererAPI->DrawLines(vertexArray, vertexCount);
+            m_RendererAPI->DrawLines(vertexArray, vertexCount);
         }
-        inline static void SetLineWidth(float width)
+        static void SetLineWidth(float width)
         {
-            rendererAPI->SetLineWidth(width);
+            m_RendererAPI->SetLineWidth(width);
         }
         
     private:
-        static RendererAPI* rendererAPI;
+        static Scope<RendererAPI> m_RendererAPI;
     };
 }

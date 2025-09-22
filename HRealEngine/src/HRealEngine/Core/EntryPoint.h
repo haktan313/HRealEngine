@@ -1,5 +1,4 @@
 
-//EntryPoint.h
 #pragma once
 
 #ifdef HREALENGINE_PLATFORM_WINDOWS
@@ -11,18 +10,9 @@ int main(int argc, char** argv)
 {
 	HRealEngine::Logger::Init();
 	
-	HR_PROFILE_BEGIN_SESSION("Startup", "HRealEngineProfile-Startup.json");
 	auto app = HRealEngine::CreateApplication({argc, argv});
-	HR_PROFILE_END_SESSION();
-	
-	HR_PROFILE_BEGIN_SESSION("Runtime", "HRealEngineProfile-Runtime.json");
 	app->Run();
-	HR_PROFILE_END_SESSION();
-	
-	HR_PROFILE_BEGIN_SESSION("Shutdown", "HRealEngineProfile-Shutdown.json");
 	delete app;
-	HR_PROFILE_END_SESSION();
-	
 	return 0;
 }
 

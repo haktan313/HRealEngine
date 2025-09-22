@@ -1,12 +1,11 @@
 
-//Renderer2D.h
 #pragma once
-#include "Camera.h"
-#include "EditorCamera.h"
-#include "OrthCamera.h"
+#include "HRealEngine/Camera/Camera.h"
+#include "HRealEngine/Camera/EditorCamera.h"
+#include "HRealEngine/Camera/OrthCamera.h"
+
 #include "SubTexture2D.h"
-#include "Texture.h"
-#include "HRealEngine/Scene/Components.h"
+#include "HRealEngine/Core/Components.h"
 
 namespace HRealEngine
 {

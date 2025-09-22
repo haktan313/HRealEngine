@@ -1,9 +1,7 @@
 
-//OpenGLFramebuffer.cpp
+#include "HRpch.h"
 #include "OpenGLFramebuffer.h"
 #include <glad/glad.h>
-
-#include "HRealEngine/Core/Logger.h"
 
 namespace HRealEngine
 {

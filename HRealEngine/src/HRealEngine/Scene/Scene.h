@@ -1,12 +1,11 @@
 
-//Scene.h
+
 #pragma once
 #include <entt.hpp>
-#include <string>
-#include "glm/glm.hpp"
+
+#include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Core/UUID.h"
-#include "HRealEngine/Renderer/EditorCamera.h"
 
 class b2World;
 
@@ -25,7 +24,7 @@ namespace HRealEngine
         Entity CreateEntity(const std::string& name = std::string());
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
         void DestroyEntity(Entity entity);
-        entt::registry& GetRegistry() { return registry; }
+        entt::registry& GetRegistry() { return m_Registry; }
 
         void OnRuntimeStart();
         void OnRuntimeStop();
@@ -50,7 +49,7 @@ namespace HRealEngine
 
         b2World* m_PhysicsWorld = nullptr;
         
-        entt::registry registry;
+        entt::registry m_Registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;
         
         friend class Entity;

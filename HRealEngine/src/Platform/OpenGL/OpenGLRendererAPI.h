@@ -1,5 +1,5 @@
 
-//OpenGLRendererAPI.h
+
 #pragma once
 #include "HRealEngine/Renderer/RendererAPI.h"
 
@@ -8,15 +8,15 @@ namespace HRealEngine
     class OpenGLRendererAPI : public RendererAPI
     {
     public:
-        virtual void Init() override;
-        virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+        void Init() override;
+        void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
         
-        virtual void SetClearColor(const glm::vec4& color) override;
-        virtual void Clear() override;
+        void SetClearColor(const glm::vec4& color) override;
+        void Clear() override;
 
-        virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t IndexCount = 0) override;
-        virtual void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
-        virtual void SetLineWidth(float width) override;
+        void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t IndexCount = 0) override;
+        void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
+        void SetLineWidth(float width) override;
     };
     
 }

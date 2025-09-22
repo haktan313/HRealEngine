@@ -19,7 +19,7 @@ namespace HRealEngine
 {
     extern const std::filesystem::path g_AssetsDirectory;
     
-    EditorLayer::EditorLayer() : Layer("EditorLayer"), orthCameraControllerRef(1280.0f / 720.0f, true)
+    EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
     {
         
     }
@@ -30,13 +30,8 @@ namespace HRealEngine
         fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
-        framebufferRef = Framebuffer::Create(fbSpec);
-        
-        /*joseMourinhoTextureRef = Texture2D::Create("assets/textures/joseMourinho.png");
-        checkBoardTextureRef = Texture2D::Create("assets/textures/Checkerboard.png");
-        spriteSheetRef = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
-
-        textureStairs = SubTexture2D::CreateFromCoords(spriteSheetRef, {7, 6}, {128, 128});
+        m_Framebuffer = Framebuffer::Create(fbSpec);
+        /*textureStairs = SubTexture2D::CreateFromCoords(spriteSheetRef, {7, 6}, {128, 128});
         textureTree = SubTexture2D::CreateFromCoords(spriteSheetRef, {2, 1}, {128, 128}, {1,2});
         textureBarrel = SubTexture2D::CreateFromCoords(spriteSheetRef, {8, 2}, {128, 128});
 
@@ -49,16 +44,15 @@ namespace HRealEngine
         m_Particle.Velocity = { 0.0f, 0.0f };
         m_Particle.VelocityVariation = { 3.0f, 1.0f };
         m_Particle.Position = { 0.0f, 0.0f };*/
-
-        //activeSceneRef = CreateRef<Scene>();
-        editorSceneRef = CreateRef<Scene>();
-        activeSceneRef = editorSceneRef;
+        
+        m_EditorScene = CreateRef<Scene>();
+        m_ActiveScene = m_EditorScene;
 
         auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
             auto scenePath = commandLineArgs[1];
-            SceneSerializer serializer(activeSceneRef);
+            SceneSerializer serializer(m_ActiveScene);
             serializer.Deserialize(scenePath);
         }
         
@@ -95,10 +89,10 @@ namespace HRealEngine
         };
         cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
         */
-        iconPlayRef = Texture2D::Create("assets/textures/StartButton.png");
-        iconStopRef = Texture2D::Create("assets/textures/stopButton.png");
-        iconSimulateRef = Texture2D::Create("assets/textures/SimulateButton.png");
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        m_IconPlay = Texture2D::Create("assets/textures/StartButton.png");
+        m_IconStop = Texture2D::Create("assets/textures/stopButton.png");
+        m_IconSimulate = Texture2D::Create("assets/textures/SimulateButton.png");
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
     }
 
@@ -109,44 +103,28 @@ namespace HRealEngine
 
     void EditorLayer::OnUpdate(Timestep timestep)
     {
-        HR_PROFILE_FUNC();
-
-        if (FramebufferSpecification spec = framebufferRef->GetSpecification();
+        if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
         {
-            framebufferRef->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            orthCameraControllerRef.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_OrthCameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
             m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-            activeSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         }
         
         {
             if (m_ViewportFocused)
-                orthCameraControllerRef.OnUpdate(timestep);
+                m_OrthCameraController.OnUpdate(timestep);
             m_EditorCamera.OnUpdate(timestep);
         }
         
         Renderer2D::ResetStats();
         {
-            HR_PROFILE_SCOPE("Renderer Prep");
-            framebufferRef->Bind();
+            m_Framebuffer->Bind();
             RenderCommand::Clear();
             RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
         }
-        framebufferRef->ClearAttachment(1, -1);
-        /*{
-            HR_PROFILE_SCOPE("Renderer Draw");
-            Renderer2D::BeginScene(orthCameraControllerRef.GetCamera());
-
-            Renderer2D::DrawRotatedQuad({-0.2f, 0.5f}, {0.8f, 0.8f}, glm::radians(-75.f), {0.8f, 0.2f, 0.3f, 1.0f});
-            Renderer2D::DrawQuad({-0.7f, 0.0f}, {0.8f, 0.4f}, {0.2f, 0.8f, 0.3f, 1.0f});
-            Renderer2D::DrawQuad({0.5f, -0.5f}, {1.f, 1.0f}, joseMourinhoTextureRef);
-            Renderer2D::DrawRotatedQuad({0.f, 0.f}, {1.f, 1.f}, glm::radians(45.f), checkBoardTextureRef, 30.f, glm::vec4(.5f, 0.3f, 0.9f, 1.0f));
-            Renderer2D::DrawQuad({0.0f, 0.0f}, {10.f, 10.f}, checkBoardTextureRef, 10.f);
-        
-            Renderer2D::EndScene();
-        }*/
-
+        m_Framebuffer->ClearAttachment(1, -1);
         /*if (Input::IsMouseButtonPressed(HR_MOUSE_BUTTON_LEFT))
         {
             auto [x, y] = Input::GetMousePosition();
@@ -161,7 +139,6 @@ namespace HRealEngine
             for (int i = 0; i < 5; i++)
                 m_ParticleSystem.Emit(m_Particle);
         }
-    
         m_ParticleSystem.OnUpdate(timestep);
         m_ParticleSystem.OnRender(orthCameraControllerRef.GetCamera());
 
@@ -171,41 +148,27 @@ namespace HRealEngine
         Renderer2D::DrawQuad({1.f,0.f, 0.5f}, {1.f,1.f}, textureBarrel);
         Renderer2D::EndScene();*/
 
-        //Renderer2D::BeginScene(orthCameraControllerRef.GetCamera());
-        //activeSceneRef->OnUpdateRuntime(timestep);
-        //activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
-        /*if (m_SceneState == SceneState::Runtime)
-            activeSceneRef->OnUpdateRuntime(timestep);
-        else if (m_SceneState == SceneState::Editor)
-        {
-            if (m_ViewportFocused)
-                orthCameraControllerRef.OnUpdate(timestep);
-            m_EditorCamera.OnUpdate(timestep);
-            activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
-        }*/
-        //Renderer2D::EndScene();
-
         switch (m_SceneState)
         {
             case SceneState::Editor:
             {
                 if (m_ViewportFocused)
-                    orthCameraControllerRef.OnUpdate(timestep);
+                    m_OrthCameraController.OnUpdate(timestep);
                 m_EditorCamera.OnUpdate(timestep);
-                activeSceneRef->OnUpdateEditor(timestep, m_EditorCamera);
+                m_ActiveScene->OnUpdateEditor(timestep, m_EditorCamera);
                 break;
             }
             case SceneState::Runtime:
             {
-                activeSceneRef->OnUpdateRuntime(timestep);
+                m_ActiveScene->OnUpdateRuntime(timestep);
                 break;
             }
             case SceneState::Simulate:
             {
                 if (m_ViewportFocused)
-                    orthCameraControllerRef.OnUpdate(timestep);
+                    m_OrthCameraController.OnUpdate(timestep);
                 m_EditorCamera.OnUpdate(timestep);
-                activeSceneRef->OnUpdateSimulation(timestep, m_EditorCamera);
+                m_ActiveScene->OnUpdateSimulation(timestep, m_EditorCamera);
                 break;
             }
         }
@@ -220,14 +183,13 @@ namespace HRealEngine
         int mouseY = (int)my;
         if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
         {
-            int pixelData = framebufferRef->ReadPixel(1, mouseX, mouseY);
-            m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, activeSceneRef.get());
+            int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+            m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
             LOG_CORE_INFO("Pixel data = {0}", pixelData);
         }
 
         OnOverlayRender();
-        
-        framebufferRef->Unbind();
+        m_Framebuffer->Unbind();
     }
 
     void EditorLayer::OnImGuiRender()
@@ -333,8 +295,8 @@ namespace HRealEngine
             ImGui::EndMenuBar();
         }
 
-        sceneHierarchyPanelRef.OnImGuiRender();
-        contentBrowserPanelRef.OnImGuiRender();
+        m_SceneHierarchyPanel.OnImGuiRender();
+        m_ContentBrowserPanel.OnImGuiRender();
         
         ImGui::Begin("Profile Results");
 
@@ -370,7 +332,7 @@ namespace HRealEngine
             //orthCameraControllerRef.OnResize(m_ViewportSize.x, m_ViewportSize.y);
         }
 
-        uint32_t textureID = framebufferRef->GetColorAttachmentRendererID();
+        uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
         if (ImGui::BeginDragDropTarget())
@@ -391,7 +353,7 @@ namespace HRealEngine
         m_ViewportBounds[0] = { minBound.x, minBound.y };
         m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
-        Entity selectedEntity = sceneHierarchyPanelRef.GetSelectedEntity();
+        Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity && m_GizmoType != -1)
         {
             ImGuizmo::SetOrthographic(true);
@@ -423,7 +385,7 @@ namespace HRealEngine
             if (ImGuizmo::IsUsing())
             {
                 glm::vec3 translation, rotation, scale;
-                activeSceneRef->DecomposeTransform(transform, translation, rotation, scale);
+                m_ActiveScene->DecomposeTransform(transform, translation, rotation, scale);
                 transformComponent.Position = translation;
                 glm::vec3 deltaRotation = rotation - transformComponent.Rotation;
                 transformComponent.Rotation += deltaRotation;
@@ -441,7 +403,7 @@ namespace HRealEngine
 
     void EditorLayer::OnEvent(EventBase& eventRef)
     {
-        orthCameraControllerRef.OnEvent(eventRef);
+        m_OrthCameraController.OnEvent(eventRef);
         if (m_SceneState == SceneState::Editor)
             m_EditorCamera.OnEvent(eventRef);
 
@@ -499,7 +461,7 @@ namespace HRealEngine
     {
         if (event.GetMouseButton() == HR_MOUSE_BUTTON_LEFT)
             if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(HR_KEY_LEFT_ALT))
-                sceneHierarchyPanelRef.SetSelectedEntity(m_HoveredEntity);
+                m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
         return false;
     }
 
@@ -507,7 +469,7 @@ namespace HRealEngine
     {
         if (m_SceneState == SceneState::Runtime)
         {
-            Entity cameraEntity = activeSceneRef->GetPrimaryCameraEntity();
+            Entity cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
             if (!cameraEntity)
                 return;
             Renderer2D::BeginScene(cameraEntity.GetComponent<CameraComponent>().Camera, cameraEntity.GetComponent<TransformComponent>().GetTransform());
@@ -517,7 +479,7 @@ namespace HRealEngine
         if (m_ShowPhysicsColliders)
         {
             {
-                auto view = activeSceneRef->GetRegistry().view<BoxCollider2DComponent, TransformComponent>();
+                auto view = m_ActiveScene->GetRegistry().view<BoxCollider2DComponent, TransformComponent>();
                 for (auto entity : view)
                 {
                     auto [boxCollider, transform] = view.get<BoxCollider2DComponent, TransformComponent>(entity);
@@ -531,7 +493,7 @@ namespace HRealEngine
                 }
             }
             {
-                auto view = activeSceneRef->GetRegistry().view<CircleCollider2DComponent, TransformComponent>();
+                auto view = m_ActiveScene->GetRegistry().view<CircleCollider2DComponent, TransformComponent>();
                 for (auto entity : view)
                 {
                     auto [circleCollider, transform] = view.get<CircleCollider2DComponent, TransformComponent>(entity);
@@ -542,7 +504,7 @@ namespace HRealEngine
             }
         }
 
-        if (Entity selectedEntity = sceneHierarchyPanelRef.GetSelectedEntity())
+        if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
         {
             if (selectedEntity.HasComponent<TransformComponent>())
             {
@@ -555,11 +517,11 @@ namespace HRealEngine
 
     void EditorLayer::NewScene()
     {
-        activeSceneRef = CreateRef<Scene>();
-        activeSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        m_ActiveScene = CreateRef<Scene>();
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-        editorScenePath = std::filesystem::path();
+        m_EditorScenePath = std::filesystem::path();
     }
 
     void EditorLayer::OpenScene()
@@ -583,12 +545,12 @@ namespace HRealEngine
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
-            editorSceneRef = newScene;
-            editorSceneRef->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            sceneHierarchyPanelRef.SetContext(editorSceneRef);
+            m_EditorScene = newScene;
+            m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
-            activeSceneRef = editorSceneRef;
-            editorScenePath = path;
+            m_ActiveScene = m_EditorScene;
+            m_EditorScenePath = path;
         }
     }
 
@@ -597,15 +559,15 @@ namespace HRealEngine
         std::string filePath = FileDialogs::SaveFile("HRE Scene (*.hrs)\0*.hrs\0");
         if (!filePath.empty())
         {
-            SerializeScene(activeSceneRef, filePath);
-            editorScenePath = filePath;
+            SerializeScene(m_ActiveScene, filePath);
+            m_EditorScenePath = filePath;
         }
     }
 
     void EditorLayer::SaveScene()
     {
-        if (!editorScenePath.empty())
-            SerializeScene(activeSceneRef, editorScenePath);
+        if (!m_EditorScenePath.empty())
+            SerializeScene(m_ActiveScene, m_EditorScenePath);
         else
             SaveSceneAs();
     }
@@ -622,10 +584,10 @@ namespace HRealEngine
             OnSceneStop();
         m_SceneState = SceneState::Runtime;
         
-        activeSceneRef = Scene::Copy(editorSceneRef);
-        activeSceneRef->OnRuntimeStart();
+        m_ActiveScene = Scene::Copy(m_EditorScene);
+        m_ActiveScene->OnRuntimeStart();
         
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -634,32 +596,32 @@ namespace HRealEngine
             OnSceneStop();
         m_SceneState = SceneState::Simulate;
 
-        activeSceneRef = Scene::Copy(editorSceneRef);
-        activeSceneRef->OnSimulationStart();
+        m_ActiveScene = Scene::Copy(m_EditorScene);
+        m_ActiveScene->OnSimulationStart();
 
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnSceneStop() 
     {
         if (m_SceneState == SceneState::Runtime)
-            activeSceneRef->OnRuntimeStop();
+            m_ActiveScene->OnRuntimeStop();
         else if (m_SceneState == SceneState::Simulate)
-            activeSceneRef->OnSimulationStop();
+            m_ActiveScene->OnSimulationStop();
         
         m_SceneState = SceneState::Editor;
         
-        activeSceneRef = editorSceneRef;
+        m_ActiveScene = m_EditorScene;
         
-        sceneHierarchyPanelRef.SetContext(activeSceneRef);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnDuplicateEntity()
     {
         if (m_SceneState != SceneState::Editor)
             return;
-        if (sceneHierarchyPanelRef.GetSelectedEntity())
-            activeSceneRef->DuplicateEntity(sceneHierarchyPanelRef.GetSelectedEntity());
+        if (m_SceneHierarchyPanel.GetSelectedEntity())
+            m_ActiveScene->DuplicateEntity(m_SceneHierarchyPanel.GetSelectedEntity());
     }
 
     void EditorLayer::UIToolbar()
@@ -675,14 +637,14 @@ namespace HRealEngine
 
         ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-        bool bToolbarEnabled = (bool)activeSceneRef;
+        bool bToolbarEnabled = (bool)m_ActiveScene;
         ImVec4 tintColor = ImVec4(1,1,1,1);
         if (!bToolbarEnabled)
             tintColor.w = 0.5f;
 
         float size = ImGui::GetWindowHeight() - 4.0f;
         {
-            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? iconPlayRef : iconStopRef;
+            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
             ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
             if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
@@ -695,7 +657,7 @@ namespace HRealEngine
         }
         ImGui::SameLine();
         {
-            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? iconSimulateRef : iconStopRef;
+            Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? m_IconSimulate : m_IconStop;
             if (ImGui::ImageButton("##simulate", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
             {

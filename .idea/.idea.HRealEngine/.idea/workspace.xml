@@ -9,30 +9,131 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/OrthCamera.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/OrthCamera.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/SceneCamera.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/HRealEngineProfile-Runtime.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/HRealEngineEditorApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/HRealEngineEditorApp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/HRealEngine.vcxproj.filters" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Core.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Core.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/EntryPoint.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/EntryPoint.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Input.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Input.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/KeyCodes.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/KeyCodes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/LayerStack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/LayerStack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/LayerStack.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/LayerStack.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Logger.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Logger.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Logger.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Logger.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/MouseButtonCodes.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/MouseButtonCodes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Timestep.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Timestep.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Window.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Window.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Debug/Instrumentor.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/AppEvent.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/AppEvent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/EventBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/EventBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/KeyEvent.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/KeyEvent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/MouseEvent.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/MouseEvent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/ImGui/ImGuiLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/ImGui/ImGuiLayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/ImGui/ImGuiLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/ImGui/ImGuiLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Camera.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/Camera.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/EditorCamera.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/EditorCamera.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/EditorCamera.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/EditorCamera.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Framebuffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Framebuffer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Framebuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Framebuffer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/GraphicsContext.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/GraphicsContext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/OrthCamera.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/OrthCamera.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/OrthCameraController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/OrthCameraController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/OrthCameraController.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/OrthCameraController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RenderCommand.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Renderer2D.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/RendererAPI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/SubTexture2D.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/SubTexture2D.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/SubTexture2D.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/SubTexture2D.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Texture.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Texture.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Texture.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Texture.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/UniformBuffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/UniformBuffer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/VertexArray.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/VertexArray.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/VertexArray.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/VertexArray.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Components.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Components.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Entity.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneCamera.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Camera/SceneCamera.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneCamera.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Utils/PlatformUtils.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Utils/PlatformUtils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRpch.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRpch.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLBuffers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLBuffers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLBuffers.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLBuffers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLContext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLContext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLContext.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLContext.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLRendererAPI.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLShader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLTexture.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLTexture.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLTexture.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLTexture.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLUniformBuffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLUniformBuffer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLUniformBuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLUniformBuffer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLVertexArray.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLVertexArray.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLVertexArray.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLVertexArray.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsInput.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsInput.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsPlatformUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsPlatformUtils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsInput.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsInput.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsWindow.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsWindow.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsWindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsWindow.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/Glad/Glad.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/Glad/Glad.vcxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/yaml-cpp.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/yaml-cpp/yaml-cpp.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/HRealEngineProfile-Runtime.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/HRealEngineProfile-Shutdown.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/HRealEngineProfile-Startup.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/Sandbox.vcxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/Sandbox.vcxproj.filters" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/assets/game/textures/RPGpack_sheet_2X.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/assets/shaders/FlatColor.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/assets/shaders/Texture.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/assets/textures/Checkerboard.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/assets/textures/joseMourinho.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/imgui.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/src/Sandbox2D.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/src/Sandbox2D.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/src/SandboxApp.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,9 +147,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://8" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$USER_HOME$/AppData/Local/Temp/p4v/DESKTOP-PF36QAP_fgsrv_1666/FG24_GP4_WAR_Team07/FG24_GP4_WAR_Team07/Source/DriveTru_Prototyping/Private/Yigit/Npc#1.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$USER_HOME$/AppData/Local/Temp/p4v/DESKTOP-PF36QAP_fgsrv_1666/FG24_GP4_WAR_Team07/FG24_GP4_WAR_Team07/Source/DriveTru_Prototyping/Public/Yigit/Npc#1.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://2" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -87,8 +186,6 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLUniformBuffer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/Windows/WindowsPlatformUtils.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/vendor/imgui/imgui.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Sandbox/src/Sandbox2D.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Sandbox/src/Sandbox2D.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -271,6 +368,9 @@
       <workItem from="1758385423079" duration="20738000" />
       <workItem from="1758414583779" duration="426000" />
       <workItem from="1758539523487" duration="3442000" />
+      <workItem from="1758554357804" duration="9652000" />
+      <workItem from="1758573696592" duration="4120000" />
+      <workItem from="1758577857213" duration="828000" />
     </task>
     <servers />
   </component>

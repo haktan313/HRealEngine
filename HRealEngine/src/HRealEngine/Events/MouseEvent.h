@@ -1,7 +1,5 @@
 
-//MouseEvent.h
 #pragma once
-
 #include "EventBase.h"
 
 namespace HRealEngine
@@ -9,46 +7,45 @@ namespace HRealEngine
 	class HREALENGINE_API MouseMovedEvent : public EventBase
 	{
 	public:
-		MouseMovedEvent(float x, float y) : mouseX(x), mouseY(y) {}
+		MouseMovedEvent(float x, float y) : m_MouseX(x), m_MouseY(y) {}
 
-		inline float GetX() const { return mouseX; }
-		inline float GetY() const { return mouseY; }
+		float GetX() const { return m_MouseX; }
+		float GetY() const { return m_MouseY; }
 
 		
 		EVENT_CLASS_TYPE(MouseMoved)
 		EVENT_CLASS_CATEGORY(MouseEvents | InputEvents)
 	private:
-		float mouseX, mouseY;
+		float m_MouseX, m_MouseY;
 	};
 
 	class HREALENGINE_API MouseScrolledEvent : public EventBase
 	{
 	public:
-		MouseScrolledEvent(float offsetX, float offsetY) : scrollX(offsetX), scrollY(offsetY) {}
+		MouseScrolledEvent(float offsetX, float offsetY) : m_ScrollX(offsetX), m_ScrollY(offsetY) {}
 
-		inline float GetOffsetX() const { return scrollX; }
-		inline float GetOffsetY() const { return scrollY; }
+		float GetOffsetX() const { return m_ScrollX; }
+		float GetOffsetY() const { return m_ScrollY; }
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << scrollX << ", " << scrollY;
+			ss << "MouseScrolledEvent: " << m_ScrollX << ", " << m_ScrollY;
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(MouseScrolled)
 		EVENT_CLASS_CATEGORY(MouseEvents | InputEvents)
 	private:
-		float scrollX, scrollY;
+		float m_ScrollX, m_ScrollY;
 	};
 
 	class HREALENGINE_API MouseButtonEvent : public EventBase
 	{
 	public:
-		inline int GetMouseButton() const { return mouseButton; }
+		int GetMouseButton() const { return m_MouseButton; }
 		EVENT_CLASS_CATEGORY(MouseButtonEvents | InputEvents)
 	protected:
-	protected:
-		MouseButtonEvent(int button) : mouseButton(button) {}
-		int mouseButton;
+		MouseButtonEvent(int button) : m_MouseButton(button) {}
+		int m_MouseButton;
 	};
 
 	class HREALENGINE_API MouseButtonPressedEvent : public MouseButtonEvent
@@ -58,7 +55,7 @@ namespace HRealEngine
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonPressedEvent: " << mouseButton;
+			ss << "MouseButtonPressedEvent: " << m_MouseButton;
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(MouseButtonPressed)
@@ -71,7 +68,7 @@ namespace HRealEngine
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "MouseButtonReleasedEvent: " << mouseButton;
+			ss << "MouseButtonReleasedEvent: " << m_MouseButton;
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(MouseButtonReleased)

@@ -1,6 +1,6 @@
 
 
-//OrthCameraController.cpp
+
 #include "HRpch.h"
 #include "OrthCameraController.h"
 #include "HRealEngine/Core/Input.h"
@@ -9,33 +9,32 @@
 namespace HRealEngine
 {
     OrthCameraController::OrthCameraController(float aspectRatio, bool rotation)
-        : aspectRatioRef(aspectRatio), bRotationRef(rotation), cameraBoundsRef({ -aspectRatio * zoomLevelRef, aspectRatio * zoomLevelRef, -zoomLevelRef, zoomLevelRef }), orthCameraRef(cameraBoundsRef.Left, cameraBoundsRef.Right, cameraBoundsRef.Bottom, cameraBoundsRef.Top)
-            
+        : m_AspectRatio(aspectRatio), m_bRotationRef(rotation), m_CameraBounds({ -aspectRatio * m_ZoomLevel, aspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel }),
+            m_OrthCamera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top)
     {
-        
     }
 
     void OrthCameraController::OnUpdate(Timestep timestep)
     {
         if (Input::IsKeyPressed(HR_KEY_A))
-            cameraPosition.x -= cameraMoveSpeed * timestep;
+            m_CameraPosition.x -= m_CameraMoveSpeed * timestep;
         else if (Input::IsKeyPressed(HR_KEY_D))
-            cameraPosition.x += cameraMoveSpeed * timestep;
+            m_CameraPosition.x += m_CameraMoveSpeed * timestep;
         if (Input::IsKeyPressed(HR_KEY_W))
-            cameraPosition.y += cameraMoveSpeed * timestep;
+            m_CameraPosition.y += m_CameraMoveSpeed * timestep;
         else if (Input::IsKeyPressed(HR_KEY_S))
-            cameraPosition.y -= cameraMoveSpeed * timestep;
+            m_CameraPosition.y -= m_CameraMoveSpeed * timestep;
 
-        if (bRotationRef)
+        if (m_bRotationRef)
         {
             if (Input::IsKeyPressed(HR_KEY_Q))
-                cameraRotation -= cameraRotationSpeed * timestep;
+                m_CameraRotation -= m_CameraRotationSpeed * timestep;
             else if (Input::IsKeyPressed(HR_KEY_E))
-                cameraRotation += cameraRotationSpeed * timestep;
-            orthCameraRef.SetRotation(cameraRotation);
+                m_CameraRotation += m_CameraRotationSpeed * timestep;
+            m_OrthCamera.SetRotation(m_CameraRotation);
         }
-        orthCameraRef.SetPosition(cameraPosition);
-        cameraMoveSpeed = zoomLevelRef;
+        m_OrthCamera.SetPosition(m_CameraPosition);
+        m_CameraMoveSpeed = m_ZoomLevel;
     }
 
     void OrthCameraController::OnEvent(EventBase& eventRef)
@@ -47,20 +46,20 @@ namespace HRealEngine
 
     void OrthCameraController::OnResize(float width, float height)
     {
-        aspectRatioRef = width / height;
+        m_AspectRatio = width / height;
         CalculateView();
     }
 
     void OrthCameraController::CalculateView()
     {
-        cameraBoundsRef = { -aspectRatioRef * zoomLevelRef, aspectRatioRef * zoomLevelRef, -zoomLevelRef, zoomLevelRef };
-        orthCameraRef.SetProjection(cameraBoundsRef.Left, cameraBoundsRef.Right, cameraBoundsRef.Bottom, cameraBoundsRef.Top);
+        m_CameraBounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+        m_OrthCamera.SetProjection(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top);
     }
 
     bool OrthCameraController::OnMouseScrolled(MouseScrolledEvent& eventRef)
     {
-        zoomLevelRef -= eventRef.GetOffsetY() * 0.25f;
-        zoomLevelRef = std::max(zoomLevelRef, 0.25f);
+        m_ZoomLevel -= eventRef.GetOffsetY() * 0.25f;
+        m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
         CalculateView();
         return false;
     }

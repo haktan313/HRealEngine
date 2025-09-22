@@ -1,8 +1,7 @@
 
-//OpenGLShader.h
+
 #pragma once
 #include "HRealEngine/Renderer/Shader.h"
-#include <glm/glm.hpp>
 
 typedef unsigned int GLenum;
 
@@ -15,8 +14,8 @@ namespace HRealEngine
         OpenGLShader(const std::string& filePath);
         virtual ~OpenGLShader();
 
-        virtual void Bind() const override;
-        virtual void Unbind() const override;
+        void Bind() const override;
+        void Unbind() const override;
 
         void SetInt(const std::string& name, int value) override;
         void SetIntArray(const std::string& name, int* values, uint32_t count) override;
@@ -25,7 +24,7 @@ namespace HRealEngine
         void SetFloat4(const std::string& name,const glm::vec4& value) override;
         void SetMat4(const std::string& name,const glm::mat4& value) override;
 
-        virtual const std::string& GetName() const override { return shaderName; }
+        const std::string& GetName() const override { return m_ShaderName; }
         
         void UploadUniformFloat(const std::string& uniformName, float values);
         void UploadUniformFloat2(const std::string& uniformName, const glm::vec2& values);
@@ -42,7 +41,7 @@ namespace HRealEngine
         std::unordered_map<GLenum,std::string> PreProcess(const std::string& source);
         void Compile(const std::unordered_map<GLenum,std::string>& shaderSources);
 
-        uint32_t rendererID;
-        std::string shaderName;
+        uint32_t m_RendererID;
+        std::string m_ShaderName;
     };
 }

@@ -1,9 +1,8 @@
 
-//Buffers.cpp
+
 #include "HRpch.h"
 #include "Buffers.h"
 #include "Renderer.h"
-#include "HRealEngine/Core/Core.h"
 #include "Platform/OpenGL/OpenGLBuffers.h"
 
 namespace HRealEngine

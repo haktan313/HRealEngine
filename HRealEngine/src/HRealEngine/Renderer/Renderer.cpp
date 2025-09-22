@@ -1,16 +1,13 @@
 
-//Renderer.cpp
+
+#include "HRpch.h"
 #include "Renderer.h"
 #include "RenderCommand.h"
-#include "VertexArray.h"
-#include "OrthCamera.h"
 #include "Renderer2D.h"
-#include "Platform/OpenGL/OpenGLShader.h"
 
 namespace HRealEngine
 {
-    //RendererAPI Renderer::rendererAPI = RendererAPI::OpenGL;
-    Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
+    Scope<Renderer::SceneData> Renderer::s_SceneData = CreateScope<Renderer::SceneData>();
 
     void Renderer::Init()
     {
@@ -18,14 +15,19 @@ namespace HRealEngine
         Renderer2D::Init();
     }
 
-    void Renderer::OnwindowResize(uint32_t width, uint32_t height)
+    void Renderer::Shutdown()
+    {
+        Renderer2D::Shutdown();
+    }
+
+    void Renderer::OnWindowResize(uint32_t width, uint32_t height)
     {
         RenderCommand::SetViewport(0, 0, width, height);
     }
 
     void Renderer::BeginScene(OrthCamera& orthCameraRef)
     {
-        sceneData->viewProjectionMatrix = orthCameraRef.GetViewProjectionMatrix();
+        s_SceneData->viewProjectionMatrix = orthCameraRef.GetViewProjectionMatrix();
     }
 
     void Renderer::EndScene()
@@ -35,8 +37,8 @@ namespace HRealEngine
     void Renderer::Submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shaderRef, const glm::mat4& transform)
     {
         shaderRef->Bind();
-        std::dynamic_pointer_cast<OpenGLShader>(shaderRef)->UploadUniformMat4("viewProjectionMatrix", sceneData->viewProjectionMatrix);
-        std::dynamic_pointer_cast<OpenGLShader>(shaderRef)->UploadUniformMat4("transform", transform);
+        shaderRef->SetMat4("u_ViewProjection", s_SceneData->viewProjectionMatrix);
+        shaderRef->SetMat4("u_Transform", transform);
         
         vertexArray->Bind();
         RenderCommand::DrawIndexed(vertexArray);

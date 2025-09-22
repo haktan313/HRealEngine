@@ -16,8 +16,7 @@
 #include <unordered_set>
 
 #include "HRealEngine/Core/Logger.h"
-#include "HRealEngine/Debug/Instrumentor.h"
 
 #ifdef HREALENGINE_PLATFORM_WINDOWS
-#include "Windows.h"
+    #include "Windows.h"
 #endif

@@ -1,5 +1,6 @@
 
-//SceneCamera.cpp
+
+#include "HRpch.h"
 #include "SceneCamera.h"
 
 #include "glm/ext/matrix_clip_space.hpp"
@@ -14,27 +15,27 @@ namespace HRealEngine
     void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
     {
         m_ProjectionType = ProjectionType::Orthographic;
-        OrthSize = size;
-        OrthNear = nearClip;
-        OrthFar = farClip;
+        m_OrthSize = size;
+        m_OrthNear = nearClip;
+        m_OrthFar = farClip;
         RecalculateProjection();
     }
 
     void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
     {
         m_ProjectionType = ProjectionType::Perspective;
-        PerspectiveFOV = verticalFOV;
-        PerspectiveNear = nearClip;
-        PerspectiveFar = farClip;
+        m_PerspectiveFOV = verticalFOV;
+        m_PerspectiveNear = nearClip;
+        m_PerspectiveFar = farClip;
         RecalculateProjection();
     }
 
     void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
     {
         if (height == 0)
-            AspectRatio = 0.0f;
+            m_AspectRatio = 0.0f;
         else
-            AspectRatio = (float)width / (float)height;
+            m_AspectRatio = (float)width / (float)height;
         RecalculateProjection();
     }
 
@@ -42,16 +43,16 @@ namespace HRealEngine
     {
         if (m_ProjectionType == ProjectionType::Perspective)
         {
-            m_ProjectionMatrix = glm::perspective(PerspectiveFOV, AspectRatio, PerspectiveNear, PerspectiveFar);
+            m_ProjectionMatrix = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
         }
         else
         {
-            float left = -OrthSize * AspectRatio * 0.5f;
-            float right = OrthSize * AspectRatio * 0.5f;
-            float bottom = -OrthSize * 0.5f;
-            float top = OrthSize * 0.5f;
+            float left = -m_OrthSize * m_AspectRatio * 0.5f;
+            float right = m_OrthSize * m_AspectRatio * 0.5f;
+            float bottom = -m_OrthSize * 0.5f;
+            float top = m_OrthSize * 0.5f;
     
-            m_ProjectionMatrix = glm::ortho(left, right, bottom, top, OrthNear, OrthFar);
+            m_ProjectionMatrix = glm::ortho(left, right, bottom, top, m_OrthNear, m_OrthFar);
         }
     }
 

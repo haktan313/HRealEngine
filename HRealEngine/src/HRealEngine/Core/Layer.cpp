@@ -1,16 +1,12 @@
 
-//Layer.cpp
-#include "Layer.h"
+
 #include "HRpch.h"
+
+#include "Layer.h"
 
 namespace HRealEngine
 {
-	Layer::Layer(const std::string& name) : debugName(name)
+	Layer::Layer(const std::string& name) : m_DebugName(name)
 	{
-
-	}
-	Layer::~Layer()
-	{
-	
 	}
 }

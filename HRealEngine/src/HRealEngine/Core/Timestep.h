@@ -1,5 +1,5 @@
 
-//Timestep.h
+
 #pragma once
 
 namespace HRealEngine
@@ -8,14 +8,14 @@ namespace HRealEngine
     {
     public:
         Timestep(float time = 0.0f)   
-            : timeRef(time)
+            : m_TimeRef(time)
         {
         }
-        operator float() const { return timeRef; }
+        operator float() const { return m_TimeRef; }
         
-        float GetSeconds() const { return timeRef; }
-        float GetMilliseconds() const { return timeRef * 1000.0f; }
+        float GetSeconds() const { return m_TimeRef; }
+        float GetMilliseconds() const { return m_TimeRef * 1000.0f; }
     private:
-        float timeRef;
+        float m_TimeRef;
     };
 }

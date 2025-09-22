@@ -2,12 +2,13 @@
 //WindowsWindow.cpp
 #include "HRpch.h"
 #include "WindowsWindow.h"
+
 #include "HRealEngine/Core/Core.h"
-#include <HRealEngine/Events/EventBase.h>
+
 #include <HRealEngine/Events/AppEvent.h>
 #include <HRealEngine/Events/KeyEvent.h>
 #include <HRealEngine/Events/MouseEvent.h>
-#include <glad/glad.h>
+
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace HRealEngine
@@ -19,9 +20,9 @@ namespace HRealEngine
 		LOG_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowSettings& settings)
+	Scope<Window> Window::Create(const WindowSettings& settings)
 	{
-		return new WindowsWindow(settings);
+		return CreateScope<WindowsWindow>(settings);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowSettings& settings)
@@ -37,7 +38,7 @@ namespace HRealEngine
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		contextRef->SwapBuffers();
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -52,20 +53,20 @@ namespace HRealEngine
 			glfwSwapInterval(0);
 			LOG_CORE_INFO("VSync disabled");
 		}
-		windowDataRef.VSync = enabled;
+		m_WindowData.VSync = enabled;
 	}
 
 	bool WindowsWindow::IsVSync() const
 	{
-		return windowDataRef.VSync;
+		return m_WindowData.VSync;
 	}
 
 	void WindowsWindow::Init(const WindowSettings& settings)
 	{
-		windowDataRef.Height = settings.Height;
-		windowDataRef.Width = settings.Width;
-		windowDataRef.Title = settings.Title;
-		LOG_CORE_INFO("Creating window: {0} ({1}, {2})", windowDataRef.Title, windowDataRef.Width, windowDataRef.Height);
+		m_WindowData.Height = settings.Height;
+		m_WindowData.Width = settings.Width;
+		m_WindowData.Title = settings.Title;
+		LOG_CORE_INFO("Creating window: {0} ({1}, {2})", m_WindowData.Title, m_WindowData.Width, m_WindowData.Height);
 		
 		if(!GLFWInitialized)
 		{
@@ -75,19 +76,19 @@ namespace HRealEngine
 			GLFWInitialized = true;
 		}
 
-		windowRef = glfwCreateWindow(windowDataRef.Width, windowDataRef.Height, windowDataRef.Title.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow(m_WindowData.Width, m_WindowData.Height, m_WindowData.Title.c_str(), nullptr, nullptr);
 		
-		contextRef = new OpenGLContext(windowRef);
-		contextRef->Init();
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
 
-		glfwSetWindowUserPointer(windowRef, &windowDataRef);
+		glfwSetWindowUserPointer(m_Window, &m_WindowData);
 		SetVSync(true);
 		SetupGLFWCallbacks();
 	}
 
 	void WindowsWindow::SetupGLFWCallbacks()
 	{
-		glfwSetWindowSizeCallback(windowRef, [](GLFWwindow* window, int width, int height)
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Width = width;
@@ -96,14 +97,14 @@ namespace HRealEngine
 			WindowResizeEvent event(width, height);
 			data.EventCallback(event);
 		});
-		glfwSetWindowCloseCallback(windowRef, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			WindowCloseEvent event;
 			data.EventCallback(event);
 		});
-		glfwSetKeyCallback(windowRef, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			switch (action)
@@ -128,13 +129,13 @@ namespace HRealEngine
 				}
 			}
 		});
-		glfwSetCharCallback(windowRef, [](GLFWwindow* window, unsigned int keycode)
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			KeyTypedEvent event(keycode);
 			data.EventCallback(event);
 		});
-		glfwSetMouseButtonCallback(windowRef, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			switch (action)
@@ -153,13 +154,13 @@ namespace HRealEngine
 				}
 			}
 		});
-		glfwSetCursorPosCallback(windowRef, [](GLFWwindow* window, double xpos, double ypos)
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			MouseMovedEvent event((float)xpos, (float)ypos);
 			data.EventCallback(event);
 		});
-		glfwSetScrollCallback(windowRef, [](GLFWwindow* window, double xoffset, double yoffset)
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			MouseScrolledEvent event((float)xoffset, (float)yoffset);
@@ -169,6 +170,6 @@ namespace HRealEngine
 
 	void WindowsWindow::Shutdown()
 	{
-		glfwDestroyWindow(windowRef);
+		glfwDestroyWindow(m_Window);
 	}
 };

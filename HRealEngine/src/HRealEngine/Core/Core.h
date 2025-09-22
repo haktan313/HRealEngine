@@ -1,5 +1,4 @@
 
-//Core.h
 #pragma once
 #include <memory>
 

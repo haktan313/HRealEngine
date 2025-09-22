@@ -1,8 +1,6 @@
 
-//Framebuffer.h
-#pragma once
-#include <vector>
 
+#pragma once
 #include "HRealEngine/Core/Core.h"
 
 namespace HRealEngine

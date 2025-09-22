@@ -1,14 +1,7 @@
 
-//SceneHierarchyPanel.cpp
 #include "SceneHierarchyPanel.h"
-
+#include <imgui/imgui_internal.h>
 #include <filesystem>
-#include <iostream>
-#include "glm/gtc/type_ptr.hpp"
-#include "HRealEngine/Core/Logger.h"
-#include "HRealEngine/Scene/Components.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
 
 namespace HRealEngine
 {

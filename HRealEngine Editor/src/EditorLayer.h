@@ -1,12 +1,11 @@
 
-//EditorLayer.h
+
 #pragma once
 #include "ParticleSystem.h"
 #include "HRealEngine/Core/Layer.h"
 #include "HRealEngine/Events/KeyEvent.h"
 #include "HRealEngine/Renderer/Framebuffer.h"
-#include "HRealEngine/Renderer/OrthCameraController.h"
-#include "HRealEngine/Renderer/Texture.h"
+#include "HRealEngine/Camera/OrthCameraController.h"
 #include "HRealEngine/Renderer/SubTexture2D.h"
 #include "HRealEngine/Scene/Scene.h"
 #include "Panels/ContentBrowserPanel.h"
@@ -56,16 +55,16 @@ namespace HRealEngine
         };
         SceneState m_SceneState = SceneState::Editor;
         
-        OrthCameraController orthCameraControllerRef;
-        Ref<Framebuffer> framebufferRef;
-        Ref<Scene> activeSceneRef;
-        Ref<Scene> editorSceneRef;
-        std::filesystem::path editorScenePath;
+        OrthCameraController m_OrthCameraController;
+        Ref<Framebuffer> m_Framebuffer;
+        Ref<Scene> m_ActiveScene;
+        Ref<Scene> m_EditorScene;
+        std::filesystem::path m_EditorScenePath;
         int m_GizmoType = -1; // -1: none, 0: translate, 1: rotate, 2: scale
-        SceneHierarchyPanel sceneHierarchyPanelRef;
-        ContentBrowserPanel contentBrowserPanelRef;
+        SceneHierarchyPanel m_SceneHierarchyPanel;
+        ContentBrowserPanel m_ContentBrowserPanel;
 
-        Entity cameraEntity;
+        Entity m_CameraEntity;
         Entity m_HoveredEntity;
         EditorCamera m_EditorCamera;
 
@@ -75,24 +74,24 @@ namespace HRealEngine
         bool m_ViewportHovered = false;
         bool m_ShowPhysicsColliders = false;
 
-        Ref<Texture2D> joseMourinhoTextureRef;
-        Ref<Texture2D> checkBoardTextureRef;
-        Ref<Texture2D> spriteSheetRef;
+        Ref<Texture2D> m_JoseMourinhoTexture;
+        Ref<Texture2D> m_CheckBoardTexture;
+        Ref<Texture2D> m_SpriteSheet;
 
-        Ref<Texture2D> iconPlayRef;
-        Ref<Texture2D> iconStopRef;
-        Ref<Texture2D> iconSimulateRef;
+        Ref<Texture2D> m_IconPlay;
+        Ref<Texture2D> m_IconStop;
+        Ref<Texture2D> m_IconSimulate;
         
-        Ref<SubTexture2D> textureStairs;
-        Ref<SubTexture2D> textureTree;
-        Ref<SubTexture2D> textureBarrel;
+        Ref<SubTexture2D> m_TextureStairs;
+        Ref<SubTexture2D> m_TextureTree;
+        Ref<SubTexture2D> m_TextureBarrel;
 
         struct ProfileResult
         {
             const char* Name;
             float Time;
         };
-        std::vector<ProfileResult> profileResults;
+        std::vector<ProfileResult> m_ProfileResults;
 
         ParticleSystem m_ParticleSystem;
         ParticleProps m_Particle;

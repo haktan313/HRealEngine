@@ -1,13 +1,13 @@
 
-//HRealEngine.h
+
 #pragma once
 
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/Timestep.h"
+#include "HRealEngine/Core/Logger.h"
 
 #include "HRealEngine/Renderer/Shader.h"
 #include "HRealEngine/Renderer/Texture.h"
-
 #include "HRealEngine/Renderer/Buffers.h"
 #include "HRealEngine/Renderer/Framebuffer.h"
 #include "HRealEngine/Renderer/VertexArray.h"
@@ -31,4 +31,3 @@
 #include "HRealEngine/Core/Layer.h"
 #include "HRealEngine/ImGui/ImGuiLayer.h"
 
-#include "HRealEngine/Core/Logger.h"

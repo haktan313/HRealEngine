@@ -1,5 +1,5 @@
 
-//Shader.cpp
+
 #include "HRpch.h"
 #include "Shader.h"
 #include "Renderer.h"
@@ -41,12 +41,12 @@ namespace HRealEngine
     {
 		auto& name = shader->GetName();
 		HREALENGINE_CORE_DEBUGBREAK(!Exists(name), "Shader already exists!");
-		shaders[name] = shader;
+		m_Shaders[name] = shader;
     }
 
     void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
     {
-		shaders[name] = shader;
+		m_Shaders[name] = shader;
     }
 
     Ref<Shader> ShaderLibrary::Load(const std::string& filePath)
@@ -66,11 +66,11 @@ namespace HRealEngine
     Ref<Shader> ShaderLibrary::Get(const std::string& name)
     {
 		HREALENGINE_CORE_DEBUGBREAK(Exists(name), "Shader not found!");
-		return shaders[name];
+		return m_Shaders[name];
     }
 
     bool ShaderLibrary::Exists(const std::string& name) const
     {
-		return shaders.find(name) != shaders.end();
+		return m_Shaders.find(name) != m_Shaders.end();
     }
 }

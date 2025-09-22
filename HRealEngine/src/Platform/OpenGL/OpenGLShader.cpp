@@ -1,11 +1,11 @@
 
-//OpenGLShader.cpp
 #include "HRpch.h"
 #include "OpenGLShader.h"
-#include "glad/glad.h"
-#include "fstream"
-#include "glm/gtc/type_ptr.hpp"
 #include "HRealEngine/Core/Core.h"
+
+#include <fstream>
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace HRealEngine
 {
@@ -19,7 +19,7 @@ namespace HRealEngine
 		return 0;
 	}
 
-    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : shaderName(name)
+    OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : m_ShaderName(name)
     {
 		std::unordered_map<GLenum, std::string> shaderSources;
 		shaderSources[GL_VERTEX_SHADER] = vertexSource;
@@ -37,7 +37,7 @@ namespace HRealEngine
 		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
 		auto lastDot = filePath.rfind('.');
 		auto count = lastDot == std::string::npos ? filePath.size() - lastSlash : lastDot - lastSlash;
-		shaderName = filePath.substr(lastSlash, count);
+		m_ShaderName = filePath.substr(lastSlash, count);
     }
 
 	std::string OpenGLShader::ReadFile(const std::string& filePath)
@@ -116,7 +116,7 @@ namespace HRealEngine
 			glAttachShader(program, shader);
 			glShaderIDs[glShaderIDIndex++] = shader;
 		}
-		rendererID = program;
+		m_RendererID = program;
         glLinkProgram(program);
     	
         GLint isLinked = 0;
@@ -142,12 +142,12 @@ namespace HRealEngine
 
     OpenGLShader::~OpenGLShader()
     {
-    	glDeleteProgram(rendererID);
+    	glDeleteProgram(m_RendererID);
     }
 
     void OpenGLShader::Bind() const
     {
-    	glUseProgram(rendererID);
+    	glUseProgram(m_RendererID);
     }
 
     void OpenGLShader::Unbind() const
@@ -187,49 +187,49 @@ namespace HRealEngine
 
     void OpenGLShader::UploadUniformFloat(const std::string& uniformName, float values)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniform1f(location, values);
     }
 
     void OpenGLShader::UploadUniformFloat2(const std::string& uniformName, const glm::vec2& values)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniform2f(location, values.x, values.y);
     }
 
     void OpenGLShader::UploadUniformFloat3(const std::string& uniformName, const glm::vec3& values)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniform3f(location, values.x, values.y, values.z);
     }
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& uniformName, const glm::vec4& values)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniform4f(location, values.x, values.y, values.z, values.w);
     }
 
     void OpenGLShader::UploadUniformInt(const std::string& uniformName, int value)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniform1i(location, value);
     }
 
     void OpenGLShader::UploadUniformIntArray(const std::string& uniformName, int* values, uint32_t count)
     {
-		GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+		GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
 		glUniform1iv(location, count, values);
     }
 
     void OpenGLShader::UploadUniformMat3(const std::string& uniformName, const glm::mat3& matrix)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 	
     void OpenGLShader::UploadUniformMat4(const std::string& uniformName, const glm::mat4& matrix)
     {
-    	GLint location = glGetUniformLocation(rendererID, uniformName.c_str());
+    	GLint location = glGetUniformLocation(m_RendererID, uniformName.c_str());
     	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }
 

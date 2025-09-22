@@ -17,13 +17,12 @@ project "HRealEngine Editor"
         "%{wks.location}/HRealEngine/vendor",
         "%{IncludeDir.glm}",
         "%{IncludeDir.entt}",
-        "%{IncludeDir['yaml-cpp']}",
         "%{IncludeDir.ImGuizmo}"
     }
 
     buildoptions { "/utf-8" }
     
-    links{"HRealEngine", "yaml-cpp"}
+    links{"HRealEngine"}
     
     	filter "system:windows"
     		systemversion "latest"

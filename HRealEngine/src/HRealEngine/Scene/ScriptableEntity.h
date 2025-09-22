@@ -1,8 +1,7 @@
 
-//ScriptableEntity.h
+
 #pragma once
-#include "Entity.h"
-#include "HRealEngine/Core/Timestep.h"
+#include "HRealEngine/Core/Entity.h"
 
 namespace HRealEngine
 {

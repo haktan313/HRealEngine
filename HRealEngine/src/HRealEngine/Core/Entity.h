@@ -1,11 +1,10 @@
 
-//Entity.h
-#pragma once
-#include <entt.hpp>
 
+#pragma once
 #include "Components.h"
-#include "Scene.h"
 #include "HRealEngine/Core/UUID.h"
+#include <entt.hpp>
+#include "HRealEngine/Scene/Scene.h"
 
 namespace HRealEngine
 {
@@ -19,49 +18,49 @@ namespace HRealEngine
         template <typename T, typename... Args>
         T& AddComponent(Args&&... args)
         {
-            T& component = sceneRef->GetRegistry().emplace<T>(entityHandle, std::forward<Args>(args)...);
-            sceneRef->OnComponentAdded<T>(*this, component);
+            T& component = m_Scene->GetRegistry().emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+            m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
         template <typename T, typename... Args>
         T& AddOrReplaceComponent(Args&&... args)
         {
-            T& component = sceneRef->GetRegistry().emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
-            sceneRef->OnComponentAdded<T>(*this, component);
+            T& component = m_Scene->GetRegistry().emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
+            m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
         template <typename T>
         T& GetComponent()
         {
-            return sceneRef->GetRegistry().get<T>(entityHandle);
+            return m_Scene->GetRegistry().get<T>(m_EntityHandle);
         }
         template<typename T>
         bool HasComponent() const
         {
-            return sceneRef->GetRegistry().all_of<T>(entityHandle);
+            return m_Scene->GetRegistry().all_of<T>(m_EntityHandle);
         }
         template<typename T>
         void RemoveComponent()
         {
-            sceneRef->GetRegistry().remove<T>(entityHandle);
+            m_Scene->GetRegistry().remove<T>(m_EntityHandle);
         }
 
         UUID GetUUID() { return GetComponent<EntityIDComponent>().ID; }
         const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
         
-        operator bool() const { return entityHandle != entt::null; }
-        operator entt::entity() const { return entityHandle; }
-        operator uint32_t() const { return (uint32_t)entityHandle; }
+        operator bool() const { return m_EntityHandle != entt::null; }
+        operator entt::entity() const { return m_EntityHandle; }
+        operator uint32_t() const { return (uint32_t)m_EntityHandle; }
         bool operator==(const Entity& other) const
         {
-            return entityHandle == other.entityHandle && sceneRef == other.sceneRef;
+            return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
         }
         bool operator!=(const Entity& other) const
         {
             return !(*this == other);
         }
     private:
-        entt::entity entityHandle{entt::null};
-        Scene* sceneRef = nullptr;
+        entt::entity m_EntityHandle{entt::null};
+        Scene* m_Scene = nullptr;
     };
 }

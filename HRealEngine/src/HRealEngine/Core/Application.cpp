@@ -1,61 +1,56 @@
 
-//Application.cpp
+
 #include "HRpch.h"
 #include "Application.h"
+
 #include <filesystem>
-#include "Core.h"
+
 #include "HRealEngine/Renderer/Renderer.h"
-#include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
 {
-	Application* Application::InstanceOfApp = nullptr;
+	Application* Application::s_InstanceOfApp = nullptr;
 
 	Application::Application(const ApplicationSpecification& specification)
 		: m_ApplicationSpecification(specification)
 	{
-		HREALENGINE_CORE_DEBUGBREAK(!InstanceOfApp, "App already exist!");
-		InstanceOfApp = this;
+		HREALENGINE_CORE_DEBUGBREAK(!s_InstanceOfApp, "App already exist!");
+		s_InstanceOfApp = this;
 		
 		if (!m_ApplicationSpecification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_ApplicationSpecification.WorkingDirectory);
 		
-		windowRef = std::unique_ptr<Window>(Window::Create(WindowSettings(m_ApplicationSpecification.Name)));
-		windowRef->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		m_Window = Window::Create(WindowSettings(m_ApplicationSpecification.Name));
+		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
 		
-		imGuiLayerRef = new ImGuiLayer();
-		PushOverlay(imGuiLayerRef);
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 	Application::~Application()
 	{
+		Renderer::Shutdown();
 	}
 	void Application::Run()
 	{
-		while (bRunning)
+		while (m_bRunning)
 		{
 			float time = Time::GetTime();
-			Timestep timestep = time - lastFrameTime;
-			lastFrameTime = time;
+			Timestep timeStep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
 
-			if (!bMinimized)
+			if (!m_bMinimized)
 			{
-				for (Layer* layer : layerStack)
-				{
-					layer->OnUpdate(timestep);
-				}
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timeStep);
+				m_ImGuiLayer->Begin();
+				for (Layer* layer : m_LayerStack)	
+					layer->OnImGuiRender();
+				m_ImGuiLayer->End();
 			}
-			
-			imGuiLayerRef->Begin();
-			for (Layer* layer : layerStack)	
-			{
-				layer->OnImGuiRender();
-			}
-			imGuiLayerRef->End();
-
-			windowRef->OnUpdate();
+			m_Window->OnUpdate();
 		}
 	}
 	void Application::OnEvent(EventBase& eventRef)
@@ -63,41 +58,38 @@ namespace HRealEngine
 		EventDispatcher dispatcher(eventRef);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
-
-		LOG_CORE_TRACE("{0}", eventRef.ToString());
-		for (auto it = layerStack.end(); it != layerStack.begin();)
+		
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
-			if (eventRef.bHandled) 
-			{
+			if (eventRef.m_bHandled) 
 				break;
-			}
 			(*--it)->OnEvent(eventRef);
 		}
 	}
 	bool Application::OnWindowClose(WindowCloseEvent& eventRef)
 	{
-		bRunning = false;
+		m_bRunning = false;
 		return true;
 	}
 	bool Application::OnWindowResize(WindowResizeEvent& eventRef)
 	{
 		if (eventRef.GetWidth() == 0 || eventRef.GetHeight() == 0)
 		{
-			bMinimized = true;
+			m_bMinimized = true;
 			return false;
 		}
-		bMinimized = false;
-		Renderer::OnwindowResize(eventRef.GetWidth(), eventRef.GetHeight());
+		m_bMinimized = false;
+		Renderer::OnWindowResize(eventRef.GetWidth(), eventRef.GetHeight());
 		return false;
 	}
 	void Application::PushLayer(Layer* layer)
 	{
-		layerStack.PushLayer(layer);
+		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 	void Application::PushOverlay(Layer* overlay)
 	{
-		layerStack.PushOverlay(overlay);
+		m_LayerStack.PushOverlay(overlay);
 		overlay->OnAttach();
 	}
 } 

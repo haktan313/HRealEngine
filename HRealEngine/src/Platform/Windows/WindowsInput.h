@@ -1,5 +1,5 @@
 
-//WindowsInput.h
+
 #pragma once
 #include "HRealEngine/Core/Input.h"
 
@@ -8,11 +8,11 @@ namespace HRealEngine
 	class WindowsInput : public Input
 	{
 	protected:
-		virtual bool IsKeyPressedImpl(int keyCode) override;
-		virtual bool IsMouseButtonPressedImpl(int button) override;
-		virtual std::pair<float, float> GetMousePositionImpl() override;
-		virtual float GetMouseXImpl() override;
-		virtual float GetMouseYImpl() override;
+		bool IsKeyPressedImpl(int keyCode) override;
+		bool IsMouseButtonPressedImpl(int button) override;
+		std::pair<float, float> GetMousePositionImpl() override;
+		float GetMouseXImpl() override;
+		float GetMouseYImpl() override;
 	};
 } 
 

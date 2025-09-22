@@ -1,5 +1,4 @@
 
-//RendererAPI.h
 #pragma once
 #include <memory>
 #include "glm/vec4.hpp"
@@ -18,6 +17,7 @@ namespace HRealEngine
             DirectX = 3
         };
         virtual ~RendererAPI() = default;
+        
         virtual void Init() = 0;
         virtual void SetClearColor(const glm::vec4& color) = 0;
         virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
@@ -26,9 +26,10 @@ namespace HRealEngine
         virtual void DrawIndexed(const Ref<class VertexArray>& vertexArray, uint32_t IndexCount = 0) = 0;
         virtual void DrawLines(const Ref<class VertexArray>& vertexArray, uint32_t vertexCount) = 0;
         virtual void SetLineWidth(float width) = 0;
-        
-        inline static API GetAPI() { return currentAPI; }
+
+        static API GetAPI() { return m_CurrentAPI; }
+        static Scope<RendererAPI> Create();
     private:
-    static API currentAPI;
+        static API m_CurrentAPI;
     };
 }

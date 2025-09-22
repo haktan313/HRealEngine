@@ -1,9 +1,6 @@
 
-//Buffers.h
+
 #pragma once
-#include <cstdint>
-#include <string>
-#include <vector>
 #include "HRealEngine/Core/Core.h"
 
 namespace HRealEngine
@@ -44,7 +41,7 @@ namespace HRealEngine
         ShaderDataType Type;
         bool Normalized;
 
-        BufferElement(){}
+        BufferElement() = default;
 
         uint32_t GetComponentCount() const
         {
@@ -72,31 +69,32 @@ namespace HRealEngine
     {
     public:
         BufferLayout(){}
-        BufferLayout(const std::initializer_list<BufferElement>& elements) : elementsRef(elements)
+        BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements)
         {
             CalculateOffsetsAndStride();
         }
-        std::vector<BufferElement>::iterator begin() { return elementsRef.begin(); }
-        std::vector<BufferElement>::iterator end() { return elementsRef.end(); }
-        std::vector<BufferElement>::const_iterator begin() const { return elementsRef.begin(); }
-        std::vector<BufferElement>::const_iterator end() const { return elementsRef.end(); }
+        std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
+        std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
+        
+        std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+        std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
-        inline uint32_t GetStride() const { return stride; }
-        inline const std::vector<BufferElement>& GetElements() const { return elementsRef; }
+        inline uint32_t GetStride() const { return m_Stride; }
+        inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
     private:
         void CalculateOffsetsAndStride()
         {
             uint32_t offset = 0;
-            stride = 0;
-            for (auto& element : elementsRef)
+            m_Stride = 0;
+            for (auto& element : m_Elements)
             {
                 element.Offset = offset;
                 offset += element.Size;
-                stride += element.Size;
+                m_Stride += element.Size;
             }
         }
-        std::vector<BufferElement> elementsRef;
-        uint32_t stride = 0;
+        std::vector<BufferElement> m_Elements;
+        uint32_t m_Stride = 0;
     };
     class VertexBuffer
     {

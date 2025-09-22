@@ -1,5 +1,5 @@
 
-//Texture.cpp
+#include "HRpch.h"
 #include "Texture.h"
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"

@@ -1,5 +1,5 @@
 
-//SubTexture2D.h
+
 #pragma once
 #include "Texture.h"
 

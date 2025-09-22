@@ -7,11 +7,11 @@
     <Filter Include="src\HRealEngine">
       <UniqueIdentifier>{7E154A6D-EAA0-B731-F3B1-3A265FBC1332}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\HRealEngine\Camera">
+      <UniqueIdentifier>{36D03ACA-22CA-631C-0B37-FA2CF7CFC988}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\HRealEngine\Core">
       <UniqueIdentifier>{96584271-82E7-CB3A-2B06-E0351774DCE0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\HRealEngine\Debug">
-      <UniqueIdentifier>{74C69999-E032-5594-A926-EDF1155277FC}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\HRealEngine\Events">
       <UniqueIdentifier>{A2E75CD0-8EE1-8522-774E-1C3363E7EB8E}</UniqueIdentifier>
@@ -75,10 +75,31 @@
     <ClInclude Include="src\HRealEngine.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\HRealEngine\Camera\Camera.h">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HRealEngine\Camera\EditorCamera.h">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HRealEngine\Camera\OrthCamera.h">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HRealEngine\Camera\OrthCameraController.h">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HRealEngine\Camera\SceneCamera.h">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClInclude>
     <ClInclude Include="src\HRealEngine\Core\Application.h">
       <Filter>src\HRealEngine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\HRealEngine\Core\Components.h">
+      <Filter>src\HRealEngine\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\HRealEngine\Core\Core.h">
+      <Filter>src\HRealEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HRealEngine\Core\Entity.h">
       <Filter>src\HRealEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\HRealEngine\Core\EntryPoint.h">
@@ -111,9 +132,6 @@
     <ClInclude Include="src\HRealEngine\Core\Window.h">
       <Filter>src\HRealEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\HRealEngine\Debug\Instrumentor.h">
-      <Filter>src\HRealEngine\Debug</Filter>
-    </ClInclude>
     <ClInclude Include="src\HRealEngine\Events\AppEvent.h">
       <Filter>src\HRealEngine\Events</Filter>
     </ClInclude>
@@ -132,22 +150,10 @@
     <ClInclude Include="src\HRealEngine\Renderer\Buffers.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\HRealEngine\Renderer\Camera.h">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HRealEngine\Renderer\EditorCamera.h">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="src\HRealEngine\Renderer\Framebuffer.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\HRealEngine\Renderer\GraphicsContext.h">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HRealEngine\Renderer\OrthCamera.h">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HRealEngine\Renderer\OrthCameraController.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\HRealEngine\Renderer\RenderCommand.h">
@@ -177,16 +183,7 @@
     <ClInclude Include="src\HRealEngine\Renderer\VertexArray.h">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\HRealEngine\Scene\Components.h">
-      <Filter>src\HRealEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HRealEngine\Scene\Entity.h">
-      <Filter>src\HRealEngine\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\HRealEngine\Scene\Scene.h">
-      <Filter>src\HRealEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HRealEngine\Scene\SceneCamera.h">
       <Filter>src\HRealEngine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\HRealEngine\Scene\SceneSerializer.h">
@@ -1493,7 +1490,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\HRealEngine\Camera\EditorCamera.cpp">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HRealEngine\Camera\OrthCamera.cpp">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HRealEngine\Camera\OrthCameraController.cpp">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HRealEngine\Camera\SceneCamera.cpp">
+      <Filter>src\HRealEngine\Camera</Filter>
+    </ClCompile>
     <ClCompile Include="src\HRealEngine\Core\Application.cpp">
+      <Filter>src\HRealEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HRealEngine\Core\Entity.cpp">
       <Filter>src\HRealEngine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\HRealEngine\Core\Layer.cpp">
@@ -1514,19 +1526,7 @@
     <ClCompile Include="src\HRealEngine\Renderer\Buffers.cpp">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\HRealEngine\Renderer\Camera.cpp">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HRealEngine\Renderer\EditorCamera.cpp">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\HRealEngine\Renderer\Framebuffer.cpp">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HRealEngine\Renderer\OrthCamera.cpp">
-      <Filter>src\HRealEngine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HRealEngine\Renderer\OrthCameraController.cpp">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\HRealEngine\Renderer\RenderCommand.cpp">
@@ -1556,20 +1556,14 @@
     <ClCompile Include="src\HRealEngine\Renderer\VertexArray.cpp">
       <Filter>src\HRealEngine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\HRealEngine\Scene\Entity.cpp">
-      <Filter>src\HRealEngine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\HRealEngine\Scene\Scene.cpp">
-      <Filter>src\HRealEngine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HRealEngine\Scene\SceneCamera.cpp">
       <Filter>src\HRealEngine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\HRealEngine\Scene\SceneSerializer.cpp">
       <Filter>src\HRealEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\HRealEngine\Scene\ScriptableEntity.cpp">
-      <Filter>src\HRealEngine\Scene</Filter>
+    <ClCompile Include="src\HRpch.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffers.cpp">
       <Filter>src\Platform\OpenGL</Filter>

@@ -1,13 +1,10 @@
 
-//Scene.cpp
+#include "HRpch.h"
 #include "Scene.h"
-#include "Components.h"
+#include "HRealEngine/Core/Components.h"
 #include "ScriptableEntity.h"
-#include "Entity.h"
+#include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
 
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
@@ -15,7 +12,8 @@
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
 
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace HRealEngine
 {
@@ -66,8 +64,8 @@ namespace HRealEngine
         newScene->viewportHeight = other->viewportHeight;
 
         std::unordered_map<UUID, entt::entity> entityMap;
-        auto& srcRegistry = other->registry;
-        auto& dstRegistry = newScene->registry;
+        auto& srcRegistry = other->m_Registry;
+        auto& dstRegistry = newScene->m_Registry;
 
         auto idView = srcRegistry.view<EntityIDComponent>();
         for (auto e : idView)
@@ -97,7 +95,7 @@ namespace HRealEngine
 
     Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
     {
-        Entity entity = {registry.create(),this};
+        Entity entity = {m_Registry.create(),this};
         entity.AddComponent<EntityIDComponent>(uuid);
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
@@ -107,7 +105,7 @@ namespace HRealEngine
 
     void Scene::DestroyEntity(Entity entity)
     {
-        registry.destroy(entity);
+        m_Registry.destroy(entity);
     }
 
     void Scene::OnRuntimeStart()
@@ -136,7 +134,7 @@ namespace HRealEngine
         const int32_t positionIterations = 2;
         m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
 
-        auto view = registry.view<Rigidbody2DComponent>();
+        auto view = m_Registry.view<Rigidbody2DComponent>();
         for (auto e : view)
         {
             Entity entity = {e, this};
@@ -161,7 +159,7 @@ namespace HRealEngine
     void Scene::OnUpdateRuntime(Timestep deltaTime)
     {
         {
-            registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
+            m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
             {
                if (!nativeScript.Instance)
                {
@@ -178,7 +176,7 @@ namespace HRealEngine
             const int32_t positionIterations = 2;
             m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
 
-            auto view = registry.view<Rigidbody2DComponent>();
+            auto view = m_Registry.view<Rigidbody2DComponent>();
             for (auto e : view)
             {
                 Entity entity = {e, this};
@@ -196,7 +194,7 @@ namespace HRealEngine
         Camera* mainCamera = nullptr;
         glm::mat4 cameraTransform;
         {
-            auto view = registry.view<TransformComponent, CameraComponent>();
+            auto view = m_Registry.view<TransformComponent, CameraComponent>();
             for (auto entity : view)
             {
                 auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
@@ -214,7 +212,7 @@ namespace HRealEngine
         
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
-            auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity : group)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
@@ -222,7 +220,7 @@ namespace HRealEngine
             }
         }
         {
-            auto view = registry.view<TransformComponent, CircleRendererComponent>();
+            auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
             for (auto entity : view)
             {
                 auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
@@ -236,7 +234,7 @@ namespace HRealEngine
     {
         viewportWidth = width;
         viewportHeight = height;
-        auto view = registry.view<CameraComponent>();
+        auto view = m_Registry.view<CameraComponent>();
         for (auto entity : view)
         {
             auto& cameraComponent = view.get<CameraComponent>(entity);
@@ -249,7 +247,7 @@ namespace HRealEngine
 
     Entity Scene::GetPrimaryCameraEntity()
     {
-        auto view = registry.view<CameraComponent>();
+        auto view = m_Registry.view<CameraComponent>();
         for (auto entity : view)
         {
             const auto& camera = view.get<CameraComponent>(entity);
@@ -321,7 +319,7 @@ namespace HRealEngine
     {
         m_PhysicsWorld = new b2World({0.0f, -9.81f});
 
-        auto view = registry.view<Rigidbody2DComponent>();
+        auto view = m_Registry.view<Rigidbody2DComponent>();
         for (auto e : view)
         {
             Entity entity = {e, this};
@@ -382,7 +380,7 @@ namespace HRealEngine
     {
         Renderer2D::BeginScene(camera);
         {
-            auto group = registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity : group)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
@@ -391,7 +389,7 @@ namespace HRealEngine
             }
         }
         {
-            auto view = registry.view<TransformComponent, CircleRendererComponent>();
+            auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
             for (auto entity : view)
             {
                 auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);

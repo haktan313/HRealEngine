@@ -1,21 +1,24 @@
 
-//Logger.cpp
+
+#include "HRpch.h"
+
 #include "Logger.h"
+
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace HRealEngine
 {
-	std::shared_ptr<spdlog::logger> Logger::coreLogger;
-	std::shared_ptr<spdlog::logger> Logger::clientLogger;
+	Ref<spdlog::logger> Logger::s_CoreLogger;
+	Ref<spdlog::logger> Logger::s_ClientLogger;
 
 	void Logger::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
-		coreLogger = spdlog::stdout_color_mt("HREALENGINE");
-		coreLogger->set_level(spdlog::level::trace);
+		s_CoreLogger = spdlog::stdout_color_mt("HREALENGINE");
+		s_CoreLogger->set_level(spdlog::level::trace);
 
-		clientLogger = spdlog::stdout_color_mt("APP");
-		clientLogger->set_level(spdlog::level::trace);
+		s_ClientLogger = spdlog::stdout_color_mt("APP");
+		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 }

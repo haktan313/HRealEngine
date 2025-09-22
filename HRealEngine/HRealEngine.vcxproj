@@ -73,7 +73,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>HRpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;GLFW_INCLUDE_NONE;_CRT_SECURE_NO_WARNINGS;HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imgui\backends;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -96,7 +97,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>HRpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;GLFW_INCLUDE_NONE;_CRT_SECURE_NO_WARNINGS;HREALENGINE_PLATFORM_WINDOWS;HREALENGINE_RELEASE;HREALENGINE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imgui\backends;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -122,7 +124,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>HRpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;GLFW_INCLUDE_NONE;_CRT_SECURE_NO_WARNINGS;HREALENGINE_PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\imgui\backends;vendor\glm;vendor\stb_image;vendor\entt\include;vendor\yaml-cpp\include;vendor\ImGuizmo;vendor\Box2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -143,8 +146,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\HRealEngine.h" />
+    <ClInclude Include="src\HRealEngine\Camera\Camera.h" />
+    <ClInclude Include="src\HRealEngine\Camera\EditorCamera.h" />
+    <ClInclude Include="src\HRealEngine\Camera\OrthCamera.h" />
+    <ClInclude Include="src\HRealEngine\Camera\OrthCameraController.h" />
+    <ClInclude Include="src\HRealEngine\Camera\SceneCamera.h" />
     <ClInclude Include="src\HRealEngine\Core\Application.h" />
+    <ClInclude Include="src\HRealEngine\Core\Components.h" />
     <ClInclude Include="src\HRealEngine\Core\Core.h" />
+    <ClInclude Include="src\HRealEngine\Core\Entity.h" />
     <ClInclude Include="src\HRealEngine\Core\EntryPoint.h" />
     <ClInclude Include="src\HRealEngine\Core\Input.h" />
     <ClInclude Include="src\HRealEngine\Core\KeyCodes.h" />
@@ -155,19 +165,14 @@
     <ClInclude Include="src\HRealEngine\Core\Timestep.h" />
     <ClInclude Include="src\HRealEngine\Core\UUID.h" />
     <ClInclude Include="src\HRealEngine\Core\Window.h" />
-    <ClInclude Include="src\HRealEngine\Debug\Instrumentor.h" />
     <ClInclude Include="src\HRealEngine\Events\AppEvent.h" />
     <ClInclude Include="src\HRealEngine\Events\EventBase.h" />
     <ClInclude Include="src\HRealEngine\Events\KeyEvent.h" />
     <ClInclude Include="src\HRealEngine\Events\MouseEvent.h" />
     <ClInclude Include="src\HRealEngine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\HRealEngine\Renderer\Buffers.h" />
-    <ClInclude Include="src\HRealEngine\Renderer\Camera.h" />
-    <ClInclude Include="src\HRealEngine\Renderer\EditorCamera.h" />
     <ClInclude Include="src\HRealEngine\Renderer\Framebuffer.h" />
     <ClInclude Include="src\HRealEngine\Renderer\GraphicsContext.h" />
-    <ClInclude Include="src\HRealEngine\Renderer\OrthCamera.h" />
-    <ClInclude Include="src\HRealEngine\Renderer\OrthCameraController.h" />
     <ClInclude Include="src\HRealEngine\Renderer\RenderCommand.h" />
     <ClInclude Include="src\HRealEngine\Renderer\Renderer.h" />
     <ClInclude Include="src\HRealEngine\Renderer\Renderer2D.h" />
@@ -177,10 +182,7 @@
     <ClInclude Include="src\HRealEngine\Renderer\Texture.h" />
     <ClInclude Include="src\HRealEngine\Renderer\UniformBuffer.h" />
     <ClInclude Include="src\HRealEngine\Renderer\VertexArray.h" />
-    <ClInclude Include="src\HRealEngine\Scene\Components.h" />
-    <ClInclude Include="src\HRealEngine\Scene\Entity.h" />
     <ClInclude Include="src\HRealEngine\Scene\Scene.h" />
-    <ClInclude Include="src\HRealEngine\Scene\SceneCamera.h" />
     <ClInclude Include="src\HRealEngine\Scene\SceneSerializer.h" />
     <ClInclude Include="src\HRealEngine\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\HRealEngine\Utils\PlatformUtils.h" />
@@ -617,18 +619,19 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\HRealEngine\Camera\EditorCamera.cpp" />
+    <ClCompile Include="src\HRealEngine\Camera\OrthCamera.cpp" />
+    <ClCompile Include="src\HRealEngine\Camera\OrthCameraController.cpp" />
+    <ClCompile Include="src\HRealEngine\Camera\SceneCamera.cpp" />
     <ClCompile Include="src\HRealEngine\Core\Application.cpp" />
+    <ClCompile Include="src\HRealEngine\Core\Entity.cpp" />
     <ClCompile Include="src\HRealEngine\Core\Layer.cpp" />
     <ClCompile Include="src\HRealEngine\Core\LayerStack.cpp" />
     <ClCompile Include="src\HRealEngine\Core\Logger.cpp" />
     <ClCompile Include="src\HRealEngine\Core\UUID.cpp" />
     <ClCompile Include="src\HRealEngine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Buffers.cpp" />
-    <ClCompile Include="src\HRealEngine\Renderer\Camera.cpp" />
-    <ClCompile Include="src\HRealEngine\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Framebuffer.cpp" />
-    <ClCompile Include="src\HRealEngine\Renderer\OrthCamera.cpp" />
-    <ClCompile Include="src\HRealEngine\Renderer\OrthCameraController.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\Renderer2D.cpp" />
@@ -638,11 +641,11 @@
     <ClCompile Include="src\HRealEngine\Renderer\Texture.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\UniformBuffer.cpp" />
     <ClCompile Include="src\HRealEngine\Renderer\VertexArray.cpp" />
-    <ClCompile Include="src\HRealEngine\Scene\Entity.cpp" />
     <ClCompile Include="src\HRealEngine\Scene\Scene.cpp" />
-    <ClCompile Include="src\HRealEngine\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\HRealEngine\Scene\SceneSerializer.cpp" />
-    <ClCompile Include="src\HRealEngine\Scene\ScriptableEntity.cpp" />
+    <ClCompile Include="src\HRpch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffers.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
@@ -654,10 +657,18 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
-    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="vendor\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="vendor\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="vendor\stb_image\stb_imagecpp.cpp" />
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_glfw.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_opengl3.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="vendor\stb_image\stb_imagecpp.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

@@ -1,8 +1,6 @@
 
-//Input.h
 #pragma once
 #include "Core.h"
-#include "HRpch.h"
 
 namespace HRealEngine
 {
@@ -11,11 +9,11 @@ namespace HRealEngine
 	public:
 		virtual ~Input() = default;
 		
-		inline static bool IsKeyPressed(int keyCode) { return instanceOfInput->IsKeyPressedImpl(keyCode);}
-		inline static bool IsMouseButtonPressed(int button) { return instanceOfInput->IsMouseButtonPressedImpl(button); }
-		inline static std::pair<float, float> GetMousePosition() { return instanceOfInput->GetMousePositionImpl(); }
-		inline static float GetMouseX() { return instanceOfInput->GetMouseXImpl(); }
-		inline static float GetMouseY() { return instanceOfInput->GetMouseYImpl(); }
+		static bool IsKeyPressed(int keyCode) { return s_InstanceOfInput->IsKeyPressedImpl(keyCode);}
+		static bool IsMouseButtonPressed(int button) { return s_InstanceOfInput->IsMouseButtonPressedImpl(button); }
+		static std::pair<float, float> GetMousePosition() { return s_InstanceOfInput->GetMousePositionImpl(); }
+		static float GetMouseX() { return s_InstanceOfInput->GetMouseXImpl(); }
+		static float GetMouseY() { return s_InstanceOfInput->GetMouseYImpl(); }
 
 	protected:
 		virtual bool IsKeyPressedImpl(int keyCode) = 0;
@@ -24,6 +22,6 @@ namespace HRealEngine
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 	private:
-		static Input* instanceOfInput;
+		static Input* s_InstanceOfInput;
 	};
 }

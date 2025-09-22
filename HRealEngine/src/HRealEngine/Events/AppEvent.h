@@ -1,5 +1,4 @@
 
-//AppEvent.h
 #pragma once
 
 #include "EventBase.h"
@@ -9,19 +8,19 @@ namespace HRealEngine
 	class HREALENGINE_API WindowResizeEvent : public EventBase
 	{
 	public:
-		WindowResizeEvent(unsigned int widthRef, unsigned int heightRef) : width(widthRef), height(heightRef) {}
-		inline unsigned int GetWidth() const { return width; }
-		inline unsigned int GetHeight() const { return height; }
+		WindowResizeEvent(unsigned int widthRef, unsigned int heightRef) : m_Width(widthRef), m_Height(heightRef) {}
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "WindowResizeEvent: " << width << " x " << height;
+			ss << "WindowResizeEvent: " << m_Width << " x " << m_Height;
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(WindowResize)
 		EVENT_CLASS_CATEGORY(AppEvents)
 	private:
-		unsigned int width, height;
+		unsigned int m_Width, m_Height;
 	};
 
 	class HREALENGINE_API WindowCloseEvent : public EventBase

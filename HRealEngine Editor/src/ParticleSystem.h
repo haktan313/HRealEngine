@@ -1,7 +1,6 @@
 
-//ParticleSystem.h
-#pragma once
 
+#pragma once
 #include "HRealEngine.h"
 
 struct ParticleProps

@@ -1,11 +1,11 @@
 
-#define GLM_ENABLE_EXPERIMENTAL
+#include "HRpch.h"
 #include "EditorCamera.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/gtx/transform.hpp"
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/KeyCodes.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/quaternion.hpp"
 
 namespace HRealEngine
@@ -115,10 +115,10 @@ namespace HRealEngine
 
     std::pair<float, float> EditorCamera::PanSpeed() const
     {
-        float x = std::min(m_ViewportWidth / 1000.0f, 2.4f); //max 2.4
+        float x = std::min(m_ViewportWidth / 1000.0f, 2.4f);
         float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
 
-        float y = std::min(m_ViewportHeight / 1000.0f, 2.4f); //max 2.4
+        float y = std::min(m_ViewportHeight / 1000.0f, 2.4f);
         float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
 
         return { xFactor, yFactor };

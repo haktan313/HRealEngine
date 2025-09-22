@@ -1,9 +1,8 @@
 
-//SceneHierarchyPanel.h
+
 #pragma once
 #include "HRealEngine/Core/Core.h"
-#include "HRealEngine/Scene/Scene.h"
-#include "HRealEngine/Scene/Entity.h"
+#include "HRealEngine/Core/Entity.h"
 
 namespace HRealEngine
 {

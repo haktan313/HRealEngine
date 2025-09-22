@@ -1,5 +1,5 @@
 
-//Layer.h
+
 #pragma once
 #include "Timestep.h"
 #include "Core.h"
@@ -12,7 +12,7 @@ namespace HRealEngine
 	{
 	public:
 		Layer(const std::string& name = "Layer");
-		virtual ~Layer();
+		virtual ~Layer() = default;
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
@@ -20,9 +20,9 @@ namespace HRealEngine
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(EventBase& eventRef) {}
 
-		inline const std::string& GetName() const { return debugName; }
+		inline const std::string& GetName() const { return m_DebugName; }
 	protected:
-		std::string debugName;
+		std::string m_DebugName;
 	};
 }
 

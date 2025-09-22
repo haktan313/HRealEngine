@@ -1,7 +1,6 @@
 
-//VertexArray.cpp
+
 #include "HRpch.h"
-#include "VertexArray.h"
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 

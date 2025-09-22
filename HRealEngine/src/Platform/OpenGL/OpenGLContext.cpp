@@ -1,5 +1,6 @@
 
-//OpenGLContext.cpp
+
+#include "HRpch.h"
 #include "OpenGLContext.h"
 #include "glad/glad.h"
 

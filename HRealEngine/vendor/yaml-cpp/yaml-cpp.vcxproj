@@ -193,38 +193,102 @@
     <ClInclude Include="src\token.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\binary.cpp" />
-    <ClCompile Include="src\contrib\graphbuilder.cpp" />
-    <ClCompile Include="src\contrib\graphbuilderadapter.cpp" />
-    <ClCompile Include="src\convert.cpp" />
-    <ClCompile Include="src\depthguard.cpp" />
-    <ClCompile Include="src\directives.cpp" />
-    <ClCompile Include="src\emit.cpp" />
-    <ClCompile Include="src\emitfromevents.cpp" />
-    <ClCompile Include="src\emitter.cpp" />
-    <ClCompile Include="src\emitterstate.cpp" />
-    <ClCompile Include="src\emitterutils.cpp" />
-    <ClCompile Include="src\exceptions.cpp" />
-    <ClCompile Include="src\exp.cpp" />
-    <ClCompile Include="src\fptostring.cpp" />
-    <ClCompile Include="src\memory.cpp" />
-    <ClCompile Include="src\node.cpp" />
-    <ClCompile Include="src\node_data.cpp" />
-    <ClCompile Include="src\nodebuilder.cpp" />
-    <ClCompile Include="src\nodeevents.cpp" />
-    <ClCompile Include="src\null.cpp" />
-    <ClCompile Include="src\ostream_wrapper.cpp" />
-    <ClCompile Include="src\parse.cpp" />
-    <ClCompile Include="src\parser.cpp" />
-    <ClCompile Include="src\regex_yaml.cpp" />
-    <ClCompile Include="src\scanner.cpp" />
-    <ClCompile Include="src\scanscalar.cpp" />
-    <ClCompile Include="src\scantag.cpp" />
-    <ClCompile Include="src\scantoken.cpp" />
-    <ClCompile Include="src\simplekey.cpp" />
-    <ClCompile Include="src\singledocparser.cpp" />
-    <ClCompile Include="src\stream.cpp" />
-    <ClCompile Include="src\tag.cpp" />
+    <ClCompile Include="src\binary.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\contrib\graphbuilder.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\contrib\graphbuilderadapter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\convert.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\depthguard.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\directives.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\emit.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\emitfromevents.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\emitter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\emitterstate.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\emitterutils.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\exceptions.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\exp.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\fptostring.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\memory.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\node.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\node_data.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\nodebuilder.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\nodeevents.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\null.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\ostream_wrapper.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\parse.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\parser.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\regex_yaml.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\scanner.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\scanscalar.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\scantag.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\scantoken.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\simplekey.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\singledocparser.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\stream.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\tag.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

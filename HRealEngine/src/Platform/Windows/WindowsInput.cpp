@@ -1,12 +1,13 @@
 
-//WindowsInput.cpp
+#include "hrpch.h"
 #include "WindowsInput.h"
+
 #include <GLFW/glfw3.h>
 #include "HRealEngine/Core/Application.h"
 
 namespace HRealEngine
 {
-	Input* Input::instanceOfInput = new WindowsInput();
+	Input* Input::s_InstanceOfInput = new WindowsInput();
 
 	bool WindowsInput::IsKeyPressedImpl(int keyCode)
 	{

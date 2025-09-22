@@ -1,8 +1,8 @@
 
-//OpenGLVertexArray.cpp
-#include "OpenGLVertexArray.h"
 
-#include "glad/glad.h"
+#include "HRpch.h"
+#include "OpenGLVertexArray.h"
+#include <glad/glad.h>
 
 namespace HRealEngine
 {
@@ -29,17 +29,18 @@ namespace HRealEngine
     
     OpenGLVertexArray::OpenGLVertexArray()
     {
-        glCreateVertexArrays(1, &rendererID);
+        m_VertexBufferIndex = 0;
+        glCreateVertexArrays(1, &m_RendererID);
     }
 
     OpenGLVertexArray::~OpenGLVertexArray()
     {
-        glDeleteVertexArrays(1, &rendererID);
+        glDeleteVertexArrays(1, &m_RendererID);
     }
 
     void OpenGLVertexArray::Bind() const
     {
-        glBindVertexArray(rendererID);
+        glBindVertexArray(m_RendererID);
     }
 
     void OpenGLVertexArray::Unbind() const
@@ -50,10 +51,9 @@ namespace HRealEngine
     void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
     {
         HREALENGINE_CORE_DEBUGBREAK(vertexBuffer->GetLayout().GetElements().size(), "VertexBuffer has no layout!");
-        glBindVertexArray(rendererID);
+        glBindVertexArray(m_RendererID);
         vertexBuffer->Bind();
-
-        uint32_t index = 0;
+        
         const auto& layout = vertexBuffer->GetLayout();
         for (const auto& element : layout)
         {
@@ -64,10 +64,10 @@ namespace HRealEngine
                 case ShaderDataType::Float3:
                 case ShaderDataType::Float4:
                 {
-                    glEnableVertexAttribArray(index);
-                    glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
+                    glEnableVertexAttribArray(m_VertexBufferIndex);
+                    glVertexAttribPointer(m_VertexBufferIndex, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
                         element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (const void*)element.Offset);
-                    index++;
+                    m_VertexBufferIndex++;
                     break;
                 }
                 case ShaderDataType::Int:
@@ -76,23 +76,21 @@ namespace HRealEngine
                 case ShaderDataType::Int4:
                 case ShaderDataType::Bool:
                 {
-                    glEnableVertexAttribArray(index);
-                    glVertexAttribIPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
+                    glEnableVertexAttribArray(m_VertexBufferIndex);
+                    glVertexAttribIPointer(m_VertexBufferIndex, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
                         layout.GetStride(), (const void*)element.Offset);
-                    index++;
+                    m_VertexBufferIndex++;
                     break;
                 }
             }
         }
-        vertexBuffers.push_back(vertexBuffer);
+        m_VertexBuffers.push_back(vertexBuffer);
     }
 
     void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
     {
-        glBindVertexArray(rendererID);
-
-        
+        glBindVertexArray(m_RendererID);
         indexBuffer->Bind();
-        indexBufferRef = indexBuffer;
+        m_IndexBuffer = indexBuffer;
     }
 }

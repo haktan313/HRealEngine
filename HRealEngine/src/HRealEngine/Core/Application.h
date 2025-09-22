@@ -1,12 +1,9 @@
 
-//Application.h
 #pragma once
 #include "Core.h"
 #include "Window.h"
 #include "Layer.h"
 #include "LayerStack.h"
-#include "HRealEngine/Events/EventBase.h"
-#include "HRealEngine/Events/AppEvent.h"
 #include "HRealEngine/ImGui/ImGuiLayer.h"
 #include "HRealEngine/Renderer/VertexArray.h"
 
@@ -41,25 +38,30 @@ namespace HRealEngine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
-		void Close() { bRunning = false; }
+		void Close() { m_bRunning = false; }
 
-		inline Window& GetWindow() { return *windowRef; }
-		ImGuiLayer* GetImGuiLayer() { return imGuiLayerRef; }
-		inline static Application& Get() { return *InstanceOfApp; }
+		Window& GetWindow() { return *m_Window; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		static Application& Get() { return *s_InstanceOfApp; }
 
 		const ApplicationSpecification& GetSpecification() const { return m_ApplicationSpecification; }
+		
 	private:
 		bool OnWindowClose(WindowCloseEvent& eventRef);
 		bool OnWindowResize(WindowResizeEvent& eventRef);
 
 		ApplicationSpecification m_ApplicationSpecification;
-		std::unique_ptr<Window> windowRef;
-		ImGuiLayer* imGuiLayerRef;
-		bool bRunning = true;
-		bool bMinimized = false;
-		LayerStack layerStack;
-		static Application* InstanceOfApp;
-		float lastFrameTime = 0.0f;
+		LayerStack m_LayerStack;
+
+		ImGuiLayer* m_ImGuiLayer;
+		static Application* s_InstanceOfApp;
+
+		Scope<Window> m_Window;
+		
+		bool m_bRunning = true;
+		bool m_bMinimized = false;
+
+		float m_LastFrameTime = 0.0f;
 		
 	};
 	Application* CreateApplication(AppCommandLineArgs args); 

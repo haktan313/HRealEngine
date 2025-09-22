@@ -1,8 +1,7 @@
 
-//VertexArray.h
+
 #pragma once
 #include <memory>
-
 #include "HRealEngine/Renderer/Buffers.h"
 
 namespace HRealEngine

@@ -1,12 +1,12 @@
 
-//Window.h
+
 #pragma once
 #include "HRealEngine/Core/Core.h"
-#include "HRealEngine/Events/EventBase.h"
-#include "HRpch.h"
 
 namespace HRealEngine
 {
+	class EventBase;
+	
 	struct WindowSettings
 	{
 		std::string Title;
@@ -30,7 +30,7 @@ namespace HRealEngine
 
 		virtual void* GetNativeWindow() const = 0;
 		
-		static Window* Create(const WindowSettings& settings = WindowSettings());
+		static Scope<Window> Create(const WindowSettings& settings = WindowSettings());
 	};
 }
 

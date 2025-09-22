@@ -10,8 +10,8 @@ project "HRealEngine"
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
     
-    --pchheader "HRpch.h"
-    --pchsource "src/HRpch.cpp"
+    pchheader "HRpch.h"
+    pchsource "src/HRpch.cpp"
     
     files{
         "src/**.h",

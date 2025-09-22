@@ -1,8 +1,9 @@
 
-//EventBase.h
 #pragma once
-#include "HRpch.h"
+
 #include "HRealEngine/Core/Core.h"
+#include <sstream>
+#include <string>
 
 namespace HRealEngine
 {
@@ -35,14 +36,15 @@ namespace HRealEngine
 		friend class EventDispatcher;
 	public:
 		virtual ~EventBase() = default;
+		
 		virtual EventTypes GetType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
-		inline bool IsInCategory(EventCategory category) { return GetCategoryFlags() & category; }
+		bool IsInCategory(EventCategory category) { return GetCategoryFlags() & category; }
 
-		bool bHandled = false;
+		bool m_bHandled = false;
 	};
 
 	class EventDispatcher
@@ -50,20 +52,20 @@ namespace HRealEngine
 		//type alias
 		template<typename comingEvent> using EventFunction = std::function<bool(comingEvent&)>;
 	public:
-		EventDispatcher(EventBase& event) : eventRef(event) {}
+		EventDispatcher(EventBase& event) : m_Event(event) {}
 		//template
 		template<typename comingEvent>
 		bool Dispatch(EventFunction<comingEvent> /*std::function<bool(WindowCloseEvent&)>*/ func)
 		{
-			if (eventRef.GetType() == comingEvent::GetEventStaticType())
+			if (m_Event.GetType() == comingEvent::GetEventStaticType())
 			{
-				eventRef.bHandled = func(*(comingEvent*)&eventRef);
+				m_Event.m_bHandled = func(*(comingEvent*)&m_Event);
 				return true;
 			}
 			return false;
 		}
 	private:
-		EventBase& eventRef;
+		EventBase& m_Event;
 	};
 	inline std::ostream& operator<<(std::ostream& os, const EventBase& e)
 	{
