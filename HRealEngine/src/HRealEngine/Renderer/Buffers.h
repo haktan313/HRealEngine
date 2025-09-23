@@ -2,6 +2,9 @@
 
 #pragma once
 #include "HRealEngine/Core/Core.h"
+#include <string>
+#include <vector>
+#include <cstdint>
 
 namespace HRealEngine
 {

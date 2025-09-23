@@ -2,6 +2,8 @@
 
 #pragma once
 #include "HRealEngine/Core/Core.h"
+#include <string>
+#include <functional>
 
 namespace HRealEngine
 {

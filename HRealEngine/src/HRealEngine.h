@@ -13,16 +13,16 @@
 #include "HRealEngine/Renderer/VertexArray.h"
 
 #include "HRealEngine/Scene/Scene.h"
-#include "HRealEngine/Scene/Entity.h"
+#include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Scene/ScriptableEntity.h"
-#include "HRealEngine/Scene/Components.h"
+#include "HRealEngine/Core/Components.h"
 
 #include "HRealEngine/Renderer/Renderer.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 
-#include "HRealEngine/Renderer/OrthCamera.h"
-#include "HRealEngine/Renderer/OrthCameraController.h"
+#include "HRealEngine/Camera/OrthCamera.h"
+#include "HRealEngine/Camera/OrthCameraController.h"
 
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/KeyCodes.h"

@@ -3,6 +3,7 @@
 #include "HRealEngine.h"
 #include "EditorLayer.h"
 #include <imgui/imgui.h>
+#include "HRealEngine/Core/EntryPoint.h"
 
 namespace HRealEngine
 {

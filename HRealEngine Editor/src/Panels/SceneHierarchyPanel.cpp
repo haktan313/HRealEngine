@@ -2,6 +2,7 @@
 #include "SceneHierarchyPanel.h"
 #include <imgui/imgui_internal.h>
 #include <filesystem>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace HRealEngine
 {
