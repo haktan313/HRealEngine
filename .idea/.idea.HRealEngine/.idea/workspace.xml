@@ -9,15 +9,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/Example.hrs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/sadadas.hrs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/test.hrs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/HRealEngineEditorApp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/HRealEngineEditorApp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Window.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Window.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Buffers.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +30,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://0" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://2" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -249,6 +248,8 @@
       <workItem from="1758577857213" duration="828000" />
       <workItem from="1758621757944" duration="40000" />
       <workItem from="1758621821311" duration="1037000" />
+      <workItem from="1758804962431" duration="523000" />
+      <workItem from="1758805502667" duration="751000" />
     </task>
     <servers />
   </component>

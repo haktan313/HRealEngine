@@ -2,13 +2,14 @@ Scene: Untitled
 Entities:
   - Entity: 8820226750914397380
     TagComponent:
-      Tag: zemin
+      Tag: ground
     TransformComponent:
       Position: [0, -2.096508, 0]
       Rotation: [0, 0, 0]
       Scale: [8.299993, 0.10000006, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
@@ -23,11 +24,12 @@ Entities:
     TagComponent:
       Tag: aaa
     TransformComponent:
-      Position: [0.10188726, 1.756867, 0]
-      Rotation: [0, 0, 0.0022333558]
-      Scale: [0.99998814, 0.99998814, 1]
+      Position: [1.3801861, 1.7597216, 0]
+      Rotation: [0, 0, 0.53969663]
+      Scale: [0.99998856, 0.99998856, 1]
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -47,6 +49,7 @@ Entities:
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -66,6 +69,7 @@ Entities:
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -78,13 +82,14 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 11815319910955465353
     TagComponent:
-      Tag: zemin
+      Tag: ground white
     TransformComponent:
       Position: [-0.0031170032, -0.8452482, 0.014169606]
       Rotation: [0.011645551, -0.02259915, -0.25916106]
       Scale: [8.299997, 0.100000024, 1]
     SpriteRendererComponent:
       Color: [0.19467838, 0.8967972, 0.45453727, 1]
+      TilingFactor: 1
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
@@ -119,7 +124,7 @@ Entities:
     TransformComponent:
       Position: [-1.3523598, 1.2842369, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [1.2759051, 1, 1]
     CircleRendererComponent:
       Color: [1, 1, 1, 1]
       Thickness: 1
