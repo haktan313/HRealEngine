@@ -1,5 +1,19 @@
 .vs/
 bin/
 bin-int/
+Intermediates/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
 
+*.log
 *.user
+
+!vendor/
+!vendor/bin/
+!vendor/bin/premake/
+!vendor/bin/premake/premake5.exe
+
+
