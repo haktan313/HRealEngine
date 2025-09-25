@@ -20,12 +20,12 @@ I used a few submodules there is:
 HRealEngine uses the following libraries (all included as Git submodules):
 
 - **[Box2D](https://github.com/erincatto/box2d)** – 2D physics engine
-- **[entt](https://github.com/skypjack/entt)** – Entity-Component-System (ECS) framework
+- **[entt](https://github.com/skypjack/entt)** – Entity Component System
 - **[GLFW](https://github.com/glfw/glfw)** – Window and input handling
 - **[Glad](https://github.com/Dav1dde/glad)** – OpenGL function loader
-- **[ImGui](https://github.com/ocornut/imgui)** – Immediate-mode GUI
+- **[ImGui](https://github.com/ocornut/imgui)** – Immediate mode GUI
 - **[ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)** – Gizmo manipulation for ImGui
 - **[spdlog](https://github.com/gabime/spdlog)** – Fast logging library
-- **[stb_image](https://github.com/nothings/stb)** – Image loading (header-only)
-- **[yaml-cpp](https://github.com/jbeder/yaml-cpp)** – YAML serialization
-- **[glm](https://github.com/g-truc/glm)** – Mathematics library for graphics
+- **[stb_image](https://github.com/nothings/stb)** – Image loading
+- **[yaml-cpp](https://github.com/jbeder/yaml-cpp)** – Serialization
+- **[glm](https://github.com/g-truc/glm)** – Math library for graphics
