@@ -1,4 +1,4 @@
-# HRealEngineTest
+# HRealEngine
 
 **HRealEngine** is a custom **2D Game Engine** built with **C++** and **OpenGL**.
 
