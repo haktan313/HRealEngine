@@ -4,6 +4,8 @@
 #include "HRealEngine/Core/Core.h"
 #include <sstream>
 #include <string>
+#include <functional>
+
 
 namespace HRealEngine
 {

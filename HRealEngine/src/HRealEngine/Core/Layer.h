@@ -3,6 +3,7 @@
 #pragma once
 #include "Timestep.h"
 #include "Core.h"
+#include <string> 
 #include "HRealEngine/Events/AppEvent.h"
 
 

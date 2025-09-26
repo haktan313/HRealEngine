@@ -23,6 +23,7 @@ workspace "HRealEngine"
     group ""
     include "HRealEngine"
     include "HRealEngine Editor"
+    include "FlappyMourinho"
     
     
     

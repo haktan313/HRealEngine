@@ -2,7 +2,6 @@
 
 #pragma once
 #include <entt.hpp>
-
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Core/UUID.h"
