@@ -35,7 +35,9 @@ namespace HRealEngine
 
     void MourinhoController::OnCollisionEnter(Entity other)
     {
+        auto& tag = other.GetComponent<TagComponent>().Tag;
+        if (tag == "aliTop" || tag == "aliBottom")
+            DestroySelf();
         LOG_CORE_INFO("Collision with {0}", other.GetName());
-        DestroySelf();
     }
 }

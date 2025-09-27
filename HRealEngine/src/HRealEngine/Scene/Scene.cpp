@@ -205,9 +205,9 @@ namespace HRealEngine
         }
 
         {
-            if (!m_CollisionEvents.empty())
+            if (!m_CollisionEnterEvents.empty())
             {
-                for (const auto& collisionEvent : m_CollisionEvents)
+                for (const auto& collisionEvent : m_CollisionEnterEvents)
                 {
                     if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
                     {
@@ -224,7 +224,28 @@ namespace HRealEngine
                             nativeScriptB.Instance->OnCollisionEnter(Entity{collisionEvent.A, this});
                     }
                 }
-                m_CollisionEvents.clear();
+                m_CollisionEnterEvents.clear();
+            }
+            if (!m_CollisionExitEvents.empty())
+            {
+                for (const auto& collisionEvent : m_CollisionExitEvents)
+                {
+                    if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
+                    {
+                        Entity entityA = {collisionEvent.A, this};
+                        auto& nativeScriptA = entityA.GetComponent<NativeScriptComponent>();
+                        if (nativeScriptA.Instance)
+                            nativeScriptA.Instance->OnCollisionExit(Entity{collisionEvent.B, this});
+                    }
+                    if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.B))
+                    {
+                        Entity entityB = {collisionEvent.B, this};
+                        auto& nativeScriptB = entityB.GetComponent<NativeScriptComponent>();
+                        if (nativeScriptB.Instance)
+                            nativeScriptB.Instance->OnCollisionExit(Entity{collisionEvent.A, this});
+                    }
+                }
+                m_CollisionExitEvents.clear();
             }
         }
         
@@ -355,11 +376,11 @@ namespace HRealEngine
     void Scene::OnPhysics2DStart()
     {
         m_PhysicsWorld = new b2World({0.0f, -9.81f});
-        m_PhysicsWorld->SetContactListener(new GameContactListener(this));
+        m_PhysicsWorld->SetContactListener(&m_ContactListener);
 
         auto view = m_Registry.view<Rigidbody2DComponent>();
         for (auto e : view)
-        {
+        { 
             Entity entity = {e, this};
             auto& transform = entity.GetComponent<TransformComponent>();
             auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
@@ -412,6 +433,10 @@ namespace HRealEngine
 
     void Scene::OnPhysics2DStop()
     {
+        if (m_PhysicsWorld)
+            m_PhysicsWorld->SetContactListener(nullptr);
+        m_CollisionEnterEvents.clear();
+        m_CollisionExitEvents.clear();
         delete m_PhysicsWorld;
         m_PhysicsWorld = nullptr;
     }
@@ -449,7 +474,7 @@ namespace HRealEngine
         if (entityA == entt::null || entityB == entt::null)
             return;
         if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
-            m_Scene->m_CollisionEvents.push_back({entityA, entityB});
+            m_Scene->m_CollisionEnterEvents.push_back({entityA, entityB});
     }
 
     void Scene::GameContactListener::EndContact(b2Contact* contact)
@@ -457,7 +482,12 @@ namespace HRealEngine
         b2Body* bodyA = contact->GetFixtureA()->GetBody();
         b2Body* bodyB = contact->GetFixtureB()->GetBody();
 
-        
+        auto entityA = (entt::entity)bodyA->GetUserData().pointer;
+        auto entityB = (entt::entity)bodyB->GetUserData().pointer;
+        if (entityA == entt::null || entityB == entt::null)
+            return;
+        if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
+            m_Scene->m_CollisionExitEvents.push_back({entityA, entityB});
     }
 
     template <typename T>

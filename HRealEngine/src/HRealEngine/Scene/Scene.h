@@ -72,7 +72,8 @@ namespace HRealEngine
         private:
             Scene* m_Scene;
         };
-        std::vector<CollisionEvent> m_CollisionEvents;
+        std::vector<CollisionEvent> m_CollisionEnterEvents;
+        std::vector<CollisionEvent> m_CollisionExitEvents;
         GameContactListener m_ContactListener{this};
     };
 }
