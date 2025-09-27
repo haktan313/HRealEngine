@@ -18,6 +18,8 @@ namespace HRealEngine
         virtual void OnCreate() {}
         virtual void OnDestroy() {}
         virtual void OnUpdate(Timestep ts) {}
+        virtual void OnCollisionEnter(Entity other) {}
+        virtual void OnCollisionExit(Entity other) {}
 
         Entity& GetEntity() { return m_Entity; }
         void DestroySelf() { m_Entity.Destoy(); }

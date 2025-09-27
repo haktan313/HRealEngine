@@ -144,6 +144,8 @@ namespace HRealEngine
             body->SetFixedRotation(rb.FixedRotation);
             rb.RuntimeBody = body;
 
+            body->GetUserData().pointer = static_cast<uintptr_t>(entt::to_integral((entt::entity)eBottom));
+
             if (eBottom.HasComponent<BoxCollider2DComponent>())
             {
                 auto& bc = eBottom.GetComponent<BoxCollider2DComponent>();
@@ -189,6 +191,8 @@ namespace HRealEngine
             b2Body* body = m_ActiveGameScene->GetPhysicsWorld()->CreateBody(&def);
             body->SetFixedRotation(rb.FixedRotation);
             rb.RuntimeBody = body;
+
+            body->GetUserData().pointer = static_cast<uintptr_t>(entt::to_integral((entt::entity)eTop));
 
             if (eTop.HasComponent<BoxCollider2DComponent>())
             {

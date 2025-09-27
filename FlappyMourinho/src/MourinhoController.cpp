@@ -32,4 +32,10 @@ namespace HRealEngine
         }
         m_Jumped = Input::IsKeyPressed(HR_KEY_SPACE);
     }
+
+    void MourinhoController::OnCollisionEnter(Entity other)
+    {
+        LOG_CORE_INFO("Collision with {0}", other.GetName());
+        DestroySelf();
+    }
 }

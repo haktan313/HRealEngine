@@ -12,6 +12,8 @@ namespace HRealEngine
         void OnCreate() override;
         void OnDestroy() override;
         void OnUpdate(Timestep ts) override;
+        void OnCollisionEnter(Entity other) override;
+
     private:
         b2Body* m_Body = nullptr;
         float m_JumpForce = 4.f;

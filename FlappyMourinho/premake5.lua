@@ -16,7 +16,8 @@ project "FlappyMourinho"
         "%{wks.location}/HRealEngine/src",
         "%{wks.location}/HRealEngine/vendor",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.entt}"
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.Box2D}"
     }
 
     buildoptions { "/utf-8" }

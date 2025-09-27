@@ -12,18 +12,19 @@
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlappyMourinho/assets/scenes/GameScene.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/assets/scenes/GameScene.hrs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FlappyMourinho/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.h" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +38,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://72" root0="FORCE_HIGHLIGHTING" />
-    <setting file="cidr-memory-view://79" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -314,7 +316,7 @@
       <workItem from="1758892811410" duration="22625000" />
       <workItem from="1758935141974" duration="93000" />
       <workItem from="1758978553834" duration="1050000" />
-      <workItem from="1758988330283" duration="8065000" />
+      <workItem from="1758988330283" duration="18625000" />
     </task>
     <servers />
   </component>

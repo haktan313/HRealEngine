@@ -17,7 +17,8 @@ project "HRealEngine Editor"
         "%{wks.location}/HRealEngine/vendor",
         "%{IncludeDir.glm}",
         "%{IncludeDir.entt}",
-        "%{IncludeDir.ImGuizmo}"
+        "%{IncludeDir.ImGuizmo}",
+        "%{IncludeDir.Box2D}"
     }
 
     buildoptions { "/utf-8" }
