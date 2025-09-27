@@ -105,6 +105,13 @@ namespace HRealEngine
 
     void Scene::DestroyEntity(Entity entity)
     {
+        if (entity.HasComponent<Rigidbody2DComponent>()) {
+            auto& rb = entity.GetComponent<Rigidbody2DComponent>();
+            if (m_PhysicsWorld && rb.RuntimeBody) {
+                m_PhysicsWorld->DestroyBody((b2Body*)rb.RuntimeBody);
+                rb.RuntimeBody = nullptr;
+            }
+        }
         m_Registry.destroy(entity);
     }
 

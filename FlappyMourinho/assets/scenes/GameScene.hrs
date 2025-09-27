@@ -1,16 +1,26 @@
 Scene: Untitled
 Entities:
-  - Entity: 14011171251359177206
+  - Entity: 17770297664192825325
     TagComponent:
-      Tag: Empty Entity
+      Tag: bird
     TransformComponent:
-      Position: [3.0911083, 0, 0]
-      Rotation: [0, 0, 0.60641575]
-      Scale: [0.9999999, 0.9999999, 1]
+      Position: [-1.767498, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.5, 0.5, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.27735215, 0.77935946, 0, 1]
       TexturePath: assets\textures\joseMourinho.png
       TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: true
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 3076424936503579956
     TagComponent:
       Tag: camera
@@ -26,6 +36,48 @@ Entities:
         PerspectiveFOV: 0.7853982
         PerspectiveNear: 0.01
         PerspectiveFar: 1000
-        OrthographicSize: 10
+        OrthographicSize: 5
         OrthographicNear: -1
         OrthographicFar: 1
+  - Entity: 10823615048424333006
+    TagComponent:
+      Tag: aliBottom
+    TransformComponent:
+      Position: [5, -2.0238075, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.9, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\textures\alikoc.png
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Kinematic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 5484348835576295558
+    TagComponent:
+      Tag: aliTop
+    TransformComponent:
+      Position: [5, 1.9012413, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.9, 1.579193, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\textures\alikoc.png
+      TilingFactor: 1
+    Rigidbody2DComponent:
+      BodyType: Kinematic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5

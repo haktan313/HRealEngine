@@ -39,6 +39,7 @@ namespace HRealEngine
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
+        b2World* GetPhysicsWorld() { return m_PhysicsWorld; }
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);

@@ -220,11 +220,30 @@ namespace HRealEngine
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
             ShowAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
             ShowAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
+            if (ImGui::MenuItem("Native Script"))
+            {
+                m_SelectedEntity.AddComponent<NativeScriptComponent>();
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::EndPopup();
         }
 
         ImGui::PopItemWidth();
         
+        DrawComponent<NativeScriptComponent>("Native Script", entity, [](auto& component)
+        {
+            ImGui::Button("Bind Script");
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
+                    //component.BindScript(fullPath.string());
+                }
+                ImGui::EndDragDropTarget();
+            }
+        });
         DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
         {
             DrawVec3Control("Position", component.Position);
@@ -319,7 +338,7 @@ namespace HRealEngine
             
             if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
                     if (ImGui::Selectable(bodyTypeStrings[i], isSelected))

@@ -1,5 +1,5 @@
 #pragma once
-#include "HRealEngine/Camera/SceneCamera.h"
+#include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Core/Layer.h"
 #include "HRealEngine/Events/KeyEvent.h"
 #include "HRealEngine/Renderer/Framebuffer.h"
@@ -20,11 +20,13 @@ namespace HRealEngine
         void OnImGuiRender() override;
         void OnEvent(EventBase& eventRef) override;
     private:
-        bool OnKeyPressed(KeyPressedEvent& event);
-        
+        void SpawnNewAliPipe();
+        void Dockspace();
+
+        Entity m_AliTop, m_AliBottom; 
         Ref<Scene> m_ActiveGameScene;
         Ref<Framebuffer> m_Framebuffer;
-        SceneCamera m_Camera;
-        
+        float m_SpawnTimer = 0.0f;
+        float  m_SpawnInterval = 1.5f;
     };
 }

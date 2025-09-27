@@ -11,16 +11,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/assets/scenes/GameScene.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/assets/scenes/GameScene.hrs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Layer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/EventBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/EventBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Renderer/Shader.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,8 +37,14 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="cidr-memory-view://72" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://79" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/GameLayer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/GameLayer.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/MourinhoController.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/aliPipe.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/FlappyMourinho/src/aliPipe.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -83,27 +92,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;C/C++ Project.FlappyMourinho.executor&quot;: &quot;Debug&quot;,
-    &quot;C/C++ Project.HRealEngine Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;C/C++ Project.Sandbox.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;flapy-mourinho&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "C/C++ Project.FlappyMourinho.executor": "Debug",
+    "C/C++ Project.HRealEngine Editor.executor": "Debug",
+    "C/C++ Project.Sandbox.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "flapy-mourinho",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="C/C++ Project.FlappyMourinho">
     <configuration name="FlappyMourinho" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -302,6 +311,10 @@
       <workItem from="1758841918202" duration="111000" />
       <workItem from="1758842090554" duration="2282000" />
       <workItem from="1758844399368" duration="2608000" />
+      <workItem from="1758892811410" duration="22625000" />
+      <workItem from="1758935141974" duration="93000" />
+      <workItem from="1758978553834" duration="1050000" />
+      <workItem from="1758988330283" duration="8065000" />
     </task>
     <servers />
   </component>
