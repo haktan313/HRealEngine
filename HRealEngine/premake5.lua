@@ -45,7 +45,8 @@ project "HRealEngine"
         "%{IncludeDir.entt}",
         "%{IncludeDir['yaml-cpp']}",
         "%{IncludeDir.ImGuizmo}",
-        "%{IncludeDir.Box2D}"
+        "%{IncludeDir.Box2D}",
+        "%{IncludeDir.mono}"
     }
 
     links
@@ -55,7 +56,8 @@ project "HRealEngine"
         "Glad",
         "ImGui",
         "yaml-cpp",
-        "Box2D"
+        "Box2D",
+        "%{Library.mono}"
     }
 
     buildoptions { "/utf-8" }
@@ -63,6 +65,7 @@ project "HRealEngine"
     filter "system:windows"
         systemversion "latest"
         defines { "HREALENGINE_PLATFORM_WINDOWS" }
+        links { "%{Library.WinSock}", "%{Library.WinMM}", "%{Library.WinVersion}", "%{Library.Bcrypt}" }
     
     filter "configurations:Debug"
         defines { "HREALENGINE_DEBUG" }

@@ -11,12 +11,15 @@
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dependencies.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Dependencies.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/Example.hrs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/sadadas.hrs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/test.hrs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +41,7 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/Main.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.h" root0="FORCE_HIGHLIGHTING" />
@@ -54,6 +58,8 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Utils/PlatformUtils.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.h" root0="FORCE_HIGHLIGHTING" />
@@ -87,7 +93,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;C#-scripting&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -250,6 +256,9 @@
       <workItem from="1758621821311" duration="1037000" />
       <workItem from="1758804962431" duration="523000" />
       <workItem from="1758805502667" duration="751000" />
+      <workItem from="1759065254503" duration="1250000" />
+      <workItem from="1759067235690" duration="7462000" />
+      <workItem from="1759090750932" duration="2226000" />
     </task>
     <servers />
   </component>

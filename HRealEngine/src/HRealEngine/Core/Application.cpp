@@ -6,6 +6,7 @@
 #include <filesystem>
 
 #include "HRealEngine/Renderer/Renderer.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
@@ -25,6 +26,7 @@ namespace HRealEngine
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 		
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
