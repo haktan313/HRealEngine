@@ -24,6 +24,7 @@ namespace HRealEngine
 
     void ScriptEngine::Shutdown()
     {
+        ShutdownMono();
         delete s_Data;
     }
 
@@ -112,10 +113,41 @@ namespace HRealEngine
 
         s_Data->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
         PrintAssemblyTypes(s_Data->CoreAssembly);
+
+        MonoImage* coreImage = mono_assembly_get_image(s_Data->CoreAssembly);
+        MonoClass* monoClass = mono_class_from_name(coreImage, "HRealEngine", "Main");
+        MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
+        mono_runtime_object_init(instance);
+
+        MonoMethod* method = mono_class_get_method_from_name(monoClass, "PrintHello", 0);
+        mono_runtime_invoke(method, instance, nullptr, nullptr);
+
+        MonoMethod* printNumberMethod = mono_class_get_method_from_name(monoClass, "PrintNumber", 1);
+        int value = 42;
+        //void* param = (void*)42;
+        void* param = &value;
+        mono_runtime_invoke(printNumberMethod, instance, &param, nullptr);
+
+        MonoMethod* printNumbersMethod = mono_class_get_method_from_name(monoClass, "PrintNumbers", 2);
+        int value1 = 3;
+        int value2 = 1;
+        void* params2[2]
+        {
+            &value1, &value2
+        };
+        mono_runtime_invoke(printNumbersMethod, instance, params2, nullptr);
+
+        MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
+        MonoString* message = mono_string_new(s_Data->AppDomain, "Hello from C++!");
+        void* stringParam = message;
+        mono_runtime_invoke(printCustomMessageMethod, instance, &stringParam, nullptr);
     }
 
     void ScriptEngine::ShutdownMono()
     {
-         
+        //mono_domain_unload(s_Data->AppDomain);
+        s_Data->AppDomain = nullptr;
+        //mono_jit_cleanup(s_Data->RootDomain);
+        s_Data->RootDomain = nullptr;
     }
 }
