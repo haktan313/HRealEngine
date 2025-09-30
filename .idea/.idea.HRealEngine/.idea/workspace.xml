@@ -13,9 +13,9 @@
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/Main.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/Main.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" afterDir="false" />
@@ -32,7 +32,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://13" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://1" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -83,26 +83,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;C/C++ Project.HRealEngine Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;C/C++ Project.Sandbox.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;C#-scripting&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "C/C++ Project.HRealEngine Editor.executor": "Debug",
+    "C/C++ Project.Sandbox.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "C#-scripting",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="C/C++ Project.HRealEngine Editor">
     <configuration name="HRealEngine Editor" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -259,7 +259,8 @@
       <workItem from="1759067235690" duration="7462000" />
       <workItem from="1759090750932" duration="2226000" />
       <workItem from="1759103714202" duration="21000" />
-      <workItem from="1759156336231" duration="2702000" />
+      <workItem from="1759156336231" duration="8985000" />
+      <workItem from="1759176910457" duration="5058000" />
     </task>
     <servers />
   </component>

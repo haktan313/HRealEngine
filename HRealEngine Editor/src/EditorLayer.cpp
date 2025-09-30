@@ -185,7 +185,7 @@ namespace HRealEngine
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
             m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
-            LOG_CORE_INFO("Pixel data = {0}", pixelData);
+            //LOG_CORE_INFO("Pixel data = {0}", pixelData);
         }
 
         OnOverlayRender();
