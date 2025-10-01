@@ -298,7 +298,7 @@ namespace HRealEngine
             if (!bScriptClassIsExist)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 0.2f, 0.2f, 1.0f});
             if (ImGui::InputText("Class", className, sizeof(className)))
-                component.ClassName = std::string(className);
+                component.ClassName = className;
             if (!bScriptClassIsExist)
                 ImGui::PopStyleColor();
         });

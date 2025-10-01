@@ -1,4 +1,4 @@
-namespace HRealEngine.HRealEngine.Core
+namespace HRealEngine
 {
     public abstract class Component
     {
@@ -20,15 +20,15 @@ namespace HRealEngine.HRealEngine.Core
             }
         }
     }
-    public class RigidBody2DComponent : Component
+    public class Rigidbody2DComponent : Component
     {
         public void ApplyLinearImpulse(Vector2 impulse, Vector2 point, bool wake)
         {
-            InternalCalls.RigidBody2DComponent_ApplyLinearImpulse(entity.EntityID, ref impulse, ref point, wake);
+            InternalCalls.Rigidbody2DComponent_ApplyLinearImpulse(entity.EntityID, ref impulse, ref point, wake);
         } 
         public void ApplyLinearImpulse(Vector2 impulse, bool wake)
         {
-            InternalCalls.RigidBody2DComponent_ApplyLinearImpulse(entity.EntityID, ref impulse, wake);
+            InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(entity.EntityID, ref impulse, wake);
         }
     }
 }

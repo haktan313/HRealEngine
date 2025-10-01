@@ -212,7 +212,7 @@ namespace HRealEngine
     {
         UUID entityID = entity.GetUUID();
         Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
-        instance->InvokeOnUpdate(ts);
+        instance->InvokeOnUpdate((float)ts);
     }
 
     Scene* ScriptEngine::GetSceneContext()
@@ -279,11 +279,11 @@ namespace HRealEngine
 
     ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity) : m_ScriptClass(scriptClass)
     {
-        m_Instance = m_ScriptClass->Instantiate();
+        m_Instance = scriptClass->Instantiate();
 
-        m_Constructor = m_ScriptClass->GetMethod(".ctor", 1);
-        m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
-        m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
+        m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
+        m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
+        m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
         {
             UUID entityID = entity.GetUUID();

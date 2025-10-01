@@ -1,7 +1,5 @@
 
 
-using HRealEngine.HRealEngine.Core;
-
 namespace HRealEngine
 {
     public class Entity

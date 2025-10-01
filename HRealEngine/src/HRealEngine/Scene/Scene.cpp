@@ -80,6 +80,7 @@ namespace HRealEngine
 
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
@@ -102,7 +103,7 @@ namespace HRealEngine
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
         tag.Tag = name.empty() ? "Entity" : name;
-        m_EntityMap[uuid] = (entt::entity)entity;
+        m_EntityMap[uuid] = entity;
         return entity;
     }
 
@@ -129,6 +130,7 @@ namespace HRealEngine
     void Scene::OnRuntimeStop()
     {
         OnPhysics2DStop();
+        ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
@@ -172,7 +174,7 @@ namespace HRealEngine
     void Scene::OnUpdateRuntime(Timestep deltaTime)
     {
         {
-            auto view = m_Registry.view<NativeScriptComponent>();
+            auto view = m_Registry.view<ScriptComponent>();
             for (auto e : view)
             {
                 Entity entity = {e, this};

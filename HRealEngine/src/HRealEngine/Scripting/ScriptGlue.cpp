@@ -36,21 +36,34 @@ namespace HRealEngine
 
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
-        Scene* scene = ScriptEngine::GetSceneContext();
+        /*Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
 
         MonoType* managedType = mono_reflection_type_get_type(componentType);
-        return s_EntityHasComponentFunctions.at(managedType)(entity);
+        return s_EntityHasComponentFunctions.at(managedType)(entity);*/
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->GetEntityByUUID(entityID);
+        
+        MonoType* managedType = mono_reflection_type_get_type(componentType);
+
+        auto it = s_EntityHasComponentFunctions.find(managedType);
+        if (it == s_EntityHasComponentFunctions.end())
+        {
+            const char* tn = mono_type_get_name(managedType);
+            LOG_CORE_ERROR("Entity_HasComponent: Unregistered component type: {}", tn ? tn : "<null>");
+            return false;
+        }
+        return it->second(entity);
     }
 
-    static void TransformComponent_GetPosition(UUID entityID, glm::vec3* outPosition)
+    static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
         *outPosition = entity.GetComponent<TransformComponent>().Position;
     }
 
-    static void TransformComponent_SetPosition(UUID entityID, glm::vec3* position)
+    static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* position)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -66,13 +79,13 @@ namespace HRealEngine
         body->ApplyLinearImpulse(b2Vec2(impulse->x, impulse->y), b2Vec2(point->x, point->y), wake);
     }
 
-    static void Rigidbody2DComponent_ApplyForce(UUID entityID, glm::vec2* impulse, bool wake)
+    static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impulse, bool wake)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
         auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
-        body->ApplyForceToCenter(b2Vec2(impulse->x, impulse->y), wake);
+        body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
 
     static bool Input_IsKeyDown(KeyCodes keycode)
@@ -115,5 +128,12 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(PrintLog);
         HRE_ADD_INTERNAL_CALL(PrintLog_Vector);
         HRE_ADD_INTERNAL_CALL(PrintLog_VectorDot);
+
+        HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
+        HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
+        HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+        HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
+        HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+        HRE_ADD_INTERNAL_CALL(Input_IsKeyDown);
     }
 }

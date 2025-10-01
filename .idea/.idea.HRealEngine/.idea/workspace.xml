@@ -12,18 +12,19 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/Main.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Components.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Components.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/KeyCodes.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/KeyCodes.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/KeyEvent.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Events/KeyEvent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Components.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Component.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Entities/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Entities/Camera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Entities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Entities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/box2d/src/dynamics/b2_world.cpp" afterDir="false" />
@@ -40,7 +41,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://18" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://87" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/13/6f01a4c0/Type.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -49,7 +50,7 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Components.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Component.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Enums/KeyCodes.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Input.cs" root0="FORCE_HIGHLIGHTING" />
@@ -280,7 +281,7 @@
       <workItem from="1759103714202" duration="21000" />
       <workItem from="1759156336231" duration="8985000" />
       <workItem from="1759176910457" duration="5373000" />
-      <workItem from="1759250327961" duration="19927000" />
+      <workItem from="1759250327961" duration="24872000" />
     </task>
     <servers />
   </component>
@@ -311,6 +312,16 @@
           <url>file://$PROJECT_DIR$/Sandbox/src/Sandbox2D.cpp</url>
           <line>2</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp</url>
+          <line>179</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp</url>
+          <line>180</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

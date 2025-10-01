@@ -193,7 +193,7 @@ namespace HRealEngine
             auto& scriptComponent = entity.GetComponent<ScriptComponent>();
             out << YAML::Key << "ScriptComponent";
             out << YAML::BeginMap;
-            out << YAML::Key << "ModuleName" << YAML::Value << scriptComponent.ClassName;
+            out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<Rigidbody2DComponent>())
