@@ -5,59 +5,12 @@
 #include <mono/metadata/assembly.h>
 #include <mono/jit/jit.h>
 
+#include "ScriptGlue.h"
+#include "HRealEngine/Core/Components.h"
+#include "HRealEngine/Core/Entity.h"
+
 namespace HRealEngine
 {
-    struct ScriptEngineData
-    {
-        MonoDomain* RootDomain = nullptr;
-        MonoDomain* AppDomain = nullptr;
-
-        MonoAssembly* CoreAssembly = nullptr;
-        MonoImage* CoreImage = nullptr;
-    };
-    static ScriptEngineData* s_Data = nullptr;
-    
-    void ScriptEngine::Init()
-    {
-        s_Data = new ScriptEngineData();
-        InitMono();
-        LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
-
-        // Test
-        MonoClass* monoClass = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "Main");
-        MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
-        mono_runtime_object_init(instance);
-
-        MonoMethod* method = mono_class_get_method_from_name(monoClass, "PrintHello", 0);
-        mono_runtime_invoke(method, instance, nullptr, nullptr);
-
-        MonoMethod* printNumberMethod = mono_class_get_method_from_name(monoClass, "PrintNumber", 1);
-        int value = 42;
-        //void* param = (void*)42;
-        void* param = &value;
-        mono_runtime_invoke(printNumberMethod, instance, &param, nullptr);
-
-        MonoMethod* printNumbersMethod = mono_class_get_method_from_name(monoClass, "PrintNumbers", 2);
-        int value1 = 3;
-        int value2 = 1;
-        void* params2[2]
-        {
-            &value1, &value2
-        };
-        mono_runtime_invoke(printNumbersMethod, instance, params2, nullptr);
-
-        MonoMethod* printCustomMessageMethod = mono_class_get_method_from_name(monoClass, "PrintCustomMessage", 1);
-        MonoString* message = mono_string_new(s_Data->AppDomain, "Hello from C++!");
-        void* stringParam = message;
-        mono_runtime_invoke(printCustomMessageMethod, instance, &stringParam, nullptr);
-    }
-
-    void ScriptEngine::Shutdown()
-    {
-        ShutdownMono();
-        delete s_Data;
-    }
-
     //------------------------------------------------------------------ 
     //Mono Embedding for Game Engines
     static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
@@ -129,10 +82,64 @@ namespace HRealEngine
             printf("%s.%s", typeNamespace, typeName);
         }
     }
-    //------------------------------------------------------------------                                                                                                                                                                             
+    //------------------------------------------------------------------
+    
+    struct ScriptEngineData
+    {
+        MonoDomain* RootDomain = nullptr;
+        MonoDomain* AppDomain = nullptr;
 
+        MonoAssembly* CoreAssembly = nullptr;
+        MonoImage* CoreImage = nullptr;
 
-    void ScriptEngine::LoadAssembly(const std::string& assemblyPath)
+        ScriptClass EntityClass;
+
+        std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
+        std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+
+        Scene* SceneContext = nullptr;
+    };
+    static ScriptEngineData* s_Data = nullptr;
+    
+    void ScriptEngine::Init()
+    {
+        s_Data = new ScriptEngineData();
+        InitMono();
+        LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
+        LoadAssemblyClasses(s_Data->CoreAssembly);
+
+        ScriptGlue::RegisterComponents();
+        ScriptGlue::RegisterFunctions();
+
+        // Test
+        s_Data->EntityClass = ScriptClass("HRealEngine", "Entity");
+        /*MonoObject* instance = s_Data->EntityClass.Instantiate();
+
+        MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
+        int intValue = 123;
+        void* param = &intValue;
+        s_Data->EntityClass.InvokeMethod(instance, printIntFunc, &param);
+        MonoMethod* printIntsFunc = s_Data->EntityClass.GetMethod("PrintInts", 2);
+        int intValue2 = 1;
+        void* params[2]
+        {
+            &intValue, &intValue2
+        };
+        s_Data->EntityClass.InvokeMethod(instance, printIntsFunc, params);
+
+        MonoString* str = mono_string_new(s_Data->AppDomain, "Hello from C++!");
+        MonoMethod* printStringFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
+        void* stringParam = str;
+        s_Data->EntityClass.InvokeMethod(instance, printStringFunc, &stringParam);*/
+    }
+
+    void ScriptEngine::Shutdown()
+    {
+        ShutdownMono();
+        delete s_Data;
+    }
+
+    void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath)
     {
         s_Data->AppDomain = mono_domain_create_appdomain("HRealEngineAppDomain", nullptr);
         mono_domain_set(s_Data->AppDomain, true);
@@ -141,7 +148,88 @@ namespace HRealEngine
         //PrintAssemblyTypes(s_Data->CoreAssembly);
         s_Data->CoreImage = mono_assembly_get_image(s_Data->CoreAssembly);
     }
-    
+
+    void ScriptEngine::LoadAssemblyClasses(MonoAssembly* assembly)
+    {
+        s_Data->EntityClasses.clear();
+
+        MonoImage* image = mono_assembly_get_image(assembly);
+        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+        MonoClass* entityClass = mono_class_from_name(image, "HRealEngine", "Entity");
+
+        for (int32_t i = 0; i < numTypes; i++)
+        {
+            uint32_t cols[MONO_TYPEDEF_SIZE];
+            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+            const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+            const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+            std::string fullName;
+            if (strlen(nameSpace) != 0)
+                fullName = fmt::format("{}.{}", nameSpace, name);
+            else
+                fullName = name;
+
+            MonoClass* monoClass = mono_class_from_name(image, nameSpace, name);
+
+            if (monoClass == entityClass)
+                continue;
+
+            bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
+            if (isEntity)
+                s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
+        }
+    }
+
+    void ScriptEngine::OnRuntimeStart(Scene* scene)
+    {
+        s_Data->SceneContext = scene;
+    }
+
+    void ScriptEngine::OnRuntimeStop()
+    {
+        s_Data->SceneContext = nullptr; 
+    }
+
+    bool ScriptEngine::IsEntityClassExist(const std::string& className)
+    {
+        return s_Data->EntityClasses.find(className) != s_Data->EntityClasses.end();
+    }
+
+    void ScriptEngine::OnCreateEntity(Entity entity)
+    {
+        const auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+        if (ScriptEngine::IsEntityClassExist(scriptComponent.ClassName))
+        {
+            Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName], entity);
+            s_Data->EntityInstances[entity.GetUUID()] = instance;
+            instance->InvokeOnCreate();
+        }
+    }
+
+    void ScriptEngine::OnUpdateEntity(Entity entity, Timestep ts)
+    {
+        UUID entityID = entity.GetUUID();
+        Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
+        instance->InvokeOnUpdate(ts);
+    }
+
+    Scene* ScriptEngine::GetSceneContext()
+    {
+        return s_Data->SceneContext;
+    }
+
+    std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetEntityClasses()
+    {
+        return s_Data->EntityClasses;
+    }
+
+    MonoImage* ScriptEngine::GetCoreAssemblyImage()
+    {
+        return s_Data->CoreImage;
+    }
+
     void ScriptEngine::InitMono()
     {
         mono_set_assemblies_path("mono/lib/mono/4.5");
@@ -158,5 +246,65 @@ namespace HRealEngine
         s_Data->AppDomain = nullptr;
         mono_jit_cleanup(s_Data->RootDomain);
         s_Data->RootDomain = nullptr;
+    }
+
+    MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
+    {
+        MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
+        mono_runtime_object_init(instance);
+        return instance;
+    }
+
+    //---------------- ScriptClass ----------------
+
+    ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className)
+        : m_ClassNamespace(classNamespace), m_ClassName(className)
+    {
+        m_MonoClass = mono_class_from_name(s_Data->CoreImage, m_ClassNamespace.c_str(), m_ClassName.c_str());
+    }
+    MonoObject* ScriptClass::Instantiate()
+    {
+        return ScriptEngine::InstantiateClass(m_MonoClass);
+    }
+    MonoMethod* ScriptClass::GetMethod(const std::string& methodName, int paramCount)
+    {
+        return mono_class_get_method_from_name(m_MonoClass, methodName.c_str(), paramCount);
+    }
+    MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
+    {
+        return mono_runtime_invoke(method, instance, params, nullptr);
+    }
+
+    //---------------- ScriptInstance ----------------
+
+    ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity) : m_ScriptClass(scriptClass)
+    {
+        m_Instance = m_ScriptClass->Instantiate();
+
+        m_Constructor = m_ScriptClass->GetMethod(".ctor", 1);
+        m_OnCreateMethod = m_ScriptClass->GetMethod("OnCreate", 0);
+        m_OnUpdateMethod = m_ScriptClass->GetMethod("OnUpdate", 1);
+
+        {
+            UUID entityID = entity.GetUUID();
+            void* param = &entityID;
+            m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
+        }
+    }
+
+    void ScriptInstance::InvokeOnCreate()
+    {
+        if (m_OnCreateMethod)
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
+    }
+
+    void ScriptInstance::InvokeOnUpdate(Timestep ts)
+    {
+        if (m_OnUpdateMethod)
+        {
+            float time = (float)ts;
+            void* param = &time;
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+        }
     }
 }

@@ -36,6 +36,7 @@ namespace HRealEngine
         void OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera);
         void OnUpdateRuntime(Timestep deltaTime);
         void OnViewportResize(uint32_t width, uint32_t height);
+        Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
         void DuplicateEntity(Entity entity);
 
@@ -48,6 +49,8 @@ namespace HRealEngine
         void RenderScene(EditorCamera& camera);
 
         b2World* m_PhysicsWorld = nullptr;
+
+        std::unordered_map<UUID, entt::entity> m_EntityMap;
         
         entt::registry m_Registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;

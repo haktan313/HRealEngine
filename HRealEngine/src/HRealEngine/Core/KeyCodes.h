@@ -2,6 +2,10 @@
 
 #pragma once
 
+namespace HRealEngine
+{
+    using KeyCodes = uint16_t;
+}
 //FROM GLFW3
 #define HR_KEY_SPACE              32
 #define HR_KEY_APOSTROPHE         39  /* ' */

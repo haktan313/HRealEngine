@@ -15,6 +15,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "HRealEngine/Scripting/ScriptEngine.h"
+
 namespace HRealEngine
 {
     static b2BodyType RigidBody2DTypeToBox2D(Rigidbody2DComponent::BodyType type)
@@ -100,17 +102,28 @@ namespace HRealEngine
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
         tag.Tag = name.empty() ? "Entity" : name;
+        m_EntityMap[uuid] = (entt::entity)entity;
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
         m_Registry.destroy(entity);
+        m_EntityMap.erase(entity.GetUUID());
     }
 
     void Scene::OnRuntimeStart()
     {
        OnPhysics2DStart();
+       {
+           ScriptEngine::OnRuntimeStart(this);
+           auto view = m_Registry.view<ScriptComponent>();
+           for (auto e : view)
+           {
+             Entity entity = {e, this};
+             ScriptEngine::OnCreateEntity(entity);
+           }
+       }
     }
 
     void Scene::OnRuntimeStop()
@@ -159,6 +172,12 @@ namespace HRealEngine
     void Scene::OnUpdateRuntime(Timestep deltaTime)
     {
         {
+            auto view = m_Registry.view<NativeScriptComponent>();
+            for (auto e : view)
+            {
+                Entity entity = {e, this};
+                ScriptEngine::OnUpdateEntity(entity, deltaTime);
+            } 
             m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
             {
                if (!nativeScript.Instance)
@@ -243,6 +262,13 @@ namespace HRealEngine
                 cameraComponent.Camera.SetViewportSize(width, height);
             }
         }   
+    }
+
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+        if (m_EntityMap.find(uuid) != m_EntityMap.end())
+            return Entity{m_EntityMap.at(uuid), this};
+        return {};
     }
 
     Entity Scene::GetPrimaryCameraEntity()
@@ -413,6 +439,10 @@ namespace HRealEngine
     {
         if (viewportWidth > 0 && viewportHeight > 0)
             component.Camera.SetViewportSize(viewportWidth, viewportHeight);
+    }
+    template<>
+    void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+    {
     }
     template<>
     void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)

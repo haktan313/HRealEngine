@@ -1,22 +1,23 @@
 #pragma once
 #include "EventBase.h"
+#include "HRealEngine/Core/KeyCodes.h"
 
 namespace HRealEngine
 {
 	class HREALENGINE_API KeyEventBase : public EventBase
 	{
 	public:
-		int GetKeyCode() const { return m_KeyCode; }
+		KeyCodes GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(KeyboardEvents | InputEvents)
 	protected:
-		KeyEventBase(int keyCode) : m_KeyCode(keyCode) {}
-		int m_KeyCode;
+		KeyEventBase(KeyCodes keyCode) : m_KeyCode(keyCode) {}
+		KeyCodes m_KeyCode;
 	};
 
 	class HREALENGINE_API KeyPressedEvent : public KeyEventBase
 	{
 	public:
-		KeyPressedEvent(int keyCode, bool bIsRepeate = false) : KeyEventBase(keyCode), m_bIsRepeating(bIsRepeate) {}
+		KeyPressedEvent(KeyCodes keyCode, bool bIsRepeate = false) : KeyEventBase(keyCode), m_bIsRepeating(bIsRepeate) {}
 		bool IsRepeating() const { return m_bIsRepeating; }
 		std::string ToString() const override
 		{
@@ -32,7 +33,7 @@ namespace HRealEngine
 	class HREALENGINE_API KeyReleasedEvent : public KeyEventBase
 	{
 	public:
-		KeyReleasedEvent(int keyCode) : KeyEventBase(keyCode) {}
+		KeyReleasedEvent(KeyCodes keyCode) : KeyEventBase(keyCode) {}
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -45,7 +46,7 @@ namespace HRealEngine
 	class HREALENGINE_API KeyTypedEvent : public KeyEventBase
 	{
 	public:
-		KeyTypedEvent(int keyCode) : KeyEventBase(keyCode){}
+		KeyTypedEvent(KeyCodes keyCode) : KeyEventBase(keyCode){}
 		std::string ToString() const override
 		{
 			std::stringstream ss;

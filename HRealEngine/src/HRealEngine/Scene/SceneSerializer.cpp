@@ -188,6 +188,14 @@ namespace HRealEngine
             out << YAML::EndMap;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<ScriptComponent>())
+        {
+            auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+            out << YAML::Key << "ScriptComponent";
+            out << YAML::BeginMap;
+            out << YAML::Key << "ModuleName" << YAML::Value << scriptComponent.ClassName;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<Rigidbody2DComponent>())
         {
             out << YAML::Key << "Rigidbody2DComponent";
@@ -313,6 +321,11 @@ namespace HRealEngine
 
                     cameraComp.PrimaryCamera = cameraComponent["PrimaryCamera"].as<bool>();
                     cameraComp.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+                }
+                if (auto scriptComponent = entity["ScriptComponent"])
+                {
+                    auto& sc = deserializedEntity.AddComponent<ScriptComponent>();
+                    sc.ClassName = scriptComponent["ClassName"].as<std::string>();
                 }
                 if (auto spriteRendererComponent = entity["SpriteRendererComponent"])
                 {

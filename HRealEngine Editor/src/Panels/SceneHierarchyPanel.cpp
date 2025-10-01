@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "HRealEngine/Scripting/ScriptEngine.h"
+
 namespace HRealEngine
 {
     extern const std::filesystem::path g_AssetsDirectory;
@@ -215,6 +217,7 @@ namespace HRealEngine
         if (ImGui::BeginPopup("AddComponent"))
         {  
             ShowAddComponentEntry<CameraComponent>("Camera Component");
+            ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -286,6 +289,18 @@ namespace HRealEngine
                 if (ImGui::DragFloat("Far", &perspectiveFar))
                     camera.SetPerspectiveFar(perspectiveFar);
             }
+        });
+        DrawComponent<ScriptComponent>("Script Component", entity, [](auto& component)
+        {
+            bool bScriptClassIsExist = ScriptEngine::IsEntityClassExist(component.ClassName);
+            static char className[64];
+            strcpy(className, component.ClassName.c_str());
+            if (!bScriptClassIsExist)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 0.2f, 0.2f, 1.0f});
+            if (ImGui::InputText("Class", className, sizeof(className)))
+                component.ClassName = std::string(className);
+            if (!bScriptClassIsExist)
+                ImGui::PopStyleColor();
         });
         DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
         {
