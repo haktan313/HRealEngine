@@ -6,8 +6,8 @@ project "HRealEngine-ScriptCore"
     language "C#"
     dotnetframework "4.7.2"
     
-    targetdir ("%{wks.location}/HRealEngine Editor/Resources/Scripts")
-    objdir ("%{wks.location}/HRealEngine Editor/Resources/Scripts/Intermediates")
+    targetdir ("../HRealEngine Editor/Resources/Scripts")
+    objdir ("../HRealEngine Editor/Resources/Scripts/Intermediates")
     
     files
     {

@@ -25,14 +25,14 @@ namespace HRealEngine
             Vector3 velocity = Vector3.Zero;
 
             if (Input.IsKeyDown(KeyCodes.HRE_KEY_UP))
-                velocity.Y = 1.0f;
+                velocity.Y = 10.0f;
             else if (Input.IsKeyDown(KeyCodes.HRE_KEY_DOWN))
-                velocity.Y = -1.0f;
+                velocity.Y = -10.0f;
 
             if (Input.IsKeyDown(KeyCodes.HRE_KEY_LEFT))
-                velocity.X = -1.0f;
+                velocity.X = -10.0f;
             else if (Input.IsKeyDown(KeyCodes.HRE_KEY_RIGHT))
-                velocity.X = 1.0f;
+                velocity.X = 10.0f;
 
             velocity *= speed;
 

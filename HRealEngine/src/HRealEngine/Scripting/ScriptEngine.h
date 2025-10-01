@@ -20,7 +20,7 @@ namespace HRealEngine
     {
     public:
         ScriptClass() = default;
-        ScriptClass(const std::string& classNamespace, const std::string& className);
+        ScriptClass(const std::string& classNamespace, const std::string& className, bool bIsCore = false);
 
         MonoObject* Instantiate();
         MonoMethod* GetMethod(const std::string& methodName, int paramCount);
@@ -53,7 +53,8 @@ namespace HRealEngine
         static void Shutdown();
 
         static void LoadAssembly(const std::filesystem::path& assemblyPath);
-        static void LoadAssemblyClasses(MonoAssembly* assembly);
+        static void LoadAppAssembly(const std::filesystem::path& assemblyPath);
+        static void LoadAssemblyClasses(/*MonoAssembly* assembly*/);
 
         static void OnRuntimeStart(Scene* scene);
         static void OnRuntimeStop();

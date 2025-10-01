@@ -92,6 +92,9 @@ namespace HRealEngine
         MonoAssembly* CoreAssembly = nullptr;
         MonoImage* CoreImage = nullptr;
 
+        MonoAssembly* AppAssembly = nullptr;
+        MonoImage* AppImage = nullptr;
+
         ScriptClass EntityClass;
 
         std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
@@ -106,13 +109,14 @@ namespace HRealEngine
         s_Data = new ScriptEngineData();
         InitMono();
         LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
-        LoadAssemblyClasses(s_Data->CoreAssembly);
+        LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+        LoadAssemblyClasses(/*s_Data->CoreAssembly*/);
 
         ScriptGlue::RegisterComponents();
         ScriptGlue::RegisterFunctions();
 
         // Test
-        s_Data->EntityClass = ScriptClass("HRealEngine", "Entity");
+        s_Data->EntityClass = ScriptClass("HRealEngine", "Entity", true);
         /*MonoObject* instance = s_Data->EntityClass.Instantiate();
 
         MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
@@ -149,9 +153,17 @@ namespace HRealEngine
         s_Data->CoreImage = mono_assembly_get_image(s_Data->CoreAssembly);
     }
 
-    void ScriptEngine::LoadAssemblyClasses(MonoAssembly* assembly)
+    void ScriptEngine::LoadAppAssembly(const std::filesystem::path& assemblyPath)
     {
-        s_Data->EntityClasses.clear();
+        s_Data->AppAssembly = LoadCSharpAssembly(assemblyPath);
+        auto appAsemb = s_Data->AppAssembly;
+        s_Data->AppImage = mono_assembly_get_image(s_Data->AppAssembly);
+        auto appImg = s_Data->AppImage;
+    }
+
+    void ScriptEngine::LoadAssemblyClasses(/*MonoAssembly* assembly*/)
+    {
+        /*s_Data->EntityClasses.clear();
 
         MonoImage* image = mono_assembly_get_image(assembly);
         const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
@@ -172,6 +184,32 @@ namespace HRealEngine
                 fullName = name;
 
             MonoClass* monoClass = mono_class_from_name(image, nameSpace, name);
+
+            if (monoClass == entityClass)
+                continue;
+
+            bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
+            if (isEntity)
+                s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
+        }*/
+        s_Data->EntityClasses.clear();
+        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppImage, MONO_TABLE_TYPEDEF);
+        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+        MonoClass* entityClass = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "Entity");
+        for (int32_t i = 0; i < numTypes; i++)
+        {
+            uint32_t cols[MONO_TYPEDEF_SIZE];
+            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+            const char* nameSpace = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAMESPACE]);
+            const char* name = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAME]);
+            std::string fullName;
+            if (strlen(nameSpace) != 0)
+                fullName = fmt::format("{}.{}", nameSpace, name);
+            else
+                fullName = name;
+
+            MonoClass* monoClass = mono_class_from_name(s_Data->AppImage, nameSpace, name);
 
             if (monoClass == entityClass)
                 continue;
@@ -257,10 +295,10 @@ namespace HRealEngine
 
     //---------------- ScriptClass ----------------
 
-    ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className)
+    ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool bIsCore)
         : m_ClassNamespace(classNamespace), m_ClassName(className)
     {
-        m_MonoClass = mono_class_from_name(s_Data->CoreImage, m_ClassNamespace.c_str(), m_ClassName.c_str());
+        m_MonoClass = mono_class_from_name(bIsCore ? s_Data->CoreImage : s_Data->AppImage, m_ClassNamespace.c_str(), m_ClassName.c_str());
     }
     MonoObject* ScriptClass::Instantiate()
     {
