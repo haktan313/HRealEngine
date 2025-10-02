@@ -290,15 +290,35 @@ namespace HRealEngine
                     camera.SetPerspectiveFar(perspectiveFar);
             }
         });
-        DrawComponent<ScriptComponent>("Script Component", entity, [](auto& component)
+        DrawComponent<ScriptComponent>("Script Component", entity, [entity](auto& component) mutable 
         {
             bool bScriptClassIsExist = ScriptEngine::IsEntityClassExist(component.ClassName);
+            
             static char className[64];
             strcpy(className, component.ClassName.c_str());
+            
             if (!bScriptClassIsExist)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 0.2f, 0.2f, 1.0f});
+            
             if (ImGui::InputText("Class", className, sizeof(className)))
                 component.ClassName = className;
+            
+            /*if (!bScriptClassIsExist)
+                ImGui::PopStyleColor();*/
+            Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntitySriptInstance(entity.GetUUID());
+            if (scriptInstance)
+            {
+                const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+                for (const auto& [name, field] : fields)
+                {
+                    if (field.Type == ScriptFieldType::Float)
+                    {
+                        float data = scriptInstance->GetFieldValue<float>(name);
+                        if (ImGui::DragFloat(name.c_str(), &data))
+                            scriptInstance->SetFieldValue(name, data);
+                    }
+                }
+            }
             if (!bScriptClassIsExist)
                 ImGui::PopStyleColor();
         });

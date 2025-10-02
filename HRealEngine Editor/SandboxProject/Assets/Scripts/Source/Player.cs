@@ -8,6 +8,8 @@ namespace HRealEngine
     {
         private TransformComponent m_Transform;
         private Rigidbody2DComponent m_Rigidbody;
+        
+        public float Speed = 5.0f;
 
         void OnCreate()
         {

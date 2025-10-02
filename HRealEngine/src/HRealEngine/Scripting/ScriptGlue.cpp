@@ -40,7 +40,7 @@ namespace HRealEngine
         Entity entity = scene->GetEntityByUUID(entityID);
 
         MonoType* managedType = mono_reflection_type_get_type(componentType);
-        return s_EntityHasComponentFunctions.at(managedType)(entity);*/
+        return s_EntityHasComponentFunctions.at(managedType)(entity);*/  
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
         
