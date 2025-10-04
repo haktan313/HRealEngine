@@ -160,6 +160,7 @@ namespace HRealEngine
 
         std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
         std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+        std::unordered_map<UUID, ScriptFieldMap> EntityScriptFieldMaps;
 
         Scene* SceneContext = nullptr;
     };
@@ -324,6 +325,12 @@ namespace HRealEngine
         {
             Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[scriptComponent.ClassName], entity);
             s_Data->EntityInstances[entity.GetUUID()] = instance;
+            if (s_Data->EntityScriptFieldMaps.find(entity.GetUUID()) != s_Data->EntityScriptFieldMaps.end())
+            {
+                const ScriptFieldMap& fieldMap = s_Data->EntityScriptFieldMaps.at(entity.GetUUID());
+                for (const auto& [name, field] : fieldMap)
+                    instance->SetFieldValueInternal(name, field.m_Buffer);
+            }
             instance->InvokeOnCreate();
         }
     }
@@ -338,6 +345,19 @@ namespace HRealEngine
     Scene* ScriptEngine::GetSceneContext()
     {
         return s_Data->SceneContext;
+    }
+
+    Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& className)
+    {
+        if (s_Data->EntityClasses.find(className) == s_Data->EntityClasses.end())
+            return nullptr;
+        return s_Data->EntityClasses.at(className);
+    }
+
+    ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
+    {
+        HREALENGINE_CORE_DEBUGBREAK(entity);
+        return s_Data->EntityScriptFieldMaps[entity.GetUUID()];
     }
 
     std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetEntityClasses()

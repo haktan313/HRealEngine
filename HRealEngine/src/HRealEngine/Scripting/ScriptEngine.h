@@ -30,7 +30,33 @@ namespace HRealEngine
         std::string Name;
         MonoClassField* ClassField;
     };
+    struct ScriptFieldInstance
+    {
+        ScriptField Field;
+        ScriptFieldInstance()
+        {
+            memset(m_Buffer, 0, sizeof(m_Buffer));
+        }
 
+        template<typename T>
+        T GetValue()
+        {
+            static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::GetValue() buffer overflow");
+            return *(T*)m_Buffer;
+        }
+        template<typename T>
+        void SetValue(const T& value)
+        {
+            static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::SetValue() buffer overflow");
+            memcpy(m_Buffer, &value, sizeof(T));
+        }
+    private:
+        uint8_t m_Buffer[8];
+        friend class ScriptEngine;
+        friend class ScriptInstance;
+    };
+
+    using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
     
     class ScriptClass
     {
@@ -71,7 +97,7 @@ namespace HRealEngine
             return *(T*)s_FieldValueBuffer;
         }
         template<typename T>
-        void SetFieldValue(const std::string& name, const T& value)
+        void SetFieldValue(const std::string& name, T value)
         {
             SetFieldValueInternal(name, &value);
         }
@@ -85,10 +111,13 @@ namespace HRealEngine
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
 
-            inline static char s_FieldValueBuffer[8];
+        inline static char s_FieldValueBuffer[8];
+
+        friend class ScriptEngine;
+        friend struct ScriptFieldInstance;
     };
     
-    class ScriptEngine
+    class ScriptEngine 
     {
     public:
         static void Init();
@@ -106,6 +135,8 @@ namespace HRealEngine
         static void OnUpdateEntity(Entity entity, Timestep ts);
 
         static Scene* GetSceneContext();
+        static Ref<ScriptClass> GetEntityClass(const std::string& className);
+        static ScriptFieldMap& GetScriptFieldMap(Entity entity);
         static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
         static MonoImage* GetCoreAssemblyImage();
         static Ref<ScriptInstance> GetEntitySriptInstance(UUID entityID);

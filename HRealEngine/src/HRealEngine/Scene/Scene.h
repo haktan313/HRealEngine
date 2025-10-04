@@ -38,6 +38,7 @@ namespace HRealEngine
         void OnViewportResize(uint32_t width, uint32_t height);
         Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
+        bool IsRunning() const { return m_bIsRunning; }
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
@@ -49,6 +50,8 @@ namespace HRealEngine
         void RenderScene(EditorCamera& camera);
 
         b2World* m_PhysicsWorld = nullptr;
+
+        bool m_bIsRunning = false;
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
         

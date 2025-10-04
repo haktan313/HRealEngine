@@ -115,6 +115,9 @@ namespace HRealEngine
 
     void Scene::OnRuntimeStart()
     {
+        m_bIsRunning = true;
+        
+        m_PhysicsWorld = new b2World({0.0f, -9.81f});
        OnPhysics2DStart();
        {
            ScriptEngine::OnRuntimeStart(this);
@@ -129,6 +132,8 @@ namespace HRealEngine
 
     void Scene::OnRuntimeStop()
     {
+        m_bIsRunning = false;
+        
         OnPhysics2DStop();
         ScriptEngine::OnRuntimeStop();
     }

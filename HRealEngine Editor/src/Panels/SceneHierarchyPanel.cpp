@@ -290,12 +290,12 @@ namespace HRealEngine
                     camera.SetPerspectiveFar(perspectiveFar);
             }
         });
-        DrawComponent<ScriptComponent>("Script Component", entity, [entity](auto& component) mutable 
+        DrawComponent<ScriptComponent>("Script Component", entity, [entity, scene = m_Context](auto& component) mutable 
         {
             bool bScriptClassIsExist = ScriptEngine::IsEntityClassExist(component.ClassName);
             
             static char className[64];
-            strcpy(className, component.ClassName.c_str());
+            strcpy_s(className, sizeof(className), component.ClassName.c_str());
             
             if (!bScriptClassIsExist)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 0.2f, 0.2f, 1.0f});
@@ -305,17 +305,56 @@ namespace HRealEngine
             
             /*if (!bScriptClassIsExist)
                 ImGui::PopStyleColor();*/
-            Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntitySriptInstance(entity.GetUUID());
-            if (scriptInstance)
+            bool bIsSceneRunning = scene->IsRunning();
+            if (bIsSceneRunning)
             {
-                const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-                for (const auto& [name, field] : fields)
+                Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntitySriptInstance(entity.GetUUID());
+                if (scriptInstance)
                 {
-                    if (field.Type == ScriptFieldType::Float)
+                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+                    for (const auto& [name, field] : fields)
                     {
-                        float data = scriptInstance->GetFieldValue<float>(name);
-                        if (ImGui::DragFloat(name.c_str(), &data))
-                            scriptInstance->SetFieldValue(name, data);
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            float data = scriptInstance->GetFieldValue<float>(name);
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                                scriptInstance->SetFieldValue(name, data);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (bScriptClassIsExist)
+                {
+                    Ref<ScriptClass> scriptClass = ScriptEngine::GetEntityClass(component.ClassName);
+                    const auto& fields = scriptClass->GetFields();
+                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+                    for (const auto& [name, field] : fields)
+                    {
+                        if (entityFields.find(name) != entityFields.end())
+                        {
+                            ScriptFieldInstance& scriptField = entityFields.at(name);
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = scriptField.GetValue<float>();
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                    scriptField.SetValue(data);
+                            }
+                        }
+                        else
+                        {
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = 0.0f;
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                {
+                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                    scriptField.Field = field;
+                                    scriptField.SetValue(data);
+                                }
+                            }
+                        }
                     }
                 }
             }
