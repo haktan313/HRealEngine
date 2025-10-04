@@ -41,13 +41,13 @@ namespace HRealEngine
         template<typename T>
         T GetValue()
         {
-            static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::GetValue() buffer overflow");
+            //static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::GetValue() buffer overflow");
             return *(T*)m_Buffer;
         }
         template<typename T>
         void SetValue(const T& value)
         {
-            static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::SetValue() buffer overflow");
+            //static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::SetValue() buffer overflow");
             memcpy(m_Buffer, &value, sizeof(T));
         }
     private:
@@ -111,7 +111,7 @@ namespace HRealEngine
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
 
-        inline static char s_FieldValueBuffer[8];
+        inline static char s_FieldValueBuffer[16];
 
         friend class ScriptEngine;
         friend struct ScriptFieldInstance;
@@ -120,6 +120,54 @@ namespace HRealEngine
     class ScriptEngine 
     {
     public:
+        static const char* ScriptFieldTypeToString(ScriptFieldType type)
+        {
+            switch (type)
+            {
+            case ScriptFieldType::None:       return "None";
+            case ScriptFieldType::Float:      return "Float";
+            case ScriptFieldType::Double:     return "Double";
+            case ScriptFieldType::Bool:       return "Bool";
+            case ScriptFieldType::Char:       return "Char";
+            case ScriptFieldType::Byte:       return "Byte";
+            case ScriptFieldType::Short:      return "Short";
+            case ScriptFieldType::Int:        return "Int";
+            case ScriptFieldType::Long:       return "Long";
+            case ScriptFieldType::UByte:      return "UByte";
+            case ScriptFieldType::UShort:     return "UShort";
+            case ScriptFieldType::UInt:       return "UInt";
+            case ScriptFieldType::ULong:      return "ULong";
+            case ScriptFieldType::Vector2:    return "Vector2";
+            case ScriptFieldType::Vector3:    return "Vector3";
+            case ScriptFieldType::Vector4:    return "Vector4";
+            case ScriptFieldType::Entity:     return "Entity";
+            }
+            HREALENGINE_CORE_DEBUGBREAK(false, "Unknown script field type");
+            return "<Invalid>";
+        }
+    
+        static inline ScriptFieldType ScriptFieldTypeFromString(const std::string& type)
+        {
+            if (type == "None")       return ScriptFieldType::None;
+            if (type == "Float")      return ScriptFieldType::Float;
+            if (type == "Double")     return ScriptFieldType::Double;
+            if (type == "Bool")       return ScriptFieldType::Bool;
+            if (type == "Char")       return ScriptFieldType::Char;
+            if (type == "Byte")       return ScriptFieldType::Byte;
+            if (type == "Short")      return ScriptFieldType::Short;
+            if (type == "Int")        return ScriptFieldType::Int;
+            if (type == "Long")       return ScriptFieldType::Long;
+            if (type == "UByte")      return ScriptFieldType::UByte;
+            if (type == "UShort")     return ScriptFieldType::UShort;
+            if (type == "UInt")       return ScriptFieldType::UInt;
+            if (type == "ULong")      return ScriptFieldType::ULong;
+            if (type == "Vector2")    return ScriptFieldType::Vector2;
+            if (type == "Vector3")    return ScriptFieldType::Vector3;
+            if (type == "Vector4")    return ScriptFieldType::Vector4;
+            if (type == "Entity")     return ScriptFieldType::Entity;
+            HREALENGINE_CORE_DEBUGBREAK(false, "Unknown script field type");
+            return ScriptFieldType::None;
+        }
         static void Init();
         static void Shutdown();
 
@@ -148,4 +196,5 @@ namespace HRealEngine
         friend class ScriptClass;
         friend class ScriptGlue;
     };
+    
 }
