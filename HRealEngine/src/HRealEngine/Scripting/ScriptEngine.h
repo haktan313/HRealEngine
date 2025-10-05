@@ -101,6 +101,8 @@ namespace HRealEngine
         {
             SetFieldValueInternal(name, &value);
         }
+
+        MonoObject* GetManagedObject() const { return m_Instance; }
     private:
         bool GetFieldValueInternal(const std::string& name, void* outValue);
         bool SetFieldValueInternal(const std::string& name, const void* value);
@@ -188,6 +190,7 @@ namespace HRealEngine
         static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
         static MonoImage* GetCoreAssemblyImage();
         static Ref<ScriptInstance> GetEntitySriptInstance(UUID entityID);
+        static MonoObject* GetManagedInstance(UUID entityID);
     private:
         static void InitMono();
         static void ShutdownMono();

@@ -2,8 +2,19 @@ namespace HRealEngine
 {
     public class Camera : Entity
     {
+        public Entity Target;
+        public float DistanceToTarget = 2.0f;
+        private Entity m_Player;
+        
+        void OnCreate()
+        {
+            m_Player = FindEntityByName("Empty Entity");
+        }
         void OnUpdate(float ts)
         {
+            if(m_Player != null)
+                Translation = new Vector3(m_Player.Translation.XY, DistanceToTarget);
+            
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
 

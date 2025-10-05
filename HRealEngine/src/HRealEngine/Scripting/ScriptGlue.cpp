@@ -34,6 +34,11 @@ namespace HRealEngine
         return glm::dot(*parameter, *parameter);
     }
 
+    static MonoObject* GetScriptInstance(UUID entityID)
+    {
+        return ScriptEngine::GetManagedInstance(entityID);
+    }
+
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
         /*Scene* scene = ScriptEngine::GetSceneContext();
@@ -54,6 +59,17 @@ namespace HRealEngine
             return false;
         }
         return it->second(entity);
+    }
+
+    static uint64_t Entity_FindEntityByName(MonoString* name)
+    {
+        char* nameCStr = mono_string_to_utf8(name);
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->FindEntityByName(nameCStr);
+        mono_free(nameCStr);
+        if (!entity)
+            return 0;
+        return entity.GetUUID();
     }
 
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
@@ -129,6 +145,8 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(PrintLog_Vector);
         HRE_ADD_INTERNAL_CALL(PrintLog_VectorDot);
 
+        HRE_ADD_INTERNAL_CALL(GetScriptInstance);
+        HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

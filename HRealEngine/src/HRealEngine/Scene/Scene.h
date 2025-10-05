@@ -38,6 +38,7 @@ namespace HRealEngine
         void OnViewportResize(uint32_t width, uint32_t height);
         Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
+        Entity FindEntityByName(std::string_view name);
         bool IsRunning() const { return m_bIsRunning; }
         void DuplicateEntity(Entity entity);
 

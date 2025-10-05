@@ -35,6 +35,16 @@ namespace HRealEngine
                 velocity.X = -10.0f;
             else if (Input.IsKeyDown(KeyCodes.HRE_KEY_RIGHT))
                 velocity.X = 10.0f;
+            
+            Entity camera = FindEntityByName("camera");
+            if (camera != null)
+            {
+                Camera cam = camera.As<Camera>();
+                if(Input.IsKeyDown(KeyCodes.HRE_KEY_Q))
+                    cam.DistanceToTarget += 2.0f * speed * ts;
+                else if(Input.IsKeyDown(KeyCodes.HRE_KEY_E))
+                    cam.DistanceToTarget -= 2.0f * speed * ts;
+            }
 
             velocity *= speed;
 

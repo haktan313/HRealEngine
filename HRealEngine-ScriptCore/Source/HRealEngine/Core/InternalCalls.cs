@@ -9,6 +9,10 @@ namespace HRealEngine
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_FindEntityByName(string name);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static object GetScriptInstance(ulong entityID);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCodes keyCode);

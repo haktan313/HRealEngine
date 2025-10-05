@@ -353,6 +353,12 @@ namespace HRealEngine
         return it->second;
     }
 
+    MonoObject* ScriptEngine::GetManagedInstance(UUID entityID)
+    {
+        HREALENGINE_CORE_DEBUGBREAK(s_Data->EntityInstances.find(entityID) != s_Data->EntityInstances.end());
+        return s_Data->EntityInstances.at(entityID)->GetManagedObject();
+    }
+
     void ScriptEngine::InitMono()
     {
         mono_set_assemblies_path("mono/lib/mono/4.5");

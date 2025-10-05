@@ -258,6 +258,9 @@ namespace HRealEngine
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
+        if (viewportWidth == width && viewportHeight == height)
+            return;
+        
         viewportWidth = width;
         viewportHeight = height;
         auto view = m_Registry.view<CameraComponent>();
@@ -285,6 +288,18 @@ namespace HRealEngine
         {
             const auto& camera = view.get<CameraComponent>(entity);
             if (camera.PrimaryCamera)
+                return Entity{entity, this};
+        }
+        return {};
+    }
+
+    Entity Scene::FindEntityByName(std::string_view name)
+    {
+        auto view = m_Registry.view<TagComponent>();
+        for (auto entity : view)
+        {
+            const TagComponent& tagComponent = view.get<TagComponent>(entity);
+            if (tagComponent.Tag == name)
                 return Entity{entity, this};
         }
         return {};
