@@ -177,6 +177,8 @@ namespace HRealEngine
         static void LoadAppAssembly(const std::filesystem::path& assemblyPath);
         static void LoadAssemblyClasses(/*MonoAssembly* assembly*/);
 
+        static void ReloadAssembly();
+
         static void OnRuntimeStart(Scene* scene);
         static void OnRuntimeStop();
 

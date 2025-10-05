@@ -136,6 +136,7 @@ namespace HRealEngine
     }
     void ScriptGlue::RegisterComponents()
     {
+        s_EntityHasComponentFunctions.clear();
         RegisterComponent(AllComponents{});
     }
 

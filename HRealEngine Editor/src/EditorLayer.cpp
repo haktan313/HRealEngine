@@ -10,6 +10,7 @@
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 #include "imgui/imgui.h"
 #include "ImGuizmo/ImGuizmo.h"
@@ -292,6 +293,12 @@ namespace HRealEngine
                 
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Script"))
+            {
+                if (ImGui::MenuItem("Reload C# Assembly"))
+                    ScriptEngine::ReloadAssembly();
+                ImGui::EndMenu();
+            }
     
             ImGui::EndMenuBar();
         }
@@ -451,7 +458,11 @@ namespace HRealEngine
             m_GizmoType = ImGuizmo::OPERATION::ROTATE;
             break;
         case HR_KEY_R:
-            m_GizmoType = ImGuizmo::OPERATION::SCALE;
+            if (bControlPressed)
+                ScriptEngine::ReloadAssembly();
+            else
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = ImGuizmo::OPERATION::SCALE;
             break;
 
         }

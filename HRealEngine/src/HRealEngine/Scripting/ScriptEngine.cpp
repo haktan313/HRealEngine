@@ -133,6 +133,9 @@ namespace HRealEngine
 
         ScriptClass EntityClass;
 
+        std::filesystem::path CoreAssemblyFilePath;
+        std::filesystem::path AppAssemblyFilePath;
+
         std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
         std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
         std::unordered_map<UUID, ScriptFieldMap> EntityScriptFieldMaps;
@@ -145,11 +148,11 @@ namespace HRealEngine
     {
         s_Data = new ScriptEngineData();
         InitMono();
+        ScriptGlue::RegisterComponents();//
         LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
         LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
         LoadAssemblyClasses(/*s_Data->CoreAssembly*/);
 
-        ScriptGlue::RegisterComponents();
         ScriptGlue::RegisterFunctions();
 
         // Test
@@ -185,6 +188,8 @@ namespace HRealEngine
         s_Data->AppDomain = mono_domain_create_appdomain("HRealEngineAppDomain", nullptr);
         mono_domain_set(s_Data->AppDomain, true);
 
+        s_Data->CoreAssemblyFilePath = assemblyPath;
+        
         s_Data->CoreAssembly = LoadCSharpAssembly(assemblyPath);
         //PrintAssemblyTypes(s_Data->CoreAssembly);
         s_Data->CoreImage = mono_assembly_get_image(s_Data->CoreAssembly);
@@ -192,6 +197,8 @@ namespace HRealEngine
 
     void ScriptEngine::LoadAppAssembly(const std::filesystem::path& assemblyPath)
     {
+        s_Data->AppAssemblyFilePath = assemblyPath;
+        
         s_Data->AppAssembly = LoadCSharpAssembly(assemblyPath);
         auto appAsemb = s_Data->AppAssembly;
         s_Data->AppImage = mono_assembly_get_image(s_Data->AppAssembly);
@@ -276,6 +283,19 @@ namespace HRealEngine
             }
         }
         auto& entityClasses = s_Data->EntityClasses;
+    }
+
+    void ScriptEngine::ReloadAssembly()
+    {
+        mono_domain_set(mono_get_root_domain(), false);
+        mono_domain_unload(s_Data->AppDomain);
+
+        LoadAssembly(s_Data->CoreAssemblyFilePath);
+        LoadAppAssembly(s_Data->AppAssemblyFilePath);
+        LoadAssemblyClasses();
+        ScriptGlue::RegisterComponents();
+        
+        s_Data->EntityClass = ScriptClass("HRealEngine", "Entity", true);
     }
 
     void ScriptEngine::OnRuntimeStart(Scene* scene)
@@ -371,7 +391,8 @@ namespace HRealEngine
 
     void ScriptEngine::ShutdownMono()
     {
-        //mono_domain_unload(s_Data->AppDomain);
+        mono_domain_set(mono_get_root_domain(), false);
+        mono_domain_unload(s_Data->AppDomain);
         s_Data->AppDomain = nullptr;
         mono_jit_cleanup(s_Data->RootDomain);
         s_Data->RootDomain = nullptr;

@@ -9,7 +9,8 @@ namespace HRealEngine
         private TransformComponent m_Transform;
         private Rigidbody2DComponent m_Rigidbody;
         
-        public float Speed = 5.0f;
+        public float Speed = 15.0f;
+        public float JumpForce = 5.0f;
 
         void OnCreate()
         {
