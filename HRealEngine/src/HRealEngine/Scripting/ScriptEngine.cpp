@@ -148,11 +148,11 @@ namespace HRealEngine
     {
         s_Data = new ScriptEngineData();
         InitMono();
-        ScriptGlue::RegisterComponents();//
         LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
         LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
         LoadAssemblyClasses(/*s_Data->CoreAssembly*/);
 
+        ScriptGlue::RegisterComponents();//
         ScriptGlue::RegisterFunctions();
 
         // Test
