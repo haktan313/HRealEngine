@@ -150,53 +150,7 @@ namespace HRealEngine
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)
     {
-        const int32_t velocityIterations = 6;
-        const int32_t positionIterations = 2;
-        m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
-
-        auto view = m_Registry.view<Rigidbody2DComponent>();
-        for (auto e : view)
-        {
-            Entity entity = {e, this};
-            auto& transform = entity.GetComponent<TransformComponent>();
-            auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-            b2Body* body = (b2Body*)rb2d.RuntimeBody;
-            const auto& position = body->GetPosition();
-            transform.Position.x = position.x;
-            transform.Position.y = position.y;
-            transform.Rotation.z = body->GetAngle();
-        }
-        RenderScene(camera);
-    }
-
-
-    void Scene::OnUpdateEditor(Timestep deltaTime, EditorCamera& camera)
-    {
-        RenderScene(camera);
-    }
-
-    void Scene::OnUpdateRuntime(Timestep deltaTime)
-    {
-        {
-            auto view = m_Registry.view<ScriptComponent>();
-            for (auto e : view)
-            {
-                Entity entity = {e, this};
-                ScriptEngine::OnUpdateEntity(entity, deltaTime);
-            } 
-            m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
-            {
-               if (!nativeScript.Instance)
-               {
-                   nativeScript.Instance = nativeScript.InstantiateScript();
-                   nativeScript.Instance->m_Entity = Entity{entity, this};
-                   nativeScript.Instance->OnCreate();
-               }
-                nativeScript.Instance->OnUpdate(Timestep(deltaTime));
-            });
-        }
-
+        if (!m_bIsPaused || m_StepFrames-- > 0)
         {
             const int32_t velocityIterations = 6;
             const int32_t positionIterations = 2;
@@ -215,7 +169,59 @@ namespace HRealEngine
                 transform.Position.y = position.y;
                 transform.Rotation.z = body->GetAngle();
             }
+            RenderScene(camera);
         }
+    }
+
+
+    void Scene::OnUpdateEditor(Timestep deltaTime, EditorCamera& camera)
+    {
+        RenderScene(camera);
+    }
+
+    void Scene::OnUpdateRuntime(Timestep deltaTime)
+    {
+        if (!m_bIsPaused || m_StepFrames-- > 0)
+        {
+            {
+                auto view = m_Registry.view<ScriptComponent>();
+                for (auto e : view)
+                {
+                    Entity entity = {e, this};
+                    ScriptEngine::OnUpdateEntity(entity, deltaTime);
+                } 
+                m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
+                {
+                   if (!nativeScript.Instance)
+                   {
+                       nativeScript.Instance = nativeScript.InstantiateScript();
+                       nativeScript.Instance->m_Entity = Entity{entity, this};
+                       nativeScript.Instance->OnCreate();
+                   }
+                    nativeScript.Instance->OnUpdate(Timestep(deltaTime));
+                });
+            }
+            {
+                const int32_t velocityIterations = 6;
+                const int32_t positionIterations = 2;
+                m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
+
+                auto view = m_Registry.view<Rigidbody2DComponent>();
+                for (auto e : view)
+                {
+                    Entity entity = {e, this};
+                    auto& transform = entity.GetComponent<TransformComponent>();
+                    auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    const auto& position = body->GetPosition();
+                    transform.Position.x = position.x;
+                    transform.Position.y = position.y;
+                    transform.Rotation.z = body->GetAngle();
+                }
+            }
+        }
+
         
         Camera* mainCamera = nullptr;
         glm::mat4 cameraTransform;

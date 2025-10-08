@@ -40,6 +40,9 @@ namespace HRealEngine
         Entity GetPrimaryCameraEntity();
         Entity FindEntityByName(std::string_view name);
         bool IsRunning() const { return m_bIsRunning; }
+        bool IsPaused() const { return m_bIsPaused; }
+        void SetPaused(bool paused) { m_bIsPaused = paused; }
+        void Step(int frames = 1) { m_StepFrames = frames; }
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
@@ -53,6 +56,8 @@ namespace HRealEngine
         b2World* m_PhysicsWorld = nullptr;
 
         bool m_bIsRunning = false;
+        bool m_bIsPaused = false;
+        int m_StepFrames = 0;
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
         

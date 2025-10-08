@@ -94,6 +94,8 @@ namespace HRealEngine
         m_IconPlay = Texture2D::Create("assets/textures/StartButton.png");
         m_IconStop = Texture2D::Create("assets/textures/stopButton.png");
         m_IconSimulate = Texture2D::Create("assets/textures/SimulateButton.png");
+        m_IconPause = Texture2D::Create("assets/textures/PauseButton.png");
+        m_IconStep = Texture2D::Create("assets/textures/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
     }
@@ -628,6 +630,13 @@ namespace HRealEngine
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
+    void EditorLayer::OnScenePause()
+    {
+        if (m_SceneState == SceneState::Editor)
+            return;
+        m_ActiveScene->SetPaused(true);
+    }
+
     void EditorLayer::OnDuplicateEntity()
     {
         if (m_SceneState != SceneState::Editor)
@@ -655,9 +664,16 @@ namespace HRealEngine
             tintColor.w = 0.5f;
 
         float size = ImGui::GetWindowHeight() - 4.0f;
+
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+        bool bHasPlayButton = m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime;
+        bool bHasSimulateButton = m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate;
+        bool bHasPauseButton = m_SceneState != SceneState::Editor;
+
+        if (bHasPlayButton)
         {
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
-            ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
             if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
             {
@@ -667,8 +683,12 @@ namespace HRealEngine
                     OnSceneStop();
             }
         }
-        ImGui::SameLine();
+
+        if (bHasSimulateButton)
         {
+            if (bHasPlayButton)
+                ImGui::SameLine();
+            
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? m_IconSimulate : m_IconStop;
             if (ImGui::ImageButton("##simulate", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
@@ -677,6 +697,28 @@ namespace HRealEngine
                     OnSceneSimulate();
                 else if (m_SceneState == SceneState::Simulate)
                     OnSceneStop();
+            }
+        }
+
+        if (bHasPauseButton)
+        {
+            bool bIsPaused = m_ActiveScene->IsPaused();
+            ImGui::SameLine();
+            {
+                {
+                    Ref<Texture2D> icon = m_IconPause;
+                    if (ImGui::ImageButton("##pause", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                        m_ActiveScene->SetPaused(!bIsPaused);
+                }
+                if (bIsPaused)
+                {
+                    ImGui::SameLine();
+                    {
+                        Ref<Texture2D> icon = m_IconStep;
+                        if (ImGui::ImageButton("##step", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                            m_ActiveScene->Step();
+                    }
+                }
             }
         }
         ImGui::PopStyleVar(2);

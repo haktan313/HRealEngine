@@ -10,6 +10,8 @@
 #include "HRealEngine/Core/Components.h"
 #include "HRealEngine/Core/Entity.h"
 
+#include "FileWatch.hpp"
+
 namespace HRealEngine
 {
     //------------------------------------------------------------------ 

@@ -46,7 +46,8 @@ project "HRealEngine"
         "%{IncludeDir['yaml-cpp']}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.Box2D}",
-        "%{IncludeDir.mono}"
+        "%{IncludeDir.mono}",
+        "%{IncludeDir.filewatch}"
     }
 
     links
