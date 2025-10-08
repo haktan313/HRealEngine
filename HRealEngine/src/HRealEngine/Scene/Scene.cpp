@@ -52,11 +52,19 @@ namespace HRealEngine
             dst.emplace_or_replace<Component>(dstEntt, component); 
         }
     }
-    template<typename Component>
-    static void CopyComponentIfExist(Entity dst, Entity src)
+    template<typename... Component>
+    static void CopyComponentIfExists(Entity dst, Entity src)
     {
-        if (src.HasComponent<Component>())
-            dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        ([&]()
+        {
+            if (src.HasComponent<Component>())
+                dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        }(), ...);
+    }
+    template<typename... Component>
+    static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+    {
+        CopyComponentIfExists<Component...>(dst, src);
     }
 
     Ref<Scene> Scene::Copy(Ref<Scene> other)
@@ -117,7 +125,6 @@ namespace HRealEngine
     {
         m_bIsRunning = true;
         
-        m_PhysicsWorld = new b2World({0.0f, -9.81f});
        OnPhysics2DStart();
        {
            ScriptEngine::OnRuntimeStart(this);
@@ -169,8 +176,8 @@ namespace HRealEngine
                 transform.Position.y = position.y;
                 transform.Rotation.z = body->GetAngle();
             }
-            RenderScene(camera);
         }
+        RenderScene(camera);
     }
 
 
@@ -314,15 +321,16 @@ namespace HRealEngine
     void Scene::DuplicateEntity(Entity entity)
     {
         Entity newEntity = CreateEntity(entity.GetName());
-        
-        CopyComponentIfExist<TransformComponent>(newEntity, entity);
+
+        CopyComponentIfExists(AllComponents{}, newEntity, entity);
+        /*CopyComponentIfExist<TransformComponent>(newEntity, entity);
         CopyComponentIfExist<CameraComponent>(newEntity, entity);
         CopyComponentIfExist<SpriteRendererComponent>(newEntity, entity);
         CopyComponentIfExist<CircleRendererComponent>(newEntity, entity);
         CopyComponentIfExist<NativeScriptComponent>(newEntity, entity);
         CopyComponentIfExist<Rigidbody2DComponent>(newEntity, entity);
         CopyComponentIfExist<BoxCollider2DComponent>(newEntity, entity);
-        CopyComponentIfExist<CircleCollider2DComponent>(newEntity, entity);
+        CopyComponentIfExist<CircleCollider2DComponent>(newEntity, entity);*/
     }
 
     bool Scene::DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale)

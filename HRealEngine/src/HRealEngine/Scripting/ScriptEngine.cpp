@@ -11,6 +11,7 @@
 #include "HRealEngine/Core/Entity.h"
 
 #include "FileWatch.hpp"
+#include "HRealEngine/Core/Application.h"
 
 namespace HRealEngine
 {
@@ -120,6 +121,7 @@ namespace HRealEngine
         }
         return it->second;
     }
+    
     //------------------------------------------------------------------
     
     struct ScriptEngineData
@@ -142,9 +144,25 @@ namespace HRealEngine
         std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
         std::unordered_map<UUID, ScriptFieldMap> EntityScriptFieldMaps;
 
+        Scope<filewatch::FileWatch<std::string>> AppAssemblyWatcher;
+        bool bAssemblyReloadPending = false;
+
         Scene* SceneContext = nullptr;
     };
     static ScriptEngineData* s_Data = nullptr;
+
+    /*static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+    {
+        if (!s_Data->bAssemblyReloadPending && change_type == filewatch::Event::modified)
+        {
+            s_Data->bAssemblyReloadPending = true;
+            Application::Get().SubmitToMainThread([]()
+            {
+                s_Data->AppAssemblyWatcher.reset();
+                ScriptEngine::ReloadAssembly();
+            });
+        }
+    }*/
     
     void ScriptEngine::Init()
     {
@@ -205,6 +223,20 @@ namespace HRealEngine
         auto appAsemb = s_Data->AppAssembly;
         s_Data->AppImage = mono_assembly_get_image(s_Data->AppAssembly);
         auto appImg = s_Data->AppImage;
+
+        s_Data->AppAssemblyWatcher = CreateScope<filewatch::FileWatch<std::string>>(assemblyPath.string(),/*OnAppAssemblyFileSystemEvent*/ [](const std::string& path, const filewatch::Event change_type)
+        {
+            if (!s_Data->bAssemblyReloadPending && change_type == filewatch::Event::modified)
+            {
+                s_Data->bAssemblyReloadPending = true;
+                Application::Get().SubmitToMainThread([]()
+                {
+                    s_Data->AppAssemblyWatcher.reset();
+                    ScriptEngine::ReloadAssembly();
+                });
+            }
+        });
+        s_Data->bAssemblyReloadPending = false;
     }
 
     void ScriptEngine::LoadAssemblyClasses(/*MonoAssembly* assembly*/)

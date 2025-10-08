@@ -119,7 +119,6 @@ namespace HRealEngine
         {
             if (m_ViewportFocused)
                 m_OrthCameraController.OnUpdate(timestep);
-            m_EditorCamera.OnUpdate(timestep);
         }
         
         Renderer2D::ResetStats();
@@ -278,7 +277,7 @@ namespace HRealEngine
                 {
                    NewScene();
                 }
-                if (ImGui::MenuItem("Open...", "Ctrl+0"))
+                if (ImGui::MenuItem("Open...", "Ctrl+O"))
                 {
                     OpenScene();
                 }
