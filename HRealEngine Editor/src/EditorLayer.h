@@ -42,6 +42,7 @@ namespace HRealEngine
         void OnScenePlay();
         void OnSceneSimulate();
         void OnSceneStop();
+        void OnScenePause();
 
         void OnDuplicateEntity();
 
@@ -81,6 +82,8 @@ namespace HRealEngine
         Ref<Texture2D> m_IconPlay;
         Ref<Texture2D> m_IconStop;
         Ref<Texture2D> m_IconSimulate;
+        Ref<Texture2D> m_IconStep;
+        Ref<Texture2D> m_IconPause;
         
         Ref<SubTexture2D> m_TextureStairs;
         Ref<SubTexture2D> m_TextureTree;

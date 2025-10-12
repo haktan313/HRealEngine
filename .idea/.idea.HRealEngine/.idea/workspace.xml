@@ -9,14 +9,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/Example.hrs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/sadadas.hrs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/suprize.hrs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/test.hrs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +29,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://2" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://5" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/09/ea14fae6/Object.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/13/6f01a4c0/Type.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/ContentBrowserPanel.h" root0="FORCE_HIGHLIGHTING" />
@@ -38,6 +39,13 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/src/ParticleSystem.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Component.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Enums/KeyCodes.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Input.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Structs/Vector2.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Structs/Vector3.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/UUID.h" root0="FORCE_HIGHLIGHTING" />
@@ -54,6 +62,10 @@
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Utils/PlatformUtils.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/Platform/OpenGL/OpenGLFramebuffer.h" root0="FORCE_HIGHLIGHTING" />
@@ -87,14 +99,14 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;C#-scripting&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -108,7 +120,7 @@
         <option name="PROGRAM_PARAMETERS" value="$(LocalDebuggerCommandArguments)" />
         <option name="WORKING_DIRECTORY" value="$(LocalDebuggerWorkingDirectory)" />
         <option name="PASS_PARENT_ENVS" value="1" />
-        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="USE_EXTERNAL_CONSOLE" value="1" />
         <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
         <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" />
       </configuration_1>
@@ -139,6 +151,10 @@
         <option name="Build" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="C/C++ Project.HRealEngine Editor" />
+      <item itemvalue="C/C++ Project.Sandbox" />
+    </list>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -250,6 +266,20 @@
       <workItem from="1758621821311" duration="1037000" />
       <workItem from="1758804962431" duration="523000" />
       <workItem from="1758805502667" duration="751000" />
+      <workItem from="1759065254503" duration="1250000" />
+      <workItem from="1759067235690" duration="7462000" />
+      <workItem from="1759090750932" duration="2226000" />
+      <workItem from="1759103714202" duration="21000" />
+      <workItem from="1759156336231" duration="8985000" />
+      <workItem from="1759176910457" duration="5373000" />
+      <workItem from="1759250327961" duration="24951000" />
+      <workItem from="1759335417624" duration="7444000" />
+      <workItem from="1759360567700" duration="1484000" />
+      <workItem from="1759433148056" duration="3581000" />
+      <workItem from="1759593388240" duration="10712000" />
+      <workItem from="1759664547426" duration="7322000" />
+      <workItem from="1759871598005" duration="5949000" />
+      <workItem from="1759949626832" duration="6128000" />
     </task>
     <servers />
   </component>

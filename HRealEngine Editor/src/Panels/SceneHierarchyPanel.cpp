@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "HRealEngine/Scripting/ScriptEngine.h"
+
 namespace HRealEngine
 {
     extern const std::filesystem::path g_AssetsDirectory;
@@ -215,6 +217,7 @@ namespace HRealEngine
         if (ImGui::BeginPopup("AddComponent"))
         {  
             ShowAddComponentEntry<CameraComponent>("Camera Component");
+            ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -286,6 +289,77 @@ namespace HRealEngine
                 if (ImGui::DragFloat("Far", &perspectiveFar))
                     camera.SetPerspectiveFar(perspectiveFar);
             }
+        });
+        DrawComponent<ScriptComponent>("Script Component", entity, [entity, scene = m_Context](auto& component) mutable 
+        {
+            bool bScriptClassIsExist = ScriptEngine::IsEntityClassExist(component.ClassName);
+            
+            static char className[64];
+            strcpy_s(className, sizeof(className), component.ClassName.c_str());
+            
+            if (!bScriptClassIsExist)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 0.2f, 0.2f, 1.0f});
+            
+            if (ImGui::InputText("Class", className, sizeof(className)))
+                component.ClassName = className;
+            
+            /*if (!bScriptClassIsExist)
+                ImGui::PopStyleColor();*/
+            bool bIsSceneRunning = scene->IsRunning();
+            if (bIsSceneRunning)
+            {
+                Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntitySriptInstance(entity.GetUUID());
+                if (scriptInstance)
+                {
+                    const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+                    for (const auto& [name, field] : fields)
+                    {
+                        if (field.Type == ScriptFieldType::Float)
+                        {
+                            float data = scriptInstance->GetFieldValue<float>(name);
+                            if (ImGui::DragFloat(name.c_str(), &data))
+                                scriptInstance->SetFieldValue(name, data);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (bScriptClassIsExist)
+                {
+                    Ref<ScriptClass> scriptClass = ScriptEngine::GetEntityClass(component.ClassName);
+                    const auto& fields = scriptClass->GetFields();
+                    auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+                    for (const auto& [name, field] : fields)
+                    {
+                        if (entityFields.find(name) != entityFields.end())
+                        {
+                            ScriptFieldInstance& scriptField = entityFields.at(name);
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = scriptField.GetValue<float>();
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                    scriptField.SetValue(data);
+                            }
+                        }
+                        else
+                        {
+                            if (field.Type == ScriptFieldType::Float)
+                            {
+                                float data = 0.0f;
+                                if (ImGui::DragFloat(name.c_str(), &data))
+                                {
+                                    ScriptFieldInstance& scriptField = entityFields[name];
+                                    scriptField.Field = field;
+                                    scriptField.SetValue(data);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!bScriptClassIsExist)
+                ImGui::PopStyleColor();
         });
         DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
         {

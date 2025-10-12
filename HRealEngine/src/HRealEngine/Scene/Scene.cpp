@@ -15,6 +15,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "HRealEngine/Scripting/ScriptEngine.h"
+
 namespace HRealEngine
 {
     static b2BodyType RigidBody2DTypeToBox2D(Rigidbody2DComponent::BodyType type)
@@ -50,11 +52,19 @@ namespace HRealEngine
             dst.emplace_or_replace<Component>(dstEntt, component); 
         }
     }
-    template<typename Component>
-    static void CopyComponentIfExist(Entity dst, Entity src)
+    template<typename... Component>
+    static void CopyComponentIfExists(Entity dst, Entity src)
     {
-        if (src.HasComponent<Component>())
-            dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        ([&]()
+        {
+            if (src.HasComponent<Component>())
+                dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+        }(), ...);
+    }
+    template<typename... Component>
+    static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+    {
+        CopyComponentIfExists<Component...>(dst, src);
     }
 
     Ref<Scene> Scene::Copy(Ref<Scene> other)
@@ -78,6 +88,7 @@ namespace HRealEngine
 
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
@@ -100,22 +111,38 @@ namespace HRealEngine
         entity.AddComponent<TransformComponent>();
         auto& tag = entity.AddComponent<TagComponent>();
         tag.Tag = name.empty() ? "Entity" : name;
+        m_EntityMap[uuid] = entity;
         return entity;
     }
 
     void Scene::DestroyEntity(Entity entity)
     {
         m_Registry.destroy(entity);
+        m_EntityMap.erase(entity.GetUUID());
     }
 
     void Scene::OnRuntimeStart()
     {
+        m_bIsRunning = true;
+        
        OnPhysics2DStart();
+       {
+           ScriptEngine::OnRuntimeStart(this);
+           auto view = m_Registry.view<ScriptComponent>();
+           for (auto e : view)
+           {
+             Entity entity = {e, this};
+             ScriptEngine::OnCreateEntity(entity);
+           }
+       }
     }
 
     void Scene::OnRuntimeStop()
     {
+        m_bIsRunning = false;
+        
         OnPhysics2DStop();
+        ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
@@ -130,47 +157,7 @@ namespace HRealEngine
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)
     {
-        const int32_t velocityIterations = 6;
-        const int32_t positionIterations = 2;
-        m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
-
-        auto view = m_Registry.view<Rigidbody2DComponent>();
-        for (auto e : view)
-        {
-            Entity entity = {e, this};
-            auto& transform = entity.GetComponent<TransformComponent>();
-            auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-            b2Body* body = (b2Body*)rb2d.RuntimeBody;
-            const auto& position = body->GetPosition();
-            transform.Position.x = position.x;
-            transform.Position.y = position.y;
-            transform.Rotation.z = body->GetAngle();
-        }
-        RenderScene(camera);
-    }
-
-
-    void Scene::OnUpdateEditor(Timestep deltaTime, EditorCamera& camera)
-    {
-        RenderScene(camera);
-    }
-
-    void Scene::OnUpdateRuntime(Timestep deltaTime)
-    {
-        {
-            m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
-            {
-               if (!nativeScript.Instance)
-               {
-                   nativeScript.Instance = nativeScript.InstantiateScript();
-                   nativeScript.Instance->m_Entity = Entity{entity, this};
-                   nativeScript.Instance->OnCreate();
-               }
-                nativeScript.Instance->OnUpdate(Timestep(deltaTime));
-            });
-        }
-
+        if (!m_bIsPaused || m_StepFrames-- > 0)
         {
             const int32_t velocityIterations = 6;
             const int32_t positionIterations = 2;
@@ -190,6 +177,58 @@ namespace HRealEngine
                 transform.Rotation.z = body->GetAngle();
             }
         }
+        RenderScene(camera);
+    }
+
+
+    void Scene::OnUpdateEditor(Timestep deltaTime, EditorCamera& camera)
+    {
+        RenderScene(camera);
+    }
+
+    void Scene::OnUpdateRuntime(Timestep deltaTime)
+    {
+        if (!m_bIsPaused || m_StepFrames-- > 0)
+        {
+            {
+                auto view = m_Registry.view<ScriptComponent>();
+                for (auto e : view)
+                {
+                    Entity entity = {e, this};
+                    ScriptEngine::OnUpdateEntity(entity, deltaTime);
+                } 
+                m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
+                {
+                   if (!nativeScript.Instance)
+                   {
+                       nativeScript.Instance = nativeScript.InstantiateScript();
+                       nativeScript.Instance->m_Entity = Entity{entity, this};
+                       nativeScript.Instance->OnCreate();
+                   }
+                    nativeScript.Instance->OnUpdate(Timestep(deltaTime));
+                });
+            }
+            {
+                const int32_t velocityIterations = 6;
+                const int32_t positionIterations = 2;
+                m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
+
+                auto view = m_Registry.view<Rigidbody2DComponent>();
+                for (auto e : view)
+                {
+                    Entity entity = {e, this};
+                    auto& transform = entity.GetComponent<TransformComponent>();
+                    auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
+                    const auto& position = body->GetPosition();
+                    transform.Position.x = position.x;
+                    transform.Position.y = position.y;
+                    transform.Rotation.z = body->GetAngle();
+                }
+            }
+        }
+
         
         Camera* mainCamera = nullptr;
         glm::mat4 cameraTransform;
@@ -232,6 +271,9 @@ namespace HRealEngine
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
     {
+        if (viewportWidth == width && viewportHeight == height)
+            return;
+        
         viewportWidth = width;
         viewportHeight = height;
         auto view = m_Registry.view<CameraComponent>();
@@ -243,6 +285,13 @@ namespace HRealEngine
                 cameraComponent.Camera.SetViewportSize(width, height);
             }
         }   
+    }
+
+    Entity Scene::GetEntityByUUID(UUID uuid)
+    {
+        if (m_EntityMap.find(uuid) != m_EntityMap.end())
+            return Entity{m_EntityMap.at(uuid), this};
+        return {};
     }
 
     Entity Scene::GetPrimaryCameraEntity()
@@ -257,18 +306,31 @@ namespace HRealEngine
         return {};
     }
 
+    Entity Scene::FindEntityByName(std::string_view name)
+    {
+        auto view = m_Registry.view<TagComponent>();
+        for (auto entity : view)
+        {
+            const TagComponent& tagComponent = view.get<TagComponent>(entity);
+            if (tagComponent.Tag == name)
+                return Entity{entity, this};
+        }
+        return {};
+    }
+
     void Scene::DuplicateEntity(Entity entity)
     {
         Entity newEntity = CreateEntity(entity.GetName());
-        
-        CopyComponentIfExist<TransformComponent>(newEntity, entity);
+
+        CopyComponentIfExists(AllComponents{}, newEntity, entity);
+        /*CopyComponentIfExist<TransformComponent>(newEntity, entity);
         CopyComponentIfExist<CameraComponent>(newEntity, entity);
         CopyComponentIfExist<SpriteRendererComponent>(newEntity, entity);
         CopyComponentIfExist<CircleRendererComponent>(newEntity, entity);
         CopyComponentIfExist<NativeScriptComponent>(newEntity, entity);
         CopyComponentIfExist<Rigidbody2DComponent>(newEntity, entity);
         CopyComponentIfExist<BoxCollider2DComponent>(newEntity, entity);
-        CopyComponentIfExist<CircleCollider2DComponent>(newEntity, entity);
+        CopyComponentIfExist<CircleCollider2DComponent>(newEntity, entity);*/
     }
 
     bool Scene::DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale)
@@ -413,6 +475,10 @@ namespace HRealEngine
     {
         if (viewportWidth > 0 && viewportHeight > 0)
             component.Camera.SetViewportSize(viewportWidth, viewportHeight);
+    }
+    template<>
+    void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+    {
     }
     template<>
     void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)

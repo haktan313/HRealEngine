@@ -10,6 +10,7 @@
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 #include "imgui/imgui.h"
 #include "ImGuizmo/ImGuizmo.h"
@@ -52,8 +53,9 @@ namespace HRealEngine
         if (commandLineArgs.Count > 1)
         {
             auto scenePath = commandLineArgs[1];
-            SceneSerializer serializer(m_ActiveScene);
-            serializer.Deserialize(scenePath);
+            /*SceneSerializer serializer(m_ActiveScene);
+            serializer.Deserialize(scenePath);*/
+            OpenScene(scenePath);
         }
         
         m_EditorCamera = EditorCamera(30.f, 1.778f/*1920/1080*/, 0.1f, 1000.f);
@@ -92,6 +94,8 @@ namespace HRealEngine
         m_IconPlay = Texture2D::Create("assets/textures/StartButton.png");
         m_IconStop = Texture2D::Create("assets/textures/stopButton.png");
         m_IconSimulate = Texture2D::Create("assets/textures/SimulateButton.png");
+        m_IconPause = Texture2D::Create("assets/textures/PauseButton.png");
+        m_IconStep = Texture2D::Create("assets/textures/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
     }
@@ -103,19 +107,18 @@ namespace HRealEngine
 
     void EditorLayer::OnUpdate(Timestep timestep)
     {
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
         {
             m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
             m_OrthCameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
             m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         }
         
         {
             if (m_ViewportFocused)
                 m_OrthCameraController.OnUpdate(timestep);
-            m_EditorCamera.OnUpdate(timestep);
         }
         
         Renderer2D::ResetStats();
@@ -185,7 +188,7 @@ namespace HRealEngine
         {
             int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
             m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
-            LOG_CORE_INFO("Pixel data = {0}", pixelData);
+            //LOG_CORE_INFO("Pixel data = {0}", pixelData);
         }
 
         OnOverlayRender();
@@ -274,7 +277,7 @@ namespace HRealEngine
                 {
                    NewScene();
                 }
-                if (ImGui::MenuItem("Open...", "Ctrl+0"))
+                if (ImGui::MenuItem("Open...", "Ctrl+O"))
                 {
                     OpenScene();
                 }
@@ -289,6 +292,12 @@ namespace HRealEngine
                 if (ImGui::MenuItem("Exit"))
                     HRealEngine::Application::Get().Close();
                 
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Script"))
+            {
+                if (ImGui::MenuItem("Reload C# Assembly"))
+                    ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
             }
     
@@ -322,7 +331,7 @@ namespace HRealEngine
         
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+        Application::Get().GetImGuiLayer()->SetBlockEvents(/*!m_ViewportFocused && */!m_ViewportHovered);
         
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize) && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
@@ -450,7 +459,11 @@ namespace HRealEngine
             m_GizmoType = ImGuizmo::OPERATION::ROTATE;
             break;
         case HR_KEY_R:
-            m_GizmoType = ImGuizmo::OPERATION::SCALE;
+            if (bControlPressed)
+                ScriptEngine::ReloadAssembly();
+            else
+                if (!ImGuizmo::IsUsing())
+                    m_GizmoType = ImGuizmo::OPERATION::SCALE;
             break;
 
         }
@@ -518,7 +531,7 @@ namespace HRealEngine
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
-        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        //m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
         m_EditorScenePath = std::filesystem::path();
@@ -546,7 +559,7 @@ namespace HRealEngine
         if (serializer.Deserialize(path.string()))
         {
             m_EditorScene = newScene;
-            m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            //m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_EditorScene);
 
             m_ActiveScene = m_EditorScene;
@@ -616,6 +629,13 @@ namespace HRealEngine
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
+    void EditorLayer::OnScenePause()
+    {
+        if (m_SceneState == SceneState::Editor)
+            return;
+        m_ActiveScene->SetPaused(true);
+    }
+
     void EditorLayer::OnDuplicateEntity()
     {
         if (m_SceneState != SceneState::Editor)
@@ -643,9 +663,16 @@ namespace HRealEngine
             tintColor.w = 0.5f;
 
         float size = ImGui::GetWindowHeight() - 4.0f;
+
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+        bool bHasPlayButton = m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime;
+        bool bHasSimulateButton = m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate;
+        bool bHasPauseButton = m_SceneState != SceneState::Editor;
+
+        if (bHasPlayButton)
         {
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
-            ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
             if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
             {
@@ -655,8 +682,12 @@ namespace HRealEngine
                     OnSceneStop();
             }
         }
-        ImGui::SameLine();
+
+        if (bHasSimulateButton)
         {
+            if (bHasPlayButton)
+                ImGui::SameLine();
+            
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? m_IconSimulate : m_IconStop;
             if (ImGui::ImageButton("##simulate", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
@@ -665,6 +696,28 @@ namespace HRealEngine
                     OnSceneSimulate();
                 else if (m_SceneState == SceneState::Simulate)
                     OnSceneStop();
+            }
+        }
+
+        if (bHasPauseButton)
+        {
+            bool bIsPaused = m_ActiveScene->IsPaused();
+            ImGui::SameLine();
+            {
+                {
+                    Ref<Texture2D> icon = m_IconPause;
+                    if (ImGui::ImageButton("##pause", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                        m_ActiveScene->SetPaused(!bIsPaused);
+                }
+                if (bIsPaused)
+                {
+                    ImGui::SameLine();
+                    {
+                        Ref<Texture2D> icon = m_IconStep;
+                        if (ImGui::ImageButton("##step", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                            m_ActiveScene->Step();
+                    }
+                }
             }
         }
         ImGui::PopStyleVar(2);

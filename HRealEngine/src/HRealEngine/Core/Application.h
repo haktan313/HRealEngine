@@ -7,6 +7,11 @@
 #include "HRealEngine/ImGui/ImGuiLayer.h"
 #include "HRealEngine/Renderer/VertexArray.h"
 
+#include <vector>
+#include <functional>
+#include <mutex>
+
+
 namespace HRealEngine
 {
 	struct AppCommandLineArgs
@@ -45,10 +50,14 @@ namespace HRealEngine
 		static Application& Get() { return *s_InstanceOfApp; }
 
 		const ApplicationSpecification& GetSpecification() const { return m_ApplicationSpecification; }
+
+		void SubmitToMainThread(const std::function<void()>& function);
 		
 	private:
 		bool OnWindowClose(WindowCloseEvent& eventRef);
 		bool OnWindowResize(WindowResizeEvent& eventRef);
+
+		void ExecuteMainThreadQueue();
 
 		ApplicationSpecification m_ApplicationSpecification;
 		LayerStack m_LayerStack;
@@ -62,7 +71,9 @@ namespace HRealEngine
 		bool m_bMinimized = false;
 
 		float m_LastFrameTime = 0.0f;
-		
+
+		std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
 	};
 	Application* CreateApplication(AppCommandLineArgs args); 
 }

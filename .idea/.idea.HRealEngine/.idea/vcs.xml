@@ -2,9 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/Box2D" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/GLFW" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/ImGuizmo/ImGuizmo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/box2d" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/glm" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/imgui" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/HRealEngine/vendor/spdlog" vcs="Git" />

@@ -6,6 +6,7 @@
 #include <filesystem>
 
 #include "HRealEngine/Renderer/Renderer.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
@@ -25,12 +26,14 @@ namespace HRealEngine
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 		
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
 	Application::~Application()
 	{
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 	void Application::Run()
@@ -40,6 +43,8 @@ namespace HRealEngine
 			float time = Time::GetTime();
 			Timestep timeStep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
+
+			ExecuteMainThreadQueue();
 
 			if (!m_bMinimized)
 			{
@@ -66,6 +71,13 @@ namespace HRealEngine
 			(*--it)->OnEvent(eventRef);
 		}
 	}
+
+	void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock lock(m_MainThreadQueueMutex);
+		m_MainThreadQueue.emplace_back(function);
+	}
+
 	bool Application::OnWindowClose(WindowCloseEvent& eventRef)
 	{
 		m_bRunning = false;
@@ -82,6 +94,15 @@ namespace HRealEngine
 		Renderer::OnWindowResize(eventRef.GetWidth(), eventRef.GetHeight());
 		return false;
 	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock lock(m_MainThreadQueueMutex);
+		for (auto& func : m_MainThreadQueue)
+			func();
+		m_MainThreadQueue.clear();
+	}
+
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);

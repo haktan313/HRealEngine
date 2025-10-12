@@ -36,7 +36,13 @@ namespace HRealEngine
         void OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera);
         void OnUpdateRuntime(Timestep deltaTime);
         void OnViewportResize(uint32_t width, uint32_t height);
+        Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
+        Entity FindEntityByName(std::string_view name);
+        bool IsRunning() const { return m_bIsRunning; }
+        bool IsPaused() const { return m_bIsPaused; }
+        void SetPaused(bool paused) { m_bIsPaused = paused; }
+        void Step(int frames = 1) { m_StepFrames = frames; }
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
@@ -48,6 +54,12 @@ namespace HRealEngine
         void RenderScene(EditorCamera& camera);
 
         b2World* m_PhysicsWorld = nullptr;
+
+        bool m_bIsRunning = false;
+        bool m_bIsPaused = false;
+        int m_StepFrames = 0;
+
+        std::unordered_map<UUID, entt::entity> m_EntityMap;
         
         entt::registry m_Registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;

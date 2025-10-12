@@ -118,6 +118,8 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
+    ScriptComponent:
+      ClassName: HRealEngine.Camera
   - Entity: 9756729186957125387
     TagComponent:
       Tag: Empty Entity
@@ -129,6 +131,12 @@ Entities:
       Color: [1, 1, 1, 1]
       Thickness: 1
       Fade: 0.005
+    ScriptComponent:
+      ClassName: HRealEngine.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 2
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false

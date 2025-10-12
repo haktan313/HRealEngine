@@ -11,5 +11,19 @@ IncludeDir["entt"] = "%{wks.location}/HRealEngine/vendor/entt/include"
 IncludeDir["yaml-cpp"] = "%{wks.location}/HRealEngine/vendor/yaml-cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/HRealEngine/vendor/ImGuizmo"
 IncludeDir["Box2D"] = "%{wks.location}/HRealEngine/vendor/Box2D/include"
+IncludeDir["mono"] = "%{wks.location}/HRealEngine/vendor/mono/include"
+IncludeDir["filewatch"] = "%{wks.location}/HRealEngine/vendor/filewatch"
+
+LibraryDir = {}
+LibraryDir["mono"] = "%{wks.location}/HRealEngine/vendor/mono/lib/%{cfg.buildcfg}"
+
+Library = {}
+Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
+ 
+--Windows DLLs
+Library["WinSock"] = "Ws2_32.lib"
+Library["WinMM"] = "Winmm.lib"
+Library["WinVersion"] = "Version.lib"
+Library["Bcrypt"] = "Bcrypt.lib"
 
 
