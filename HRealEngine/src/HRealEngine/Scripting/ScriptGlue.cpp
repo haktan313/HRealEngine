@@ -39,6 +39,15 @@ namespace HRealEngine
         return ScriptEngine::GetManagedInstance(entityID);
     }
 
+    static void DestroyEntity(UUID entityID)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->GetEntityByUUID(entityID);
+        if (!entity)
+            return;
+        scene->DestroyEntity(entity);
+    }
+
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
         /*Scene* scene = ScriptEngine::GetSceneContext();
@@ -147,6 +156,7 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(PrintLog_VectorDot);
 
         HRE_ADD_INTERNAL_CALL(GetScriptInstance);
+        HRE_ADD_INTERNAL_CALL(DestroyEntity);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);

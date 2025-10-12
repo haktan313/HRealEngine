@@ -47,6 +47,7 @@ namespace HRealEngine
 
         UUID GetUUID() { return GetComponent<EntityIDComponent>().ID; }
         const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
+        void Destroy() { m_Scene->DestroyEntity(*this); }
         
         operator bool() const { return m_EntityHandle != entt::null; }
         operator entt::entity() const { return m_EntityHandle; }

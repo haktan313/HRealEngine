@@ -15,6 +15,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "box2d/b2_contact.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -117,8 +118,25 @@ namespace HRealEngine
 
     void Scene::DestroyEntity(Entity entity)
     {
-        m_Registry.destroy(entity);
+        if (entity.HasComponent<Rigidbody2DComponent>())
+        {
+            auto& rb = entity.GetComponent<Rigidbody2DComponent>();
+            if (m_PhysicsWorld && rb.RuntimeBody)
+            {
+                b2Body* body = (b2Body*)rb.RuntimeBody;
+                body->GetUserData().pointer = 0;
+                m_PhysicsWorld->DestroyBody((b2Body*)rb.RuntimeBody);
+                rb.RuntimeBody = nullptr;
+            }
+        }
+        if (entity.HasComponent<ScriptComponent>())
+        {
+            auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+            if (ScriptEngine::IsEntityClassExist(scriptComponent.ClassName))
+                ScriptEngine::OnDestroyEntity(entity);
+        }
         m_EntityMap.erase(entity.GetUUID());
+        m_Registry.destroy(entity);
     }
 
     void Scene::OnRuntimeStart()
@@ -196,7 +214,7 @@ namespace HRealEngine
                 {
                     Entity entity = {e, this};
                     ScriptEngine::OnUpdateEntity(entity, deltaTime);
-                } 
+                }
                 m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& nativeScript)
                 {
                    if (!nativeScript.Instance)
@@ -207,6 +225,71 @@ namespace HRealEngine
                    }
                     nativeScript.Instance->OnUpdate(Timestep(deltaTime));
                 });
+                
+                if (!m_CollisionBeginEvents.empty())
+                {
+                    for (const auto& collisionEvent : m_CollisionBeginEvents)
+                    {
+                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.A))
+                        {
+                            Entity entityA = {collisionEvent.A, this};
+                            ScriptEngine::OnCollisionBegin2D(entityA, Entity{collisionEvent.B, this});
+                        }
+                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.B))
+                        {
+                            Entity entityB = {collisionEvent.B, this};
+                            ScriptEngine::OnCollisionBegin2D(entityB, Entity{collisionEvent.A, this});
+                        }
+
+                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
+                        {
+                            Entity entityA = {collisionEvent.A, this};
+                            auto& nsc = entityA.GetComponent<NativeScriptComponent>();
+                            if (nsc.Instance)
+                                nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.B, this});
+                        }
+                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.B))
+                        {
+                            Entity entityB = {collisionEvent.B, this};
+                            auto& nsc = entityB.GetComponent<NativeScriptComponent>();
+                            if (nsc.Instance)
+                                nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.A, this});
+                        }
+                    }
+                    m_CollisionBeginEvents.clear();
+                }
+                if (!m_CollisionEndEvents.empty())
+                {
+                    for (const auto& collisionEvent : m_CollisionEndEvents)
+                    {
+                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.A))
+                        {
+                            Entity entityA = {collisionEvent.A, this};
+                            ScriptEngine::OnCollisionEnd2D(entityA, Entity{collisionEvent.B, this});
+                        }
+                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.B))
+                        {
+                            Entity entityB = {collisionEvent.B, this};
+                            ScriptEngine::OnCollisionEnd2D(entityB, Entity{collisionEvent.A, this});
+                        }
+
+                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
+                        {
+                            Entity entityA = {collisionEvent.A, this};
+                            auto& nsc = entityA.GetComponent<NativeScriptComponent>();
+                            if (nsc.Instance)
+                                nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.B, this});
+                        }
+                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.B))
+                        {
+                            Entity entityB = {collisionEvent.B, this};
+                            auto& nsc = entityB.GetComponent<NativeScriptComponent>();
+                            if (nsc.Instance)
+                                nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.A, this});
+                        }
+                    }
+                    m_CollisionEndEvents.clear();
+                }
             }
             {
                 const int32_t velocityIterations = 6;
@@ -380,6 +463,7 @@ namespace HRealEngine
     void Scene::OnPhysics2DStart()
     {
         m_PhysicsWorld = new b2World({0.0f, -9.81f});
+        m_PhysicsWorld->SetContactListener(new GameContactListener(this));
 
         auto view = m_Registry.view<Rigidbody2DComponent>();
         for (auto e : view)
@@ -395,6 +479,8 @@ namespace HRealEngine
 
             b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
             body->SetFixedRotation(rb2d.FixedRotation);
+
+            body->GetUserData().pointer = entity.GetUUID();
             
             rb2d.RuntimeBody = body;
 
@@ -459,6 +545,28 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
+    }
+
+    void Scene::GameContactListener::BeginContact(b2Contact* contact)
+    {
+        b2Body* bodyA = contact->GetFixtureA()->GetBody();
+        b2Body* bodyB = contact->GetFixtureB()->GetBody();
+
+        auto entityA = m_Scene->GetEntityByUUID((UUID)bodyA->GetUserData().pointer);
+        auto entityB = m_Scene->GetEntityByUUID((UUID)bodyB->GetUserData().pointer);
+        if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
+            m_Scene->m_CollisionBeginEvents.push_back({ entityA, entityB });
+    }
+
+    void Scene::GameContactListener::EndContact(b2Contact* contact)
+    {
+        b2Body* bodyA = contact->GetFixtureA()->GetBody();
+        b2Body* bodyB = contact->GetFixtureB()->GetBody();
+
+        auto entityA = m_Scene->GetEntityByUUID((UUID)bodyA->GetUserData().pointer);
+        auto entityB = m_Scene->GetEntityByUUID((UUID)bodyB->GetUserData().pointer);
+        if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
+            m_Scene->m_CollisionEndEvents.push_back({ entityA, entityB });
     }
 
     template <typename T>

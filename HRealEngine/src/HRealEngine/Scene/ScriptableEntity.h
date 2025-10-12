@@ -18,6 +18,12 @@ namespace HRealEngine
         virtual void OnCreate() {}
         virtual void OnDestroy() {}
         virtual void OnUpdate(Timestep ts) {}
+        
+        virtual void OnCollisionBegin2D(Entity other) {}
+        virtual void OnCollisionEnd2D(Entity other) {}
+
+        Entity& GetEntity() { return m_Entity; }
+        void DestroySelf() { m_Entity.Destroy(); }
     private:
         Entity m_Entity;
         friend class Scene;

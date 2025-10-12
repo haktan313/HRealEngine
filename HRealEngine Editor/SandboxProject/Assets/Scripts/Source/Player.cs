@@ -19,10 +19,13 @@ namespace HRealEngine
             m_Transform = GetComponent<TransformComponent>();
             m_Rigidbody = GetComponent<Rigidbody2DComponent>();
         }
-
+        void OnDestroy()
+        {
+            Console.WriteLine($"Player.OnDestroy - {EntityID}");
+        }
         void OnUpdate(float ts)
         {
-            Console.WriteLine($"Player.OnUpdate: {ts}");
+            //Console.WriteLine($"Player.OnUpdate: {ts}");
 
             float speed = 0.01f;
             Vector3 velocity = Vector3.Zero;
@@ -54,6 +57,16 @@ namespace HRealEngine
             //Vector3 translation = m_Transform.Translation;
             //translation += velocity * ts;
             //m_Transform.Translation = translation;
+        }
+        
+        void OnCollisionEnter2D(ulong otherID)
+        {
+            Console.WriteLine($"Player.OnCollisionEnter2D - {otherID}");
+            Destroy(otherID);
+        }
+        void OnCollisionExit2D(ulong otherID)
+        {
+
         }
     }
 }

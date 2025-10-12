@@ -150,19 +150,6 @@ namespace HRealEngine
         Scene* SceneContext = nullptr;
     };
     static ScriptEngineData* s_Data = nullptr;
-
-    /*static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
-    {
-        if (!s_Data->bAssemblyReloadPending && change_type == filewatch::Event::modified)
-        {
-            s_Data->bAssemblyReloadPending = true;
-            Application::Get().SubmitToMainThread([]()
-            {
-                s_Data->AppAssemblyWatcher.reset();
-                ScriptEngine::ReloadAssembly();
-            });
-        }
-    }*/
     
     void ScriptEngine::Init()
     {
@@ -170,31 +157,12 @@ namespace HRealEngine
         InitMono();
         LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
         LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
-        LoadAssemblyClasses(/*s_Data->CoreAssembly*/);
+        LoadAssemblyClasses();
 
-        ScriptGlue::RegisterComponents();//
+        ScriptGlue::RegisterComponents();
         ScriptGlue::RegisterFunctions();
 
-        // Test
         s_Data->EntityClass = ScriptClass("HRealEngine", "Entity", true);
-        /*MonoObject* instance = s_Data->EntityClass.Instantiate();
-
-        MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
-        int intValue = 123;
-        void* param = &intValue;
-        s_Data->EntityClass.InvokeMethod(instance, printIntFunc, &param);
-        MonoMethod* printIntsFunc = s_Data->EntityClass.GetMethod("PrintInts", 2);
-        int intValue2 = 1;
-        void* params[2]
-        {
-            &intValue, &intValue2
-        };
-        s_Data->EntityClass.InvokeMethod(instance, printIntsFunc, params);
-
-        MonoString* str = mono_string_new(s_Data->AppDomain, "Hello from C++!");
-        MonoMethod* printStringFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
-        void* stringParam = str;
-        s_Data->EntityClass.InvokeMethod(instance, printStringFunc, &stringParam);*/
     }
 
     void ScriptEngine::Shutdown()
@@ -239,37 +207,8 @@ namespace HRealEngine
         s_Data->bAssemblyReloadPending = false;
     }
 
-    void ScriptEngine::LoadAssemblyClasses(/*MonoAssembly* assembly*/)
+    void ScriptEngine::LoadAssemblyClasses()
     {
-        /*s_Data->EntityClasses.clear();
-
-        MonoImage* image = mono_assembly_get_image(assembly);
-        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-        MonoClass* entityClass = mono_class_from_name(image, "HRealEngine", "Entity");
-
-        for (int32_t i = 0; i < numTypes; i++)
-        {
-            uint32_t cols[MONO_TYPEDEF_SIZE];
-            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-
-            const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-            const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-            std::string fullName;
-            if (strlen(nameSpace) != 0)
-                fullName = fmt::format("{}.{}", nameSpace, name);
-            else
-                fullName = name;
-
-            MonoClass* monoClass = mono_class_from_name(image, nameSpace, name);
-
-            if (monoClass == entityClass)
-                continue;
-
-            bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
-            if (isEntity)
-                s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
-        }*/
         s_Data->EntityClasses.clear();
         const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppImage, MONO_TABLE_TYPEDEF);
         int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
@@ -364,11 +303,44 @@ namespace HRealEngine
         }
     }
 
+    void ScriptEngine::OnDestroyEntity(Entity entity)
+    {
+        UUID entityID = entity.GetUUID();
+        Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
+        instance->InvokeOnDestroy();
+        s_Data->EntityInstances.erase(entityID);
+        s_Data->EntityScriptFieldMaps.erase(entityID);
+    }
+
     void ScriptEngine::OnUpdateEntity(Entity entity, Timestep ts)
     {
         UUID entityID = entity.GetUUID();
         Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
         instance->InvokeOnUpdate((float)ts);
+    }
+
+    void ScriptEngine::OnCollisionBegin2D(Entity entityA, Entity entityB)
+    {
+        UUID idA = entityA.GetUUID();
+        UUID idB = entityB.GetUUID();
+        Ref<ScriptInstance> instanceA = s_Data->EntityInstances[idA];
+        if (instanceA)
+            instanceA->InvokeOnCollisionEnter2D(idB);
+        Ref<ScriptInstance> instanceB = s_Data->EntityInstances[idB];
+        if (instanceB)
+            instanceB->InvokeOnCollisionEnter2D(idA);
+    }
+
+    void ScriptEngine::OnCollisionEnd2D(Entity entityA, Entity entityB)
+    {
+        UUID idA = entityA.GetUUID();
+        UUID idB = entityB.GetUUID();
+        Ref<ScriptInstance> instanceA = s_Data->EntityInstances[idA];
+        if (instanceA)
+            instanceA->InvokeOnCollisionExit2D(idB);
+        Ref<ScriptInstance> instanceB = s_Data->EntityInstances[idB];
+        if (instanceB)
+            instanceB->InvokeOnCollisionExit2D(idA);
     }
 
     Scene* ScriptEngine::GetSceneContext()
@@ -468,6 +440,10 @@ namespace HRealEngine
         m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
         m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
         m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+        
+        m_OnCollisionEnter2DMethod = scriptClass->GetMethod("OnCollisionEnter2D", 1);
+        m_OnCollisionExit2DMethod = scriptClass->GetMethod("OnCollisionExit2D", 1);
+        m_OnDestroyMethod = scriptClass->GetMethod("OnDestroy", 0);
 
         {
             UUID entityID = entity.GetUUID();
@@ -482,6 +458,12 @@ namespace HRealEngine
             m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
     }
 
+    void ScriptInstance::InvokeOnDestroy()
+    {
+        if (m_OnDestroyMethod)
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnDestroyMethod);
+    }
+
     void ScriptInstance::InvokeOnUpdate(Timestep ts)
     {
         if (m_OnUpdateMethod)
@@ -489,6 +471,24 @@ namespace HRealEngine
             float time = (float)ts;
             void* param = &time;
             m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+        }
+    }
+
+    void ScriptInstance::InvokeOnCollisionEnter2D(UUID otherID)
+    {
+        if (m_OnCollisionEnter2DMethod)
+        {
+            void* param = &otherID;
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnter2DMethod, &param);
+        }
+    }
+
+    void ScriptInstance::InvokeOnCollisionExit2D(UUID otherID)
+    {
+        if (m_OnCollisionExit2DMethod)
+        {
+            void* param = &otherID;
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExit2DMethod, &param);
         }
     }
 

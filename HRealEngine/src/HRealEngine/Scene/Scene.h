@@ -3,6 +3,7 @@
 #pragma once
 #include <entt.hpp>
 
+#include "box2d/b2_world_callbacks.h"
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Core/UUID.h"
@@ -67,5 +68,23 @@ namespace HRealEngine
         friend class Entity;
         friend class SceneSerializer;
         friend class SceneHierarchyPanel;
+
+        struct CollisionEvent
+        {
+            entt::entity A;
+            entt::entity B;
+        };
+        class GameContactListener : public b2ContactListener
+        {
+        public:
+            explicit GameContactListener(Scene* scene) : m_Scene(scene) {}
+            void BeginContact(b2Contact* contact) override;
+            void EndContact(b2Contact* contact) override;
+        private:
+            Scene* m_Scene;
+        };
+        GameContactListener m_ContactListener{this};
+        std::vector<CollisionEvent> m_CollisionBeginEvents;
+        std::vector<CollisionEvent> m_CollisionEndEvents;
     };
 }

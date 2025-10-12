@@ -10,12 +10,25 @@
   <component name="ChangeListManager">
     <list default="true" id="8b5004b3-b316-4d53-a859-8de73bca24dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Application.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +42,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://5" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://55" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/09/ea14fae6/Object.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/13/6f01a4c0/Type.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
@@ -99,7 +112,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;C#-scripting&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -280,6 +293,8 @@
       <workItem from="1759664547426" duration="7322000" />
       <workItem from="1759871598005" duration="5949000" />
       <workItem from="1759949626832" duration="6128000" />
+      <workItem from="1760290666236" duration="7679000" />
+      <workItem from="1760298500370" duration="491000" />
     </task>
     <servers />
   </component>

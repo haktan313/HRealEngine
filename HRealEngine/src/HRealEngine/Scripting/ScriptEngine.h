@@ -83,7 +83,9 @@ namespace HRealEngine
         ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity);
 
         void InvokeOnCreate();
+        void InvokeOnDestroy();
         void InvokeOnUpdate(Timestep ts);
+        void InvokeOnCollisionEnter2D(UUID otherID);
 
         Ref<ScriptClass> GetScriptClass() const { return m_ScriptClass; }
 
@@ -104,6 +106,7 @@ namespace HRealEngine
 
         MonoObject* GetManagedObject() const { return m_Instance; }
     private:
+        void InvokeOnCollisionExit2D(UUID otherID);
         bool GetFieldValueInternal(const std::string& name, void* outValue);
         bool SetFieldValueInternal(const std::string& name, const void* value);
         
@@ -112,6 +115,10 @@ namespace HRealEngine
         MonoMethod* m_Constructor = nullptr;
         MonoMethod* m_OnCreateMethod = nullptr;
         MonoMethod* m_OnUpdateMethod = nullptr;
+        
+        MonoMethod* m_OnCollisionEnter2DMethod = nullptr;
+        MonoMethod* m_OnCollisionExit2DMethod = nullptr;
+        MonoMethod* m_OnDestroyMethod = nullptr;
 
         inline static char s_FieldValueBuffer[16];
 
@@ -184,7 +191,10 @@ namespace HRealEngine
 
         static bool IsEntityClassExist(const std::string& className);
         static void OnCreateEntity(Entity entity);
+        static void OnDestroyEntity(Entity entity);
         static void OnUpdateEntity(Entity entity, Timestep ts);
+        static void OnCollisionBegin2D(Entity entityA, Entity entityB);
+        static void OnCollisionEnd2D(Entity entityA, Entity entityB);
 
         static Scene* GetSceneContext();
         static Ref<ScriptClass> GetEntityClass(const std::string& className);

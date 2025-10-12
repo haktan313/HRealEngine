@@ -49,5 +49,10 @@ namespace HRealEngine
             object instance = InternalCalls.GetScriptInstance(EntityID);
             return instance as T;
         }
+        
+        public void Destroy(ulong entityID)
+        {
+            InternalCalls.DestroyEntity(entityID);
+        }
     }
 }

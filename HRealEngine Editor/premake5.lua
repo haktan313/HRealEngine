@@ -17,6 +17,7 @@ project "HRealEngine Editor"
         "%{wks.location}/HRealEngine/vendor",
         "%{IncludeDir.glm}",
         "%{IncludeDir.entt}",
+        "%{IncludeDir.Box2D}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.mono}",
         "%{IncludeDir.filewatch}"
