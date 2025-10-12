@@ -11,7 +11,24 @@
 ## 📸 Screenshots
 | Editor | Sample Scene |
 |--------|-------------|
-| ![Editor Screenshot](https://github.com/user-attachments/assets/db5d561c-ae5e-4dee-8438-a36c4970f981) | ![Scene Screenshot](https://github.com/user-attachments/assets/11c43985-ec0e-4c48-8372-daf0f393670a) |
+| <img width="2555" height="1386" alt="image" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | ![Scene Screenshot](https://github.com/user-attachments/assets/11c43985-ec0e-4c48-8372-daf0f393670a) |
+
+🧩 Some Features
+- ImGui scene editor with viewport and gizmos
+- Entity Component System by entt
+- C# scripting support with Mono
+- Dual scripting support — C++ (Native) and C# (Mono)
+- Some events like: OnCreate, OnUpdate, OnDestroy, OnOverlapBegin, OnOverlapEnd, Destroy, etc.
+- 2D batch renderer with textures and shaders
+- Scene serialization using YAML
+- Input handling and event system
+- Layer and application framework
+- Logging with spdlog
+- OpenGL rendering backend
+- Hot reloadable C# assemblies
+- Framebuffer and render command abstraction
+- Orthographic camera and controller
+- File dialogs and content browser panel
 
 I used a few submodules there is:
 
@@ -20,6 +37,7 @@ I used a few submodules there is:
 HRealEngine uses the following libraries (all included as Git submodules):
 
 - **[Box2D](https://github.com/erincatto/box2d)** – 2D physics engine
+- **[mono](https://github.com/mono/mono)** - C# scripting
 - **[entt](https://github.com/skypjack/entt)** – Entity Component System
 - **[GLFW](https://github.com/glfw/glfw)** – Window and input handling
 - **[Glad](https://github.com/Dav1dde/glad)** – OpenGL function loader
@@ -29,3 +47,4 @@ HRealEngine uses the following libraries (all included as Git submodules):
 - **[stb_image](https://github.com/nothings/stb)** – Image loading
 - **[yaml-cpp](https://github.com/jbeder/yaml-cpp)** – Serialization
 - **[glm](https://github.com/g-truc/glm)** – Math library for graphics
+- **[filewatch](https://github.com/ThomasMonkman/filewatch)**
