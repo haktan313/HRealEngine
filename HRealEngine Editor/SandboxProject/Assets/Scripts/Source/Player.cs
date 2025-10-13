@@ -11,6 +11,7 @@ namespace HRealEngine
         
         public float Speed = 15.0f;
         public float JumpForce = 5.0f;
+        public string cameraName = "camera";
 
         void OnCreate()
         {
@@ -40,7 +41,7 @@ namespace HRealEngine
             else if (Input.IsKeyDown(KeyCodes.HRE_KEY_RIGHT))
                 velocity.X = 10.0f;
             
-            Entity camera = FindEntityByName("camera");
+            Entity camera = FindEntityByName(cameraName);
             if (camera != null)
             {
                 Camera cam = camera.As<Camera>();
@@ -62,7 +63,7 @@ namespace HRealEngine
         void OnCollisionEnter2D(ulong otherID)
         {
             Console.WriteLine($"Player.OnCollisionEnter2D - {otherID}");
-            Destroy(otherID);
+            //Destroy(otherID);
         }
         void OnCollisionExit2D(ulong otherID)
         {

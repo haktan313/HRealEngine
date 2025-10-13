@@ -22,7 +22,7 @@ namespace HRealEngine
         None = 0, Float, Double, Bool, Char, Byte,
         Short, Int, Long, UByte, UShort, UInt, ULong,
         Vector2, Vector3, Vector4,
-        Entity
+        Entity, String
     };
     struct ScriptField
     {
@@ -50,8 +50,12 @@ namespace HRealEngine
             //static_assert(sizeof(T) <= sizeof(m_Buffer), "ScriptFieldInstance::SetValue() buffer overflow");
             memcpy(m_Buffer, &value, sizeof(T));
         }
+
+        template<> std::string GetValue<std::string>() { return m_StringStorage; }
+        template<> void SetValue<std::string>(const std::string& v) { m_StringStorage = v; }
     private:
         uint8_t m_Buffer[8];
+        std::string m_StringStorage;
         friend class ScriptEngine;
         friend class ScriptInstance;
     };
@@ -150,6 +154,7 @@ namespace HRealEngine
             case ScriptFieldType::Vector3:    return "Vector3";
             case ScriptFieldType::Vector4:    return "Vector4";
             case ScriptFieldType::Entity:     return "Entity";
+            case ScriptFieldType::String:     return "String";
             }
             HREALENGINE_CORE_DEBUGBREAK(false, "Unknown script field type");
             return "<Invalid>";
@@ -174,6 +179,7 @@ namespace HRealEngine
             if (type == "Vector3")    return ScriptFieldType::Vector3;
             if (type == "Vector4")    return ScriptFieldType::Vector4;
             if (type == "Entity")     return ScriptFieldType::Entity;
+            if (type == "String")     return ScriptFieldType::String;
             HREALENGINE_CORE_DEBUGBREAK(false, "Unknown script field type");
             return ScriptFieldType::None;
         }

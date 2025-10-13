@@ -1,14 +1,27 @@
+
+using System;
+
 namespace HRealEngine
 {
     public class Camera : Entity
     {
         public Entity Target;
-        public float DistanceToTarget = 2.0f;
         private Entity m_Player;
         
+        public float DistanceToTarget = 2.0f;
+        public short ZoomLevel = 1;
+        public long ZoomSpeed = 1;
+        public int speed = 5;
+        public string playerName = "player";
+        public bool isActive = true;
+        public Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
+
         void OnCreate()
-        {
-            m_Player = FindEntityByName("Empty Entity");
+        { 
+           m_Player = FindEntityByName(playerName);
+           Console.WriteLine($"Camera.OnCreate - {EntityID}");
+           Console.WriteLine($"Camera.OnCreate - playerName: {playerName}");
+           Console.WriteLine($"Camera.OnCreate - player: {m_Player.EntityID}");
         }
         void OnUpdate(float ts)
         {

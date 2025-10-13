@@ -16,19 +16,15 @@
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Source/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/2dphysics.hrs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Entity.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/SceneSerializer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +38,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://55" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://90" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/09/ea14fae6/Object.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3020f90f960f433086d545c4e07afdfd531820/13/6f01a4c0/Type.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine Editor/assets/shaders/Quad_Shader2D.glsl" root0="FORCE_HIGHLIGHTING" />
@@ -103,26 +99,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;C/C++ Project.HRealEngine Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;C/C++ Project.Sandbox.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "C/C++ Project.HRealEngine Editor.executor": "Debug",
+    "C/C++ Project.Sandbox.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="C/C++ Project.HRealEngine Editor">
     <configuration name="HRealEngine Editor" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -137,6 +133,18 @@
         <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
         <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" />
       </configuration_1>
+      <configuration_2 setup="1">
+        <option name="CONFIGURATION" value="Release" />
+        <option name="PLATFORM" value="x64" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXE_PATH" value="$(LocalDebuggerCommand)" />
+        <option name="PROGRAM_PARAMETERS" value="$(LocalDebuggerCommandArguments)" />
+        <option name="WORKING_DIRECTORY" value="$(LocalDebuggerWorkingDirectory)" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" />
+      </configuration_2>
       <option name="DEFAULT_PROJECT_PATH" value="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" />
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRealEngine Editor/HRealEngine Editor.vcxproj" />
       <option name="AUTO_SELECT_PRIORITY" value="0" />
@@ -295,6 +303,7 @@
       <workItem from="1759949626832" duration="6128000" />
       <workItem from="1760290666236" duration="7679000" />
       <workItem from="1760298500370" duration="491000" />
+      <workItem from="1760378786640" duration="12095000" />
     </task>
     <servers />
   </component>

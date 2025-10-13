@@ -36,7 +36,8 @@ namespace HRealEngine
         { "HRealEngine.Vector3",  ScriptFieldType::Vector3 },
         { "HRealEngine.Vector4",  ScriptFieldType::Vector4 },
 
-        { "HRealEngine.Entity",   ScriptFieldType::Entity }
+        { "HRealEngine.Entity",   ScriptFieldType::Entity },
+        { "System.String",    ScriptFieldType::String } 
     };
     
     static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
@@ -297,7 +298,15 @@ namespace HRealEngine
             {
                 const ScriptFieldMap& fieldMap = s_Data->EntityScriptFieldMaps.at(entity.GetUUID());
                 for (const auto& [name, field] : fieldMap)
-                    instance->SetFieldValueInternal(name, field.m_Buffer);
+                {
+                    if (field.Field.Type == ScriptFieldType::String)
+                    {
+                        MonoString* monoString = mono_string_new(s_Data->AppDomain, field.m_StringStorage.c_str());
+                        instance->SetFieldValueInternal(name, monoString);
+                    }
+                    else
+                        instance->SetFieldValueInternal(name, field.m_Buffer);
+                }
             }
             instance->InvokeOnCreate();
         }
