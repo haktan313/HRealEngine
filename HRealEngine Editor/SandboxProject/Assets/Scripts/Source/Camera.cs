@@ -5,29 +5,33 @@ namespace HRealEngine
 {
     public class Camera : Entity
     {
-        public Entity Target;
+        private Entity Target;
         private Entity m_Player;
         
         public float DistanceToTarget = 2.0f;
+        public float MinDistance = 1.0f;
         public short ZoomLevel = 1;
         public long ZoomSpeed = 1;
         public int speed = 5;
         public string playerName = "player";
         public bool isActive = true;
+        public bool isMain = true;
         public Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
 
         void OnCreate()
-        { 
+        {
            m_Player = FindEntityByName(playerName);
            Console.WriteLine($"Camera.OnCreate - {EntityID}");
            Console.WriteLine($"Camera.OnCreate - playerName: {playerName}");
+           if (m_Player == null)
+               return;
            Console.WriteLine($"Camera.OnCreate - player: {m_Player.EntityID}");
         }
         void OnUpdate(float ts)
         {
-            if(m_Player != null)
-                Translation = new Vector3(m_Player.Translation.XY, DistanceToTarget);
-            
+            if(m_Player == null) 
+                return;
+            Translation = new Vector3(m_Player.Translation.XY, DistanceToTarget);
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
 

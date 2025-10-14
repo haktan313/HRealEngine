@@ -54,6 +54,9 @@ namespace HRealEngine
         void OnPhysics2DStop();
         void RenderScene(EditorCamera& camera);
 
+        void RecalculateRenderListSprite();
+        std::vector<entt::entity> m_RenderList;
+
         b2World* m_PhysicsWorld = nullptr;
 
         bool m_bIsRunning = false;

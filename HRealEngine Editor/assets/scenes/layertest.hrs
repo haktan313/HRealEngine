@@ -1,0 +1,53 @@
+Scene: Untitled
+Entities:
+  - Entity: 3136459981910956843
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 14506076717128963534
+    TagComponent:
+      Tag: Player
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0, 0.113878965, 1, 1]
+      TilingFactor: 1
+      OrderInLayer: 1
+  - Entity: 3728597002077726831
+    TagComponent:
+      Tag: Background
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [4.9, 4.7, 1]
+    SpriteRendererComponent:
+      Color: [1, 0.9822064, 0, 1]
+      TilingFactor: 1
+      OrderInLayer: 0
+  - Entity: 8649509902312880164
+    TagComponent:
+      Tag: obje
+    TransformComponent:
+      Position: [0.6684571, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1
+      OrderInLayer: 2

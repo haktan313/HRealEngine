@@ -51,6 +51,9 @@ Entities:
     ScriptComponent:
       ClassName: HRealEngine.Camera
       ScriptFields:
+        - Name: DistanceToTarget
+          Type: Float
+          Data: 5
         - Name: playerName
           Type: String
           Data: player
@@ -58,12 +61,13 @@ Entities:
     TagComponent:
       Tag: ground white
     TransformComponent:
-      Position: [-0.0031170032, -0.8452482, 0.014169606]
-      Rotation: [0.011645551, -0.02259915, -0.25916106]
+      Position: [-0.0031170286, -0.8452482, 0.014169605]
+      Rotation: [0.011645551, -0.022599166, -0.25916106]
       Scale: [8.299997, 0.100000024, 1]
     SpriteRendererComponent:
       Color: [0.19467838, 0.8967972, 0.45453727, 1]
       TilingFactor: 1
+      OrderInLayer: 1
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
@@ -84,6 +88,7 @@ Entities:
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
       TilingFactor: 1
+      OrderInLayer: 0
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -98,12 +103,13 @@ Entities:
     TagComponent:
       Tag: aaa2
     TransformComponent:
-      Position: [-2.6000547, 0.7497276, 0]
+      Position: [-2.6001947, 0.7497273, 0]
       Rotation: [0, 0, 0.0022333558]
       Scale: [0.99998814, 0.99998814, 1]
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
       TilingFactor: 1
+      OrderInLayer: 0
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -118,12 +124,13 @@ Entities:
     TagComponent:
       Tag: aaa
     TransformComponent:
-      Position: [1.3801861, 1.7597216, 0]
+      Position: [-1.8072195, -0.5380108, 0]
       Rotation: [0, 0, 0.53969663]
       Scale: [0.99998856, 0.99998856, 1]
     SpriteRendererComponent:
       Color: [0.7900356, 0.0534188, 0.0534188, 1]
       TilingFactor: 1
+      OrderInLayer: 0
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -144,6 +151,7 @@ Entities:
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       TilingFactor: 1
+      OrderInLayer: 0
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false

@@ -335,7 +335,8 @@ namespace HRealEngine
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
             auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-            for (auto entity : group)
+            RecalculateRenderListSprite();
+            for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
                 Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
@@ -529,7 +530,8 @@ namespace HRealEngine
         Renderer2D::BeginScene(camera);
         {
             auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-            for (auto entity : group)
+            RecalculateRenderListSprite();
+            for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
                 //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
@@ -545,6 +547,23 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
+    }
+
+    void Scene::RecalculateRenderListSprite()
+    {
+        m_RenderList.clear();
+        
+        auto view = m_Registry.view<SpriteRendererComponent>();
+        for (auto entity : view)
+            m_RenderList.push_back(entity);
+
+        std::sort(m_RenderList.begin(), m_RenderList.end(),
+            [&](entt::entity a, entt::entity b)
+            {
+                auto& sa = view.get<SpriteRendererComponent>(a);
+                auto& sb = view.get<SpriteRendererComponent>(b);
+                return sa.OrderInLayer > sb.OrderInLayer;
+            });
     }
 
     void Scene::GameContactListener::BeginContact(b2Contact* contact)

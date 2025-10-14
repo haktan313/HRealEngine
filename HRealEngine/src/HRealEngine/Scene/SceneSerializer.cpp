@@ -183,6 +183,7 @@ namespace HRealEngine
             if (sprite.Texture)
                 out << YAML::Key << "TexturePath" << YAML::Value << sprite.Texture->GetPath();
             out << YAML::Key << "TilingFactor" << YAML::Value << sprite.TilingFactor;
+            out << YAML::Key << "OrderInLayer" << YAML::Value << sprite.OrderInLayer;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<CircleRendererComponent>())
@@ -447,6 +448,8 @@ namespace HRealEngine
                         sprite.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
                     if (spriteRendererComponent["TilingFactor"])
                         sprite.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+                    if (spriteRendererComponent["OrderInLayer"])
+                        sprite.OrderInLayer = spriteRendererComponent["OrderInLayer"].as<int>();
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {

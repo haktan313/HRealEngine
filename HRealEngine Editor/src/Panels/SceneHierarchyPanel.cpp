@@ -77,6 +77,14 @@ namespace HRealEngine
             ImGui::EndPopup();
         }
         
+        if (ImGui::BeginDragDropSource())
+        {
+            UUID uuid = entity.GetUUID(); 
+            ImGui::SetDragDropPayload("SCENE_ENTITY", &uuid, sizeof(UUID));
+            ImGui::Text("%s", Tag.c_str());
+            ImGui::EndDragDropSource();
+        }
+        
         if (bOpened)
         {
             ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -596,30 +604,6 @@ namespace HRealEngine
                                     scriptField.SetValue(data);
                                 }
                             }
-                            if (field.Type == ScriptFieldType::UShort)
-                            {
-                                uint16_t data = 0;
-                                int intData = (int)data;
-                                if (ImGui::DragInt(name.c_str(), &intData, 1.0f, 0, UINT16_MAX))
-                                {
-                                    data = (uint16_t)intData;
-                                    ScriptFieldInstance& scriptField = entityFields[name];
-                                    scriptField.Field = field;
-                                    scriptField.SetValue(data);
-                                }
-                            }
-                            if (field.Type == ScriptFieldType::UInt)
-                            {
-                                uint32_t data = 0;
-                                int intData = (int)data;
-                                if (ImGui::DragInt(name.c_str(), &intData, 1.0f, 0, INT32_MAX))
-                                {
-                                    data = (uint32_t)intData;
-                                    ScriptFieldInstance& scriptField = entityFields[name];
-                                    scriptField.Field = field;
-                                    scriptField.SetValue(data);
-                                }
-                            }
                             if (field.Type == ScriptFieldType::ULong)
                             {
                                 uint64_t data = 0;
@@ -701,6 +685,7 @@ namespace HRealEngine
                 ImGui::EndDragDropTarget();
             }
             ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+            ImGui::DragInt("Order In Layer", &component.OrderInLayer, 1, 0, 100);
         });
         DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
         {
