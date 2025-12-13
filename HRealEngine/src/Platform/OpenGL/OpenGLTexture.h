@@ -31,4 +31,9 @@ namespace HRealEngine
         uint32_t m_Width, m_Height;
         GLenum m_IternalFormat, m_DataFormat;
     };
+    class OpenGLTexture3D : public Texture3D
+    {
+    public:
+        
+    };
 }

@@ -54,6 +54,12 @@ namespace HRealEngine
         operator const glm::vec4& () const { return Color; }
     };
 
+    struct MeshRendererComponent
+    {
+        MeshRendererComponent() = default;
+        MeshRendererComponent(const MeshRendererComponent&) = default;
+    };
+
     struct TagComponent
     {
         std::string Tag;

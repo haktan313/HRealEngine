@@ -16,6 +16,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 #include "box2d/b2_contact.h"
+#include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -333,13 +334,16 @@ namespace HRealEngine
             return;
         
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
+        Renderer3D::BeginScene(*mainCamera, cameraTransform);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>, entt::exclude<MeshRendererComponent>);
             RecalculateRenderListSprite();
             for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                auto [transform3D, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
                 Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                Renderer3D::DrawMesh(transform3D.GetTransform(), mesh, (int)entity);
             }
         }
         {
@@ -351,6 +355,7 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
+        Renderer3D::EndScene();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -528,14 +533,17 @@ namespace HRealEngine
     void Scene::RenderScene(EditorCamera& camera)
     {
         Renderer2D::BeginScene(camera);
+        Renderer3D::BeginScene(camera);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>, entt::exclude<MeshRendererComponent>);
             RecalculateRenderListSprite();
             for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                auto [transform3D, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
                 //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
                 Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                Renderer3D::DrawMesh(transform3D.GetTransform(), meshRenderer, (int)entity);
             }
         }
         {
@@ -547,6 +555,7 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
+        Renderer3D::EndScene();
     }
 
     void Scene::RecalculateRenderListSprite()
