@@ -77,4 +77,52 @@ namespace HRealEngine
         HREALENGINE_CORE_DEBUGBREAK(size == widthRef * heightRef * bpp, "Data must be entire texture!");
         glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
     }
+
+    OpenGLTexture3D::OpenGLTexture3D(uint32_t width, uint32_t height, uint32_t depth)
+        : m_Width(width), m_Height(height), m_Depth(depth)
+    {
+        m_InternalFormat = GL_RGBA8;
+        m_DataFormat = GL_RGBA;
+
+        glCreateTextures(GL_TEXTURE_3D, 1, &m_RendererID);
+        glTextureStorage3D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height, m_Depth);
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    }
+
+    OpenGLTexture3D::OpenGLTexture3D(const std::string& path)
+        : m_FilePath(path)
+    {
+        // 3D Texture tek bir dosyadan (stb_image ile) yüklemek zordur, genelde veri elle verilir.
+        // Şimdilik boş bir texture oluşturalım ki hata vermesin.
+        m_Width = 1; m_Height = 1; m_Depth = 1;
+        m_InternalFormat = GL_RGBA8;
+        m_DataFormat = GL_RGBA;
+
+        glCreateTextures(GL_TEXTURE_3D, 1, &m_RendererID);
+        glTextureStorage3D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height, m_Depth);
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+
+    OpenGLTexture3D::~OpenGLTexture3D()
+    {
+        glDeleteTextures(1, &m_RendererID);
+    }
+
+    void OpenGLTexture3D::SetData(void* data, uint32_t size)
+    {
+        // 3D veri yükleme
+        glTextureSubImage3D(m_RendererID, 0, 0, 0, 0, m_Width, m_Height, m_Depth, m_DataFormat, GL_UNSIGNED_BYTE, data);
+    }
+
+    void OpenGLTexture3D::Bind(uint32_t slot) const
+    {
+        glBindTextureUnit(slot, m_RendererID);
+    }
 }

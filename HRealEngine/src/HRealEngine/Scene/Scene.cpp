@@ -332,18 +332,26 @@ namespace HRealEngine
         
         if (!mainCamera)
             return;
-        
-        Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
+
         Renderer3D::BeginScene(*mainCamera, cameraTransform);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>, entt::exclude<MeshRendererComponent>);
+            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+            }
+        }
+        Renderer3D::EndScene();
+        
+        Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
+        {
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             RecalculateRenderListSprite();
             for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                auto [transform3D, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
                 Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-                Renderer3D::DrawMesh(transform3D.GetTransform(), mesh, (int)entity);
             }
         }
         {
@@ -355,7 +363,6 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
-        Renderer3D::EndScene();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -532,18 +539,26 @@ namespace HRealEngine
 
     void Scene::RenderScene(EditorCamera& camera)
     {
-        Renderer2D::BeginScene(camera);
         Renderer3D::BeginScene(camera);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>, entt::exclude<MeshRendererComponent>);
+            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+            }
+        }
+        Renderer3D::EndScene();
+        
+        Renderer2D::BeginScene(camera);
+        {
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             RecalculateRenderListSprite();
             for (auto entity : m_RenderList)
             {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                auto [transform3D, meshRenderer] = group.get<TransformComponent, MeshRendererComponent>(entity);
                 //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
                 Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-                Renderer3D::DrawMesh(transform3D.GetTransform(), meshRenderer, (int)entity);
             }
         }
         {
@@ -555,7 +570,6 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
-        Renderer3D::EndScene();
     }
 
     void Scene::RecalculateRenderListSprite()
@@ -630,6 +644,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
     {
     }
     template<>
