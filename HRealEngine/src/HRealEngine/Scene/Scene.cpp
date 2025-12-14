@@ -92,6 +92,7 @@ namespace HRealEngine
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<MeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
@@ -333,7 +334,7 @@ namespace HRealEngine
         if (!mainCamera)
             return;
 
-        Renderer3D::BeginScene(*mainCamera, cameraTransform);
+        Renderer3D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
             auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
             for (auto entity : view)

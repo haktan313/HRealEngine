@@ -177,6 +177,7 @@ namespace HRealEngine
         TagComponent,
         CameraComponent,
         SpriteRendererComponent,
+        MeshRendererComponent,
         CircleRendererComponent,
         NativeScriptComponent,
         ScriptComponent,
