@@ -186,6 +186,17 @@ namespace HRealEngine
             out << YAML::Key << "OrderInLayer" << YAML::Value << sprite.OrderInLayer;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<MeshRendererComponent>())
+        {
+            auto& mesh = entity.GetComponent<MeshRendererComponent>();
+            out << YAML::Key << "MeshRendererComponent";
+            out << YAML::BeginMap;
+            out << YAML::Key << "Color" << YAML::Value << mesh.Color;
+            if (mesh.Texture)
+                out << YAML::Key << "TexturePath" << YAML::Value << mesh.Texture->GetPath();
+            out << YAML::Key << "TilingFactor" << YAML::Value << mesh.TilingFactor;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<CircleRendererComponent>())
         {
             auto& circle = entity.GetComponent<CircleRendererComponent>();
@@ -450,6 +461,15 @@ namespace HRealEngine
                         sprite.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
                     if (spriteRendererComponent["OrderInLayer"])
                         sprite.OrderInLayer = spriteRendererComponent["OrderInLayer"].as<int>();
+                }
+                if (auto meshRendererComponent = entity["MeshRendererComponent"])
+                {
+                    auto& mesh = deserializedEntity.AddComponent<MeshRendererComponent>();
+                    mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
+                    if (meshRendererComponent["TexturePath"])
+                        mesh.Texture = Texture2D::Create(meshRendererComponent["TexturePath"].as<std::string>());
+                    if (meshRendererComponent["TilingFactor"])
+                        mesh.TilingFactor = meshRendererComponent["TilingFactor"].as<float>();
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {

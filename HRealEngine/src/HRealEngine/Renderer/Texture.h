@@ -30,4 +30,10 @@ namespace HRealEngine
         static Ref<Texture2D> Create(const std::string& filePath);
         static Ref<Texture2D> Create(uint32_t width, uint32_t height);
     };
+    class Texture3D : public Texture
+    {
+    public:
+        static Ref<Texture3D> Create(const std::string& filePath);
+        static Ref<Texture3D> Create(uint32_t width, uint32_t height, uint32_t depth);
+    };
 }

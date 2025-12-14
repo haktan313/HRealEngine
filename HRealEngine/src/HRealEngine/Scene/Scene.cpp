@@ -16,6 +16,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 #include "box2d/b2_contact.h"
+#include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -91,6 +92,7 @@ namespace HRealEngine
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<MeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
@@ -331,6 +333,17 @@ namespace HRealEngine
         
         if (!mainCamera)
             return;
+
+        Renderer3D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
+        {
+            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+            }
+        }
+        Renderer3D::EndScene();
         
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
@@ -527,6 +540,17 @@ namespace HRealEngine
 
     void Scene::RenderScene(EditorCamera& camera)
     {
+        Renderer3D::BeginScene(camera);
+        {
+            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+            }
+        }
+        Renderer3D::EndScene();
+        
         Renderer2D::BeginScene(camera);
         {
             auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -621,6 +645,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
     {
     }
     template<>

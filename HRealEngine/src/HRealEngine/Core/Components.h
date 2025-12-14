@@ -54,6 +54,20 @@ namespace HRealEngine
         operator const glm::vec4& () const { return Color; }
     };
 
+    struct MeshRendererComponent
+    {
+        glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
+        Ref<Texture2D> Texture;
+        float TilingFactor = 1.0f;
+        
+        MeshRendererComponent() = default;
+        MeshRendererComponent(const MeshRendererComponent&) = default;
+        MeshRendererComponent(const glm::vec4& color) : Color(color) {}
+
+        operator glm::vec4& () { return Color; }
+        operator const glm::vec4& () const { return Color; }
+    };
+
     struct TagComponent
     {
         std::string Tag;
@@ -163,6 +177,7 @@ namespace HRealEngine
         TagComponent,
         CameraComponent,
         SpriteRendererComponent,
+        MeshRendererComponent,
         CircleRendererComponent,
         NativeScriptComponent,
         ScriptComponent,
