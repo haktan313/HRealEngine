@@ -47,7 +47,9 @@ project "HRealEngine"
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.Box2D}",
         "%{IncludeDir.mono}",
-        "%{IncludeDir.filewatch}"
+        "%{IncludeDir.filewatch}",
+        "%{IncludeDir.Jolt}",
+        "%{IncludeDir.JoltPhysics}"
     }
 
     links
@@ -58,7 +60,8 @@ project "HRealEngine"
         "ImGui",
         "yaml-cpp",
         "Box2D",
-        "%{Library.mono}"
+        "%{Library.mono}",
+        "JoltPhysics"
     }
 
     buildoptions { "/utf-8" }

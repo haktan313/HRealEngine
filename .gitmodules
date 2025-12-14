@@ -20,3 +20,6 @@
 [submodule "HRealEngine/vendor/box2d"]
 	path = HRealEngine/vendor/box2d
 	url = https://github.com/TheCherno/box2d.git
+[submodule "HRealEngine/vendor/JoltPhysics"]
+	path = HRealEngine/vendor/JoltPhysics
+	url = https://github.com/haktan313/JoltPhysics.git
