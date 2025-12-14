@@ -4,6 +4,9 @@ Entities:
     TagComponent:
       Tag: 3d cube test
     TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Position: [1.4051342, 0, 0]
+      Rotation: [-0.55298114, 0, 0]
+      Scale: [1, 2.749397, 0.4087302]
+    MeshRendererComponent:
+      Color: [0.6512456, 0.2711592, 0.2711592, 1]
+      TilingFactor: 1
