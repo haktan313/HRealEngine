@@ -390,6 +390,8 @@ namespace HRealEngine
     {
         if (m_Box2DWorld)
             m_Box2DWorld->Init();
+        else if (m_JoltWorld)
+            m_JoltWorld->Init();
     }
 
     void Scene::OnPhysics2DStop()

@@ -72,19 +72,19 @@ project "HRealEngine"
         links { "%{Library.WinSock}", "%{Library.WinMM}", "%{Library.WinVersion}", "%{Library.Bcrypt}" }
     
     filter "configurations:Debug"
-        defines { "HREALENGINE_DEBUG" }
+        defines { "HREALENGINE_DEBUG", "JPH_DEBUG", "JPH_ENABLE_ASSERTS" }
         runtime "Debug"
         symbols "on"
         staticruntime "off"
     		
     filter "configurations:Release"
-        defines { "HREALENGINE_RELEASE" }
+        defines { "HREALENGINE_RELEASE", "JPH_RELEASE" }
         runtime "Release"
         optimize "on"
         staticruntime "off"
     
-    filter "configurations:Release"
-  	    defines { "HREALENGINE_DIST" }
+    filter "configurations:Dist"
+  	    defines { "HREALENGINE_DIST", "JPH_DIST" }
   	    runtime "Release"
   	    optimize "on"
   	    staticruntime "off"

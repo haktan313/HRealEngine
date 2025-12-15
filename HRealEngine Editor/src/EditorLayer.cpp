@@ -599,7 +599,7 @@ namespace HRealEngine
         m_SceneState = SceneState::Runtime;
         
         m_ActiveScene = Scene::Copy(m_EditorScene);
-        m_ActiveScene->Set2DPhysicsEnabled(true);
+        m_ActiveScene->Set2DPhysicsEnabled(false);
         m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnRuntimeStart();
         
@@ -613,7 +613,7 @@ namespace HRealEngine
         m_SceneState = SceneState::Simulate;
 
         m_ActiveScene = Scene::Copy(m_EditorScene);
-        m_ActiveScene->Set2DPhysicsEnabled(true);
+        m_ActiveScene->Set2DPhysicsEnabled(false);
         m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnSimulationStart();
 
