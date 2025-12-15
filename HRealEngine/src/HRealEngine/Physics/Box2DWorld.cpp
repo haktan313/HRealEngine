@@ -1,8 +1,7 @@
 #include "HRpch.h"
 #include "Box2DWorld.h"
 
-#include "Scene.h"
-#include "ScriptableEntity.h"
+
 #include "HRealEngine/Core/Components.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
@@ -11,6 +10,7 @@
 #include "box2d/b2_contact.h"
 #include "box2d/b2_circle_shape.h"
 #include "box2d/b2_polygon_shape.h"
+#include "HRealEngine/Scene/ScriptableEntity.h"
 
 namespace HRealEngine
 {

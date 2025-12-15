@@ -230,6 +230,7 @@ namespace HRealEngine
             ShowAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
+            ShowAddComponentEntry<Rigidbody3DComponent>("Rigidbody 3D");
             ShowAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
             ShowAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
             ImGui::EndPopup();
@@ -739,6 +740,45 @@ namespace HRealEngine
                     {
                         currentBodyTypeString = bodyTypeStrings[i];
                         component.Type = (Rigidbody2DComponent::BodyType)i;
+                    }
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+        });
+        DrawComponent<Rigidbody3DComponent>("Rigidbody 3D", entity, [](auto& component)
+        {
+            const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+            const char* bodyShapeStrings[] = { "Box", "Sphere", "Capsule", "Cylinder", "Plane", "Triangle" };
+            const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+            const char* currentBodyShapeString = bodyShapeStrings[(int)component.Shape];
+            
+            if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+                    if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+                    {
+                        currentBodyTypeString = bodyTypeStrings[i];
+                        component.Type = (Rigidbody3DComponent::BodyType)i;
+                    }
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            if (ImGui::BeginCombo("Collision Shape", currentBodyShapeString))
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    bool isSelected = currentBodyShapeString == bodyShapeStrings[i];
+                    if (ImGui::Selectable(bodyShapeStrings[i], isSelected))
+                    {
+                        currentBodyShapeString = bodyShapeStrings[i];
+                        component.Shape = (Rigidbody3DComponent::CollisionShape)i;
                     }
                     if (isSelected)
                         ImGui::SetItemDefaultFocus();

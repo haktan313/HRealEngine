@@ -1,4 +1,5 @@
 #pragma once
+#include "JoltWorldHelper.h"
 
 namespace HRealEngine
 {
@@ -9,9 +10,10 @@ namespace HRealEngine
     public:
         JoltWorld(Scene* scene);
         ~JoltWorld();
-
         void Init();
+        
     private:
         Scene* m_Scene = nullptr;
+        Scope<JoltWorldHelper> m_JoltWorldHelper;
     };
 }

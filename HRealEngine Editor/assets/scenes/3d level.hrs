@@ -1,15 +1,5 @@
 Scene: Untitled
 Entities:
-  - Entity: 10197530516364081433
-    TagComponent:
-      Tag: 3d cube test
-    TransformComponent:
-      Position: [1.4051342, 0, 0]
-      Rotation: [-0.80429226, 0.75373995, -0.6178906]
-      Scale: [0.99999976, 2.7493968, 0.40873012]
-    MeshRendererComponent:
-      Color: [0.6512456, 0.2711592, 0.2711592, 1]
-      TilingFactor: 1
   - Entity: 1969986894705506227
     TagComponent:
       Tag: Camera
@@ -28,14 +18,13 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 8848153506568005771
+  - Entity: 10197530516364081433
     TagComponent:
-      Tag: Empty Entity
+      Tag: 3d cube test
     TransformComponent:
-      Position: [1.5122881, 0, 0.30935448]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Position: [1.4051342, 0, 0]
+      Rotation: [-0.80429226, 0.75373995, -0.6178906]
+      Scale: [0.99999976, 2.7493968, 0.40873012]
+    MeshRendererComponent:
+      Color: [0.6512456, 0.2711592, 0.2711592, 1]
       TilingFactor: 1
-      OrderInLayer: 0

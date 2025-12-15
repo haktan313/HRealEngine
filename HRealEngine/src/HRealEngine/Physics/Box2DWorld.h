@@ -15,6 +15,7 @@ namespace HRealEngine
         Box2DWorld(Scene* scene);
         ~Box2DWorld();
         void Init();
+        
         void UpdateSimulation2D(Timestep deltaTime, int& stepFrames);
         void UpdateRuntime2D();
         void Step2DWorld(Timestep deltaTime);

@@ -8,17 +8,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="67a20f18-214b-4773-b2ad-4e8a7bd176c8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/3d level.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/3d level.hrs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/premake5.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/EditorLayer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/premake5.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/src/Panels/SceneHierarchyPanel.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Components.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Core/Components.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Box2DWorld.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Box2DWorld.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/JoltPhysics" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/JoltPhysics" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRealEngine/vendor/JoltPhysics/premake5.lua" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/vendor/JoltPhysics/premake5.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,11 +35,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://23" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Box2DWorld.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Box2DWorld.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/JoltWorld.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/vendor/JoltPhysics/HelloWorld/HelloWorld.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
@@ -51,22 +55,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;C/C++ Project.HRealEngine Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;jolt&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "C/C++ Project.HRealEngine Editor.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "git-widget-placeholder": "jolt",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="HRealEngine Editor" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -114,6 +118,10 @@
       <workItem from="1765748448966" duration="3070000" />
       <workItem from="1765791204985" duration="37000" />
       <workItem from="1765791297378" duration="12140000" />
+      <workItem from="1765807643570" duration="339000" />
+      <workItem from="1765834552046" duration="2018000" />
+      <workItem from="1765836595963" duration="401000" />
+      <workItem from="1765837024188" duration="4761000" />
     </task>
     <servers />
   </component>
@@ -139,6 +147,11 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp</url>
+          <line>31</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

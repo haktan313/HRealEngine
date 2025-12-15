@@ -16,11 +16,10 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 /*#include "box2d/b2_contact.h"*/
+#include "HRealEngine/Physics/Box2DWorld.h"
+#include "HRealEngine/Physics/JoltWorld.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
-
-#include "Box2DWorld.h"
-#include "JoltWorld.h"
 
 
 namespace HRealEngine
