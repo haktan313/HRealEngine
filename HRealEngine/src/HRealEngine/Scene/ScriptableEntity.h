@@ -27,5 +27,6 @@ namespace HRealEngine
     private:
         Entity m_Entity;
         friend class Scene;
+        friend class Box2DWorld;
     };
 }

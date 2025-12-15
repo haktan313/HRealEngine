@@ -20,7 +20,8 @@ project "HRealEngine Editor"
         "%{IncludeDir.Box2D}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.mono}",
-        "%{IncludeDir.filewatch}"
+        "%{IncludeDir.filewatch}",
+        "%{IncludeDir.JoltPhysics}"
     }
 
     buildoptions { "/utf-8" }

@@ -544,7 +544,8 @@ namespace HRealEngine
             OpenScene(filePath);
     }
 
-    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    void EditorLayer::
+    OpenScene(const std::filesystem::path& path)
     {
         if (m_SceneState != SceneState::Editor)
             OnSceneStop();
@@ -598,6 +599,8 @@ namespace HRealEngine
         m_SceneState = SceneState::Runtime;
         
         m_ActiveScene = Scene::Copy(m_EditorScene);
+        m_ActiveScene->Set2DPhysicsEnabled(true);
+        m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnRuntimeStart();
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -610,6 +613,8 @@ namespace HRealEngine
         m_SceneState = SceneState::Simulate;
 
         m_ActiveScene = Scene::Copy(m_EditorScene);
+        m_ActiveScene->Set2DPhysicsEnabled(true);
+        m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnSimulationStart();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
