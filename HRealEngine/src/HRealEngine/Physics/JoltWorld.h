@@ -4,6 +4,8 @@
 namespace HRealEngine
 {
     class Scene;
+    class Entity;
+    class Timestep;
     
     class JoltWorld
     {
@@ -11,9 +13,17 @@ namespace HRealEngine
         JoltWorld(Scene* scene);
         ~JoltWorld();
         void Init();
+
+        void DestroyEntityPhysics(Entity entity);
+        void Step3DWorld(Timestep deltaTime);
+        void UpdateSimulation3D(Timestep deltaTime, int& stepFrames);
         
     private:
         Scene* m_Scene = nullptr;
+        JPH::BodyInterface* body_interface;
+
         Scope<JoltWorldHelper> m_JoltWorldHelper;
+        
+        JPH::PhysicsSystem physics_system;
     };
 }

@@ -136,6 +136,8 @@ namespace HRealEngine
     {
         if (m_b2PhysicsEnabled)
             m_Box2DWorld->DestroyEntityPhysics(entity);
+        else 
+            m_JoltWorld->DestroyEntityPhysics(entity);
         
         if (entity.HasComponent<ScriptComponent>())
         {
@@ -185,6 +187,8 @@ namespace HRealEngine
     {
         if (m_b2PhysicsEnabled)
             m_Box2DWorld->UpdateSimulation2D(deltaTime, m_StepFrames);
+        else 
+            m_JoltWorld->UpdateSimulation3D(deltaTime, m_StepFrames);
         RenderScene(camera);
     }
 
@@ -222,6 +226,8 @@ namespace HRealEngine
             {
                 if (m_b2PhysicsEnabled)
                     m_Box2DWorld->Step2DWorld(deltaTime);
+                else
+                    m_JoltWorld->Step3DWorld(deltaTime);
             }
         }
 
