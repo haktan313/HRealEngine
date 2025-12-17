@@ -8,6 +8,8 @@
 
 - If you make changes to the build files or need to regenerate Visual Studio project files, run `scripts/Win-GenProjects.bat` this will call **premake5** and create the required `.sln` files.
 
+https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
+
 ## 📸 Screenshots
 | 2D | 3D |
 |--------|-------------|
