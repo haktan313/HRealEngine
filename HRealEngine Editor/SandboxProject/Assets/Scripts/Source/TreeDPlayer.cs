@@ -61,7 +61,7 @@ namespace HRealEngine
         void OnCollisionEnter2D(ulong otherID)
         {
             Console.WriteLine($"Player.OnCollisionEnter2D - {otherID}");
-            //Destroy(otherID);
+            Destroy(otherID);
         }
         void OnCollisionExit2D(ulong otherID)
         {

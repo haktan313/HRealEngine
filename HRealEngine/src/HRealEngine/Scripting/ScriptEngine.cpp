@@ -290,7 +290,8 @@ namespace HRealEngine
 
     void ScriptEngine::SetBodyInterface(JPH::BodyInterface* bodyInterface)
     {
-        s_Data->body_interface = bodyInterface;
+        if (s_Data)
+            s_Data->body_interface = bodyInterface;
     }
 
     bool ScriptEngine::IsEntityClassExist(const std::string& className)
