@@ -54,7 +54,6 @@ namespace HRealEngine
         physics_system.Init( cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints,
             m_BPLayerInterface, m_ObjectVsBroadPhaseLayerFilter, m_ObjectLayerPairFilter);
         physics_system.SetBodyActivationListener(&m_BodyActivationListener);
-        physics_system.SetContactListener(&m_ContactListener);
 
         m_Initialized = true;
     }

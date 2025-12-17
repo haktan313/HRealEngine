@@ -4,28 +4,32 @@
 #include "HRealEngine/Core/Components.h"
 #include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Scene/Scene.h"
+#include "HRealEngine/Scene/ScriptableEntity.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/Body/BodyCreationSettings.h"
 #include "Physics/Collision/Shape/BoxShape.h"
 
 namespace HRealEngine
 {
-    JoltWorld::JoltWorld(Scene* scene) : m_Scene(scene)
+    JoltWorld::JoltWorld(Scene* scene) : m_Scene(scene), m_ContactListener(scene, this)
     {
         m_JoltWorldHelper = CreateScope<JoltWorldHelper>(this);
     }
 
     JoltWorld::~JoltWorld()
     {
-        
+        Stop3DPhysics();
     }
 
     void JoltWorld::Init()
     {
         m_JoltWorldHelper->Initialize(physics_system);
+        physics_system.SetContactListener(&m_ContactListener);
         // The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a non-locking
         // variant of this. We're going to use the locking version (even though we're not planning to access bodies from multiple threads)
         body_interface = &physics_system.GetBodyInterface();
+        ScriptEngine::SetBodyInterface(body_interface);
 
         auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
         for (auto e : view)
@@ -44,19 +48,23 @@ namespace HRealEngine
 
                 JPH::EMotionType motionType = JPH::EMotionType::Static;
                 auto layer = Layers::NON_MOVING;
+                bool bAllowSleep = false;
                 switch (rb3d.Type)
                 {
                 case Rigidbody3DComponent::BodyType::Static:
                     motionType = JPH::EMotionType::Static;
                     layer = Layers::NON_MOVING;
+                    bAllowSleep = true;
                     break;
                 case Rigidbody3DComponent::BodyType::Dynamic:
                     motionType = JPH::EMotionType::Dynamic;
                     layer = Layers::MOVING;
+                    bAllowSleep = false;
                     break;
                 case Rigidbody3DComponent::BodyType::Kinematic:
                     motionType = JPH::EMotionType::Kinematic;
                     layer = Layers::MOVING;
+                    bAllowSleep = false;
                     break;
                 }
                 glm::quat q = glm::quat(transform.Rotation); // (pitch/yaw/roll) rad
@@ -65,7 +73,9 @@ namespace HRealEngine
                 JPH::BodyCreationSettings bodySettings(boxShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
                     joltRot, motionType, layer);
 
+                bodySettings.mAllowSleeping = bAllowSleep; 
                 JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
+                body->SetUserData(entity.GetUUID());
                 body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
                 rb3d.RuntimeBody = body;
             }
@@ -85,6 +95,7 @@ namespace HRealEngine
             if (rb.RuntimeBody)
             {
                 auto body = (JPH::Body*)rb.RuntimeBody;
+                body->SetUserData(0);
                 body_interface->RemoveBody(body->GetID());
                 body_interface->DestroyBody(body->GetID());
                 rb.RuntimeBody = nullptr;
@@ -92,8 +103,15 @@ namespace HRealEngine
         }
     }
 
+    void JoltWorld::Stop3DPhysics()
+    {
+        ScriptEngine::SetBodyInterface(nullptr);
+        m_JoltWorldHelper = nullptr;
+    }
+
     void JoltWorld::Step3DWorld(Timestep deltaTime)
     {
+        m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
         auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
         for (auto e : view)
         {
@@ -116,13 +134,13 @@ namespace HRealEngine
             transform.Rotation.y = euler.y;
             transform.Rotation.z = euler.z;
         }
-        m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
     }
 
     void JoltWorld::UpdateSimulation3D(Timestep deltaTime, int& stepFrames)
     {
         if (!m_Scene->IsPaused() || stepFrames-- > 0)
         {
+            m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
             auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
             for (auto e : view)
             {
@@ -145,7 +163,72 @@ namespace HRealEngine
                 transform.Rotation.y = euler.y;
                 transform.Rotation.z = euler.z;
             }
-            m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
+        }
+    }
+
+    void JoltWorld::UpdateRuntime3D()
+    {
+        if (!m_CollisionBeginEvents.empty())
+        {
+            for (const auto& collisionEvent : m_CollisionBeginEvents)
+            {
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
+                {
+                    Entity entityA = {collisionEvent.A, m_Scene};
+                    ScriptEngine::OnCollisionBegin(entityA, Entity{collisionEvent.B, m_Scene});
+                }
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
+                {
+                    Entity entityB = {collisionEvent.B, m_Scene};
+                    ScriptEngine::OnCollisionBegin(entityB, Entity{collisionEvent.A, m_Scene});
+                }       
+                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
+                {
+                    Entity entityA = {collisionEvent.A, m_Scene};
+                    auto& nsc = entityA.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.B, m_Scene});
+                }
+                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
+                {
+                    Entity entityB = {collisionEvent.B, m_Scene};
+                    auto& nsc = entityB.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.A, m_Scene});
+                }
+            }
+            m_CollisionBeginEvents.clear();
+        }
+        if (!m_CollisionEndEvents.empty())
+        {
+            for (const auto& collisionEvent : m_CollisionEndEvents)
+            {
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
+                {
+                    Entity entityA = {collisionEvent.A, m_Scene};
+                    ScriptEngine::OnCollisionEnd(entityA, Entity{collisionEvent.B, m_Scene});
+                }
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
+                {
+                    Entity entityB = {collisionEvent.B, m_Scene};
+                    ScriptEngine::OnCollisionEnd(entityB, Entity{collisionEvent.A, m_Scene});
+                }       
+                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
+                {
+                    Entity entityA = {collisionEvent.A, m_Scene};
+                    auto& nsc = entityA.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.B, m_Scene});
+                }
+                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
+                {
+                    Entity entityB = {collisionEvent.B, m_Scene};
+                    auto& nsc = entityB.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.A, m_Scene});
+                }
+            }
+            m_CollisionEndEvents.clear();
         }
     }
 }

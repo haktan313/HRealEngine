@@ -51,8 +51,8 @@ namespace HRealEngine
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
-        void OnPhysics2DStart();
-        void OnPhysics2DStop();
+        void OnPhysicsStart();
+        void OnPhysicsStop();
         void RenderScene(EditorCamera& camera);
 
         void RecalculateRenderListSprite();

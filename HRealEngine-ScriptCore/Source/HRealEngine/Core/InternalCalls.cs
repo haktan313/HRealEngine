@@ -28,5 +28,8 @@ namespace HRealEngine
         internal extern static void Rigidbody2DComponent_ApplyLinearImpulse(ulong entityID, ref Vector2 impulse, ref Vector2 point, bool wake);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(ulong entityID, ref Vector2 impulse, bool wake);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_ApplyLinearImpulseToCenter(ulong entityID, ref Vector3 impulse);
     }
 }

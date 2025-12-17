@@ -9,7 +9,28 @@
   <component name="ChangeListManager">
     <list default="true" id="67a20f18-214b-4773-b2ad-4e8a7bd176c8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRealEngine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/Resources/Scripts/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/.idea/.idea.SandboxProject/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/.idea/.idea.SandboxProject/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/HRealEngine-ScriptCore.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries/Sandbox.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/3d level.hrs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/assets/scenes/3d level.hrs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine Editor/imgui.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Component.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/Component.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine-ScriptCore/Source/HRealEngine/Core/InternalCalls.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorldHelper.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/Scene.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scene/ScriptableEntity.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptEngine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/HRealEngine/src/HRealEngine/Scripting/ScriptGlue.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +44,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://10" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://13" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/Box2DWorld.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRealEngine/src/HRealEngine/Physics/JoltWorld.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -111,7 +132,8 @@
       <workItem from="1765834552046" duration="2018000" />
       <workItem from="1765836595963" duration="401000" />
       <workItem from="1765837024188" duration="4761000" />
-      <workItem from="1765881175693" duration="5158000" />
+      <workItem from="1765881175693" duration="13854000" />
+      <workItem from="1765965245639" duration="907000" />
     </task>
     <servers />
   </component>

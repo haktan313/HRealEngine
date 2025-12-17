@@ -19,8 +19,8 @@ namespace HRealEngine
         virtual void OnDestroy() {}
         virtual void OnUpdate(Timestep ts) {}
         
-        virtual void OnCollisionBegin2D(Entity other) {}
-        virtual void OnCollisionEnd2D(Entity other) {}
+        virtual void OnCollisionBegin(Entity other) {}
+        virtual void OnCollisionEnd(Entity other) {}
 
         Entity& GetEntity() { return m_Entity; }
         void DestroySelf() { m_Entity.Destroy(); }
@@ -28,5 +28,6 @@ namespace HRealEngine
         Entity m_Entity;
         friend class Scene;
         friend class Box2DWorld;
+        friend class JoltWorld;
     };
 }

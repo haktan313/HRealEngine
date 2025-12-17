@@ -153,7 +153,7 @@ namespace HRealEngine
     {
         m_bIsRunning = true;
         
-       OnPhysics2DStart();
+       OnPhysicsStart();
        {
            ScriptEngine::OnRuntimeStart(this);
            auto view = m_Registry.view<ScriptComponent>();
@@ -169,18 +169,18 @@ namespace HRealEngine
     {
         m_bIsRunning = false;
         
-        OnPhysics2DStop();
+        OnPhysicsStop();
         ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
     {
-        OnPhysics2DStart();
+        OnPhysicsStart();
     }
 
     void Scene::OnSimulationStop()
     {
-        OnPhysics2DStop();
+        OnPhysicsStop();
     }
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)
@@ -222,6 +222,8 @@ namespace HRealEngine
 
                 if (m_b2PhysicsEnabled)
                     m_Box2DWorld->UpdateRuntime2D();
+                else
+                    m_JoltWorld->UpdateRuntime3D();
             }
             {
                 if (m_b2PhysicsEnabled)
@@ -391,7 +393,7 @@ namespace HRealEngine
         return true;
     }
 
-    void Scene::OnPhysics2DStart()
+    void Scene::OnPhysicsStart()
     {
         if (m_Box2DWorld)
             m_Box2DWorld->Init();
@@ -399,7 +401,7 @@ namespace HRealEngine
             m_JoltWorld->Init();
     }
 
-    void Scene::OnPhysics2DStop()
+    void Scene::OnPhysicsStop()
     {
         if (m_b2PhysicsEnabled)
             m_Box2DWorld = nullptr;

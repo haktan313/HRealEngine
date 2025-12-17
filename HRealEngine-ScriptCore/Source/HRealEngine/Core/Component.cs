@@ -31,4 +31,11 @@ namespace HRealEngine
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(entity.EntityID, ref impulse, wake);
         }
     }
+    public class Rigidbody3DComponent : Component
+    {
+        public void ApplyLinearImpulse(Vector3 impulse)
+        {
+            InternalCalls.Rigidbody3DComponent_ApplyLinearImpulseToCenter(entity.EntityID, ref impulse);
+        } 
+    }
 }

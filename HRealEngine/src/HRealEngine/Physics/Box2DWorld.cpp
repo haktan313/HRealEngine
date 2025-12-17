@@ -126,26 +126,26 @@ namespace HRealEngine
                 if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
                 {
                     Entity entityA = {collisionEvent.A, m_Scene};
-                    ScriptEngine::OnCollisionBegin2D(entityA, Entity{collisionEvent.B, m_Scene});
+                    ScriptEngine::OnCollisionBegin(entityA, Entity{collisionEvent.B, m_Scene});
                 }
                 if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
                 {
                     Entity entityB = {collisionEvent.B, m_Scene};
-                    ScriptEngine::OnCollisionBegin2D(entityB, Entity{collisionEvent.A, m_Scene});
+                    ScriptEngine::OnCollisionBegin(entityB, Entity{collisionEvent.A, m_Scene});
                 }       
                 if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
                 {
                     Entity entityA = {collisionEvent.A, m_Scene};
                     auto& nsc = entityA.GetComponent<NativeScriptComponent>();
                     if (nsc.Instance)
-                        nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.B, m_Scene});
+                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.B, m_Scene});
                 }
                 if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
                 {
                     Entity entityB = {collisionEvent.B, m_Scene};
                     auto& nsc = entityB.GetComponent<NativeScriptComponent>();
                     if (nsc.Instance)
-                        nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.A, m_Scene});
+                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.A, m_Scene});
                 }
             }
             m_CollisionBeginEvents.clear();
@@ -157,26 +157,26 @@ namespace HRealEngine
                 if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
                 {
                     Entity entityA = {collisionEvent.A, m_Scene};
-                    ScriptEngine::OnCollisionEnd2D(entityA, Entity{collisionEvent.B, m_Scene});
+                    ScriptEngine::OnCollisionEnd(entityA, Entity{collisionEvent.B, m_Scene});
                 }
                 if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
                 {
                     Entity entityB = {collisionEvent.B, m_Scene};
-                    ScriptEngine::OnCollisionEnd2D(entityB, Entity{collisionEvent.A, m_Scene});
+                    ScriptEngine::OnCollisionEnd(entityB, Entity{collisionEvent.A, m_Scene});
                 }       
                 if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
                 {
                     Entity entityA = {collisionEvent.A, m_Scene};
                     auto& nsc = entityA.GetComponent<NativeScriptComponent>();
                     if (nsc.Instance)
-                        nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.B, m_Scene});
+                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.B, m_Scene});
                 }
                 if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
                 {
                     Entity entityB = {collisionEvent.B, m_Scene};
                     auto& nsc = entityB.GetComponent<NativeScriptComponent>();
                     if (nsc.Instance)
-                        nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.A, m_Scene});
+                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.A, m_Scene});
                 }
             }
             m_CollisionEndEvents.clear();
