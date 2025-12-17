@@ -74,6 +74,7 @@ namespace HRealEngine
         bool m_ViewportFocused = false;
         bool m_ViewportHovered = false;
         bool m_ShowPhysicsColliders = false;
+        bool m_bSetPhysics2DEnabled = false;
 
         Ref<Texture2D> m_JoseMourinhoTexture;
         Ref<Texture2D> m_CheckBoardTexture;

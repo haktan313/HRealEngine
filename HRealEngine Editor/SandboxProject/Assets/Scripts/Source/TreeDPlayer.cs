@@ -11,6 +11,8 @@ namespace HRealEngine
         public float Speed = 15.0f;
         public float JumpForce = 5.0f;
         public string cameraName = "camera";
+        
+        private float firstDestroyObject = 0.0f;
 
         void OnCreate()
         {
@@ -61,7 +63,11 @@ namespace HRealEngine
         void OnCollisionEnter2D(ulong otherID)
         {
             Console.WriteLine($"Player.OnCollisionEnter2D - {otherID}");
-            Destroy(otherID);
+            if (firstDestroyObject == 0.0f)
+            {
+                firstDestroyObject = otherID;
+                Destroy(otherID);
+            }
         }
         void OnCollisionExit2D(ulong otherID)
         {

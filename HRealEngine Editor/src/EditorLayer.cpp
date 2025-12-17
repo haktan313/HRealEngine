@@ -322,6 +322,11 @@ namespace HRealEngine
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+        m_bSetPhysics2DEnabled = m_ActiveScene->Is2DPhysicsEnabled();
+        if (ImGui::Checkbox("Enable 2D Physics", &m_bSetPhysics2DEnabled))
+        {
+            m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
+        }
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -599,7 +604,7 @@ namespace HRealEngine
         m_SceneState = SceneState::Runtime;
         
         m_ActiveScene = Scene::Copy(m_EditorScene);
-        m_ActiveScene->Set2DPhysicsEnabled(false);
+        m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
         m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnRuntimeStart();
         
@@ -613,7 +618,7 @@ namespace HRealEngine
         m_SceneState = SceneState::Simulate;
 
         m_ActiveScene = Scene::Copy(m_EditorScene);
-        m_ActiveScene->Set2DPhysicsEnabled(false);
+        m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
         m_ActiveScene->CreatePhysicsWorld();
         m_ActiveScene->OnSimulationStart();
 
