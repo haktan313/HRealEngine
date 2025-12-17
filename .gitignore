@@ -1,3 +1,9 @@
+
+.idea/
+.vscode/
+*.user
+*.suo
+*.VC.db
 .vs/
 bin/
 bin-int/
@@ -16,4 +22,17 @@ Intermediates/
 !vendor/bin/premake/
 !vendor/bin/premake/premake5.exe
 
+HRealEngine Editor/Resources/Scripts/*.dll
+HRealEngine Editor/Resources/Scripts/*.pdb
+HRealEngine Editor/Resources/Scripts/Intermediates/
+HRealEngine Editor/Resources/Scripts/**/obj/
+HRealEngine Editor/Resources/Scripts/**/bin/
 
+SandboxProject/Assets/Scripts/Binaries/
+SandboxProject/Assets/Scripts/**/obj/
+SandboxProject/Assets/Scripts/**/bin/
+SandboxProject/Assets/Scripts/Intermediates/
+SandboxProject/Assets/Scripts/.vs/
+SandboxProject/Assets/Scripts/.idea/
+SandboxProject/Assets/Scripts/*.DotSettings.user
+SandboxProject/Assets/Scripts/*.sln

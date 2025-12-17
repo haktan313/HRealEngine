@@ -25,6 +25,16 @@ project "HRealEngine Editor"
     }
 
     buildoptions { "/utf-8" }
+
+    postbuildcommands
+    {
+        '{COPYFILE} "%{wks.location}/HRealEngine Editor/imgui.ini" "%{cfg.targetdir}"',
+        '{COPYDIR} "%{wks.location}/HRealEngine Editor/mono" "%{cfg.targetdir}/mono"',
+        '{COPYDIR} "%{wks.location}/HRealEngine Editor/assets" "%{cfg.targetdir}/assets"',
+        '{COPYDIR} "%{wks.location}/HRealEngine Editor/Resources" "%{cfg.targetdir}/Resources"',
+        '{COPYDIR} "%{wks.location}/HRealEngine Editor/SandboxProject/Assets/Scripts/Binaries" "%{cfg.targetdir}/SandboxProject/Assets/Scripts/Binaries"'
+    }
+
     
     links{"HRealEngine"}
     

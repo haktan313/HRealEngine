@@ -27,7 +27,7 @@ namespace HRealEngine
 
 		Renderer::Init();
 		ScriptEngine::Init();
-		
+		LOG_CORE_INFO("HRealEngine initialized!");
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
