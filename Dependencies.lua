@@ -15,6 +15,7 @@ IncludeDir["mono"] = "%{wks.location}/HRealEngine/vendor/mono/include"
 IncludeDir["filewatch"] = "%{wks.location}/HRealEngine/vendor/filewatch"
 IncludeDir["JoltPhysics"] = "%{wks.location}/HRealEngine/vendor/JoltPhysics"
 IncludeDir["Jolt"] = "%{wks.location}/HRealEngine/vendor/JoltPhysics/Jolt"
+IncludeDir["assimp"] = "%{wks.location}/HRealEngine/vendor/assimp/include"
 
 
 LibraryDir = {}

@@ -23,3 +23,6 @@
 [submodule "HRealEngine/vendor/JoltPhysics"]
 	path = HRealEngine/vendor/JoltPhysics
 	url = https://github.com/haktan313/JoltPhysics.git
+[submodule "HRealEngine/vendor/stb"]
+	path = HRealEngine/vendor/stb
+	url = https://github.com/AminAliari/assimp.git

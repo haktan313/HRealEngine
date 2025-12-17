@@ -49,7 +49,8 @@ project "HRealEngine"
         "%{IncludeDir.mono}",
         "%{IncludeDir.filewatch}",
         "%{IncludeDir.Jolt}",
-        "%{IncludeDir.JoltPhysics}"
+        "%{IncludeDir.JoltPhysics}",
+        "%{IncludeDir.assimp}"
     }
 
     links
