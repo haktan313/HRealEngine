@@ -13,6 +13,11 @@
 #include "FileWatch.hpp"
 #include "HRealEngine/Core/Application.h"
 
+namespace JPH
+{
+    class BodyInterface;
+}
+
 namespace HRealEngine
 {
     //------------------------------------------------------------------ 
@@ -149,6 +154,7 @@ namespace HRealEngine
         bool bAssemblyReloadPending = false;
 
         Scene* SceneContext = nullptr;
+        JPH::BodyInterface* body_interface;
     };
     static ScriptEngineData* s_Data = nullptr;
     
@@ -282,6 +288,12 @@ namespace HRealEngine
         s_Data->SceneContext = nullptr; 
     }
 
+    void ScriptEngine::SetBodyInterface(JPH::BodyInterface* bodyInterface)
+    {
+        if (s_Data)
+            s_Data->body_interface = bodyInterface;
+    }
+
     bool ScriptEngine::IsEntityClassExist(const std::string& className)
     {
         return s_Data->EntityClasses.find(className) != s_Data->EntityClasses.end();
@@ -328,7 +340,7 @@ namespace HRealEngine
         instance->InvokeOnUpdate((float)ts);
     }
 
-    void ScriptEngine::OnCollisionBegin2D(Entity entityA, Entity entityB)
+    void ScriptEngine::OnCollisionBegin(Entity entityA, Entity entityB)
     {
         UUID idA = entityA.GetUUID();
         UUID idB = entityB.GetUUID();
@@ -340,7 +352,7 @@ namespace HRealEngine
             instanceB->InvokeOnCollisionEnter2D(idA);
     }
 
-    void ScriptEngine::OnCollisionEnd2D(Entity entityA, Entity entityB)
+    void ScriptEngine::OnCollisionEnd(Entity entityA, Entity entityB)
     {
         UUID idA = entityA.GetUUID();
         UUID idB = entityB.GetUUID();
@@ -355,6 +367,11 @@ namespace HRealEngine
     Scene* ScriptEngine::GetSceneContext()
     {
         return s_Data->SceneContext;
+    }
+
+    JPH::BodyInterface* ScriptEngine::GetBodyInterface()
+    {
+        return s_Data->body_interface;
     }
 
     Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& className)

@@ -20,7 +20,8 @@ project "HRealEngine Editor"
         "%{IncludeDir.Box2D}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.mono}",
-        "%{IncludeDir.filewatch}"
+        "%{IncludeDir.filewatch}",
+        "%{IncludeDir.JoltPhysics}"
     }
 
     buildoptions { "/utf-8" }
@@ -32,17 +33,17 @@ project "HRealEngine Editor"
     		defines { "HREALENGINE_PLATFORM_WINDOWS" }
     
     	filter "configurations:Debug"
-    		defines { "HREALENGINE_DEBUG" }
+    		defines { "HREALENGINE_DEBUG", "JPH_DEBUG", "JPH_ENABLE_ASSERTS" }
     		runtime "Debug"
     		symbols "on"
     
     	filter "configurations:Release"
-    		defines { "HREALENGINE_RELEASE" }
+    		defines { "HREALENGINE_RELEASE", "JPH_RELEASE" }
     		runtime "Release"
     		optimize "on"
     
     	filter "configurations:Dist"
-    		defines { "HREALENGINE_DIST" }
+    		defines { "HREALENGINE_DIST", "JPH_DIST" }
     		runtime "Release"
     		optimize "on"
     		

@@ -5,6 +5,11 @@
 
 #include "HRealEngine/Scene/Scene.h"
 
+namespace JPH
+{
+    class BodyInterface;
+}
+
 extern "C"
 {
     typedef struct _MonoClass MonoClass;
@@ -194,15 +199,17 @@ namespace HRealEngine
 
         static void OnRuntimeStart(Scene* scene);
         static void OnRuntimeStop();
+        static void SetBodyInterface(JPH::BodyInterface* bodyInterface);
 
         static bool IsEntityClassExist(const std::string& className);
         static void OnCreateEntity(Entity entity);
         static void OnDestroyEntity(Entity entity);
         static void OnUpdateEntity(Entity entity, Timestep ts);
-        static void OnCollisionBegin2D(Entity entityA, Entity entityB);
-        static void OnCollisionEnd2D(Entity entityA, Entity entityB);
+        static void OnCollisionBegin(Entity entityA, Entity entityB);
+        static void OnCollisionEnd(Entity entityA, Entity entityB);
 
         static Scene* GetSceneContext();
+        static JPH::BodyInterface* GetBodyInterface();
         static Ref<ScriptClass> GetEntityClass(const std::string& className);
         static ScriptFieldMap& GetScriptFieldMap(Entity entity);
         static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();

@@ -6,39 +6,30 @@
 #include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 
-#include "box2d/b2_world.h"
+/*#include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
 #include "box2d/b2_circle_shape.h"
 #include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_polygon_shape.h"*/
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-#include "box2d/b2_contact.h"
+/*#include "box2d/b2_contact.h"*/
+#include "HRealEngine/Physics/Box2DWorld.h"
+#include "HRealEngine/Physics/JoltWorld.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
+
 namespace HRealEngine
 {
-    static b2BodyType RigidBody2DTypeToBox2D(Rigidbody2DComponent::BodyType type)
-    {
-        switch (type)
-        {
-            case Rigidbody2DComponent::BodyType::Static:   return b2_staticBody;
-            case Rigidbody2DComponent::BodyType::Dynamic:  return b2_dynamicBody;
-            case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-        }
-        HREALENGINE_CORE_DEBUGBREAK(false, "Unknown body type");
-        return b2_staticBody;
-    }
-    
     Scene::Scene()
     {
+
     }
     Scene::~Scene()
     {
-        delete m_PhysicsWorld;
     }
 
     template<typename Component>
@@ -96,6 +87,7 @@ namespace HRealEngine
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<Rigidbody3DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         
@@ -118,19 +110,35 @@ namespace HRealEngine
         return entity;
     }
 
-    void Scene::DestroyEntity(Entity entity)
+    void Scene::CreatePhysicsWorld()
     {
-        if (entity.HasComponent<Rigidbody2DComponent>())
+        if (m_b2PhysicsEnabled)
         {
-            auto& rb = entity.GetComponent<Rigidbody2DComponent>();
-            if (m_PhysicsWorld && rb.RuntimeBody)
+            if (!m_Box2DWorld)
             {
-                b2Body* body = (b2Body*)rb.RuntimeBody;
-                body->GetUserData().pointer = 0;
-                m_PhysicsWorld->DestroyBody((b2Body*)rb.RuntimeBody);
-                rb.RuntimeBody = nullptr;
+                if (m_JoltWorld)
+                    m_JoltWorld = nullptr;
+                m_Box2DWorld = CreateScope<Box2DWorld>(this);
             }
         }
+        else
+        {
+            if (!m_JoltWorld)
+            {
+                if (m_Box2DWorld)
+                    m_Box2DWorld = nullptr;
+                m_JoltWorld = CreateScope<JoltWorld>(this);
+            }
+        }
+    }
+
+    void Scene::DestroyEntity(Entity entity)
+    {
+        if (m_b2PhysicsEnabled)
+            m_Box2DWorld->DestroyEntityPhysics(entity);
+        else 
+            m_JoltWorld->DestroyEntityPhysics(entity);
+        
         if (entity.HasComponent<ScriptComponent>())
         {
             auto& scriptComponent = entity.GetComponent<ScriptComponent>();
@@ -145,7 +153,7 @@ namespace HRealEngine
     {
         m_bIsRunning = true;
         
-       OnPhysics2DStart();
+       OnPhysicsStart();
        {
            ScriptEngine::OnRuntimeStart(this);
            auto view = m_Registry.view<ScriptComponent>();
@@ -161,42 +169,26 @@ namespace HRealEngine
     {
         m_bIsRunning = false;
         
-        OnPhysics2DStop();
+        OnPhysicsStop();
         ScriptEngine::OnRuntimeStop();
     }
 
     void Scene::OnSimulationStart()
     {
-        OnPhysics2DStart();
+        OnPhysicsStart();
     }
 
     void Scene::OnSimulationStop()
     {
-        OnPhysics2DStop();
+        OnPhysicsStop();
     }
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)
     {
-        if (!m_bIsPaused || m_StepFrames-- > 0)
-        {
-            const int32_t velocityIterations = 6;
-            const int32_t positionIterations = 2;
-            m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
-
-            auto view = m_Registry.view<Rigidbody2DComponent>();
-            for (auto e : view)
-            {
-                Entity entity = {e, this};
-                auto& transform = entity.GetComponent<TransformComponent>();
-                auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-                b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                const auto& position = body->GetPosition();
-                transform.Position.x = position.x;
-                transform.Position.y = position.y;
-                transform.Rotation.z = body->GetAngle();
-            }
-        }
+        if (m_b2PhysicsEnabled)
+            m_Box2DWorld->UpdateSimulation2D(deltaTime, m_StepFrames);
+        else 
+            m_JoltWorld->UpdateSimulation3D(deltaTime, m_StepFrames);
         RenderScene(camera);
     }
 
@@ -227,90 +219,17 @@ namespace HRealEngine
                    }
                     nativeScript.Instance->OnUpdate(Timestep(deltaTime));
                 });
-                
-                if (!m_CollisionBeginEvents.empty())
-                {
-                    for (const auto& collisionEvent : m_CollisionBeginEvents)
-                    {
-                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.A))
-                        {
-                            Entity entityA = {collisionEvent.A, this};
-                            ScriptEngine::OnCollisionBegin2D(entityA, Entity{collisionEvent.B, this});
-                        }
-                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.B))
-                        {
-                            Entity entityB = {collisionEvent.B, this};
-                            ScriptEngine::OnCollisionBegin2D(entityB, Entity{collisionEvent.A, this});
-                        }
 
-                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
-                        {
-                            Entity entityA = {collisionEvent.A, this};
-                            auto& nsc = entityA.GetComponent<NativeScriptComponent>();
-                            if (nsc.Instance)
-                                nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.B, this});
-                        }
-                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.B))
-                        {
-                            Entity entityB = {collisionEvent.B, this};
-                            auto& nsc = entityB.GetComponent<NativeScriptComponent>();
-                            if (nsc.Instance)
-                                nsc.Instance->OnCollisionBegin2D(Entity{collisionEvent.A, this});
-                        }
-                    }
-                    m_CollisionBeginEvents.clear();
-                }
-                if (!m_CollisionEndEvents.empty())
-                {
-                    for (const auto& collisionEvent : m_CollisionEndEvents)
-                    {
-                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.A))
-                        {
-                            Entity entityA = {collisionEvent.A, this};
-                            ScriptEngine::OnCollisionEnd2D(entityA, Entity{collisionEvent.B, this});
-                        }
-                        if (m_Registry.any_of<ScriptComponent>(collisionEvent.B))
-                        {
-                            Entity entityB = {collisionEvent.B, this};
-                            ScriptEngine::OnCollisionEnd2D(entityB, Entity{collisionEvent.A, this});
-                        }
-
-                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.A))
-                        {
-                            Entity entityA = {collisionEvent.A, this};
-                            auto& nsc = entityA.GetComponent<NativeScriptComponent>();
-                            if (nsc.Instance)
-                                nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.B, this});
-                        }
-                        if (m_Registry.any_of<NativeScriptComponent>(collisionEvent.B))
-                        {
-                            Entity entityB = {collisionEvent.B, this};
-                            auto& nsc = entityB.GetComponent<NativeScriptComponent>();
-                            if (nsc.Instance)
-                                nsc.Instance->OnCollisionEnd2D(Entity{collisionEvent.A, this});
-                        }
-                    }
-                    m_CollisionEndEvents.clear();
-                }
+                if (m_b2PhysicsEnabled)
+                    m_Box2DWorld->UpdateRuntime2D();
+                else
+                    m_JoltWorld->UpdateRuntime3D();
             }
             {
-                const int32_t velocityIterations = 6;
-                const int32_t positionIterations = 2;
-                m_PhysicsWorld->Step(deltaTime, velocityIterations, positionIterations);
-
-                auto view = m_Registry.view<Rigidbody2DComponent>();
-                for (auto e : view)
-                {
-                    Entity entity = {e, this};
-                    auto& transform = entity.GetComponent<TransformComponent>();
-                    auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-                    b2Body* body = (b2Body*)rb2d.RuntimeBody;
-                    const auto& position = body->GetPosition();
-                    transform.Position.x = position.x;
-                    transform.Position.y = position.y;
-                    transform.Rotation.z = body->GetAngle();
-                }
+                if (m_b2PhysicsEnabled)
+                    m_Box2DWorld->Step2DWorld(deltaTime);
+                else
+                    m_JoltWorld->Step3DWorld(deltaTime);
             }
         }
 
@@ -474,68 +393,22 @@ namespace HRealEngine
         return true;
     }
 
-    void Scene::OnPhysics2DStart()
+    void Scene::OnPhysicsStart()
     {
-        m_PhysicsWorld = new b2World({0.0f, -9.81f});
-        m_PhysicsWorld->SetContactListener(new GameContactListener(this));
-
-        auto view = m_Registry.view<Rigidbody2DComponent>();
-        for (auto e : view)
-        {
-            Entity entity = {e, this};
-            auto& transform = entity.GetComponent<TransformComponent>();
-            auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-
-            b2BodyDef bodyDef;
-            bodyDef.type = RigidBody2DTypeToBox2D(rb2d.Type);
-            bodyDef.position.Set(transform.Position.x, transform.Position.y);
-            bodyDef.angle = transform.Rotation.z;
-
-            b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-            body->SetFixedRotation(rb2d.FixedRotation);
-
-            body->GetUserData().pointer = entity.GetUUID();
-            
-            rb2d.RuntimeBody = body;
-
-            if (entity.HasComponent<BoxCollider2DComponent>())
-            {
-                auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
-
-                b2PolygonShape shape;
-                shape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &shape;
-                fixtureDef.density = bc2d.Density;
-                fixtureDef.friction = bc2d.Friction;
-                fixtureDef.restitution = bc2d.Restitution;
-                fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-            if (entity.HasComponent<CircleCollider2DComponent>())
-            {
-                auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
-
-                b2CircleShape shape;
-                shape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-                shape.m_radius = cc2d.Radius * transform.Scale.x;
-
-                b2FixtureDef fixtureDef;
-                fixtureDef.shape = &shape;
-                fixtureDef.density = cc2d.Density;
-                fixtureDef.friction = cc2d.Friction;
-                fixtureDef.restitution = cc2d.Restitution;
-                fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-                body->CreateFixture(&fixtureDef);
-            }
-        }
+        if (m_Box2DWorld)
+            m_Box2DWorld->Init();
+        else if (m_JoltWorld)
+            m_JoltWorld->Init();
     }
 
-    void Scene::OnPhysics2DStop()
+    void Scene::OnPhysicsStop()
     {
-        delete m_PhysicsWorld;
-        m_PhysicsWorld = nullptr;
+        if (m_b2PhysicsEnabled)
+            m_Box2DWorld = nullptr;
+        else
+            m_JoltWorld = nullptr;
+        /*delete m_PhysicsWorld2D;
+        m_PhysicsWorld2D = nullptr;*/
     }
 
     void Scene::RenderScene(EditorCamera& camera)
@@ -590,28 +463,6 @@ namespace HRealEngine
             });
     }
 
-    void Scene::GameContactListener::BeginContact(b2Contact* contact)
-    {
-        b2Body* bodyA = contact->GetFixtureA()->GetBody();
-        b2Body* bodyB = contact->GetFixtureB()->GetBody();
-
-        auto entityA = m_Scene->GetEntityByUUID((UUID)bodyA->GetUserData().pointer);
-        auto entityB = m_Scene->GetEntityByUUID((UUID)bodyB->GetUserData().pointer);
-        if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
-            m_Scene->m_CollisionBeginEvents.push_back({ entityA, entityB });
-    }
-
-    void Scene::GameContactListener::EndContact(b2Contact* contact)
-    {
-        b2Body* bodyA = contact->GetFixtureA()->GetBody();
-        b2Body* bodyB = contact->GetFixtureB()->GetBody();
-
-        auto entityA = m_Scene->GetEntityByUUID((UUID)bodyA->GetUserData().pointer);
-        auto entityB = m_Scene->GetEntityByUUID((UUID)bodyB->GetUserData().pointer);
-        if (m_Scene->m_Registry.valid(entityA) && m_Scene->m_Registry.valid(entityB))
-            m_Scene->m_CollisionEndEvents.push_back({ entityA, entityB });
-    }
-
     template <typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {
@@ -657,6 +508,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<Rigidbody3DComponent>(Entity entity, Rigidbody3DComponent& component)
     {
     }
     template<>

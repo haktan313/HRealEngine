@@ -10,6 +10,8 @@
 #include <mono/metadata/reflection.h>
 
 #include "box2d/b2_body.h"
+#include "Physics/Body/Body.h"
+#include "Physics/Body/BodyInterface.h"
 
 namespace HRealEngine
 {
@@ -113,6 +115,16 @@ namespace HRealEngine
         body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
     }
 
+    static void Rigidbody3DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec3* impulse)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->GetEntityByUUID(entityID);
+        auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+        JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
+        JPH::BodyInterface* bodyInterface = ScriptEngine::GetBodyInterface();
+        bodyInterface->AddLinearVelocity(body->GetID(), JPH::Vec3(impulse->x, impulse->y, impulse->z));
+    }
+
     static bool Input_IsKeyDown(KeyCodes keycode)
     {
         return Input::IsKeyPressed(keycode);
@@ -163,6 +175,7 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+        HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyLinearImpulseToCenter);
         HRE_ADD_INTERNAL_CALL(Input_IsKeyDown);
     }
 }

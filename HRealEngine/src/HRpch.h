@@ -17,6 +17,8 @@
 
 #include "HRealEngine/Core/Logger.h"
 
+#include <Jolt/Jolt.h>
+
 #ifdef HREALENGINE_PLATFORM_WINDOWS
     #include "Windows.h"
 #endif

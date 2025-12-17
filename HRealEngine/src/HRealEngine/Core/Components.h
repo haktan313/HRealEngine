@@ -123,6 +123,20 @@ namespace HRealEngine
         Rigidbody2DComponent() = default;
         Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
     };
+    struct Rigidbody3DComponent
+    {
+        enum class BodyType { Static = 0, Dynamic, Kinematic };
+        enum class CollisionShape { Box = 0, Sphere, Capsule, Cylinder, Plane, Triangle };
+        BodyType Type = BodyType::Static;
+        CollisionShape Shape = CollisionShape::Box;
+        bool FixedRotation = false;
+
+        // Runtime
+        void* RuntimeBody = nullptr;
+
+        Rigidbody3DComponent() = default;
+        Rigidbody3DComponent(const Rigidbody3DComponent&) = default;
+    };
 
     struct BoxCollider2DComponent
     {
@@ -182,6 +196,7 @@ namespace HRealEngine
         NativeScriptComponent,
         ScriptComponent,
         Rigidbody2DComponent,
+        Rigidbody3DComponent,
         BoxCollider2DComponent,
         CircleCollider2DComponent>;
 }

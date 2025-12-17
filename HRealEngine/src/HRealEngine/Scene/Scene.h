@@ -2,17 +2,15 @@
 
 #pragma once
 #include <entt.hpp>
-
-#include "box2d/b2_world_callbacks.h"
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Core/UUID.h"
 
-class b2World;
-
 namespace HRealEngine
 {
+    class JoltWorld;
     class Entity;
+    class Box2DWorld;
     
     class Scene
     {
@@ -24,6 +22,7 @@ namespace HRealEngine
 
         Entity CreateEntity(const std::string& name = std::string());
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
+        void CreatePhysicsWorld();
         void DestroyEntity(Entity entity);
         entt::registry& GetRegistry() { return m_Registry; }
 
@@ -44,20 +43,20 @@ namespace HRealEngine
         bool IsPaused() const { return m_bIsPaused; }
         void SetPaused(bool paused) { m_bIsPaused = paused; }
         void Step(int frames = 1) { m_StepFrames = frames; }
+        void Set2DPhysicsEnabled(bool enabled) { m_b2PhysicsEnabled = enabled; }
+        bool Is2DPhysicsEnabled() const { return m_b2PhysicsEnabled; }
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
-        void OnPhysics2DStart();
-        void OnPhysics2DStop();
+        void OnPhysicsStart();
+        void OnPhysicsStop();
         void RenderScene(EditorCamera& camera);
 
         void RecalculateRenderListSprite();
         std::vector<entt::entity> m_RenderList;
-
-        b2World* m_PhysicsWorld = nullptr;
 
         bool m_bIsRunning = false;
         bool m_bIsPaused = false;
@@ -72,22 +71,8 @@ namespace HRealEngine
         friend class SceneSerializer;
         friend class SceneHierarchyPanel;
 
-        struct CollisionEvent
-        {
-            entt::entity A;
-            entt::entity B;
-        };
-        class GameContactListener : public b2ContactListener
-        {
-        public:
-            explicit GameContactListener(Scene* scene) : m_Scene(scene) {}
-            void BeginContact(b2Contact* contact) override;
-            void EndContact(b2Contact* contact) override;
-        private:
-            Scene* m_Scene;
-        };
-        GameContactListener m_ContactListener{this};
-        std::vector<CollisionEvent> m_CollisionBeginEvents;
-        std::vector<CollisionEvent> m_CollisionEndEvents;
+        Scope<JoltWorld> m_JoltWorld;
+        Scope<Box2DWorld> m_Box2DWorld;
+        bool m_b2PhysicsEnabled = true;
     };
 }

@@ -1,22 +1,46 @@
 Scene: Untitled
 Entities:
+  - Entity: 6143512475824172773
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [2.3406112, -1.8771994, 0]
+      Rotation: [0, 0, 0]
+      Scale: [9.9412565, 1, 3.5769231]
+    MeshRendererComponent:
+      Color: [0.33191067, 0.40645137, 0.4163701, 1]
+      TilingFactor: 1
+    Rigidbody3DComponent:
+      BodyType: Static
+      CollisionShape: Box
+      FixedRotation: false
   - Entity: 10197530516364081433
     TagComponent:
       Tag: 3d cube test
     TransformComponent:
-      Position: [1.4051342, 0, 0]
-      Rotation: [-0.80429226, 0.75373995, -0.6178906]
-      Scale: [0.99999976, 2.7493968, 0.40873012]
+      Position: [2.6698093, 1.8566101, -0.047653377]
+      Rotation: [-8.947485e-07, 0.45259076, 2.0824172]
+      Scale: [3.1138947, 0.9049033, 0.40873048]
     MeshRendererComponent:
       Color: [0.6512456, 0.2711592, 0.2711592, 1]
       TilingFactor: 1
+    ScriptComponent:
+      ClassName: HRealEngine.TreeDPlayer
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 5
+    Rigidbody3DComponent:
+      BodyType: Dynamic
+      CollisionShape: Box
+      FixedRotation: false
   - Entity: 1969986894705506227
     TagComponent:
       Tag: Camera
     TransformComponent:
-      Position: [1.2908049, 0, 4.7701793]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Position: [1.2908049, 6.438079, 5.7614603]
+      Rotation: [-0.53108245, 0, 0]
+      Scale: [0.9999999, 1, 1]
     CameraComponent:
       PrimaryCamera: true
       FixedAspectRatio: false
@@ -28,14 +52,3 @@ Entities:
         OrthographicSize: 10
         OrthographicNear: -1
         OrthographicFar: 1
-  - Entity: 8848153506568005771
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [1.5122881, 0, 0.30935448]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-      TilingFactor: 1
-      OrderInLayer: 0
