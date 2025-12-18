@@ -7,6 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+#include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace YAML
@@ -191,6 +192,9 @@ namespace HRealEngine
             auto& mesh = entity.GetComponent<MeshRendererComponent>();
             out << YAML::Key << "MeshRendererComponent";
             out << YAML::BeginMap;
+            if (mesh.MeshAssetPath.empty() == false)
+                out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();
+
             out << YAML::Key << "Color" << YAML::Value << mesh.Color;
             if (mesh.Texture)
                 out << YAML::Key << "TexturePath" << YAML::Value << mesh.Texture->GetPath();
@@ -492,6 +496,15 @@ namespace HRealEngine
                 if (auto meshRendererComponent = entity["MeshRendererComponent"])
                 {
                     auto& mesh = deserializedEntity.AddComponent<MeshRendererComponent>();
+                    if (meshRendererComponent["MeshPath"])
+                    {
+                        std::string path = meshRendererComponent["MeshPath"].as<std::string>();
+                        mesh.MeshAssetPath = path;
+
+                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
+                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);
+                    }
+
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
                     if (meshRendererComponent["TexturePath"])
                         mesh.Texture = Texture2D::Create(meshRendererComponent["TexturePath"].as<std::string>());

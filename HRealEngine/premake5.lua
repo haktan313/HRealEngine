@@ -62,7 +62,8 @@ project "HRealEngine"
         "yaml-cpp",
         "Box2D",
         "%{Library.mono}",
-        "JoltPhysics"
+        "JoltPhysics",
+        "assimp"
     }
 
     buildoptions { "/utf-8" }

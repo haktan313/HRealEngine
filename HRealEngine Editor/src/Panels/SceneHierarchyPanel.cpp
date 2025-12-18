@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "HRealEngine/Core/Logger.h"
+#include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -691,10 +693,29 @@ namespace HRealEngine
         });
         DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
         {
-            // Renk Seçici
+            ImGui::Text("Mesh");
+            ImGui::Button("Drop .hmesh here", ImVec2(200, 0));
+        
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    std::filesystem::path droppedPath = path;
+        
+                    if (droppedPath.extension() == ".hmesh")
+                    {
+                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
+        
+                        component.Mesh = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
+                        component.MeshAssetPath = droppedPath;
+                        LOG_CORE_INFO("Assigned mesh: {}", droppedPath.string());
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
             ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
             
-            // Texture Button ve Drag Drop Alanı
             ImGui::Button("Texture");
             if (ImGui::BeginDragDropTarget())
             {
@@ -709,15 +730,11 @@ namespace HRealEngine
                 }
                 ImGui::EndDragDropTarget();
             }
-
-            // Eğer texture yüklüyse texture'ın path'ini veya adını göstermek istersen:
             if (component.Texture)
             {
                 ImGui::SameLine();
-                ImGui::Text("Loaded"); // İstersen: ImGui::Text(component.Texture->GetPath().c_str());
+                ImGui::Text("Loaded");
             }
-
-            // Tiling Factor
             ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
         });
         DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)

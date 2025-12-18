@@ -1,0 +1,9 @@
+Type: StaticMesh
+Source: models/flash.obj
+Cooked: cache/flash.hmeshbin
+Import:
+  Triangulate: true
+  GenSmoothNormals: true
+  CalcTangents: true
+  FlipUVs: false
+  Scale: 1.0

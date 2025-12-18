@@ -1,6 +1,7 @@
 #pragma once
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Components.h"
+#include "HRealEngine/Core/ObjLoader.h"
 
 namespace HRealEngine
 {
@@ -15,7 +16,8 @@ namespace HRealEngine
         static void EndScene();
         static void StartBatch();
         static void Flush();
-
+        
+        static Ref<MeshGPU> BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices,const Ref<Shader>& shader);
         static void DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID = -1);
     };
 }

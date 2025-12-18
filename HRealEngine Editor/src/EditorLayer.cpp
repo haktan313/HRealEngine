@@ -18,6 +18,7 @@
 
 namespace HRealEngine
 {
+    struct StaticMeshVertex;
     extern const std::filesystem::path g_AssetsDirectory;
     
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
