@@ -1,19 +1,21 @@
 #include "HRpch.h"
 #include "ObjLoader.h"
 
+#include <filesystem>
+#include <fstream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "HRealEngine/Renderer/Buffers.h"
+#include "HRealEngine/Renderer/Renderer3D.h"
 
 namespace HRealEngine
 {
-    namespace
-    {
-        glm::vec3 ToVec3(const aiVector3D& v) { return { v.x, v.y, v.z }; }
-        glm::vec2 ToVec2(const aiVector3D& v) { return { v.x, v.y }; }
-    }
+    std::unordered_map<std::filesystem::path, Ref<MeshGPU>> ObjLoader::s_Cache;
+    
+    glm::vec3 ToVec3(const aiVector3D& v) { return { v.x, v.y, v.z }; }
+    glm::vec2 ToVec2(const aiVector3D& v) { return { v.x, v.y }; }
 
     bool ObjLoader::LoadMeshFromFile(const std::string& path, std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices)
     {
@@ -42,10 +44,10 @@ namespace HRealEngine
             aiMesh* mesh = scene->mMeshes[m];
             const uint32_t baseVertex = (uint32_t)outVertices.size();
 
-            const bool hasNormals  = mesh->HasNormals();
-            const bool hasUV0      = mesh->HasTextureCoords(0);
+            const bool hasNormals = mesh->HasNormals();
+            const bool hasUV0 = mesh->HasTextureCoords(0);
             const bool hasTangents = mesh->HasTangentsAndBitangents();
-            const bool hasColors0  = mesh->HasVertexColors(0);
+            const bool hasColors0 = mesh->HasVertexColors(0);
 
             outVertices.reserve(outVertices.size() + mesh->mNumVertices);
 
@@ -84,45 +86,109 @@ namespace HRealEngine
         return true;
     }
 
-    Ref<MeshGPU> ObjLoader::BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Shader>& shader)
+    bool ObjLoader::WriteHMeshBin(const std::filesystem::path& path, const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices)
     {
-        Ref<MeshGPU> mesh = CreateRef<MeshGPU>();
-        mesh->VAO = VertexArray::Create();
-        mesh->Shader = shader;
+        std::filesystem::create_directories(path.parent_path());
 
-        constexpr uint32_t kFloatsPerVertex = 14;
+        std::ofstream out(path, std::ios::binary);
+        if (!out)
+            return false;
 
-        std::vector<float> packed;
-        packed.reserve(vertices.size() * kFloatsPerVertex);
+        HMeshBinHeader header;
+        header.VertexCount = (uint32_t)vertices.size();
+        header.IndexCount  = (uint32_t)indices.size();
 
-        for (const MeshVertex& v : vertices)
-        {
-            packed.push_back(v.Position.x); packed.push_back(v.Position.y); packed.push_back(v.Position.z);
-            packed.push_back(v.Normal.x);   packed.push_back(v.Normal.y);   packed.push_back(v.Normal.z);
-            packed.push_back(v.UV.x);       packed.push_back(v.UV.y);
-            packed.push_back(v.Tangent.x);  packed.push_back(v.Tangent.y);  packed.push_back(v.Tangent.z);
-            packed.push_back(v.Color.x);    packed.push_back(v.Color.y);    packed.push_back(v.Color.z);
-        }
+        out.write((const char*)&header, sizeof(header));
+        out.write((const char*)vertices.data(), sizeof(MeshVertex) * vertices.size());
+        out.write((const char*)indices.data(),  sizeof(uint32_t) * indices.size());
+        return true;
+    }
 
-        const uint32_t vbSizeBytes = (uint32_t)(packed.size() * sizeof(float));
-        Ref<VertexBuffer> vbo = VertexBuffer::Create(packed.data(), vbSizeBytes);
+    bool ObjLoader::ReadHMeshBin(const std::filesystem::path& path, std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices)
+    {
+        std::ifstream in(path, std::ios::binary);
+        if (!in)
+            return false;
 
-        BufferLayout layout = {
-            { "a_Position", ShaderDataType::Float3, false },
-            { "a_Normal",   ShaderDataType::Float3, false },
-            { "a_TexCoord", ShaderDataType::Float2, false },
-            { "a_Tangent",  ShaderDataType::Float3, false },
-            { "a_Color",    ShaderDataType::Float3, false }
-        };
-        vbo->SetLayout(layout);
+        HMeshBinHeader header;
+        in.read((char*)&header, sizeof(header));
 
-        mesh->VAO->AddVertexBuffer(vbo);
+        if (header.Magic != 0x48534D48 || header.Version != 1)
+            return false;
 
-        Ref<IndexBuffer> ibo = IndexBuffer::Create((uint32_t*)indices.data(), (uint32_t)indices.size());
-        mesh->VAO->SetIndexBuffer(ibo);
+        outVertices.resize(header.VertexCount);
+        outIndices.resize(header.IndexCount);
 
-        mesh->IndexCount = (uint32_t)indices.size();
+        in.read((char*)outVertices.data(), sizeof(MeshVertex) * outVertices.size());
+        in.read((char*)outIndices.data(),  sizeof(uint32_t) * outIndices.size());
+        return true;
+    }
+
+    Ref<MeshGPU> ObjLoader::GetOrLoad(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader)
+    {
+        auto it = s_Cache.find(hmeshPath);
+        if (it != s_Cache.end())
+            return it->second;
+
+        Ref<MeshGPU> mesh = LoadHMeshAsset(hmeshPath, assetsRoot, shader);
+        if (mesh)
+            s_Cache[hmeshPath] = mesh;
+
         return mesh;
     }
 
+    Ref<MeshGPU> ObjLoader::LoadHMeshAsset(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader)
+    {
+        std::filesystem::path hmeshAbs = assetsRoot / hmeshPath;
+
+        std::string cookedRel;
+        if (!ExtractCookedRelativePath(hmeshAbs, cookedRel))
+        {
+            LOG_CORE_ERROR("Failed to parse Cooked path from: {}", hmeshAbs.string());
+            return nullptr;
+        }
+
+        std::filesystem::path cookedAbs = assetsRoot / cookedRel;
+
+        std::vector<MeshVertex> verts;
+        std::vector<uint32_t> inds;
+        if (!ReadHMeshBin(cookedAbs, verts, inds))
+        {
+            LOG_CORE_ERROR("Failed to read cooked mesh: {}", cookedAbs.string());
+            return nullptr;
+        }
+
+        LOG_CORE_INFO("Loaded cooked mesh: {} (V={}, I={})", cookedAbs.string(), verts.size(), inds.size());
+
+        return Renderer3D::BuildStaticMeshGPU(verts, inds, shader);
+    }
+
+    bool ObjLoader::ExtractCookedRelativePath(const std::filesystem::path& hmeshPath, std::string& outCookedRel)
+    {
+        std::ifstream in(hmeshPath);
+        if (!in)
+            return false;
+
+        std::string line;
+        while (std::getline(in, line))
+        {
+            const std::string key = "Cooked:";
+            if (line.rfind(key, 0) == 0)
+            {
+                std::string value = line.substr(key.size());
+                size_t first = value.find_first_not_of(" \t");
+                if (first != std::string::npos)
+                    value = value.substr(first);
+
+                outCookedRel = value;
+                return !outCookedRel.empty();
+            }
+        }
+        return false;
+    }
+
+    void ObjLoader::Clear()
+    {
+        s_Cache.clear();
+    }
 }

@@ -181,6 +181,47 @@ namespace HRealEngine
         // s_Data.Stats.DrawCalls++;
     }
 
+    Ref<MeshGPU> Renderer3D::BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Shader>& shader)
+    {
+        Ref<MeshGPU> mesh = CreateRef<MeshGPU>();
+        mesh->VAO = VertexArray::Create();
+        mesh->Shader = shader;
+
+        constexpr uint32_t kFloatsPerVertex = 14;
+
+        std::vector<float> packed;
+        packed.reserve(vertices.size() * kFloatsPerVertex);
+
+        for (const MeshVertex& v : vertices)
+        {
+            packed.push_back(v.Position.x); packed.push_back(v.Position.y); packed.push_back(v.Position.z);
+            packed.push_back(v.Normal.x);   packed.push_back(v.Normal.y);   packed.push_back(v.Normal.z);
+            packed.push_back(v.UV.x);       packed.push_back(v.UV.y);
+            packed.push_back(v.Tangent.x);  packed.push_back(v.Tangent.y);  packed.push_back(v.Tangent.z);
+            packed.push_back(v.Color.x);    packed.push_back(v.Color.y);    packed.push_back(v.Color.z);
+        }
+
+        const uint32_t vbSizeBytes = (uint32_t)(packed.size() * sizeof(float));
+        Ref<VertexBuffer> vbo = VertexBuffer::Create(packed.data(), vbSizeBytes);
+
+        BufferLayout layout = {
+            { "a_Position", ShaderDataType::Float3, false },
+            { "a_Normal",   ShaderDataType::Float3, false },
+            { "a_TexCoord", ShaderDataType::Float2, false },
+            { "a_Tangent",  ShaderDataType::Float3, false },
+            { "a_Color",    ShaderDataType::Float3, false }
+        };
+        vbo->SetLayout(layout);
+
+        mesh->VAO->AddVertexBuffer(vbo);
+
+        Ref<IndexBuffer> ibo = IndexBuffer::Create((uint32_t*)indices.data(), (uint32_t)indices.size());
+        mesh->VAO->SetIndexBuffer(ibo);
+
+        mesh->IndexCount = (uint32_t)indices.size();
+        return mesh;
+    }
+
     void Renderer3D::DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID)
     {
         if (meshRenderer.Mesh && meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0)

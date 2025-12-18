@@ -20,5 +20,9 @@ namespace HRealEngine
         std::filesystem::path m_CurrentDirectory;
 
         Ref<Texture2D> m_FileIcon, m_FolderIcon;
+
+        std::string m_LastError;
+        bool m_OpenErrorPopup = false;
+
     };
 }

@@ -11,18 +11,11 @@
 #include <filesystem>
 #include <glm/gtx/quaternion.hpp>
 
-#include "HRealEngine/Renderer/Mesh.h"
-#include "HRealEngine/Renderer/Shader.h"
-#include "HRealEngine/Renderer/VertexArray.h"
-
 
 namespace HRealEngine
 {
+    struct MeshGPU;
     struct MeshData;
-}
-
-namespace HRealEngine
-{
 
     struct EntityIDComponent
     {

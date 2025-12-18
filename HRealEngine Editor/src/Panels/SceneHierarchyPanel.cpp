@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "HRealEngine/Core/Logger.h"
-#include "HRealEngine/Core/MeshAssetCache.h"
+#include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -707,7 +707,7 @@ namespace HRealEngine
                     {
                         auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
         
-                        component.Mesh = MeshAssetCache::GetOrLoad(droppedPath, "assets", shader);
+                        component.Mesh = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
                         component.MeshAssetPath = droppedPath;
                         LOG_CORE_INFO("Assigned mesh: {}", droppedPath.string());
                     }

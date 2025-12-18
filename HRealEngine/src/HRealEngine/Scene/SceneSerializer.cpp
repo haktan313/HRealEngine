@@ -7,7 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-#include "HRealEngine/Core/MeshAssetCache.h"
+#include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace YAML
@@ -502,7 +502,7 @@ namespace HRealEngine
                         mesh.MeshAssetPath = path;
 
                         auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
-                        mesh.Mesh = MeshAssetCache::GetOrLoad(path, "assets", shader);
+                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);
                     }
 
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();

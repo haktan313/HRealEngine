@@ -1,9 +1,0 @@
-Type: StaticMesh
-Source: models/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.obj
-Cooked: cache/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmeshbin
-Import:
-  Triangulate: true
-  GenSmoothNormals: true
-  CalcTangents: true
-  FlipUVs: false
-  Scale: 1.0

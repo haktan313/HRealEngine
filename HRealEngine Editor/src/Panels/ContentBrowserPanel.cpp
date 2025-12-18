@@ -6,11 +6,11 @@
 
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/ObjLoader.h"
-#include "HRealEngine/Renderer/HMeshSerialization.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
 {
+    static constexpr uint64_t kMaxImportFileBytes = 2ull * 1024ull * 1024ull;
     extern const std::filesystem::path g_AssetsDirectory = "assets"; 
 
     ContentBrowserPanel::ContentBrowserPanel() : m_CurrentDirectory(g_AssetsDirectory)
@@ -24,9 +24,7 @@ namespace HRealEngine
         ImGui::Begin("Content Browser");
 
         if (ImGui::Button("Import OBJ"))
-        {
             ImportOBJ();
-        }
         ImGui::SameLine();
         ImGui::TextDisabled("%s", m_CurrentDirectory.string().c_str());
         ImGui::Separator();
@@ -84,6 +82,23 @@ namespace HRealEngine
         ImGui::SliderFloat("Distance", &distance, 0, 32);
         
         ImGui::End();
+
+        if (m_OpenErrorPopup)
+        {
+            ImGui::OpenPopup("Import Error");
+            m_OpenErrorPopup = false;
+        }
+
+        if (ImGui::BeginPopupModal("Import Error", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::TextWrapped("%s", m_LastError.c_str());
+            ImGui::Spacing();
+
+            if (ImGui::Button("OK", ImVec2(120, 0)))
+                ImGui::CloseCurrentPopup();
+
+            ImGui::EndPopup();
+        }
     }
 
     void ContentBrowserPanel::ImportOBJ()
@@ -93,6 +108,24 @@ namespace HRealEngine
             return;
     
         std::filesystem::path srcObj = selected;
+        uint64_t fileSize = 0;
+        try
+        {
+            fileSize = std::filesystem::file_size(srcObj);
+        }
+        catch (...)
+        {
+            m_LastError = "Could not read OBJ file size.";
+            m_OpenErrorPopup = true;
+            return;
+        }
+
+        if (fileSize > kMaxImportFileBytes)
+        {
+            m_LastError = "OBJ file is too large for import budget.";
+            m_OpenErrorPopup = true;
+            return;
+        }
         
         std::filesystem::path modelsDir = g_AssetsDirectory / "models";
         std::filesystem::create_directories(modelsDir);
@@ -127,7 +160,7 @@ namespace HRealEngine
         cookedPath /= dstObj.stem();
         cookedPath += ".hmeshbin";
     
-        if (!WriteHMeshBin(cookedPath, verts, inds))
+        if (!ObjLoader::WriteHMeshBin(cookedPath, verts, inds))
         {
             LOG_CORE_INFO("Cook write failed: {}", cookedPath.string());
             return;
@@ -161,11 +194,11 @@ namespace HRealEngine
         if (!std::filesystem::exists(p))
             return p;
 
-        const auto dir = p.parent_path();
-        const auto stem = p.stem().string();
-        const auto ext = p.extension().string();
+        const auto dir = p.parent_path();//assets/models
+        const auto stem = p.stem().string();//model name
+        const auto ext = p.extension().string();//.obj
 
-        for (int i = 1; i < 10'000; i++)
+        for (int i = 1; i < 10.000; i++)
         {
             std::filesystem::path candidate = dir / (stem + "_" + std::to_string(i) + ext);
             if (!std::filesystem::exists(candidate))
