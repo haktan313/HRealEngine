@@ -1,37 +1,19 @@
 Scene: Untitled
 Entities:
-  - Entity: 6403601012851422686
+  - Entity: 6143512475824172773
     TagComponent:
-      Tag: Plane2
+      Tag: Plane1
     TransformComponent:
-      Position: [1.6018901, -9.595785, -3.3195677]
+      Position: [2.340611, -1.8771994, 0]
       Rotation: [0, 0, 0]
-      Scale: [27.914146, 1, 22.684803]
+      Scale: [9.9412565, 1, 6.793043]
     MeshRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.33191067, 0.40645137, 0.4163701, 1]
       TilingFactor: 1
     Rigidbody3DComponent:
       BodyType: Static
       CollisionShape: Box
       FixedRotation: false
-  - Entity: 1969986894705506227
-    TagComponent:
-      Tag: Camera
-    TransformComponent:
-      Position: [1.6425059, 2.2068372, 21.275646]
-      Rotation: [-0.2617994, 0, 0]
-      Scale: [0.99999595, 0.9999999, 0.99999976]
-    CameraComponent:
-      PrimaryCamera: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 1.3089969
-        PerspectiveNear: 0.01
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
   - Entity: 10197530516364081433
     TagComponent:
       Tag: 3d cube test
@@ -52,15 +34,33 @@ Entities:
       BodyType: Dynamic
       CollisionShape: Box
       FixedRotation: false
-  - Entity: 6143512475824172773
+  - Entity: 1969986894705506227
     TagComponent:
-      Tag: Plane1
+      Tag: Camera
     TransformComponent:
-      Position: [2.340611, -1.8771994, 0]
+      Position: [1.6425059, 2.2068372, 21.275646]
+      Rotation: [-0.2617994, 0, 0]
+      Scale: [0.99999595, 0.9999999, 0.99999976]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.3089969
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 6403601012851422686
+    TagComponent:
+      Tag: Plane2
+    TransformComponent:
+      Position: [1.6018901, -9.595785, -3.3195677]
       Rotation: [0, 0, 0]
-      Scale: [9.9412565, 1, 6.793043]
+      Scale: [27.914146, 1, 22.684803]
     MeshRendererComponent:
-      Color: [0.33191067, 0.40645137, 0.4163701, 1]
+      Color: [1, 1, 1, 1]
       TilingFactor: 1
     Rigidbody3DComponent:
       BodyType: Static

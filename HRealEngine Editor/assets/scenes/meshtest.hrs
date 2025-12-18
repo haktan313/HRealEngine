@@ -1,0 +1,35 @@
+Scene: Untitled
+Entities:
+  - Entity: 7931128955914813429
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [-1.9630148, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\textures\joseMourinho.png
+      TilingFactor: 1
+  - Entity: 12919096549496938254
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshPath: models\INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
+      Color: [0.8647687, 0.2862046, 0.2862046, 1]
+      TilingFactor: 1
+  - Entity: 958112591557687915
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [5, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshPath: models\flash.hmesh
+      Color: [1, 1, 1, 1]
+      TilingFactor: 1

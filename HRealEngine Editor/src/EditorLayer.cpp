@@ -5,8 +5,10 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
 #include "HRealEngine/Core/Application.h"
+#include "HRealEngine/Core/HMeshAssetLoader.h"
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
+#include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
@@ -18,6 +20,7 @@
 
 namespace HRealEngine
 {
+    struct StaticMeshVertex;
     extern const std::filesystem::path g_AssetsDirectory;
     
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)

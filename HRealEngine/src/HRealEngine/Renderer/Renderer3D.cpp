@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "UniformBuffer.h"
 #include "VertexArray.h"
+#include "HRealEngine/Core/ObjLoader.h"
 
 namespace HRealEngine
 {
@@ -182,6 +183,18 @@ namespace HRealEngine
 
     void Renderer3D::DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID)
     {
+        if (meshRenderer.Mesh && meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0)
+        {
+            meshRenderer.Mesh->Shader->Bind();
+            meshRenderer.Mesh->Shader->SetInt("u_EntityID", entityID);
+            meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+            meshRenderer.Mesh->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
+            meshRenderer.Mesh->Shader->SetMat4("u_Transform", transform);
+
+            RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, meshRenderer.Mesh->IndexCount);
+            return;
+        }
+        
         if (s_Data.CubeIndexCount >= s_Data.MaxIndices)
         {
             Flush();

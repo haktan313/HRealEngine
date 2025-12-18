@@ -8,8 +8,18 @@
 
 #include "glm/ext/matrix_transform.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
+#include <filesystem>
 #include <glm/gtx/quaternion.hpp>
 
+#include "HRealEngine/Renderer/Mesh.h"
+#include "HRealEngine/Renderer/Shader.h"
+#include "HRealEngine/Renderer/VertexArray.h"
+
+
+namespace HRealEngine
+{
+    struct MeshData;
+}
 
 namespace HRealEngine
 {
@@ -55,9 +65,11 @@ namespace HRealEngine
     };
 
     struct MeshRendererComponent
-    {
+    { 
         glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
         Ref<Texture2D> Texture;
+        Ref<MeshGPU> Mesh;
+        std::filesystem::path MeshAssetPath;
         float TilingFactor = 1.0f;
         
         MeshRendererComponent() = default;
