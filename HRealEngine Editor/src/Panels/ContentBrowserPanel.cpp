@@ -10,7 +10,7 @@
 
 namespace HRealEngine
 {
-    static constexpr uint64_t kMaxImportFileBytes = 2ull * 1024ull * 1024ull;
+    static constexpr uint64_t kMaxImportFileBytes = 20ull * 1024ull * 1024ull;
     extern const std::filesystem::path g_AssetsDirectory = "assets"; 
 
     ContentBrowserPanel::ContentBrowserPanel() : m_CurrentDirectory(g_AssetsDirectory)
@@ -103,7 +103,7 @@ namespace HRealEngine
 
     void ContentBrowserPanel::ImportOBJ()
     {
-         std::string selected = FileDialogs::OpenFile("OBJ (*.obj)\0*.obj\0");
+        std::string selected = FileDialogs::OpenFile("OBJ (*.obj)\0*.obj\0");
         if (selected.empty())
             return;
     

@@ -12,7 +12,6 @@ out vec3 v_Normal;
 
 void main()
 {
-    // Normal transform (basitçe model matrisinden)
     v_Normal = mat3(transpose(inverse(u_Transform))) * a_Normal;
     gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 }

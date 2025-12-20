@@ -224,6 +224,7 @@ namespace HRealEngine
 
     void Renderer3D::DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID)
     {
+        // Draw with MeshGPU if available
         if (meshRenderer.Mesh && meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0)
         {
             meshRenderer.Mesh->Shader->Bind();
@@ -235,7 +236,8 @@ namespace HRealEngine
             RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, meshRenderer.Mesh->IndexCount);
             return;
         }
-        
+
+        //Draw Cube Batch if no MeshGPU
         if (s_Data.CubeIndexCount >= s_Data.MaxIndices)
         {
             Flush();
