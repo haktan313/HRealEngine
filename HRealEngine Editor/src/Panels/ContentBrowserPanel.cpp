@@ -133,7 +133,7 @@ namespace HRealEngine
         std::filesystem::path dstObj;
         std::filesystem::path lastCopiedTexAbs;
         std::vector<std::filesystem::path> texturePaths;
-        CreateDirectoriesIfNotExists(m_CurrentDirectory, dstObj, lastCopiedTexAbs, texturePaths);   
+        CreateDirectoriesIfNotExists(srcObj, dstObj, lastCopiedTexAbs, texturePaths);   
         ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
     }
 
@@ -149,7 +149,8 @@ namespace HRealEngine
         std::filesystem::create_directories(sourceDir);
         std::filesystem::create_directories(matsDir);
         std::filesystem::create_directories(texDir);
-        
+
+        dstObj = sourceDir / srcObj.filename();
         dstObj = MakeUniquePath(dstObj);        
         if (!ObjLoader::CopyFileSafe(srcObj, dstObj))
         {
