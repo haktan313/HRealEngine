@@ -255,18 +255,12 @@ namespace HRealEngine
                     {
                         chosenMat = meshRenderer.Mesh->MaterialPaths[slot];
                     }
-
-                    LOG_CORE_INFO("Submesh slot={} chosenMat='{}'", slot, chosenMat.string());
                     
                     if (!chosenMat.empty())
                     {
                         Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, "assets");
                         if (mat)
                         {
-                            LOG_CORE_WARN("MAT DEBUG: Color = {},{},{},{}  Tex = {}",
-                                mat->Color.r, mat->Color.g, mat->Color.b, mat->Color.a,
-                                mat->AlbedoTexture ? "YES" : "NO");
-
                             mat->Apply(meshRenderer.Mesh->Shader);
                         }
                         else

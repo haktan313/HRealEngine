@@ -406,4 +406,161 @@ namespace HRealEngine
         if (s.empty()) s = "Material";
         return s;
     }
+
+    
+
+    std::string ObjLoader::Trim(std::string s)
+    {
+        auto is_ws = [](unsigned char c)
+        {
+            return std::isspace(c) != 0;
+        };
+        
+        while (!s.empty() && is_ws((unsigned char)s.front()))
+            s.erase(s.begin());
+        while (!s.empty() && is_ws((unsigned char)s.back()))
+            s.pop_back();
+        
+        return s;
+    }
+
+    std::string ObjLoader::StripQuotes(std::string s)
+    {
+        s = Trim(std::move(s));
+        if (s.size() >= 2)
+        {
+            if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\''))
+                return s.substr(1, s.size() - 2);
+        }
+        return s;
+    }
+    
+    std::string ObjLoader::RemainderAfterKeyword(const std::string& line, const std::string& keyword)
+    {
+        std::string rest = line.substr(keyword.size());
+        return Trim(rest);
+    }
+
+    bool ObjLoader::StartsWith(const std::string& s, const char* prefix)
+    {
+        return s.rfind(prefix, 0) == 0;
+    }
+
+    void ObjLoader::NormalizeSlashes(std::string& s)
+    {
+        for (char& c : s) if (c == '\\') c = '/';
+    }
+    
+    std::vector<std::string> ObjLoader::ParseObjMtllibs(const std::filesystem::path& objAbs)
+    {
+        std::vector<std::string> out;
+        std::ifstream in(objAbs);
+        if (!in)
+            return out;
+
+        std::string line;
+        while (std::getline(in, line))
+        {
+            line = Trim(line);
+            if (line.empty() || line[0] == '#') continue;
+
+            if (StartsWith(line, "mtllib"))
+            {
+                std::string rest = RemainderAfterKeyword(line, "mtllib");
+                rest = StripQuotes(rest);
+                NormalizeSlashes(rest);
+                if (!rest.empty())
+                    out.push_back(rest);
+            }
+        }
+        return out;
+    }
+    
+    bool ObjLoader::ExtractMtlMapPath(const std::string& line, std::string& outPath)
+    {
+        std::string s = Trim(line);
+        if (s.empty() || s[0] == '#')
+            return false;
+        if (!StartsWith(s, "map_") && !StartsWith(s, "bump") && !StartsWith(s, "map_Bump"))
+            return false;
+        
+        std::istringstream iss(s);
+        std::string first;
+        iss >> first;
+
+        std::vector<std::string> tokens;
+        std::string tok;
+        while (iss >> tok)
+            tokens.push_back(tok);
+
+        if (tokens.empty())
+            return false;
+        
+        std::string candidate = tokens.back();
+        candidate = StripQuotes(candidate);
+        NormalizeSlashes(candidate);
+
+        if (candidate.empty())
+            return false;
+
+        outPath = candidate;
+        return true;
+    }
+    
+    bool ObjLoader::RewriteMtlAndCollectTextures(const std::filesystem::path& srcMtlAbs, const std::filesystem::path& dstMtlAbs, std::vector<std::string>& outTextureRelOrAbs)
+    {
+        std::ifstream in(srcMtlAbs);
+        if (!in)
+            return false;
+
+        std::vector<std::string> lines;
+        lines.reserve(512);
+
+        std::string line;
+        while (std::getline(in, line))
+        {
+            std::string trimmed = Trim(line);
+
+            std::string tex;
+            if (ExtractMtlMapPath(trimmed, tex))
+            {
+                outTextureRelOrAbs.push_back(tex);
+                
+                std::filesystem::path p = tex;
+                std::string newRef = std::string("../Textures/") + p.filename().generic_string();
+                std::string original = line;
+                size_t lastSpace = original.find_last_of(" \t");
+                
+                if (lastSpace != std::string::npos)
+                {
+                    original = original.substr(0, lastSpace + 1) + newRef;
+                    line = original;
+                }
+                else
+                {
+                    line = newRef;
+                }
+            }
+            lines.push_back(line);
+        }
+
+        std::ofstream out(dstMtlAbs);
+        if (!out)
+            return false;
+
+        for (auto& l : lines)
+            out << l << "\n";
+
+        return true;
+    }
+    
+    bool ObjLoader::CopyFileSafe(const std::filesystem::path& src, const std::filesystem::path& dst)
+    {
+        std::error_code ec;
+        std::filesystem::create_directories(dst.parent_path(), ec);
+        ec.clear();
+
+        std::filesystem::copy_file(src, dst, std::filesystem::copy_options::overwrite_existing, ec);
+        return !ec;
+    }
 }

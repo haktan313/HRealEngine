@@ -63,6 +63,17 @@
             static void Clear();
             static std::string SanitizeName(std::string s);
 
+            
+            static std::string Trim(std::string s);
+            static std::string StripQuotes(std::string s);
+            static std::string RemainderAfterKeyword(const std::string& line, const std::string& keyword);
+            static bool StartsWith(const std::string& s, const char* prefix);
+            static void NormalizeSlashes(std::string& s);
+            static std::vector<std::string> ParseObjMtllibs(const std::filesystem::path& objAbs);
+            static bool ExtractMtlMapPath(const std::string& line, std::string& outPath);
+            static bool RewriteMtlAndCollectTextures(const std::filesystem::path& srcMtlAbs, const std::filesystem::path& dstMtlAbs, std::vector<std::string>& outTextureRelOrAbs);
+            static bool CopyFileSafe(const std::filesystem::path& src, const std::filesystem::path& dst);
+
         private:
             static std::unordered_map<std::filesystem::path, Ref<MeshGPU>> s_Cache;
         };

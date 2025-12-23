@@ -12,162 +12,6 @@
 
 namespace HRealEngine
 {
-    static std::string Trim(std::string s)
-    {
-        auto is_ws = [](unsigned char c)
-        {
-            return std::isspace(c) != 0;
-        };
-        
-        while (!s.empty() && is_ws((unsigned char)s.front()))
-            s.erase(s.begin());
-        while (!s.empty() && is_ws((unsigned char)s.back()))
-            s.pop_back();
-        
-        return s;
-    }
-
-    static std::string StripQuotes(std::string s)
-    {
-        s = Trim(std::move(s));
-        if (s.size() >= 2)
-        {
-            if ((s.front() == '"' && s.back() == '"') || (s.front() == '\'' && s.back() == '\''))
-                return s.substr(1, s.size() - 2);
-        }
-        return s;
-    }
-    
-    static std::string RemainderAfterKeyword(const std::string& line, const std::string& keyword)
-    {
-        std::string rest = line.substr(keyword.size());
-        return Trim(rest);
-    }
-
-    static bool StartsWith(const std::string& s, const char* prefix)
-    {
-        return s.rfind(prefix, 0) == 0;
-    }
-
-    static void NormalizeSlashes(std::string& s)
-    {
-        for (char& c : s) if (c == '\\') c = '/';
-    }
-    
-    
-    static std::vector<std::string> ParseObjMtllibs(const std::filesystem::path& objAbs)
-    {
-        std::vector<std::string> out;
-        std::ifstream in(objAbs);
-        if (!in)
-            return out;
-
-        std::string line;
-        while (std::getline(in, line))
-        {
-            line = Trim(line);
-            if (line.empty() || line[0] == '#') continue;
-
-            if (StartsWith(line, "mtllib"))
-            {
-                std::string rest = RemainderAfterKeyword(line, "mtllib");
-                rest = StripQuotes(rest);
-                NormalizeSlashes(rest);
-                if (!rest.empty())
-                    out.push_back(rest);
-            }
-        }
-        return out;
-    }
-    
-    static bool ExtractMtlMapPath(const std::string& line, std::string& outPath)
-    {
-        std::string s = Trim(line);
-        if (s.empty() || s[0] == '#')
-            return false;
-        if (!StartsWith(s, "map_") && !StartsWith(s, "bump") && !StartsWith(s, "map_Bump"))
-            return false;
-        
-        std::istringstream iss(s);
-        std::string first;
-        iss >> first;
-
-        std::vector<std::string> tokens;
-        std::string tok;
-        while (iss >> tok)
-            tokens.push_back(tok);
-
-        if (tokens.empty())
-            return false;
-        
-        std::string candidate = tokens.back();
-        candidate = StripQuotes(candidate);
-        NormalizeSlashes(candidate);
-
-        if (candidate.empty())
-            return false;
-
-        outPath = candidate;
-        return true;
-    }
-    
-    static bool RewriteMtlAndCollectTextures(const std::filesystem::path& srcMtlAbs, const std::filesystem::path& dstMtlAbs, std::vector<std::string>& outTextureRelOrAbs)
-    {
-        std::ifstream in(srcMtlAbs);
-        if (!in)
-            return false;
-
-        std::vector<std::string> lines;
-        lines.reserve(512);
-
-        std::string line;
-        while (std::getline(in, line))
-        {
-            std::string trimmed = Trim(line);
-
-            std::string tex;
-            if (ExtractMtlMapPath(trimmed, tex))
-            {
-                outTextureRelOrAbs.push_back(tex);
-                
-                std::filesystem::path p = tex;
-                std::string newRef = std::string("../Textures/") + p.filename().generic_string();
-                std::string original = line;
-                size_t lastSpace = original.find_last_of(" \t");
-                
-                if (lastSpace != std::string::npos)
-                {
-                    original = original.substr(0, lastSpace + 1) + newRef;
-                    line = original;
-                }
-                else
-                {
-                    line = newRef;
-                }
-            }
-            lines.push_back(line);
-        }
-
-        std::ofstream out(dstMtlAbs);
-        if (!out)
-            return false;
-
-        for (auto& l : lines)
-            out << l << "\n";
-
-        return true;
-    }
-    
-    static bool CopyFileSafe(const std::filesystem::path& src, const std::filesystem::path& dst)
-    {
-        std::error_code ec;
-        std::filesystem::create_directories(dst.parent_path(), ec);
-        ec.clear();
-
-        std::filesystem::copy_file(src, dst, std::filesystem::copy_options::overwrite_existing, ec);
-        return !ec;
-    }
-    
     static constexpr uint64_t kMaxImportFileBytes = 200ull * 1024ull * 1024ull;
     extern const std::filesystem::path g_AssetsDirectory = "assets"; 
 
@@ -285,7 +129,17 @@ namespace HRealEngine
             m_OpenErrorPopup = true;
             return;
         }
-        
+
+        std::filesystem::path dstObj;
+        std::filesystem::path lastCopiedTexAbs;
+        std::vector<std::filesystem::path> texturePaths;
+        CreateDirectoriesIfNotExists(m_CurrentDirectory, dstObj, lastCopiedTexAbs, texturePaths);   
+        ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
+    }
+
+    void ContentBrowserPanel::CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj,
+        std::filesystem::path& lastCopiedTexAbs,std::vector<std::filesystem::path>& texturePaths)
+    {
         const std::string modelName = srcObj.stem().string();       
         std::filesystem::path importedDir = g_AssetsDirectory / "Imported" / modelName;
         std::filesystem::path sourceDir = importedDir / "Source";
@@ -298,19 +152,17 @@ namespace HRealEngine
         
         std::filesystem::path dstObj = sourceDir / srcObj.filename();
         dstObj = MakeUniquePath(dstObj);        
-        if (!CopyFileSafe(srcObj, dstObj))
+        if (!ObjLoader::CopyFileSafe(srcObj, dstObj))
         {
             m_LastError = "Failed to copy OBJ into assets Imported/Source.";
             m_OpenErrorPopup = true;
             return;
         }       
 
-        std::vector<std::string> mtllibs = ParseObjMtllibs(srcObj);
-        std::vector<std::filesystem::path> texturePaths;
+        std::vector<std::string> mtllibs = ObjLoader::ParseObjMtllibs(srcObj);
         if (!mtllibs.empty())
             LOG_CORE_INFO("OBJ mtllib count = {}", (int)mtllibs.size());
-
-        std::filesystem::path lastCopiedTexAbs;
+        
         for (const std::string& mtlRel : mtllibs)
         {
             std::filesystem::path srcMtlAbs = srcObj.parent_path() / mtlRel;
@@ -322,10 +174,10 @@ namespace HRealEngine
 
             std::filesystem::path dstMtlAbs = sourceDir / srcMtlAbs.filename();     
             std::vector<std::string> texRefs;
-            if (!RewriteMtlAndCollectTextures(srcMtlAbs, dstMtlAbs, texRefs))
+            if (!ObjLoader::RewriteMtlAndCollectTextures(srcMtlAbs, dstMtlAbs, texRefs))
             {
                 LOG_CORE_WARN("Failed to rewrite/copy MTL: {}", srcMtlAbs.string());
-                CopyFileSafe(srcMtlAbs, dstMtlAbs);
+                ObjLoader::CopyFileSafe(srcMtlAbs, dstMtlAbs);
                 continue;
             }       
 
@@ -349,15 +201,19 @@ namespace HRealEngine
                 }
                 
                 lastCopiedTexAbs = texDir / srcTexAbs.filename();        
-                if (!CopyFileSafe(srcTexAbs, lastCopiedTexAbs))
+                if (!ObjLoader::CopyFileSafe(srcTexAbs, lastCopiedTexAbs))
                     LOG_CORE_WARN("Failed to copy texture: {} -> {}", srcTexAbs.string(), lastCopiedTexAbs.string());
                 else
                     LOG_CORE_INFO("Copied texture: {}", lastCopiedTexAbs.string());
                 texturePaths.push_back(lastCopiedTexAbs);
             }       
             LOG_CORE_INFO("Copied+rewritten MTL: {}", dstMtlAbs.string());
-        }       
+        }    
+    }
 
+    void ContentBrowserPanel::ImportDataFromOBJ(const std::filesystem::path& dstObj,const std::filesystem::path& lastCopiedTexAbs,
+        const std::vector<std::filesystem::path>& texturePaths)
+    {
         std::vector<MeshVertex> verts;
         std::vector<uint32_t> inds;
         std::vector<HMeshBinSubmesh> submeshes;     
