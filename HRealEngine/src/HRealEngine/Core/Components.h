@@ -62,6 +62,7 @@ namespace HRealEngine
         Ref<Texture2D> Texture;
         Ref<MeshGPU> Mesh;
         std::filesystem::path MeshAssetPath;
+        std::vector<std::string> MaterialOverrides;
         float TilingFactor = 1.0f;
         
         MeshRendererComponent() = default;
