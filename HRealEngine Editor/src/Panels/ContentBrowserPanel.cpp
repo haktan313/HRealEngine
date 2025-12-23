@@ -150,7 +150,6 @@ namespace HRealEngine
         std::filesystem::create_directories(matsDir);
         std::filesystem::create_directories(texDir);
         
-        std::filesystem::path dstObj = sourceDir / srcObj.filename();
         dstObj = MakeUniquePath(dstObj);        
         if (!ObjLoader::CopyFileSafe(srcObj, dstObj))
         {

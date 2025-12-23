@@ -162,7 +162,7 @@ namespace HRealEngine
             mat->Get(AI_MATKEY_COLOR_DIFFUSE, kd);
             
             std::string albedoTexRel = "null";
-            if (!texturePaths.empty())
+            if (!texturePaths.empty() && i - 1 < texturePaths.size())
                 albedoTexRel = std::filesystem::relative(texturePaths[i - 1], assetsRoot).generic_string();
 
             
