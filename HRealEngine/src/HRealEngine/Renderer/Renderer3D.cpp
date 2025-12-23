@@ -1,6 +1,7 @@
 #include "HRpch.h"
 #include "Renderer3D.h"
 
+#include "Material.h"
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "UniformBuffer.h"
@@ -229,15 +230,69 @@ namespace HRealEngine
         {
             meshRenderer.Mesh->Shader->Bind();
             meshRenderer.Mesh->Shader->SetInt("u_EntityID", entityID);
-            meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+            //meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
             meshRenderer.Mesh->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
             meshRenderer.Mesh->Shader->SetMat4("u_Transform", transform);
 
-            RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, meshRenderer.Mesh->IndexCount);
+            if (!meshRenderer.Mesh->Submeshes.empty())
+            {
+                for (const auto& sm : meshRenderer.Mesh->Submeshes)
+                {
+                    if (sm.IndexCount == 0)
+                        continue;
+            
+                    const uint32_t slot = sm.MaterialIndex;
+                    
+                    std::filesystem::path chosenMat;
+                    
+                    if (slot < meshRenderer.MaterialOverrides.size() && !meshRenderer.MaterialOverrides[slot].empty()
+                        && meshRenderer.MaterialOverrides[slot] != "null")
+                    {
+                        chosenMat = meshRenderer.MaterialOverrides[slot];
+                    }
+                    else if (slot < meshRenderer.Mesh->MaterialPaths.size() && !meshRenderer.Mesh->MaterialPaths[slot].empty()
+                        && meshRenderer.Mesh->MaterialPaths[slot] != "null")
+                    {
+                        chosenMat = meshRenderer.Mesh->MaterialPaths[slot];
+                    }
+
+                    LOG_CORE_INFO("Submesh slot={} chosenMat='{}'", slot, chosenMat.string());
+                    
+                    if (!chosenMat.empty())
+                    {
+                        Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, "assets");
+                        if (mat)
+                        {
+                            LOG_CORE_WARN("MAT DEBUG: Color = {},{},{},{}  Tex = {}",
+                                mat->Color.r, mat->Color.g, mat->Color.b, mat->Color.a,
+                                mat->AlbedoTexture ? "YES" : "NO");
+
+                            mat->Apply(meshRenderer.Mesh->Shader);
+                        }
+                        else
+                        {
+                            meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
+                            meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                        }
+                    }
+                    else
+                    {
+                        meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
+                        meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                    }
+                    RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, sm.IndexCount, sm.IndexOffset);
+                }
+            }
+            else
+            {
+                meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
+                meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, meshRenderer.Mesh->IndexCount);
+            }
+
             return;
         }
 
-        //Draw Cube Batch if no MeshGPU
         if (s_Data.CubeIndexCount >= s_Data.MaxIndices)
         {
             Flush();

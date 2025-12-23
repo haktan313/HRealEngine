@@ -37,6 +37,17 @@ namespace HRealEngine
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
     }
 
+    void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount, uint32_t indexOffset)
+    {
+        vertexArray->Bind();
+
+        const uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+        
+        const uintptr_t byteOffset = (uintptr_t)indexOffset * sizeof(uint32_t);
+
+        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (const void*)byteOffset);
+    }
+
     void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
     {
         vertexArray->Bind();

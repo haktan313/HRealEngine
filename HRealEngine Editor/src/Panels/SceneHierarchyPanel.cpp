@@ -709,6 +709,13 @@ namespace HRealEngine
         
                         component.Mesh = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
                         component.MeshAssetPath = droppedPath;
+                        if (component.Mesh)
+                        {
+                            const size_t slotCount = component.Mesh->MaterialPaths.size();
+                            component.MaterialOverrides.clear();
+                            component.MaterialOverrides.resize(slotCount);
+                            LOG_CORE_INFO("Mesh material slots: {}", slotCount);
+                        }
                         LOG_CORE_INFO("Assigned mesh: {}", droppedPath.string());
                     }
                 }
@@ -736,6 +743,63 @@ namespace HRealEngine
                 ImGui::Text("Loaded");
             }
             ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+
+            if (component.Mesh)
+            {
+                const size_t slotCount = component.Mesh->MaterialPaths.size();
+                if (slotCount > 0)
+                {
+                    ImGui::Separator();
+                    ImGui::Text("Materials");           
+
+                    if (component.MaterialOverrides.size() != slotCount)
+                        component.MaterialOverrides.resize(slotCount);          
+                    for (size_t i = 0; i < slotCount; i++)
+                    {
+                        ImGui::PushID((int)i);          
+                        const std::string& defaultPath = component.Mesh->MaterialPaths[i];          
+                        const std::string& overridePath = component.MaterialOverrides[i];
+                        const bool hasOverride = !overridePath.empty();         
+
+                        ImGui::Text("Slot %d", (int)i);
+                        ImGui::SameLine();          
+
+                        std::string buttonLabel = hasOverride ? "Override (.hmat)" : "Drop .hmat";
+                        ImGui::Button(buttonLabel.c_str(), ImVec2(200, 0));         
+
+                        if (ImGui::BeginDragDropTarget())
+                        {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                            {
+                                const wchar_t* path = (const wchar_t*)payload->Data;
+                                std::filesystem::path dropped = path;           
+                                if (dropped.extension() == ".hmat")
+                                {
+                                    component.MaterialOverrides[i] = dropped.generic_string();
+                                    LOG_CORE_INFO("Material override set: slot={} -> {}", i, component.MaterialOverrides[i]);
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
+                        }           
+
+                        ImGui::SameLine();
+                        if (ImGui::SmallButton("Clear"))
+                            component.MaterialOverrides[i].clear();         
+
+                        ImGui::TextDisabled("Default: %s", defaultPath.empty() ? "(empty)" : defaultPath.c_str());
+                        if (hasOverride)
+                            ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Using Override: %s", overridePath.c_str());
+                        else
+                            ImGui::TextDisabled("Using Default");           
+                        ImGui::Separator();
+                        ImGui::PopID();
+                    }
+                }
+                else
+                    ImGui::TextDisabled("No material slots found in this mesh.");
+            }
+            else
+                ImGui::TextDisabled("Assign a .hmesh to see material slots.");
         });
         DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
         {

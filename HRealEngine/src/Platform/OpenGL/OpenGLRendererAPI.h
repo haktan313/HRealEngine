@@ -15,6 +15,7 @@ namespace HRealEngine
         void Clear() override;
 
         void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t IndexCount = 0) override;
+        void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount, uint32_t indexOffset) override;
         void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
         void SetLineWidth(float width) override;
     };

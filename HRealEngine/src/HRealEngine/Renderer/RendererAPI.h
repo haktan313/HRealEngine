@@ -24,6 +24,8 @@ namespace HRealEngine
         virtual void Clear() = 0;
 
         virtual void DrawIndexed(const Ref<class VertexArray>& vertexArray, uint32_t IndexCount = 0) = 0;
+        virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount, uint32_t indexOffset) = 0;
+
         virtual void DrawLines(const Ref<class VertexArray>& vertexArray, uint32_t vertexCount) = 0;
         virtual void SetLineWidth(float width) = 0;
 
