@@ -12,6 +12,8 @@
 
 #include "FileWatch.hpp"
 #include "HRealEngine/Core/Application.h"
+#include "HRealEngine/Core/Buffer.h"
+#include "HRealEngine/Core/FileSystem.h"
 #include "HRealEngine/Project/Project.h"
 
 namespace JPH
@@ -46,7 +48,7 @@ namespace HRealEngine
         { "System.String",    ScriptFieldType::String } 
     };
     
-    static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
+    /*static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
     {
         std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
     
@@ -72,15 +74,17 @@ namespace HRealEngine
 
         *outSize = size;
         return buffer;
-    }
+    }*/
     static MonoAssembly* LoadCSharpAssembly(const std::filesystem::path& assemblyPath)
     {
-        uint32_t fileSize = 0;
-        char* fileData = ReadBytes(assemblyPath, &fileSize);
+        /*uint32_t fileSize = 0;
+        char* fileData = ReadBytes(assemblyPath, &fileSize);*/
+        ScopedBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
 
         // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
         MonoImageOpenStatus status;
-        MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+        //MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+        MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
 
         if (status != MONO_IMAGE_OK)
         {
@@ -163,9 +167,19 @@ namespace HRealEngine
     {
         s_Data = new ScriptEngineData();
         InitMono();
-        LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
+        bool bstatus = LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
+        if (!bstatus)
+        {
+            LOG_CORE_ERROR("Failed to load HRealEngine-ScriptCore.dll");
+            return;
+        }
         auto scriptDir = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
-        LoadAppAssembly(scriptDir);
+        bstatus = LoadAppAssembly(scriptDir);
+        if (!bstatus)
+        {
+            LOG_CORE_ERROR("Failed to load application script assembly");
+            return;
+        }
         LoadAssemblyClasses();
 
         ScriptGlue::RegisterComponents();
@@ -180,7 +194,7 @@ namespace HRealEngine
         delete s_Data;
     }
 
-    void ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath)
+    bool ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath)
     {
         s_Data->AppDomain = mono_domain_create_appdomain("HRealEngineAppDomain", nullptr);
         mono_domain_set(s_Data->AppDomain, true);
@@ -188,18 +202,21 @@ namespace HRealEngine
         s_Data->CoreAssemblyFilePath = assemblyPath;
         
         s_Data->CoreAssembly = LoadCSharpAssembly(assemblyPath);
+        if (!s_Data->CoreAssembly)
+            return false;
         //PrintAssemblyTypes(s_Data->CoreAssembly);
         s_Data->CoreImage = mono_assembly_get_image(s_Data->CoreAssembly);
+        return true;
     }
 
-    void ScriptEngine::LoadAppAssembly(const std::filesystem::path& assemblyPath)
+    bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& assemblyPath)
     {
         s_Data->AppAssemblyFilePath = assemblyPath;
         
         s_Data->AppAssembly = LoadCSharpAssembly(assemblyPath);
-        auto appAsemb = s_Data->AppAssembly;
+        if (!s_Data->AppAssembly)
+            return false;
         s_Data->AppImage = mono_assembly_get_image(s_Data->AppAssembly);
-        auto appImg = s_Data->AppImage;
 
         s_Data->AppAssemblyWatcher = CreateScope<filewatch::FileWatch<std::string>>(assemblyPath.string(),/*OnAppAssemblyFileSystemEvent*/ [](const std::string& path, const filewatch::Event change_type)
         {
@@ -338,6 +355,11 @@ namespace HRealEngine
     void ScriptEngine::OnUpdateEntity(Entity entity, Timestep ts)
     {
         UUID entityID = entity.GetUUID();
+        if (s_Data->EntityInstances.find(entityID) == s_Data->EntityInstances.end())
+        {
+            LOG_CORE_WARN("Script instance for entity {0} not found!", entityID);
+            return;
+        }
         Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
         instance->InvokeOnUpdate((float)ts);
     }

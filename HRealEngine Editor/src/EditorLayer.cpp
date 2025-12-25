@@ -743,7 +743,7 @@ namespace HRealEngine
         if (bHasPlayButton)
         {
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
-            if (ImGui::ImageButton("##playandstop",(ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
+            if (ImGui::ImageButton("##playandstop",(ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
             {
                 if (m_SceneState == SceneState::Editor)
@@ -759,7 +759,7 @@ namespace HRealEngine
                 ImGui::SameLine();
             
             Ref<Texture2D> icon = (m_SceneState == SceneState::Editor || m_SceneState == SceneState::Runtime) ? m_IconSimulate : m_IconStop;
-            if (ImGui::ImageButton("##simulate", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
+            if (ImGui::ImageButton("##simulate", (ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor)
                 && bToolbarEnabled)
             {
                 if (m_SceneState == SceneState::Editor)
@@ -776,7 +776,7 @@ namespace HRealEngine
             {
                 {
                     Ref<Texture2D> icon = m_IconPause;
-                    if (ImGui::ImageButton("##pause", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                    if (ImGui::ImageButton("##pause", (ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
                         m_ActiveScene->SetPaused(!bIsPaused);
                 }
                 if (bIsPaused)
@@ -784,7 +784,7 @@ namespace HRealEngine
                     ImGui::SameLine();
                     {
                         Ref<Texture2D> icon = m_IconStep;
-                        if (ImGui::ImageButton("##step", (ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
+                        if (ImGui::ImageButton("##step", (ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f,0.0f,0.0f,0.0f), tintColor) && bToolbarEnabled)
                             m_ActiveScene->Step();
                     }
                 }
