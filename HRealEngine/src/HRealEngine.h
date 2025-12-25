@@ -6,6 +6,8 @@
 #include "HRealEngine/Core/Timestep.h"
 #include "HRealEngine/Core/Logger.h"
 
+#include "HRealEngine/Project/Project.h"
+
 #include "HRealEngine/Renderer/Shader.h"
 #include "HRealEngine/Renderer/Texture.h"
 #include "HRealEngine/Renderer/Buffers.h"

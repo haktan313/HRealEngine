@@ -53,10 +53,20 @@ namespace HRealEngine
         auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
-            auto scenePath = commandLineArgs[1];
+            /*auto scenePath = commandLineArgs[1];
             /*SceneSerializer serializer(m_ActiveScene);
-            serializer.Deserialize(scenePath);*/
-            OpenScene(scenePath);
+            serializer.Deserialize(scenePath);#1#
+            OpenScene(scenePath);*/
+            auto proectFilePath = commandLineArgs[1];
+            OpenProject(proectFilePath);
+        }
+        else
+        {
+            //NewProject();
+            if (!OpenProject())
+            {
+                Application::Get().Close();
+            }
         }
         
         m_EditorCamera = EditorCamera(30.f, 1.778f/*1920/1080*/, 0.1f, 1000.f);
@@ -274,22 +284,40 @@ namespace HRealEngine
             {
                 // Disabling fullscreen would allow the window to be moved to the front of other windows,
                 // which we can't undo at the moment without finer window depth/z control.
-                if (ImGui::MenuItem("New", "Ctrl+N"))
+                /*if (ImGui::MenuItem("New", "Ctrl+N"))
                 {
                    NewScene();
+                }*/
+                if (ImGui::MenuItem("OpenProject...", "Ctrl+O"))
+                {
+                    OpenProject();
                 }
-                if (ImGui::MenuItem("Open...", "Ctrl+O"))
+                /*if (ImGui::MenuItem("Open...", "Ctrl+O"))
                 {
                     OpenScene();
+                }*/
+                ImGui::Separator();
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+                {
+                    NewScene();
                 }
-                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+                {
+                    SaveScene();
+                }
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+                {
+                    SaveSceneAs();
+                }
+                ImGui::Separator();
+                /*if (ImGui::MenuItem("Save", "Ctrl+S"))
                 {
                     SaveScene();
                 }
                 if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
                 {
                     SaveSceneAs();
-                }
+                }*/
                 if (ImGui::MenuItem("Exit"))
                     HRealEngine::Application::Get().Close();
                 
@@ -306,7 +334,7 @@ namespace HRealEngine
         }
 
         m_SceneHierarchyPanel.OnImGuiRender();
-        m_ContentBrowserPanel.OnImGuiRender();
+        m_ContentBrowserPanel->OnImGuiRender();
         
         ImGui::Begin("Profile Results");
 
@@ -355,7 +383,7 @@ namespace HRealEngine
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
             {
                 const wchar_t* path = (const wchar_t*)payload->Data;
-                OpenScene(std::filesystem::path(g_AssetsDirectory) / path);
+                OpenScene(path/*std::filesystem::path(g_AssetsDirectory) / path*/);
             }
             ImGui::EndDragDropTarget();
         }
@@ -441,7 +469,8 @@ namespace HRealEngine
             break;
         case HR_KEY_O:
             if (bControlPressed)
-                OpenScene();
+                //OpenScene();
+                    OpenProject();
             break;
         case HR_KEY_S:
             if (bControlPressed)
@@ -534,6 +563,37 @@ namespace HRealEngine
         Renderer2D::EndScene();
     }
 
+    void EditorLayer::NewProject()
+    {
+        Project::New();
+    }
+
+    bool EditorLayer::OpenProject()
+    {
+        std::string filepath = FileDialogs::OpenFile("HRealEngine Project (*.hrpj)\0*.hrpj\0");
+        if (filepath.empty())
+            return false;
+
+        OpenProject(filepath);
+        return true;
+    }
+
+    void EditorLayer::OpenProject(const std::filesystem::path& path)
+    {
+        if (Project::Load(path))
+        {
+            ScriptEngine::Init();
+            auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+            OpenScene(startScenePath);
+            m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+        }
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        
+    }
+
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
@@ -550,8 +610,7 @@ namespace HRealEngine
             OpenScene(filePath);
     }
 
-    void EditorLayer::
-    OpenScene(const std::filesystem::path& path)
+    void EditorLayer::OpenScene(const std::filesystem::path& path)
     {
         if (m_SceneState != SceneState::Editor)
             OnSceneStop();

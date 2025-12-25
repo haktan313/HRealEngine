@@ -12,6 +12,7 @@
 
 #include "FileWatch.hpp"
 #include "HRealEngine/Core/Application.h"
+#include "HRealEngine/Project/Project.h"
 
 namespace JPH
 {
@@ -163,7 +164,8 @@ namespace HRealEngine
         s_Data = new ScriptEngineData();
         InitMono();
         LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
-        LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+        auto scriptDir = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+        LoadAppAssembly(scriptDir);
         LoadAssemblyClasses();
 
         ScriptGlue::RegisterComponents();

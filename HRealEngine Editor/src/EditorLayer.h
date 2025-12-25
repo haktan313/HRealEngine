@@ -31,6 +31,11 @@ namespace HRealEngine
 
         void OnOverlayRender();
 
+        void NewProject();
+        bool OpenProject();
+        void OpenProject(const std::filesystem::path& path);
+        void SaveProject();
+
         void NewScene();
         void OpenScene();
         void OpenScene(const std::filesystem::path& path);
@@ -63,7 +68,7 @@ namespace HRealEngine
         std::filesystem::path m_EditorScenePath;
         int m_GizmoType = -1; // -1: none, 0: translate, 1: rotate, 2: scale
         SceneHierarchyPanel m_SceneHierarchyPanel;
-        ContentBrowserPanel m_ContentBrowserPanel;
+        Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
         Entity m_CameraEntity;
         Entity m_HoveredEntity;

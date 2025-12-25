@@ -388,6 +388,7 @@ namespace HRealEngine
         }
         catch (YAML::ParserException e)
         {
+            HREALENGINE_CORE_DEBUGBREAK("Failed to load scene file '{0}'\n     {1}", filepath, e.what());
             return false;
         }
         

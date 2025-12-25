@@ -8,6 +8,7 @@
 
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
 namespace HRealEngine
@@ -15,8 +16,11 @@ namespace HRealEngine
     static constexpr uint64_t kMaxImportFileBytes = 200ull * 1024ull * 1024ull;
     extern const std::filesystem::path g_AssetsDirectory = "assets"; 
 
-    ContentBrowserPanel::ContentBrowserPanel() : m_CurrentDirectory(g_AssetsDirectory)
+    ContentBrowserPanel::ContentBrowserPanel()
     {
+        m_BaseDirectory = Project::GetAssetDirectory();
+        m_CurrentDirectory = m_BaseDirectory;
+        
         m_FileIcon = Texture2D::Create("assets/textures/fileIcon.png");
         m_FolderIcon = Texture2D::Create("assets/textures/folderIcon.png");
     }
@@ -42,7 +46,7 @@ namespace HRealEngine
         
         ImGui::Columns(columnCount, 0, false);
         
-        if (m_CurrentDirectory != std::filesystem::path(g_AssetsDirectory))
+        if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
         {
             if (ImGui::Button("<-"))
             {
@@ -52,9 +56,8 @@ namespace HRealEngine
 
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
         {
-            std::string path = directoryEntry.path().string();
-            auto relativePath = std::filesystem::relative(directoryEntry.path(), g_AssetsDirectory);
-            std::string fileNameString = relativePath.string();
+            const auto& path = directoryEntry.path();
+            std::string fileNameString = path.filename().string();
 
             Ref<Texture2D> icon = directoryEntry.is_directory() ? m_FolderIcon : m_FileIcon;
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -63,6 +66,8 @@ namespace HRealEngine
 
             if (ImGui::BeginDragDropSource())
             {
+                //auto relativePath = std::filesystem::relative(directoryEntry.path(), g_AssetsDirectory);
+                std::filesystem::path relativePath(path);
                 const wchar_t* itemPath = relativePath.c_str();
                 ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
                 ImGui::EndDragDropSource();
@@ -141,7 +146,7 @@ namespace HRealEngine
         std::filesystem::path& lastCopiedTexAbs,std::vector<std::filesystem::path>& texturePaths)
     {
         const std::string modelName = srcObj.stem().string();       
-        std::filesystem::path importedDir = g_AssetsDirectory / "Imported" / modelName;
+        std::filesystem::path importedDir = m_CurrentDirectory / "Imported" / modelName;
         std::filesystem::path sourceDir = importedDir / "Source";
         std::filesystem::path matsDir = importedDir / "Materials";
         std::filesystem::path texDir = importedDir / "Textures";
@@ -239,7 +244,7 @@ namespace HRealEngine
         auto sourceRel = std::filesystem::relative(dstObj, g_AssetsDirectory).generic_string();
         auto cookedRel = std::filesystem::relative(cookedPath, g_AssetsDirectory).generic_string();     
 
-        auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, g_AssetsDirectory, lastCopiedTexAbs, texturePaths);        
+        auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);        
         std::ofstream out(outMesh);
         out << "Type: StaticMesh\n";
         out << "Source: " << sourceRel << "\n";

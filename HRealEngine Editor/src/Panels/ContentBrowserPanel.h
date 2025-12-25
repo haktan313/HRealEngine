@@ -22,6 +22,7 @@ namespace HRealEngine
         std::filesystem::path MakeUniquePath(const std::filesystem::path& p) const;
         
         std::filesystem::path m_CurrentDirectory;
+        std::filesystem::path m_BaseDirectory;
 
         Ref<Texture2D> m_FileIcon, m_FolderIcon;
 
