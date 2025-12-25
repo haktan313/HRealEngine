@@ -2,9 +2,10 @@
 
 #pragma once
 #include <entt.hpp>
+
+#include "HRealEngine/Asset/Asset.h"
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
-#include "HRealEngine/Core/UUID.h"
 
 namespace HRealEngine
 {
@@ -12,7 +13,7 @@ namespace HRealEngine
     class Entity;
     class Box2DWorld;
     
-    class Scene
+    class Scene : public Asset
     {
     public:
         Scene();
@@ -25,6 +26,8 @@ namespace HRealEngine
         void CreatePhysicsWorld();
         void DestroyEntity(Entity entity);
         entt::registry& GetRegistry() { return m_Registry; }
+        
+        virtual AssetType GetType() const override { return AssetType::Scene; }
 
         void OnRuntimeStart();
         void OnRuntimeStop();

@@ -44,7 +44,8 @@ namespace HRealEngine
     struct SpriteRendererComponent
     {
         glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
-        Ref<Texture2D> Texture;
+        //Ref<Texture2D> Texture;
+        AssetHandle Texture = 0;
         float TilingFactor = 1.0f;
         int OrderInLayer = 0;
 
@@ -59,7 +60,8 @@ namespace HRealEngine
     struct MeshRendererComponent
     { 
         glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
-        Ref<Texture2D> Texture;
+        //Ref<Texture2D> Texture;
+        AssetHandle Texture = 0;
         Ref<MeshGPU> Mesh;
         std::filesystem::path MeshAssetPath;
         std::vector<std::string> MaterialOverrides;

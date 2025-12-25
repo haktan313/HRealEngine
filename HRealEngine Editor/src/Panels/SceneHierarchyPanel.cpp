@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
@@ -674,21 +675,66 @@ namespace HRealEngine
         DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
         {
             ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-            ImGui::Button("Texture");
+            //ImGui::Button("Texture");
+            std::string label = "None";
+            bool isTextureValid = false;
+            if (component.Texture != 0)
+            {
+                if (AssetManager::IsAssetHandleValid(component.Texture)
+                    && AssetManager::GetAssetType(component.Texture) == AssetType::Texture)
+                {
+                    const AssetMetadata& metadata = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(component.Texture);
+                    label = metadata.FilePath.filename().string();
+                    isTextureValid = true;
+                }
+                else
+                {
+                    label = "Invalid";
+                }
+            }
+
+            ImVec2 buttonLabelSize = ImGui::CalcTextSize(label.c_str());
+            buttonLabelSize.x += 20.0f;
+            float buttonLabelWidth = glm::max<float>(100.0f, buttonLabelSize.x);
+
+            ImGui::Button(label.c_str(), ImVec2(buttonLabelWidth, 0.0f));
             if (ImGui::BeginDragDropTarget())
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
-                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    /*const wchar_t* path = (const wchar_t*)payload->Data;
                     //std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
                     std::filesystem::path fullPath(path);
                     //component.Texture = Texture2D::Create(fullPath.string());
                     Ref<Texture2D> texture = Texture2D::Create(fullPath.string());
                     if (texture->IsLoaded())
-                        component.Texture = texture;
+                        component.Texture = texture->Handle;//texture;*/
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Texture)
+                    {
+                        component.Texture = handle;
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a texture.");
+                    }
                 }
                 ImGui::EndDragDropTarget();
             }
+            if (isTextureValid)
+            {
+                ImGui::SameLine();
+                ImVec2 xLabelSize = ImGui::CalcTextSize("X");
+                float buttonSize = xLabelSize.y + ImGui::GetStyle().FramePadding.y * 2.0f;
+                if (ImGui::Button("X", ImVec2(buttonSize, buttonSize)))
+                {
+                    component.Texture = 0;
+                }
+            }
+
+            ImGui::SameLine();
+            ImGui::Text("Texture");
+            
             ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
             ImGui::DragInt("Order In Layer", &component.OrderInLayer, 1, 0, 100);
         });
@@ -729,12 +775,21 @@ namespace HRealEngine
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
-                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    /*const wchar_t* path = (const wchar_t*)payload->Data;
                     //std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
                     std::filesystem::path fullPath(path);
                     Ref<Texture2D> texture = Texture2D::Create(fullPath.string());
                     if (texture->IsLoaded())
-                        component.Texture = texture;
+                        component.Texture = texture;*/
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Texture)
+                    {
+                        component.Texture = handle;
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a texture.");
+                    }
                 }
                 ImGui::EndDragDropTarget();
             }

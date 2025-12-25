@@ -4,6 +4,8 @@
 #include "HRealEngine/Core/Logger.h"
 #include <yaml-cpp/yaml.h>
 
+#include "HRealEngine/Asset/TextureImporter.h"
+
 namespace HRealEngine
 {
     std::unordered_map<std::filesystem::path, Ref<HMaterial>> MaterialLibrary::s_Cache;
@@ -78,7 +80,8 @@ namespace HRealEngine
                 std::filesystem::path relTexPath = texStr;
                 std::filesystem::path absTexPath = MakeAbs(assetsRoot, relTexPath);
 
-                Ref<Texture2D> tex = Texture2D::Create(absTexPath.string());
+                //Ref<Texture2D> tex = Texture2D::Create(absTexPath.string());
+                Ref<Texture2D> tex = TextureImporter::LoadTexture(absTexPath);
                 if (tex && tex->IsLoaded())
                     mat->AlbedoTexture = tex;
                 else

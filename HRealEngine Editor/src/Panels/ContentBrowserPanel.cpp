@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <imgui/imgui.h>
 
+#include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Project/Project.h"
@@ -21,8 +22,13 @@ namespace HRealEngine
         m_BaseDirectory = Project::GetAssetDirectory();
         m_CurrentDirectory = m_BaseDirectory;
         
-        m_FileIcon = Texture2D::Create("assets/textures/fileIcon.png");
-        m_FolderIcon = Texture2D::Create("assets/textures/folderIcon.png");
+        /*m_FileIcon = Texture2D::Create("assets/textures/fileIcon.png");
+        m_FolderIcon = Texture2D::Create("assets/textures/folderIcon.png");*/
+        m_TreeNodes.push_back(TreeNode(".", 0)); // root node
+        m_FileIcon = TextureImporter::LoadTexture("assets/textures/fileIcon.png");
+        m_FolderIcon = TextureImporter::LoadTexture("assets/textures/folderIcon.png");
+        RefreshAssetTree();
+        m_Mode = Mode::FileSystem;
     }
 
     void ContentBrowserPanel::OnImGuiRender()
@@ -45,42 +51,118 @@ namespace HRealEngine
             columnCount = 1;
         
         ImGui::Columns(columnCount, 0, false);
-        
+
+        const char* label = m_Mode == Mode::Asset ? "Asset" : "File";
+        if (ImGui::Button(label))
+        {
+            m_Mode = m_Mode == Mode::Asset ? Mode::FileSystem : Mode::Asset;
+        }
         if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
         {
+            ImGui::SameLine();
             if (ImGui::Button("<-"))
             {
                 m_CurrentDirectory = m_CurrentDirectory.parent_path();
             }
         }
 
-        for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+        if (m_Mode == Mode::Asset)
         {
-            const auto& path = directoryEntry.path();
-            std::string fileNameString = path.filename().string();
-
-            Ref<Texture2D> icon = directoryEntry.is_directory() ? m_FolderIcon : m_FileIcon;
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-            ImGui::ImageButton(fileNameString.c_str(),(ImTextureID)(intptr_t)icon->GetRendererID(),{sizeOfImages, sizeOfImages},
-                {0,1}, {1,0});
-
-            if (ImGui::BeginDragDropSource())
+            TreeNode* node = &m_TreeNodes[0];
+            auto currentDir = std::filesystem::relative(m_CurrentDirectory, Project::GetAssetDirectory());
+            for (const auto& part : currentDir)
             {
-                //auto relativePath = std::filesystem::relative(directoryEntry.path(), g_AssetsDirectory);
-                std::filesystem::path relativePath(path);
-                const wchar_t* itemPath = relativePath.c_str();
-                ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
-                ImGui::EndDragDropSource();
-            }
-            
-            ImGui::PopStyleColor();
+                if (node->Path == currentDir)
+                    break;
 
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-                if (directoryEntry.is_directory())
-                    m_CurrentDirectory /= directoryEntry.path().filename();
-            
-            ImGui::TextWrapped(fileNameString.c_str());
-            ImGui::NextColumn();
+                if (node->Children.find(part) != node->Children.end())
+                {
+                    node = &m_TreeNodes[node->Children[part]];
+                }
+                else
+                {
+                    HREALENGINE_CORE_DEBUGBREAK(false);
+                }
+            }
+            for (const auto& [item, treeNodeIndex] : node->Children)
+            {
+                bool bisDir = std::filesystem::is_directory(Project::GetAssetDirectory() / item);
+                std::string itemStr = item.generic_string();
+                
+                Ref<Texture2D> icon = bisDir ? m_FolderIcon : m_FileIcon;
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::ImageButton(itemStr.c_str(), (ImTextureID)icon->GetRendererID(), { sizeOfImages, sizeOfImages }, { 0, 1 }, { 1, 0 });
+
+                if (ImGui::BeginPopupContextItem())
+                {
+                    /*if (ImGui::MenuItem("Import"))
+                    {
+                        auto relativePath = std::filesystem::relative(item, Project::GetAssetDirectory());
+                        Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
+                    }*/
+                    if (ImGui::MenuItem("Delete"))
+                    {
+                    }
+                    ImGui::EndPopup();
+                }
+                if (ImGui::BeginDragDropSource())
+                {
+                    AssetHandle handle = m_TreeNodes[treeNodeIndex].Handle;
+                    ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &handle, sizeof(AssetHandle));
+                    ImGui::EndDragDropSource();
+                }
+
+                ImGui::PopStyleColor();
+                if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                {
+                    if (bisDir)
+                        m_CurrentDirectory /= item.filename();
+                }
+                ImGui::TextWrapped(itemStr.c_str());
+                ImGui::NextColumn();
+            }
+        }
+        else
+        {
+            for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+            {
+                const auto& path = directoryEntry.path();
+                std::string fileNameString = path.filename().string();
+
+                Ref<Texture2D> icon = directoryEntry.is_directory() ? m_FolderIcon : m_FileIcon;
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                ImGui::ImageButton(fileNameString.c_str(),(ImTextureID)(intptr_t)icon->GetRendererID(),{sizeOfImages, sizeOfImages},
+                    {0,1}, {1,0});
+
+                if (ImGui::BeginPopupContextItem())
+                {
+                    if (ImGui::MenuItem("Import"))
+                    {
+                        auto relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
+                        Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
+                        RefreshAssetTree();
+                    }
+                    ImGui::EndPopup();
+                }
+                
+                /*if (ImGui::BeginDragDropSource())
+                {
+                    //auto relativePath = std::filesystem::relative(directoryEntry.path(), g_AssetsDirectory);
+                    std::filesystem::path relativePath(path);
+                    const wchar_t* itemPath = relativePath.c_str();
+                    ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+                    ImGui::EndDragDropSource();
+                }*/
+                
+                ImGui::PopStyleColor();
+
+                if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                    if (directoryEntry.is_directory())
+                        m_CurrentDirectory /= directoryEntry.path().filename();
+                
+                ImGui::TextWrapped(fileNameString.c_str());
+                ImGui::NextColumn();
+            }
         }
 
         ImGui::Columns(1);
@@ -105,6 +187,35 @@ namespace HRealEngine
                 ImGui::CloseCurrentPopup();
 
             ImGui::EndPopup();
+        }
+    }
+
+    void ContentBrowserPanel::RefreshAssetTree()
+    {
+        const auto& assetRegistry = Project::GetActive()->GetEditorAssetManager()->GetAssetRegistry();
+        for (const auto& [handle, metadata] : assetRegistry)
+        {
+            uint32_t currentNodeIndex = 0;
+
+            for (const auto& p : metadata.FilePath)
+            {
+                auto it = m_TreeNodes[currentNodeIndex].Children.find(p.generic_string());
+                if (it != m_TreeNodes[currentNodeIndex].Children.end())
+                {
+                    currentNodeIndex = it->second;
+                }
+                else
+                {
+                    // add node
+                    TreeNode newNode(p, handle);
+                    newNode.Parent = currentNodeIndex;
+                    m_TreeNodes.push_back(newNode);
+
+                    m_TreeNodes[currentNodeIndex].Children[p] = m_TreeNodes.size() - 1;
+                    currentNodeIndex = m_TreeNodes.size() - 1;
+                }
+
+            }
         }
     }
 

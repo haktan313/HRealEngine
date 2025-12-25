@@ -4,6 +4,10 @@
 #include "EditorLayer.h"
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
+
+#include "HRealEngine/Asset/AssetManager.h"
+#include "HRealEngine/Asset/SceneImporter.h"
+#include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
@@ -102,11 +106,16 @@ namespace HRealEngine
         };
         cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
         */
-        m_IconPlay = Texture2D::Create("assets/textures/StartButton.png");
+        /*m_IconPlay = Texture2D::Create("assets/textures/StartButton.png");
         m_IconStop = Texture2D::Create("assets/textures/stopButton.png");
         m_IconSimulate = Texture2D::Create("assets/textures/SimulateButton.png");
         m_IconPause = Texture2D::Create("assets/textures/PauseButton.png");
-        m_IconStep = Texture2D::Create("assets/textures/StepButton.png");
+        m_IconStep = Texture2D::Create("assets/textures/StepButton.png");*/
+        m_IconPlay = TextureImporter::LoadTexture("assets/textures/StartButton.png");
+        m_IconStop = TextureImporter::LoadTexture("assets/textures/stopButton.png");
+        m_IconSimulate = TextureImporter::LoadTexture("assets/textures/SimulateButton.png");
+        m_IconPause = TextureImporter::LoadTexture("assets/textures/PauseButton.png");
+        m_IconStep = TextureImporter::LoadTexture("assets/textures/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
     }
@@ -382,8 +391,9 @@ namespace HRealEngine
         {
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
             {
-                const wchar_t* path = (const wchar_t*)payload->Data;
-                OpenScene(path/*std::filesystem::path(g_AssetsDirectory) / path*/);
+                //const wchar_t* path = (const wchar_t*)payload->Data;
+                AssetHandle sceneAssetHandle = *(AssetHandle*)payload->Data;
+                OpenScene(sceneAssetHandle/*path*//*std::filesystem::path(g_AssetsDirectory) / path*/);
             }
             ImGui::EndDragDropTarget();
         }
@@ -583,8 +593,11 @@ namespace HRealEngine
         if (Project::Load(path))
         {
             ScriptEngine::Init();
-            auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
-            OpenScene(startScenePath);
+            /*auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+            OpenScene(startScenePath);*/
+            AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
+            if (startSceneHandle)
+                OpenScene(startSceneHandle);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
         }
     }
@@ -605,17 +618,18 @@ namespace HRealEngine
 
     void EditorLayer::OpenScene()
     {
-        std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
+        /*std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
         if (!filePath.empty())
-            OpenScene(filePath);
+            OpenScene(filePath);*/
     }
 
-    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    void EditorLayer::OpenScene(AssetHandle assetHandle/*const std::filesystem::path& path*/)
     {
+        HREALENGINE_CORE_DEBUGBREAK("Opening scene from asset handle {0}", assetHandle);
         if (m_SceneState != SceneState::Editor)
             OnSceneStop();
         
-        if (path.extension().string() != ".hrs")
+        /*if (path.extension().string() != ".hrs")
         {
             LOG_CORE_ERROR("Could not load {0} - not a .hrs file", path.filename().string());
             return;
@@ -630,7 +644,13 @@ namespace HRealEngine
 
             m_ActiveScene = m_EditorScene;
             m_EditorScenePath = path;
-        }
+        }*/
+        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(assetHandle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
+        m_EditorScene = newScene;
+        m_SceneHierarchyPanel.SetContext(m_EditorScene);
+        m_ActiveScene = m_EditorScene;
+        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(assetHandle);
     }
 
     void EditorLayer::SaveSceneAs()
@@ -653,8 +673,9 @@ namespace HRealEngine
 
     void EditorLayer::SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path)
     {
-        SceneSerializer serializer(sceneRef);
-        serializer.Serialize(path.string());
+        /*SceneSerializer serializer(sceneRef);
+        serializer.Serialize(path.string());*/
+        SceneImporter::SaveScene(sceneRef, path);
     }
 
     void EditorLayer::OnScenePlay()
