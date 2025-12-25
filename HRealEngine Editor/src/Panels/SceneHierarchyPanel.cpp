@@ -680,7 +680,8 @@ namespace HRealEngine
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
                     const wchar_t* path = (const wchar_t*)payload->Data;
-                    std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
+                    //std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
+                    std::filesystem::path fullPath(path);
                     //component.Texture = Texture2D::Create(fullPath.string());
                     Ref<Texture2D> texture = Texture2D::Create(fullPath.string());
                     if (texture->IsLoaded())
@@ -729,8 +730,8 @@ namespace HRealEngine
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
                     const wchar_t* path = (const wchar_t*)payload->Data;
-                    std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
-                    
+                    //std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
+                    std::filesystem::path fullPath(path);
                     Ref<Texture2D> texture = Texture2D::Create(fullPath.string());
                     if (texture->IsLoaded())
                         component.Texture = texture;

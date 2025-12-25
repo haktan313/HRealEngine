@@ -7,6 +7,7 @@
 #include "UniformBuffer.h"
 #include "VertexArray.h"
 #include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Project/Project.h"
 
 namespace HRealEngine
 {
@@ -258,7 +259,7 @@ namespace HRealEngine
                     
                     if (!chosenMat.empty())
                     {
-                        Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, "assets");
+                        Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, Project::GetAssetDirectory());
                         if (mat)
                         {
                             mat->Apply(meshRenderer.Mesh->Shader);

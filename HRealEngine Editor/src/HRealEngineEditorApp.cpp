@@ -21,6 +21,8 @@ namespace HRealEngine
 		ApplicationSpecification spec;
 		spec.Name = "HRealEngine Editor";
 		spec.CommandLineArgs = args;
+
+		//Project::New()->SaveActive("Untitled.hrpj");
 		
 		return new HRealEngineEditorApp(spec); 
 	}
