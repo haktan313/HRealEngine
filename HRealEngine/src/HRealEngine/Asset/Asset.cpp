@@ -7,8 +7,8 @@ namespace HRealEngine
     {
         switch (type)
         {
-        case AssetType::None:      return "AssetType::None";
-        case AssetType::Scene:     return "AssetType::Scene";
+        case AssetType::None: return "AssetType::None";
+        case AssetType::Scene: return "AssetType::Scene";
         case AssetType::Texture: return "AssetType::Texture";
         }
 
@@ -17,8 +17,8 @@ namespace HRealEngine
 
     AssetType AssetTypeFromString(std::string_view assetType)
     {
-        if (assetType == "AssetType::None")      return AssetType::None;
-        if (assetType == "AssetType::Scene")     return AssetType::Scene;
+        if (assetType == "AssetType::None") return AssetType::None;
+        if (assetType == "AssetType::Scene") return AssetType::Scene;
         if (assetType == "AssetType::Texture") return AssetType::Texture;
 
         return AssetType::None;

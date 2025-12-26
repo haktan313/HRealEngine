@@ -24,11 +24,11 @@ namespace HRealEngine
 
         return s_AssetExtensionMap.at(extension);
     }
-    YAML::Emitter& operator<<(YAML::Emitter& out, const std::string_view& v)
+    /*YAML::Emitter& operator<<(YAML::Emitter& out, const std::string_view& v)
     {
         out << std::string(v.data(), v.size());
         return out;
-    }
+    }*/
     Ref<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
     {
         if (!IsAssetHandleValid(assetHandle))
@@ -63,8 +63,8 @@ namespace HRealEngine
         AssetMetadata newAssetMetaData;
         newAssetMetaData.FilePath = filePath;
         newAssetMetaData.Type = GetAssetTypeFromFileExtension(filePath.extension());
-        HREALENGINE_CORE_DEBUGBREAK(metadata.Type != AssetType::None);
-
+        HREALENGINE_CORE_DEBUGBREAK(newAssetMetaData.Type != AssetType::None);
+        
         Ref<Asset> newAsset = AssetImporter::ImportAsset(newAssetHandle, newAssetMetaData);
         if (newAsset)
         {
@@ -89,7 +89,7 @@ namespace HRealEngine
                 out << YAML::Key << "Handle" << YAML::Value << handle;
                 std::string filePath = metadata.FilePath.generic_string();
                 out << YAML::Key << "FilePath" << YAML::Value << filePath;
-                out << YAML::Key << "Type" << YAML::Value << static_cast<int>(metadata.Type);
+                out << YAML::Key << "Type" << YAML::Value << AssetTypeToString(metadata.Type);
                 out << YAML::EndMap;
             }
             out << YAML::EndSeq;
@@ -107,7 +107,7 @@ namespace HRealEngine
         {
             data = YAML::LoadFile(path.string());
         }
-        catch (YAML::ParserException e)
+        catch (const YAML::Exception& e)
         {
             HREALENGINE_CORE_DEBUGBREAK("Failed to load asset registry file '{0}'\n     {1}", path, e.what());
             return false;
