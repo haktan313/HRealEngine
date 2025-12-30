@@ -98,6 +98,8 @@ namespace HRealEngine
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        if (initialData)
+            SetData(initialData);
     }
 
     void OpenGLTexture2D::SetData(Buffer data)

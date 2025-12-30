@@ -5,6 +5,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
 
+#include "HRealEngine/Asset/AssetImporter.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/SceneImporter.h"
 #include "HRealEngine/Asset/TextureImporter.h"
@@ -111,11 +112,12 @@ namespace HRealEngine
         m_IconSimulate = Texture2D::Create("assets/textures/SimulateButton.png");
         m_IconPause = Texture2D::Create("assets/textures/PauseButton.png");
         m_IconStep = Texture2D::Create("assets/textures/StepButton.png");*/
-        m_IconPlay = TextureImporter::LoadTexture("assets/textures/StartButton.png");
-        m_IconStop = TextureImporter::LoadTexture("assets/textures/stopButton.png");
-        m_IconSimulate = TextureImporter::LoadTexture("assets/textures/SimulateButton.png");
-        m_IconPause = TextureImporter::LoadTexture("assets/textures/PauseButton.png");
-        m_IconStep = TextureImporter::LoadTexture("assets/textures/StepButton.png");
+        
+        m_IconPlay = TextureImporter::LoadTexture("Resource/StartButton.png");
+        m_IconStop = TextureImporter::LoadTexture("Resource/stopButton.png");
+        m_IconSimulate = TextureImporter::LoadTexture("Resource/SimulateButton.png");
+        m_IconPause = TextureImporter::LoadTexture("Resource/PauseButton.png");
+        m_IconStep = TextureImporter::LoadTexture("Resource/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
     }
@@ -463,6 +465,7 @@ namespace HRealEngine
         EventDispatcher dispatcher(eventRef);
         dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
         dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+        dispatcher.Dispatch<WindowDropEvent>(BIND_EVENT_FN(EditorLayer::OnWindowDrop));
     }
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
@@ -521,6 +524,22 @@ namespace HRealEngine
             if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(HR_KEY_LEFT_ALT))
                 m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
         return false;
+    }
+
+    bool EditorLayer::OnWindowDrop(WindowDropEvent& event)
+    {
+        auto& paths = event.GetPaths();
+        for (auto& path : paths)
+        {
+            LOG_CORE_INFO("Path: {}", path.generic_string());
+            /*auto texture = TextureImporter::LoadTexture(path);
+            if (texture)
+                LOG_CORE_INFO("Texture loaded: {} ({}x{})", path.filename().string(), texture->GetWidth(), texture->GetHeight());*/
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+        }
+        if (!paths.empty())
+            m_ContentBrowserPanel->RefreshAssetTree();
+        return true;
     }
 
     void EditorLayer::OnOverlayRender()

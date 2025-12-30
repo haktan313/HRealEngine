@@ -28,6 +28,7 @@ namespace HRealEngine
     private:
         bool OnKeyPressed(KeyPressedEvent& event);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& event);
+        bool OnWindowDrop(WindowDropEvent& event);
 
         void OnOverlayRender();
 

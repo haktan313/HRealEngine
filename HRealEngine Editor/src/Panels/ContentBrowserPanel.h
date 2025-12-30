@@ -15,8 +15,8 @@ namespace HRealEngine
         ~ContentBrowserPanel() = default;
 
         void OnImGuiRender();
-    private:
         void RefreshAssetTree();
+    private:
         void ImportOBJ();
         void CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj, std::filesystem::path& lastCopiedTexAbs,
             std::vector<std::filesystem::path>& texturePaths);

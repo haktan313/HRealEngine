@@ -2,3 +2,21 @@ AssetRegistry:
   - Handle: 5876693894168414897
     FilePath: Scenes/2dphysics.hrs
     Type: AssetType::Scene
+  - Handle: 12326138095061292247
+    FilePath: Textures/Checkerboard.png
+    Type: AssetType::Texture
+  - Handle: 18121358212383785029
+    FilePath: Scenes/layertest.hrs
+    Type: AssetType::Scene
+  - Handle: 12681919880694640885
+    FilePath: Textures/joseMourinho.png
+    Type: AssetType::Texture
+  - Handle: 17976974299073719373
+    FilePath: Imported/dispatch-game-mecha-man-suit-invisigal-2k-wallpaper-uhdpaper.com-900@5@j.jpg
+    Type: AssetType::Texture
+  - Handle: 2282680380064637587
+    FilePath: Imported/haramball 4-0 feynord.png
+    Type: AssetType::Texture
+  - Handle: 4168462951297401035
+    FilePath: Scenes/3d level.hrs
+    Type: AssetType::Scene

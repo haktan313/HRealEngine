@@ -59,20 +59,67 @@ namespace HRealEngine
 
     void EditorAssetManager::ImportAsset(const std::filesystem::path& filePath)
     {
-        AssetHandle newAssetHandle;
-        AssetMetadata newAssetMetaData;
-        newAssetMetaData.FilePath = filePath;
-        newAssetMetaData.Type = GetAssetTypeFromFileExtension(filePath.extension());
-        HREALENGINE_CORE_DEBUGBREAK(newAssetMetaData.Type != AssetType::None);
-        
-        Ref<Asset> newAsset = AssetImporter::ImportAsset(newAssetHandle, newAssetMetaData);
-        if (newAsset)
+        const std::filesystem::path assetRoot = Project::GetAssetDirectory();
+        std::filesystem::path absPath = std::filesystem::weakly_canonical(filePath);
+
+        std::filesystem::path relPath;
         {
-            newAsset->Handle = newAssetHandle;
-            m_LoadedAssets[newAssetHandle] = newAsset;
-            m_AssetRegistry[newAssetHandle] = newAssetMetaData;
-            SerializeAssetRegistry();
+            std::error_code ec;
+            std::filesystem::path rel = std::filesystem::relative(absPath, assetRoot, ec);
+            
+            bool outsideAssets = ec || rel.empty() || (*rel.begin() == "..");
+            if (!outsideAssets)
+                relPath = rel;
         }
+
+        if (relPath.empty())
+        {
+            const std::filesystem::path importDir = assetRoot / "Imported";
+            std::filesystem::create_directories(importDir);
+            
+            std::filesystem::path dst = importDir / absPath.filename();
+            if (std::filesystem::exists(dst))
+            {
+                int suffix = 1;
+                do
+                {
+                    dst = importDir / (absPath.stem().string() + "_" + std::to_string(suffix) + absPath.extension().string());
+                    suffix++;
+                }
+                while (std::filesystem::exists(dst));
+            }
+
+            std::error_code ec;
+            std::filesystem::copy_file(absPath, dst, std::filesystem::copy_options::overwrite_existing, ec);
+            if (ec)
+            {
+                LOG_CORE_ERROR("Failed to copy imported asset: {} -> {} ({})", absPath.string(), dst.string(), ec.message());
+                return;
+            }
+
+            absPath = dst;
+            relPath = std::filesystem::relative(dst, assetRoot);
+        }
+
+        for (const auto& [handle, metadata] : m_AssetRegistry)
+            if (metadata.FilePath == relPath)
+                return;
+
+        AssetHandle newHandle;
+        AssetMetadata meta;
+        meta.FilePath = relPath;
+        meta.Type = GetAssetTypeFromFileExtension(relPath.extension());
+        HREALENGINE_CORE_DEBUGBREAK(meta.Type != AssetType::None);
+
+        Ref<Asset> asset = AssetImporter::ImportAsset(newHandle, meta);
+        if (!asset)
+            return;
+
+        asset->Handle = newHandle;
+        m_LoadedAssets[newHandle] = asset;
+        m_AssetRegistry[newHandle] = meta;
+        SerializeAssetRegistry();
+
     }
 
     void EditorAssetManager::SerializeAssetRegistry()

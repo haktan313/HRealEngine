@@ -25,8 +25,8 @@ namespace HRealEngine
         /*m_FileIcon = Texture2D::Create("assets/textures/fileIcon.png");
         m_FolderIcon = Texture2D::Create("assets/textures/folderIcon.png");*/
         m_TreeNodes.push_back(TreeNode(".", 0)); // root node
-        m_FileIcon = TextureImporter::LoadTexture("assets/textures/fileIcon.png");
-        m_FolderIcon = TextureImporter::LoadTexture("assets/textures/folderIcon.png");
+        m_FileIcon = TextureImporter::LoadTexture("Resource/fileIcon.png");
+        m_FolderIcon = TextureImporter::LoadTexture("Resource/folderIcon.png");
         RefreshAssetTree();
         m_Mode = Mode::FileSystem;
     }
@@ -131,7 +131,7 @@ namespace HRealEngine
 
                 Ref<Texture2D> icon = directoryEntry.is_directory() ? m_FolderIcon : m_FileIcon;
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-                ImGui::ImageButton(fileNameString.c_str(),(ImTextureID)(intptr_t)icon->GetRendererID(),{sizeOfImages, sizeOfImages},
+                ImGui::ImageButton(fileNameString.c_str(),(ImTextureID)(uintptr_t)icon->GetRendererID(),{sizeOfImages, sizeOfImages},
                     {0,1}, {1,0});
 
                 if (ImGui::BeginPopupContextItem())

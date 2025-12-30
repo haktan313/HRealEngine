@@ -3,6 +3,8 @@
 #include "HRpch.h"
 #include "WindowsWindow.h"
 
+#include <filesystem>
+
 #include "HRealEngine/Core/Core.h"
 
 #include <HRealEngine/Events/AppEvent.h>
@@ -102,6 +104,15 @@ namespace HRealEngine
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			WindowCloseEvent event;
+			data.EventCallback(event);
+		});
+		glfwSetDropCallback(m_Window, [](GLFWwindow* window, int count, const char** paths)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			std::vector<std::filesystem::path> droppedPaths;
+			for (int i = 0; i < count; i++)
+				droppedPaths.emplace_back(paths[i]);
+			WindowDropEvent event(droppedPaths);
 			data.EventCallback(event);
 		});
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
