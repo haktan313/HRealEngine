@@ -51,9 +51,7 @@ namespace HRealEngine
     public:
         static bool LoadMeshFromFile(const std::string& path, std::vector<MeshVertex>& outVertices,
             std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes);
-        static std::vector<std::string> ImportObjMaterialsToHMat(const std::filesystem::path& objPathInAssets,
-                                                                 const std::filesystem::path& assetsRoot, const std::filesystem::path& lastCopiedTexAbs, const std::vector<std::
-                                                                 filesystem::path>& texturePaths);
+        static std::vector<std::string> ImportObjMaterialsToHMat(const std::filesystem::path& objPathInAssets, const std::filesystem::path& assetsRoot, const std::filesystem::path& lastCopiedTexAbs, const std::vector<std::filesystem::path>& texturePaths);
         static Ref<MeshGPU> LoadHMeshAsset(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);
         static bool WriteHMeshBin(const std::filesystem::path& path,
             const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<HMeshBinSubmesh>& submeshes);

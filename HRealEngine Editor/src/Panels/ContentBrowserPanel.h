@@ -16,6 +16,7 @@ namespace HRealEngine
 
         void OnImGuiRender();
         void RefreshAssetTree();
+        void ImportOBJ(const std::filesystem::path& srcObj);
     private:
         void ImportOBJ();
         void CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj, std::filesystem::path& lastCopiedTexAbs,
@@ -49,6 +50,5 @@ namespace HRealEngine
             Asset = 0, FileSystem = 1
         };
         Mode m_Mode = Mode::Asset;
-
     };
 }

@@ -254,8 +254,38 @@ namespace HRealEngine
         RefreshAssetTree();
     }
 
+    void ContentBrowserPanel::ImportOBJ(const std::filesystem::path& srcObj)
+    {
+        uint64_t fileSize = 0;
+        
+        try
+        {
+            fileSize = std::filesystem::file_size(srcObj);
+        }
+        catch (...)
+        {
+            m_LastError = "Could not read OBJ file size.";
+            m_OpenErrorPopup = true;
+            return;
+        }
+        
+        if (fileSize > kMaxImportFileBytes)
+        {
+            m_LastError = "OBJ file is too large for import budget.";
+            m_OpenErrorPopup = true;
+            return;
+        }
+
+        std::filesystem::path dstObj;
+        std::filesystem::path lastCopiedTexAbs;
+        std::vector<std::filesystem::path> texturePaths;
+        CreateDirectoriesIfNotExists(srcObj, dstObj, lastCopiedTexAbs, texturePaths);   
+        ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
+        RefreshAssetTree();
+    }
+
     void ContentBrowserPanel::CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj,
-        std::filesystem::path& lastCopiedTexAbs,std::vector<std::filesystem::path>& texturePaths)
+                                                           std::filesystem::path& lastCopiedTexAbs,std::vector<std::filesystem::path>& texturePaths)
     {
         const std::string modelName = srcObj.stem().string();       
         std::filesystem::path importedDir = m_CurrentDirectory / "Imported" / modelName;

@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 
+#include "../../../../HRealEngine Editor/src/Panels/ContentBrowserPanel.h"
 #include "HRealEngine/Asset/AssetManagerBase.h"
 #include "HRealEngine/Asset/EditorAssetManager.h"
 
@@ -47,15 +48,18 @@ namespace HRealEngine
         Ref<EditorAssetManager> GetEditorAssetManager() { return std::static_pointer_cast<EditorAssetManager>(m_AssetManager); }
         
         static Ref<Project> GetActive() { return s_ActiveProject; }
+        static ContentBrowserPanel* GetContentBrowserPanel() { return m_ContentBrowserPanel; }
 
         static Ref<Project> New();
         static Ref<Project> Load(const std::filesystem::path& path);
         static bool SaveActive(const std::filesystem::path& path);
+        static void SetContentBrowserPanel(ContentBrowserPanel* panel) { m_ContentBrowserPanel = panel; }
     private:
         ProjectConfig m_Config;
         std::filesystem::path m_ProjectDirectory;
         Ref<AssetManagerBase> m_AssetManager;
 
+        inline static ContentBrowserPanel* m_ContentBrowserPanel;
         inline static Ref<Project> s_ActiveProject;
     };
 }

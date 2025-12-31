@@ -618,6 +618,7 @@ namespace HRealEngine
             if (startSceneHandle)
                 OpenScene(startSceneHandle);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+            Project::SetContentBrowserPanel(m_ContentBrowserPanel.get());
         }
     }
 

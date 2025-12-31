@@ -10,7 +10,7 @@ namespace HRealEngine
     static std::map<AssetType, AssetImportFunction> s_AssetImporters = {
         { AssetType::Texture, TextureImporter::ImportTexture },
         { AssetType::Scene, SceneImporter::ImportScene },
-        {AssetType::Mesh, MeshImporter::ImportMesh }
+        { AssetType::Mesh, MeshImporter::ImportMesh }
     };
     
     Ref<Asset> AssetImporter::ImportAsset(AssetHandle assetHandle, const AssetMetadata& metaData)
