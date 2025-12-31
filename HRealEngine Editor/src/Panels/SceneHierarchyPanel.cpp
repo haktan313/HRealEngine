@@ -747,7 +747,7 @@ namespace HRealEngine
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
-                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    /*const wchar_t* path = (const wchar_t*)payload->Data;
                     std::filesystem::path droppedPath = path;
         
                     if (droppedPath.extension() == ".hmesh")
@@ -764,6 +764,38 @@ namespace HRealEngine
                             LOG_CORE_INFO("Mesh material slots: {}", slotCount);
                         }
                         LOG_CORE_INFO("Assigned mesh: {}", droppedPath.string());
+                    }*/
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Mesh)
+                    {
+                        component.Mesh = handle;
+                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
+                        auto& metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(handle);
+                        std::filesystem::path droppedPath = metaData.FilePath;
+                        component.MeshAssetPath = droppedPath;
+                        
+                        auto meshGPU = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
+                        if (meshGPU)
+                        {
+                            const size_t slotCount = meshGPU->MaterialPaths.size();
+                            component.MaterialOverrides.clear();
+                            component.MaterialOverrides.resize(slotCount);
+                            LOG_CORE_INFO("Mesh material slots: {}", slotCount);
+
+                            auto meshGPUAsset = AssetManager::GetAsset<MeshGPU>(handle);
+                            if (meshGPUAsset)
+                            {
+                                meshGPUAsset->Shader = shader;
+                                meshGPUAsset->VAO = meshGPU->VAO;
+                                meshGPUAsset->IndexCount = meshGPU->IndexCount;
+                                meshGPUAsset->MaterialPaths = meshGPU->MaterialPaths;
+                                meshGPUAsset->Submeshes = meshGPU->Submeshes;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a mesh.");
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -802,7 +834,13 @@ namespace HRealEngine
 
             if (component.Mesh)
             {
-                const size_t slotCount = component.Mesh->MaterialPaths.size();
+                auto meshGPU = AssetManager::GetAsset<MeshGPU>(component.Mesh);
+                if (!meshGPU)
+                {
+                    LOG_CORE_WARN("MeshRendererComponent: Mesh asset is invalid.");
+                    return;
+                }
+                const size_t slotCount = meshGPU->MaterialPaths.size();
                 if (slotCount > 0)
                 {
                     ImGui::Separator();
@@ -813,7 +851,7 @@ namespace HRealEngine
                     for (size_t i = 0; i < slotCount; i++)
                     {
                         ImGui::PushID((int)i);          
-                        const std::string& defaultPath = component.Mesh->MaterialPaths[i];          
+                        const std::string& defaultPath = meshGPU->MaterialPaths[i];          
                         const std::string& overridePath = component.MaterialOverrides[i];
                         const bool hasOverride = !overridePath.empty();         
 

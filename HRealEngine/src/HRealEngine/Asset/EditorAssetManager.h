@@ -12,6 +12,7 @@ namespace HRealEngine
         virtual bool IsAssetHandleValid(AssetHandle assetHandle) const override { return assetHandle != 0 && m_AssetRegistry.find(assetHandle) != m_AssetRegistry.end(); }
         const AssetRegistry& GetAssetRegistry() const { return m_AssetRegistry; }
         virtual AssetType GetAssetType(AssetHandle assetHandle) const override;
+        AssetHandle GetHandleFromPath(const std::filesystem::path& relPath) const;
 
         void ImportAsset(const std::filesystem::path& filePath);
         void SerializeAssetRegistry();

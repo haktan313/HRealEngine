@@ -228,17 +228,20 @@ namespace HRealEngine
     void Renderer3D::DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID)
     {
         // Draw with MeshGPU if available
-        if (meshRenderer.Mesh && meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0)
+        if (meshRenderer.Mesh /*&& meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0*/)
         {
-            meshRenderer.Mesh->Shader->Bind();
-            meshRenderer.Mesh->Shader->SetInt("u_EntityID", entityID);
+            auto meshGPU = AssetManager::GetAsset<MeshGPU>(meshRenderer.Mesh);
+            if (!meshGPU)
+                return;
+            meshGPU->Shader->Bind();
+            meshGPU->Shader->SetInt("u_EntityID", entityID);
             //meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
-            meshRenderer.Mesh->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
-            meshRenderer.Mesh->Shader->SetMat4("u_Transform", transform);
+            meshGPU->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
+            meshGPU->Shader->SetMat4("u_Transform", transform);
 
-            if (!meshRenderer.Mesh->Submeshes.empty())
+            if (!meshGPU->Submeshes.empty())
             {
-                for (const auto& sm : meshRenderer.Mesh->Submeshes)
+                for (const auto& sm : meshGPU->Submeshes)
                 {
                     if (sm.IndexCount == 0)
                         continue;
@@ -252,10 +255,10 @@ namespace HRealEngine
                     {
                         chosenMat = meshRenderer.MaterialOverrides[slot];
                     }
-                    else if (slot < meshRenderer.Mesh->MaterialPaths.size() && !meshRenderer.Mesh->MaterialPaths[slot].empty()
-                        && meshRenderer.Mesh->MaterialPaths[slot] != "null")
+                    else if (slot < meshGPU->MaterialPaths.size() && !meshGPU->MaterialPaths[slot].empty()
+                        && meshGPU->MaterialPaths[slot] != "null")
                     {
-                        chosenMat = meshRenderer.Mesh->MaterialPaths[slot];
+                        chosenMat = meshGPU->MaterialPaths[slot];
                     }
                     
                     if (!chosenMat.empty())
@@ -263,27 +266,27 @@ namespace HRealEngine
                         Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, Project::GetAssetDirectory());
                         if (mat)
                         {
-                            mat->Apply(meshRenderer.Mesh->Shader);
+                            mat->Apply(meshGPU->Shader);
                         }
                         else
                         {
-                            meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
-                            meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                            meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                            meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
                         }
                     }
                     else
                     {
-                        meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
-                        meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                        meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                        meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
                     }
-                    RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, sm.IndexCount, sm.IndexOffset);
+                    RenderCommand::DrawIndexed(meshGPU->VAO, sm.IndexCount, sm.IndexOffset);
                 }
             }
             else
             {
-                meshRenderer.Mesh->Shader->SetInt("u_HasAlbedo", 0);
-                meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
-                RenderCommand::DrawIndexed(meshRenderer.Mesh->VAO, meshRenderer.Mesh->IndexCount);
+                meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                RenderCommand::DrawIndexed(meshGPU->VAO, meshGPU->IndexCount);
             }
 
             return;

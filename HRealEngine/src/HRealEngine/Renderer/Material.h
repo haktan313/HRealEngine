@@ -27,7 +27,7 @@ namespace HRealEngine
             {
                 shader->SetInt("u_HasAlbedo", 0);
             }
-        };
+        }
     };
 
     class MaterialLibrary

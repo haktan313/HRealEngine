@@ -251,6 +251,7 @@ namespace HRealEngine
         std::vector<std::filesystem::path> texturePaths;
         CreateDirectoriesIfNotExists(srcObj, dstObj, lastCopiedTexAbs, texturePaths);   
         ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
+        RefreshAssetTree();
     }
 
     void ContentBrowserPanel::CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj,
@@ -320,7 +321,10 @@ namespace HRealEngine
                 if (!ObjLoader::CopyFileSafe(srcTexAbs, lastCopiedTexAbs))
                     LOG_CORE_WARN("Failed to copy texture: {} -> {}", srcTexAbs.string(), lastCopiedTexAbs.string());
                 else
+                {
                     LOG_CORE_INFO("Copied texture: {}", lastCopiedTexAbs.string());
+                    Project::GetActive()->GetEditorAssetManager()->ImportAsset(lastCopiedTexAbs);
+                }
                 texturePaths.push_back(lastCopiedTexAbs);
             }       
             LOG_CORE_INFO("Copied+rewritten MTL: {}", dstMtlAbs.string());
@@ -339,7 +343,7 @@ namespace HRealEngine
             return;
         }       
 
-        std::filesystem::path cookedPath = g_AssetsDirectory / "cache";
+        std::filesystem::path cookedPath = Project::GetAssetDirectory() / "cache";
         std::filesystem::create_directories(cookedPath);        
         cookedPath /= dstObj.stem();
         cookedPath += ".hmeshbin";      
@@ -352,8 +356,8 @@ namespace HRealEngine
 
         std::filesystem::path outMesh = m_CurrentDirectory / (dstObj.stem().string() + ".hmesh");
         outMesh = MakeUniquePath(outMesh);      
-        auto sourceRel = std::filesystem::relative(dstObj, g_AssetsDirectory).generic_string();
-        auto cookedRel = std::filesystem::relative(cookedPath, g_AssetsDirectory).generic_string();     
+        auto sourceRel = std::filesystem::relative(dstObj, Project::GetAssetDirectory()).generic_string();
+        auto cookedRel = std::filesystem::relative(cookedPath, Project::GetAssetDirectory()).generic_string();     
 
         auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);        
         std::ofstream out(outMesh);
@@ -371,6 +375,7 @@ namespace HRealEngine
             out << "  - " << m << "\n";
         out.close();        
         LOG_CORE_INFO("Created mesh asset: {}", outMesh.string());
+        Project::GetActive()->GetEditorAssetManager()->ImportAsset(outMesh);
     }
 
     std::filesystem::path ContentBrowserPanel::MakeUniquePath(const std::filesystem::path& p) const

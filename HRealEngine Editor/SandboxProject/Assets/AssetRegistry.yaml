@@ -11,12 +11,18 @@ AssetRegistry:
   - Handle: 12681919880694640885
     FilePath: Textures/joseMourinho.png
     Type: AssetType::Texture
-  - Handle: 17976974299073719373
-    FilePath: Imported/dispatch-game-mecha-man-suit-invisigal-2k-wallpaper-uhdpaper.com-900@5@j.jpg
-    Type: AssetType::Texture
-  - Handle: 2282680380064637587
-    FilePath: Imported/haramball 4-0 feynord.png
-    Type: AssetType::Texture
   - Handle: 4168462951297401035
     FilePath: Scenes/3d level.hrs
     Type: AssetType::Scene
+  - Handle: 5560511583392544571
+    FilePath: Imported/flash/Textures/FL_CW_A_1.png
+    Type: AssetType::Texture
+  - Handle: 5695969506746312875
+    FilePath: flash.hmesh
+    Type: AssetType::Mesh
+  - Handle: 7211651818741635344
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
+    Type: AssetType::Texture
+  - Handle: 16262847659658369282
+    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
+    Type: AssetType::Mesh

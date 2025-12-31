@@ -12,7 +12,9 @@ namespace HRealEngine
         { ".hrs", AssetType::Scene },
         { ".png", AssetType::Texture },
         { ".jpg", AssetType::Texture },
-        { ".jpeg", AssetType::Texture }
+        { ".jpeg", AssetType::Texture },
+        {".obj", AssetType::Mesh },
+        {".hmesh", AssetType::Mesh }
     };
     static AssetType GetAssetTypeFromFileExtension(const std::filesystem::path& extension)
     {
@@ -32,7 +34,10 @@ namespace HRealEngine
     Ref<Asset> EditorAssetManager::GetAsset(AssetHandle assetHandle)
     {
         if (!IsAssetHandleValid(assetHandle))
+        {
+            LOG_CORE_ERROR("Invalid asset handle: {}", (int)assetHandle);
             return nullptr;
+        }
         Ref<Asset> asset;
         if (IsAssetLoaded(assetHandle))
         {
@@ -55,6 +60,18 @@ namespace HRealEngine
             return AssetType::None;
 
         return m_AssetRegistry.at(assetHandle).Type;
+    }
+
+    AssetHandle EditorAssetManager::GetHandleFromPath(const std::filesystem::path& relPath) const
+    {
+        std::filesystem::path norm = relPath.lexically_normal();
+
+        for (const auto& [handle, meta] : m_AssetRegistry)
+        {
+            if (meta.FilePath.lexically_normal() == norm)
+                return handle;
+        }
+        return 0;
     }
 
     void EditorAssetManager::ImportAsset(const std::filesystem::path& filePath)

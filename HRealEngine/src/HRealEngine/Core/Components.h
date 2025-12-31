@@ -62,7 +62,8 @@ namespace HRealEngine
         glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
         //Ref<Texture2D> Texture;
         AssetHandle Texture = 0;
-        Ref<MeshGPU> Mesh;
+        //Ref<MeshGPU> Mesh;
+        AssetHandle Mesh = 0;
         std::filesystem::path MeshAssetPath;
         std::vector<std::string> MaterialOverrides;
         float TilingFactor = 1.0f;

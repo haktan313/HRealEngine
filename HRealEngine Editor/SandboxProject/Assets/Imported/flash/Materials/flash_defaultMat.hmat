@@ -1,0 +1,4 @@
+Type: Material
+Shader: shaders/StaticMesh.glsl
+BaseColor: [1, 1, 1]
+AlbedoTexture: Imported/flash/Textures/FL_CW_A_1.png

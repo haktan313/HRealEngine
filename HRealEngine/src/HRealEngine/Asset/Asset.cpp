@@ -10,6 +10,7 @@ namespace HRealEngine
         case AssetType::None: return "AssetType::None";
         case AssetType::Scene: return "AssetType::Scene";
         case AssetType::Texture: return "AssetType::Texture";
+        case AssetType::Mesh: return "AssetType::Mesh";
         }
 
         return "AssetType::<Invalid>";
@@ -20,6 +21,7 @@ namespace HRealEngine
         if (assetType == "AssetType::None") return AssetType::None;
         if (assetType == "AssetType::Scene") return AssetType::Scene;
         if (assetType == "AssetType::Texture") return AssetType::Texture;
+        if (assetType == "AssetType::Mesh") return AssetType::Mesh;
 
         return AssetType::None;
     }

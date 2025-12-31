@@ -8,6 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 
 namespace HRealEngine
@@ -214,7 +215,10 @@ namespace HRealEngine
     {
         std::ifstream in(path, std::ios::binary);
         if (!in)
+        {
+            LOG_CORE_ERROR("Failed to open HMeshBin: {}", path.string());
             return false;
+        }
 
         HMeshBinHeader header;
         in.read((char*)&header, sizeof(header));
@@ -244,7 +248,8 @@ namespace HRealEngine
         if (it != s_Cache.end())
             return it->second;
 
-        Ref<MeshGPU> mesh = LoadHMeshAsset(hmeshPath, assetsRoot, shader);
+        auto assetFolder = Project::GetActive()->GetAssetDirectory();
+        Ref<MeshGPU> mesh = LoadHMeshAsset(hmeshPath, assetFolder, shader);
         if (mesh)
             s_Cache[hmeshPath] = mesh;
 

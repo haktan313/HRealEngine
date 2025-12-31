@@ -511,8 +511,8 @@ namespace HRealEngine
                         std::string path = meshRendererComponent["MeshPath"].as<std::string>();
                         mesh.MeshAssetPath = path;
 
-                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
-                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);
+                        /*auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
+                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);*/
                     }
 
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
