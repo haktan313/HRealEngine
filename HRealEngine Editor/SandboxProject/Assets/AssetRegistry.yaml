@@ -11,6 +11,12 @@ AssetRegistry:
   - Handle: 12681919880694640885
     FilePath: Textures/joseMourinho.png
     Type: AssetType::Texture
+  - Handle: 17496795571655667523
+    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
+    Type: AssetType::Mesh
   - Handle: 4168462951297401035
     FilePath: Scenes/3d level.hrs
     Type: AssetType::Scene
+  - Handle: 11828880287469525526
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
+    Type: AssetType::Texture

@@ -1,0 +1,4 @@
+Type: Material
+Shader: shaders/StaticMesh.glsl
+BaseColor: [0.64, 0.64, 0.64]
+AlbedoTexture: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png

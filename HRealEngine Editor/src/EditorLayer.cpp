@@ -531,10 +531,20 @@ namespace HRealEngine
         auto& paths = event.GetPaths();
         for (auto& path : paths)
         {
-            LOG_CORE_INFO("Path: {}", path.generic_string());
+            /*LOG_CORE_INFO("Path: {}", path.generic_string());
             /*auto texture = TextureImporter::LoadTexture(path);
             if (texture)
-                LOG_CORE_INFO("Texture loaded: {} ({}x{})", path.filename().string(), texture->GetWidth(), texture->GetHeight());*/
+                LOG_CORE_INFO("Texture loaded: {} ({}x{})", path.filename().string(), texture->GetWidth(), texture->GetHeight());#1#
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);*/
+            auto ext = path.extension().string();
+            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+            if (ext == ".obj")
+            {
+                m_ContentBrowserPanel->ImportOBJ(path);
+                continue;
+            }
+
             Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
         }
         if (!paths.empty())
