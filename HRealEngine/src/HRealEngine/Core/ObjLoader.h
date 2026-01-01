@@ -60,6 +60,7 @@ namespace HRealEngine
             std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes = nullptr);
         static Ref<MeshGPU> GetOrLoad(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);
         static bool ParseHMeshMaterials(const std::filesystem::path& hmeshAbs, std::vector<std::string>& outMaterials);
+        static bool ParseHMeshMaterialHandles(const std::filesystem::path& hmeshAbs, std::vector<AssetHandle>& outHandles);
         static bool ExtractCookedRelativePath(const std::filesystem::path& hmeshPath, std::string& outCookedRel);
         static bool TryResolveTexturePath(const std::filesystem::path& objAbs, const std::string& texRelOrAbs,std::filesystem::path& outAbs);
         static void Clear();

@@ -7,6 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+#include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
@@ -193,14 +194,23 @@ namespace HRealEngine
             auto& mesh = entity.GetComponent<MeshRendererComponent>();
             out << YAML::Key << "MeshRendererComponent";
             out << YAML::BeginMap;
-            if (mesh.MeshAssetPath.empty() == false)
-                out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();
-
+            
+            /*if (mesh.MeshAssetPath.empty() == false)
+                out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();*/
+            out << YAML::Key << "MeshHandle" << YAML::Value << mesh.Mesh;
+            
             out << YAML::Key << "Color" << YAML::Value << mesh.Color;
             /*if (mesh.Texture)
                 out << YAML::Key << "TexturePath" << YAML::Value << mesh.Texture->GetPath();*/
             out << YAML::Key << "TextureHandle" << YAML::Value << mesh.Texture;
             out << YAML::Key << "TilingFactor" << YAML::Value << mesh.TilingFactor;
+
+            out << YAML::Key << "MaterialHandleOverrides";
+            out << YAML::Value << YAML::BeginSeq;
+            for (AssetHandle h : mesh.MaterialHandleOverrides)
+                out << h;
+            out << YAML::EndSeq;
+            
             out << YAML::EndMap;
         }
         if (entity.HasComponent<CircleRendererComponent>())
@@ -506,26 +516,47 @@ namespace HRealEngine
                 if (auto meshRendererComponent = entity["MeshRendererComponent"])
                 {
                     auto& mesh = deserializedEntity.AddComponent<MeshRendererComponent>();
-                    if (meshRendererComponent["MeshPath"])
-                    {
-                        std::string path = meshRendererComponent["MeshPath"].as<std::string>();
-                        mesh.MeshAssetPath = path;
-
-                        /*auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
-                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);*/
-                    }
 
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
-                    if (meshRendererComponent["TexturePath"])
-                    {
-                        //mesh.Texture = Texture2D::Create(meshRendererComponent["TexturePath"].as<std::string>());
-                    }
+                
                     if (meshRendererComponent["TextureHandle"])
-                    {
                         mesh.Texture = meshRendererComponent["TextureHandle"].as<AssetHandle>();
-                    }
+                
                     if (meshRendererComponent["TilingFactor"])
                         mesh.TilingFactor = meshRendererComponent["TilingFactor"].as<float>();
+                    
+                    if (meshRendererComponent["MeshHandle"])
+                    {
+                        mesh.Mesh = meshRendererComponent["MeshHandle"].as<AssetHandle>();
+                    }
+                    
+                    mesh.MaterialHandleOverrides.clear();
+                
+                    if (meshRendererComponent["MaterialHandleOverrides"] && meshRendererComponent["MaterialHandleOverrides"].IsSequence())
+                    {
+                        for (auto n : meshRendererComponent["MaterialHandleOverrides"])
+                            mesh.MaterialHandleOverrides.push_back(n.as<AssetHandle>());
+                    }
+                    
+                    if (mesh.Mesh != 0 && AssetManager::IsAssetHandleValid(mesh.Mesh))
+                    {
+                        Ref<MeshGPU> meshGPU = AssetManager::GetAsset<MeshGPU>(mesh.Mesh);
+                        if (meshGPU)
+                        {
+                            const size_t slotCount = meshGPU->MaterialHandles.size();
+                            if (slotCount > 0)
+                            {
+                                if (mesh.MaterialHandleOverrides.size() < slotCount)
+                                    mesh.MaterialHandleOverrides.resize(slotCount, 0);
+                
+                                for (size_t i = 0; i < slotCount; i++)
+                                {
+                                    if (mesh.MaterialHandleOverrides[i] == 0)
+                                        mesh.MaterialHandleOverrides[i] = meshGPU->MaterialHandles[i];
+                                }
+                            }
+                        }
+                    }
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {

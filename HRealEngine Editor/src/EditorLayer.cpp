@@ -675,12 +675,19 @@ namespace HRealEngine
             m_ActiveScene = m_EditorScene;
             m_EditorScenePath = path;
         }*/
-        Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(assetHandle);
-        Ref<Scene> newScene = Scene::Copy(readOnlyScene);
-        m_EditorScene = newScene;
+        /*Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(assetHandle);
+        Ref<Scene> newScene = Scene::Copy(readOnlyScene);*/
+        Ref<Scene> scene = AssetManager::GetAsset<Scene>(assetHandle);
+        if (!scene)
+            return;
+        /*m_EditorScene = newScene;
         m_SceneHierarchyPanel.SetContext(m_EditorScene);
-        m_ActiveScene = m_EditorScene;
-        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(assetHandle);
+        m_ActiveScene = m_EditorScene;*/
+        m_ActiveScene = scene;
+        m_EditorScene = scene;
+        m_SceneHierarchyPanel.SetContext(scene);
+        //m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(assetHandle);
+        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(assetHandle).FilePath;
     }
 
     void EditorLayer::SaveSceneAs()
@@ -706,6 +713,14 @@ namespace HRealEngine
         /*SceneSerializer serializer(sceneRef);
         serializer.Serialize(path.string());*/
         SceneImporter::SaveScene(sceneRef, path);
+        AssetHandle sceneHandle = m_ActiveScene->Handle;
+
+        auto eam = Project::GetActive()->GetEditorAssetManager();
+        eam->ReloadAsset(sceneHandle);
+        
+        m_ActiveScene = AssetManager::GetAsset<Scene>(sceneHandle);
+        m_EditorScene = m_ActiveScene;
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::OnScenePlay()

@@ -8,7 +8,9 @@ namespace HRealEngine
 {
     Ref<Scene> SceneImporter::ImportScene(AssetHandle handle, const AssetMetadata& metadata)
     {
-        return LoadScene(Project::GetAssetDirectory() / metadata.FilePath);
+        Ref<Scene> scene = LoadScene(Project::GetAssetDirectory() / metadata.FilePath);
+        scene->Handle = handle;
+        return scene;
     }
 
     Ref<Scene> SceneImporter::LoadScene(const std::filesystem::path& path)

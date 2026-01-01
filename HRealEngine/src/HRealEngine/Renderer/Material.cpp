@@ -72,8 +72,22 @@ namespace HRealEngine
             mat->Color.a = root["Color"][3].as<float>();
         }
 
+        if (root["AlbedoTextureHandle"])
+        {
+            AssetHandle handle = (AssetHandle)root["AlbedoTextureHandle"].as<uint64_t>(0);
 
-        if (root["AlbedoTexture"])
+            if (handle != 0 && AssetManager::IsAssetHandleValid(handle))
+            {
+                Ref<Texture2D> tex = AssetManager::GetAsset<Texture2D>(handle);
+                if (tex && tex->IsLoaded())
+                    mat->AlbedoTexture = tex;
+                else
+                    LOG_CORE_WARN("Texture handle exists but failed to load: {}", (uint64_t)handle);
+            }
+        }
+
+
+        /*if (root["AlbedoTexture"])
         {
             /*std::string texStr = root["AlbedoTexture"].as<std::string>();
             if (!texStr.empty() && texStr != "null")
@@ -88,7 +102,7 @@ namespace HRealEngine
                     mat->AlbedoTexture = tex;
                 else
                     LOG_CORE_WARN("Failed to load albedo texture: {}", absTexPath.string());
-            }*/
+            }#1#
             std::filesystem::path relTexPath = root["AlbedoTexture"].as<std::string>();
 
             auto eam = Project::GetActive()->GetEditorAssetManager();
@@ -106,7 +120,7 @@ namespace HRealEngine
             {
                 LOG_CORE_WARN("Texture not found in AssetRegistry: {}", relTexPath.string());
             }
-        }
+        }*/
 
         return mat;
     }

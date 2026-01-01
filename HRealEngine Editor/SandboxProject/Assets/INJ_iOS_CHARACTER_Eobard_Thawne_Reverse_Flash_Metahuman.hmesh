@@ -7,6 +7,6 @@ Import:
   CalcTangents: true
   FlipUVs: false
   Scale: 1.0
-Materials:
-  - null
-  - Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
+MaterialHandles:
+  - 0
+  - 8599235794369918790

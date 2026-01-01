@@ -7,6 +7,6 @@ Import:
   CalcTangents: true
   FlipUVs: false
   Scale: 1.0
-Materials:
-  - null
-  - Imported/flash/Materials/flash_defaultMat.hmat
+MaterialHandles:
+  - 0
+  - 13301379573216789227

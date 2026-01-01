@@ -390,7 +390,21 @@ namespace HRealEngine
         auto sourceRel = std::filesystem::relative(dstObj, Project::GetAssetDirectory()).generic_string();
         auto cookedRel = std::filesystem::relative(cookedPath, Project::GetAssetDirectory()).generic_string();     
 
-        auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);        
+        auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);
+        std::vector<AssetHandle> materialHandles;
+        materialHandles.reserve(materials.size());
+
+        auto eam = Project::GetActive()->GetEditorAssetManager();
+        for (auto& m : materials)
+        {
+            if (m.empty() || m == "null")
+            {
+                materialHandles.push_back(0);
+                continue;
+            }
+            materialHandles.push_back(eam->GetHandleFromPath(std::filesystem::path(m)));
+        }
+
         std::ofstream out(outMesh);
         out << "Type: StaticMesh\n";
         out << "Source: " << sourceRel << "\n";
@@ -401,9 +415,12 @@ namespace HRealEngine
         out << "  CalcTangents: true\n";
         out << "  FlipUVs: false\n";
         out << "  Scale: 1.0\n";
-        out << "Materials:\n";
+        out << "MaterialHandles:\n";
+        for (auto h : materialHandles)
+            out << "  - " << (uint64_t)h << "\n";
+        /*out << "Materials:\n";
         for (const auto& m : materials)
-            out << "  - " << m << "\n";
+            out << "  - " << m << "\n";*/
         out.close();        
         LOG_CORE_INFO("Created mesh asset: {}", outMesh.string());
         Project::GetActive()->GetEditorAssetManager()->ImportAsset(outMesh);

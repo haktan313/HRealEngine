@@ -76,6 +76,16 @@ namespace HRealEngine
         return 0;
     }
 
+    Ref<Asset> EditorAssetManager::ReloadAsset(AssetHandle handle)
+    {
+        if (!IsAssetHandleValid(handle))
+            return nullptr;
+        
+        m_LoadedAssets.erase(handle);
+        Ref<Asset> reloaded = GetAsset(handle);
+        return reloaded;
+    }
+
     void EditorAssetManager::ImportAsset(const std::filesystem::path& filePath)
     {
         const std::filesystem::path assetRoot = Project::GetAssetDirectory();

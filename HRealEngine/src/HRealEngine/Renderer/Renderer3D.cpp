@@ -53,17 +53,6 @@ namespace HRealEngine
     };
     static Renderer3DData s_Data;
 
-    static AssetHandle ChooseMaterialHandle(const Ref<MeshGPU>& meshGPU, const MeshRendererComponent& meshRenderer, uint32_t slot)
-    {
-        if (slot < meshRenderer.MaterialHandleOverrides.size())
-            return meshRenderer.MaterialHandleOverrides[slot];
-        
-        if (slot < meshGPU->MaterialHandles.size())
-            return meshGPU->MaterialHandles[slot];
-
-        return 0;
-    }
-
     void Renderer3D::Init()
     {
         s_Data.CubeVertexArray = VertexArray::Create();
@@ -290,7 +279,9 @@ namespace HRealEngine
                         meshGPU->Shader->SetInt("u_HasAlbedo", 0);
                         meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
                     }*/
-                    AssetHandle matHandle = ChooseMaterialHandle(meshGPU, meshRenderer, slot);
+                    AssetHandle matHandle = 0;
+                    if (slot < meshRenderer.MaterialHandleOverrides.size())
+                        matHandle = meshRenderer.MaterialHandleOverrides[slot];
                     if (matHandle != 0)
                     {
                         Ref<HMaterial> mat = AssetManager::GetAsset<HMaterial>(matHandle);

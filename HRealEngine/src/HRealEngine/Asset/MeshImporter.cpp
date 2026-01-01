@@ -8,6 +8,8 @@ namespace HRealEngine
 {
     Ref<Asset> MeshImporter::ImportMesh(AssetHandle assetHandle, const AssetMetadata& metaData)
     {
+        static Ref<Shader> s_DefaultMeshShader = Shader::Create("assets/shaders/StaticMesh.glsl");
+        
         std::string ext = metaData.FilePath.extension().string();
         std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
@@ -17,12 +19,12 @@ namespace HRealEngine
 
         if (ext == ".hmesh")
         {
-            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), nullptr);
+            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
         }
         else if (ext == ".obj")
         {
             //Project::GetContentBrowserPanel()->ImportOBJ(Project::GetAssetFileSystemPath(metaData.FilePath));
-            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), nullptr);
+            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
         }
         else
         {

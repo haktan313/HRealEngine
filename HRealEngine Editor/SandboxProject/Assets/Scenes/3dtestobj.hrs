@@ -1,0 +1,44 @@
+Scene: Untitled
+Entities:
+  - Entity: 3125973510530094700
+    TagComponent:
+      Tag: f;asjjjj
+    TransformComponent:
+      Position: [0.3907424, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.9999999, 0.9999999, 1]
+    MeshRendererComponent:
+      MeshHandle: 1049105328473997768
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 13301379573216789227
+  - Entity: 10334013345553825234
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshHandle: 2448669013783252797
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 8599235794369918790
+  - Entity: 8767760679176938018
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [1.2136917, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 0

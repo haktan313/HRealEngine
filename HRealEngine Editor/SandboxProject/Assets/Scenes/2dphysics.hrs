@@ -1,31 +1,111 @@
 Scene: Untitled
 Entities:
-  - Entity: 9756729186957125387
+  - Entity: 8820226750914397380
     TagComponent:
-      Tag: player
+      Tag: ground
     TransformComponent:
-      Position: [-1.3523598, 1.2842369, 0]
+      Position: [0, -2.096508, 0]
       Rotation: [0, 0, 0]
-      Scale: [1.2759051, 1, 1]
-    CircleRendererComponent:
+      Scale: [8.299993, 0.10000006, 1]
+    SpriteRendererComponent:
       Color: [1, 1, 1, 1]
-      Thickness: 1
-      Fade: 0.005
-    ScriptComponent:
-      ClassName: HRealEngine.Player
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 2
-        - Name: cameraName
-          Type: String
-          Data: camera
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 0
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 10585805704628204280
+    TagComponent:
+      Tag: aaa
+    TransformComponent:
+      Position: [-1.6991055, -0.47324848, 0]
+      Rotation: [0, 0, 0.53969663]
+      Scale: [0.99998856, 0.99998856, 1]
+    SpriteRendererComponent:
+      Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 0
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
-    CircleCollider2DComponent:
+    BoxCollider2DComponent:
       Offset: [0, 0]
-      Radius: 0.5
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 8699832407536647932
+    TagComponent:
+      Tag: aaa2
+    TransformComponent:
+      Position: [-2.6001947, 0.7497273, 0]
+      Rotation: [0, 0, 0.0022333558]
+      Scale: [0.99998814, 0.99998814, 1]
+    SpriteRendererComponent:
+      Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 0
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 11521485255455545417
+    TagComponent:
+      Tag: aaa1
+    TransformComponent:
+      Position: [2.2216606, 0.20912585, 0]
+      Rotation: [0, 0, 0.0022333558]
+      Scale: [0.99998814, 0.99998814, 1]
+    SpriteRendererComponent:
+      Color: [0.7900356, 0.0534188, 0.0534188, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 0
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 11815319910955465353
+    TagComponent:
+      Tag: ground white
+    TransformComponent:
+      Position: [-0.0031170286, -0.8452482, 0.014169605]
+      Rotation: [0.011645551, -0.022599166, -0.25916106]
+      Scale: [8.299997, 0.100000024, 1]
+    SpriteRendererComponent:
+      Color: [0.19467838, 0.8967972, 0.45453727, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      OrderInLayer: 1
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
       Restitution: 0
@@ -57,107 +137,32 @@ Entities:
         - Name: playerName
           Type: String
           Data: player
-  - Entity: 11815319910955465353
+  - Entity: 9756729186957125387
     TagComponent:
-      Tag: ground white
+      Tag: player
     TransformComponent:
-      Position: [-0.0031170286, -0.8452482, 0.014169605]
-      Rotation: [0.011645551, -0.022599166, -0.25916106]
-      Scale: [8.299997, 0.100000024, 1]
-    SpriteRendererComponent:
-      Color: [0.19467838, 0.8967972, 0.45453727, 1]
-      TilingFactor: 1
-      OrderInLayer: 1
-    Rigidbody2DComponent:
-      BodyType: Static
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 11521485255455545417
-    TagComponent:
-      Tag: aaa1
-    TransformComponent:
-      Position: [2.2216606, 0.20912585, 0]
-      Rotation: [0, 0, 0.0022333558]
-      Scale: [0.99998814, 0.99998814, 1]
-    SpriteRendererComponent:
-      Color: [0.7900356, 0.0534188, 0.0534188, 1]
-      TilingFactor: 1
-      OrderInLayer: 0
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 8699832407536647932
-    TagComponent:
-      Tag: aaa2
-    TransformComponent:
-      Position: [-2.6001947, 0.7497273, 0]
-      Rotation: [0, 0, 0.0022333558]
-      Scale: [0.99998814, 0.99998814, 1]
-    SpriteRendererComponent:
-      Color: [0.7900356, 0.0534188, 0.0534188, 1]
-      TilingFactor: 1
-      OrderInLayer: 0
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 10585805704628204280
-    TagComponent:
-      Tag: aaa
-    TransformComponent:
-      Position: [-1.8072195, -0.5380108, 0]
-      Rotation: [0, 0, 0.53969663]
-      Scale: [0.99998856, 0.99998856, 1]
-    SpriteRendererComponent:
-      Color: [0.7900356, 0.0534188, 0.0534188, 1]
-      TilingFactor: 1
-      OrderInLayer: 0
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 8820226750914397380
-    TagComponent:
-      Tag: ground
-    TransformComponent:
-      Position: [0, -2.096508, 0]
+      Position: [-1.3523598, 1.2842369, 0]
       Rotation: [0, 0, 0]
-      Scale: [8.299993, 0.10000006, 1]
-    SpriteRendererComponent:
+      Scale: [1.2759051, 1, 1]
+    CircleRendererComponent:
       Color: [1, 1, 1, 1]
-      TilingFactor: 1
-      OrderInLayer: 0
+      Thickness: 1
+      Fade: 0.005
+    ScriptComponent:
+      ClassName: HRealEngine.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 2
+        - Name: cameraName
+          Type: String
+          Data: camera
     Rigidbody2DComponent:
-      BodyType: Static
+      BodyType: Dynamic
       FixedRotation: false
-    BoxCollider2DComponent:
+    CircleCollider2DComponent:
       Offset: [0, 0]
-      Size: [0.5, 0.5]
+      Radius: 0.5
       Density: 1
       Friction: 0.5
       Restitution: 0
