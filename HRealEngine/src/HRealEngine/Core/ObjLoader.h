@@ -45,6 +45,7 @@ namespace HRealEngine
         uint32_t IndexCount = 0;
         std::vector<HMeshBinSubmesh> Submeshes;
         std::vector<std::string> MaterialPaths;
+        std::vector<AssetHandle> MaterialHandles;
     };
     class ObjLoader
     {

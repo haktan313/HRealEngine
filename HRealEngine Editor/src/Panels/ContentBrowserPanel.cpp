@@ -86,7 +86,8 @@ namespace HRealEngine
             }
             for (const auto& [item, treeNodeIndex] : node->Children)
             {
-                bool bisDir = std::filesystem::is_directory(Project::GetAssetDirectory() / item);
+                const std::filesystem::path absItemPath = m_CurrentDirectory / item;
+                bool bisDir = std::filesystem::is_directory(absItemPath/*Project::GetAssetDirectory() / item*/);
                 std::string itemStr = item.generic_string();
                 
                 Ref<Texture2D> icon = bisDir ? m_FolderIcon : m_FileIcon;
@@ -116,7 +117,7 @@ namespace HRealEngine
                 if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                 {
                     if (bisDir)
-                        m_CurrentDirectory /= item.filename();
+                        m_CurrentDirectory /*/= item.filename();*/ = absItemPath;
                 }
                 ImGui::TextWrapped(itemStr.c_str());
                 ImGui::NextColumn();

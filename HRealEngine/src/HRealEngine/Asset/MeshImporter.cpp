@@ -21,7 +21,7 @@ namespace HRealEngine
         }
         else if (ext == ".obj")
         {
-            Project::GetContentBrowserPanel()->ImportOBJ(Project::GetAssetFileSystemPath(metaData.FilePath));
+            //Project::GetContentBrowserPanel()->ImportOBJ(Project::GetAssetFileSystemPath(metaData.FilePath));
             asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), nullptr);
         }
         else

@@ -165,7 +165,6 @@ namespace HRealEngine
             std::string albedoTexRel = "null";
             if (!texturePaths.empty() && i - 1 < texturePaths.size())
                 albedoTexRel = std::filesystem::relative(texturePaths[i - 1], assetsRoot).generic_string();
-
             
             std::filesystem::path hmatAbs = matsDir / fileName;
 
@@ -182,6 +181,7 @@ namespace HRealEngine
 
             LOG_CORE_INFO("Created HMAT (matIndex={}): {} (AlbedoTexture={})",
                 i, materialRelPaths[i], albedoTexRel);
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(hmatAbs);
         }
 
         return materialRelPaths;

@@ -14,7 +14,9 @@ namespace HRealEngine
         { ".jpg", AssetType::Texture },
         { ".jpeg", AssetType::Texture },
         {".obj", AssetType::Mesh },
-        {".hmesh", AssetType::Mesh }
+        {".hmesh", AssetType::Mesh },
+        {".hmat", AssetType::Material},
+        {".mtl", AssetType::Material}
     };
     static AssetType GetAssetTypeFromFileExtension(const std::filesystem::path& extension)
     {

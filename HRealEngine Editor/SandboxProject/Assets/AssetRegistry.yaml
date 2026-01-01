@@ -5,18 +5,30 @@ AssetRegistry:
   - Handle: 12326138095061292247
     FilePath: Textures/Checkerboard.png
     Type: AssetType::Texture
-  - Handle: 18121358212383785029
-    FilePath: Scenes/layertest.hrs
-    Type: AssetType::Scene
   - Handle: 12681919880694640885
     FilePath: Textures/joseMourinho.png
     Type: AssetType::Texture
-  - Handle: 17496795571655667523
-    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
-    Type: AssetType::Mesh
+  - Handle: 18121358212383785029
+    FilePath: Scenes/layertest.hrs
+    Type: AssetType::Scene
   - Handle: 4168462951297401035
     FilePath: Scenes/3d level.hrs
     Type: AssetType::Scene
-  - Handle: 11828880287469525526
+  - Handle: 15473645376146909979
+    FilePath: Imported/flash/Materials/flash_defaultMat.hmat
+    Type: AssetType::Material
+  - Handle: 16657721307107857536
+    FilePath: Imported/flash/Textures/FL_CW_A_1.png
+    Type: AssetType::Texture
+  - Handle: 17904660733783644660
+    FilePath: flash.hmesh
+    Type: AssetType::Mesh
+  - Handle: 17284588215135321387
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
     Type: AssetType::Texture
+  - Handle: 16402084925815642554
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
+    Type: AssetType::Material
+  - Handle: 13012744263241783706
+    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
+    Type: AssetType::Mesh

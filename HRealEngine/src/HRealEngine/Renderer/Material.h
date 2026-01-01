@@ -8,8 +8,11 @@
 
 namespace HRealEngine
 {
-    struct HMaterial
+    class HMaterial : public Asset
     {
+    public:
+        virtual ~HMaterial() = default;
+        
         glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
         Ref<Texture2D> AlbedoTexture = nullptr;
 
@@ -28,6 +31,9 @@ namespace HRealEngine
                 shader->SetInt("u_HasAlbedo", 0);
             }
         }
+
+        static AssetType GetStaticType() { return AssetType::Material; }
+        AssetType GetType() const override { return GetStaticType(); }
     };
 
     class MaterialLibrary
