@@ -259,7 +259,8 @@ namespace HRealEngine
     bool ObjLoader::ParseHMeshMaterials(const std::filesystem::path& hmeshAbs, std::vector<std::string>& outMaterials)
     {
         std::ifstream in(hmeshAbs);
-        if (!in) return false;
+        if (!in)
+            return false;
 
         outMaterials.clear();
 
@@ -269,7 +270,8 @@ namespace HRealEngine
         while (std::getline(in, line))
         {
             size_t start = line.find_first_not_of(" \t\r\n");
-            if (start == std::string::npos) continue;
+            if (start == std::string::npos)
+                continue;
             std::string s = line.substr(start);
 
             if (!inMaterials)
@@ -289,10 +291,13 @@ namespace HRealEngine
                 std::string val = s.substr(1);
 
                 size_t vstart = val.find_first_not_of(" \t");
-                if (vstart == std::string::npos) val = "";
-                else val = val.substr(vstart);
+                if (vstart == std::string::npos)
+                    val = "";
+                else
+                    val = val.substr(vstart);
 
-                if (val.empty()) val = "null";
+                if (val.empty())
+                    val = "null";
                 outMaterials.push_back(val);
             }
         }
@@ -330,7 +335,28 @@ namespace HRealEngine
         
         std::vector<std::string> mats;
         ParseHMeshMaterials(hmeshAbs, mats);
-        mesh->MaterialPaths = std::move(mats);
+
+        mesh->MaterialHandles.clear();
+        mesh->MaterialHandles.reserve(mats.size());
+
+        auto eam = Project::GetActive()->GetEditorAssetManager();
+        for (auto& m : mats)
+        {
+            if (m.empty() || m == "null")
+            {
+                mesh->MaterialHandles.push_back(0);
+                continue;
+            }
+
+            std::filesystem::path relHmat = m;
+            AssetHandle h = eam->GetHandleFromPath(relHmat);
+            mesh->MaterialHandles.push_back(h);
+
+            if (h == 0)
+                LOG_CORE_WARN("HMAT not found in AssetRegistry: {}", relHmat.string());
+        }
+        
+        //mesh->MaterialPaths = std::move(mats);
 
         if (mesh)
             mesh->Submeshes = std::move(submeshes);

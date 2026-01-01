@@ -65,7 +65,8 @@ namespace HRealEngine
         //Ref<MeshGPU> Mesh;
         AssetHandle Mesh = 0;
         std::filesystem::path MeshAssetPath;
-        std::vector<std::string> MaterialOverrides;
+        //std::vector<std::string> MaterialOverrides;
+        std::vector<AssetHandle> MaterialHandleOverrides;
         float TilingFactor = 1.0f;
         
         MeshRendererComponent() = default;

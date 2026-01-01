@@ -44,7 +44,7 @@ namespace HRealEngine
         Ref<Shader> Shader;
         uint32_t IndexCount = 0;
         std::vector<HMeshBinSubmesh> Submeshes;
-        std::vector<std::string> MaterialPaths;
+        //std::vector<std::string> MaterialPaths;
         std::vector<AssetHandle> MaterialHandles;
     };
     class ObjLoader

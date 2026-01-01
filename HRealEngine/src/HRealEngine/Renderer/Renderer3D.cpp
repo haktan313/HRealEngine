@@ -52,7 +52,18 @@ namespace HRealEngine
         glm::vec2 VertexUV[24];
     };
     static Renderer3DData s_Data;
-    
+
+    static AssetHandle ChooseMaterialHandle(const Ref<MeshGPU>& meshGPU, const MeshRendererComponent& meshRenderer, uint32_t slot)
+    {
+        if (slot < meshRenderer.MaterialHandleOverrides.size())
+            return meshRenderer.MaterialHandleOverrides[slot];
+        
+        if (slot < meshGPU->MaterialHandles.size())
+            return meshGPU->MaterialHandles[slot];
+
+        return 0;
+    }
+
     void Renderer3D::Init()
     {
         s_Data.CubeVertexArray = VertexArray::Create();
@@ -248,7 +259,7 @@ namespace HRealEngine
             
                     const uint32_t slot = sm.MaterialIndex;
                     
-                    std::filesystem::path chosenMat;
+                    /*std::filesystem::path chosenMat;
                     
                     if (slot < meshRenderer.MaterialOverrides.size() && !meshRenderer.MaterialOverrides[slot].empty()
                         && meshRenderer.MaterialOverrides[slot] != "null")
@@ -278,7 +289,25 @@ namespace HRealEngine
                     {
                         meshGPU->Shader->SetInt("u_HasAlbedo", 0);
                         meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                    }*/
+                    AssetHandle matHandle = ChooseMaterialHandle(meshGPU, meshRenderer, slot);
+                    if (matHandle != 0)
+                    {
+                        Ref<HMaterial> mat = AssetManager::GetAsset<HMaterial>(matHandle);
+                        if (mat)
+                            mat->Apply(meshGPU->Shader);
+                        else
+                        {
+                            meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                            meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                        }
                     }
+                    else
+                    {
+                        meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                        meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                    }
+
                     RenderCommand::DrawIndexed(meshGPU->VAO, sm.IndexCount, sm.IndexOffset);
                 }
             }

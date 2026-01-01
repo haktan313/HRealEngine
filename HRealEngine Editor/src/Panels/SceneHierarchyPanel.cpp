@@ -777,10 +777,15 @@ namespace HRealEngine
                         auto meshGPU = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
                         if (meshGPU)
                         {
-                            const size_t slotCount = meshGPU->MaterialPaths.size();
-                            component.MaterialOverrides.clear();
-                            component.MaterialOverrides.resize(slotCount);
+                            //const size_t slotCount = meshGPU->MaterialPaths.size();
+                            const size_t slotCount = meshGPU->MaterialHandles.size();
+                            /*component.MaterialOverrides.clear();
+                            component.MaterialOverrides.resize(slotCount);*/
+                            component.MaterialHandleOverrides.clear();
+                            component.MaterialHandleOverrides.resize(slotCount);
                             LOG_CORE_INFO("Mesh material slots: {}", slotCount);
+                            for (size_t i = 0; i < slotCount; i++)
+                                component.MaterialHandleOverrides[i] = meshGPU->MaterialHandles[i];
 
                             auto meshGPUAsset = AssetManager::GetAsset<MeshGPU>(handle);
                             if (meshGPUAsset)
@@ -788,7 +793,8 @@ namespace HRealEngine
                                 meshGPUAsset->Shader = shader;
                                 meshGPUAsset->VAO = meshGPU->VAO;
                                 meshGPUAsset->IndexCount = meshGPU->IndexCount;
-                                meshGPUAsset->MaterialPaths = meshGPU->MaterialPaths;
+                                //meshGPUAsset->MaterialPaths = meshGPU->MaterialPaths;
+                                meshGPUAsset->MaterialHandles = meshGPU->MaterialHandles;
                                 meshGPUAsset->Submeshes = meshGPU->Submeshes;
                             }
                         }
@@ -840,20 +846,26 @@ namespace HRealEngine
                     LOG_CORE_WARN("MeshRendererComponent: Mesh asset is invalid.");
                     return;
                 }
-                const size_t slotCount = meshGPU->MaterialPaths.size();
+                const size_t slotCount = meshGPU->MaterialHandles.size();
                 if (slotCount > 0)
                 {
                     ImGui::Separator();
                     ImGui::Text("Materials");           
 
-                    if (component.MaterialOverrides.size() != slotCount)
-                        component.MaterialOverrides.resize(slotCount);          
+                    /*if (component.MaterialOverrides.size() != slotCount)
+                        component.MaterialOverrides.resize(slotCount);*/
+                    if (component.MaterialHandleOverrides.size() != slotCount)
+                        component.MaterialHandleOverrides.resize(slotCount, 0);
+
                     for (size_t i = 0; i < slotCount; i++)
                     {
                         ImGui::PushID((int)i);          
-                        const std::string& defaultPath = meshGPU->MaterialPaths[i];          
-                        const std::string& overridePath = component.MaterialOverrides[i];
-                        const bool hasOverride = !overridePath.empty();         
+                        /*const std::string& defaultPath = meshGPU->MaterialPaths[i];          
+                        const std::string& overridePath = component.MaterialOverrides[i];*/
+                        AssetHandle defaultHandle  = (i < meshGPU->MaterialHandles.size()) ? meshGPU->MaterialHandles[i] : 0;
+                        AssetHandle overrideHandle = (i < component.MaterialHandleOverrides.size()) ? component.MaterialHandleOverrides[i] : 0;
+                        //const bool hasOverride = !overridePath.empty();
+                        const bool hasOverride = overrideHandle != 0;
 
                         ImGui::Text("Slot %d", (int)i);
                         ImGui::SameLine();          
@@ -865,12 +877,27 @@ namespace HRealEngine
                         {
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                             {
-                                const wchar_t* path = (const wchar_t*)payload->Data;
+                                /*const wchar_t* path = (const wchar_t*)payload->Data;
                                 std::filesystem::path dropped = path;           
                                 if (dropped.extension() == ".hmat")
                                 {
                                     component.MaterialOverrides[i] = dropped.generic_string();
                                     LOG_CORE_INFO("Material override set: slot={} -> {}", i, component.MaterialOverrides[i]);
+                                }*/
+                                AssetHandle h = *(AssetHandle*)payload->Data;
+                                if (AssetManager::GetAssetType(h) == AssetType::Material)
+                                {
+                                    if (component.MaterialHandleOverrides.size() != slotCount)
+                                        component.MaterialHandleOverrides.resize(slotCount, 0);
+                                
+                                    component.MaterialHandleOverrides[i] = h;
+                                
+                                    /*const auto& md = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(h);
+                                    component.MaterialOverrides[i] = md.FilePath.generic_string();*/
+                                }
+                                else
+                                {
+                                    LOG_CORE_WARN("Dropped asset is not a material.");
                                 }
                             }
                             ImGui::EndDragDropTarget();
@@ -878,13 +905,39 @@ namespace HRealEngine
 
                         ImGui::SameLine();
                         if (ImGui::SmallButton("Clear"))
-                            component.MaterialOverrides[i].clear();         
+                        {
+                            /*component.MaterialHandleOverrides[i] = 0;
+                            component.MaterialOverrides[i].clear();
+                            //component.MaterialOverrides[i].clear();*/
+                            component.MaterialHandleOverrides[i] = 0;
 
-                        ImGui::TextDisabled("Default: %s", defaultPath.empty() ? "(empty)" : defaultPath.c_str());
+                        }
+
+                        /*ImGui::TextDisabled("Default: %s", defaultPath.empty() ? "(empty)" : defaultPath.c_str());
                         if (hasOverride)
                             ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Using Override: %s", overridePath.c_str());
                         else
                             ImGui::TextDisabled("Using Default");           
+                        ImGui::Separator();
+                        ImGui::PopID();*/
+                        auto GetLabel = [](AssetHandle h) -> std::string
+                        {
+                            if (h == 0)
+                                return "(none)";
+                            if (!AssetManager::IsAssetHandleValid(h))
+                                return "(invalid)";
+                            auto& md = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(h);
+                            return md.FilePath.filename().string();
+                        };
+                        
+                        std::string defaultLabel  = GetLabel(defaultHandle);
+                        std::string overrideLabel = GetLabel(overrideHandle);
+                        
+                        ImGui::TextDisabled("Default: %s", defaultLabel.c_str());
+                        if (hasOverride)
+                            ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Using Override: %s", overrideLabel.c_str());
+                        else
+                            ImGui::TextDisabled("Using Default");
                         ImGui::Separator();
                         ImGui::PopID();
                     }
