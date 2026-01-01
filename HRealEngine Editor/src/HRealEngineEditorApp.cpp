@@ -23,7 +23,7 @@ namespace HRealEngine
 		spec.CommandLineArgs = args;
 
 		//Project::New()->SaveActive("Untitled.hrpj");
-		
+
 		return new HRealEngineEditorApp(spec); 
 	}
 }

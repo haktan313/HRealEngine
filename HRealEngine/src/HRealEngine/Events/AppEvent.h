@@ -2,6 +2,9 @@
 #pragma once
 
 #include "EventBase.h"
+#include <vector>
+#include <filesystem>
+#include <utility>
 
 namespace HRealEngine
 {
@@ -23,6 +26,22 @@ namespace HRealEngine
 		unsigned int m_Width, m_Height;
 	};
 
+	class HREALENGINE_API WindowDropEvent : public EventBase
+	{
+	public:
+		WindowDropEvent(const std::vector<std::filesystem::path>& paths)
+			: m_Paths(paths) {}
+
+		WindowDropEvent(std::vector<std::filesystem::path>&& paths)
+			: m_Paths(std::move(paths)) {}
+
+		const std::vector<std::filesystem::path>& GetPaths() const { return m_Paths; }
+
+		EVENT_CLASS_TYPE(WindowDrop)
+		EVENT_CLASS_CATEGORY(AppEvents)
+	private:
+		std::vector<std::filesystem::path> m_Paths;
+	};
 	class HREALENGINE_API WindowCloseEvent : public EventBase
 	{
 	public:

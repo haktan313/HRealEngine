@@ -48,6 +48,8 @@ namespace HRealEngine
 
 	void ImGuiLayer::OnEvent(EventBase& eventRef)
 	{
+		if (eventRef.GetType() == EventTypes::WindowDrop)
+			return;
 		if (!m_bBlockEvents)
 			return;
 		ImGuiIO& io = ImGui::GetIO();

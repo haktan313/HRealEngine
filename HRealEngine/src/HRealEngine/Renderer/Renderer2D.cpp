@@ -11,6 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "HRealEngine/Asset/AssetManager.h"
+
 namespace HRealEngine
 {
     struct QuadVertex
@@ -157,9 +159,10 @@ namespace HRealEngine
         s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 
         //Textures
-        s_Data.WhiteTexture = Texture2D::Create(1, 1);
+        s_Data.WhiteTexture = Texture2D::Create(TextureSpecification()/*1, 1*/);
         uint32_t whiteTextureData = 0xffffffff;
-        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+        //s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+        s_Data.WhiteTexture->SetData(Buffer(&whiteTextureData, sizeof(uint32_t)));
 
         int32_t samplers[s_Data.MaxTextureSlots];
         for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -607,10 +610,19 @@ namespace HRealEngine
 
     void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
     {
-        if (src.Texture)
+        /*if (src.Texture)
             DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
         else
+            DrawQuad(transform, src.Color, entityID);*/
+        if (src.Texture)
+        {
+            Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.Texture);
+            DrawQuad(transform, texture, src.TilingFactor, src.Color, entityID);
+        }
+        else
+        {
             DrawQuad(transform, src.Color, entityID);
+        }
     }
 
     Renderer2D::Statistics Renderer2D::GetStats()

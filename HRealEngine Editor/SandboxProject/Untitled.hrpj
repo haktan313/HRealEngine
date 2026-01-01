@@ -1,5 +1,6 @@
 Project:
-  Name: SandboxProject
-  StartScene: "Scenes/2dphysics.hrs"
+  Name: Untitled
+  StartScene: 5876693894168414897
   AssetDirectory: "assets"
+  AssetRegistryPath: "AssetRegistry.yaml"
   ScriptModulePath: "Scripts/Binaries/Sandbox.dll"

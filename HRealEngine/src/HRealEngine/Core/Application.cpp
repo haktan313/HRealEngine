@@ -5,6 +5,8 @@
 
 #include <filesystem>
 
+#include "HRealEngine/Asset/TextureImporter.h"
+#include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"

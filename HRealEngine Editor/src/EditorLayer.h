@@ -28,6 +28,7 @@ namespace HRealEngine
     private:
         bool OnKeyPressed(KeyPressedEvent& event);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& event);
+        bool OnWindowDrop(WindowDropEvent& event);
 
         void OnOverlayRender();
 
@@ -38,7 +39,7 @@ namespace HRealEngine
 
         void NewScene();
         void OpenScene();
-        void OpenScene(const std::filesystem::path& path);
+        void OpenScene(AssetHandle assetHandle);
         void SaveSceneAs();
         void SaveScene();
 

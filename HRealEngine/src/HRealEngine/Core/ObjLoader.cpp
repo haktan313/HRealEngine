@@ -8,6 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 
 namespace HRealEngine
@@ -164,9 +165,15 @@ namespace HRealEngine
             std::string albedoTexRel = "null";
             if (!texturePaths.empty() && i - 1 < texturePaths.size())
                 albedoTexRel = std::filesystem::relative(texturePaths[i - 1], assetsRoot).generic_string();
-
             
             std::filesystem::path hmatAbs = matsDir / fileName;
+            
+            AssetHandle albedoHandle = 0;
+            if (albedoTexRel != "null" && !albedoTexRel.empty())
+            {
+                auto editorAssetManager = Project::GetActive()->GetEditorAssetManager();
+                albedoHandle = editorAssetManager->GetHandleFromPath(std::filesystem::path(albedoTexRel));
+            }
 
             auto textureDist = lastCopiedTexAbs;
             LOG_CORE_INFO("  (Source Texture: {})", textureDist.string());
@@ -174,13 +181,15 @@ namespace HRealEngine
             hm << "Type: Material\n";
             hm << "Shader: shaders/StaticMesh.glsl\n";
             hm << "BaseColor: [" << kd.r << ", " << kd.g << ", " << kd.b << "]\n";
-            hm << "AlbedoTexture: " << albedoTexRel << "\n";
+            hm << "AlbedoTextureHandle: " << (uint64_t)albedoHandle << "\n";
+            //hm << "AlbedoTexture: " << albedoTexRel << "\n";
             hm.close();
 
             materialRelPaths[i] = std::filesystem::relative(hmatAbs, assetsRoot).generic_string();
 
             LOG_CORE_INFO("Created HMAT (matIndex={}): {} (AlbedoTexture={})",
                 i, materialRelPaths[i], albedoTexRel);
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(hmatAbs);
         }
 
         return materialRelPaths;
@@ -214,7 +223,10 @@ namespace HRealEngine
     {
         std::ifstream in(path, std::ios::binary);
         if (!in)
+        {
+            LOG_CORE_ERROR("Failed to open HMeshBin: {}", path.string());
             return false;
+        }
 
         HMeshBinHeader header;
         in.read((char*)&header, sizeof(header));
@@ -244,7 +256,8 @@ namespace HRealEngine
         if (it != s_Cache.end())
             return it->second;
 
-        Ref<MeshGPU> mesh = LoadHMeshAsset(hmeshPath, assetsRoot, shader);
+        auto assetFolder = Project::GetActive()->GetAssetDirectory();
+        Ref<MeshGPU> mesh = LoadHMeshAsset(hmeshPath, assetFolder, shader);
         if (mesh)
             s_Cache[hmeshPath] = mesh;
 
@@ -254,7 +267,8 @@ namespace HRealEngine
     bool ObjLoader::ParseHMeshMaterials(const std::filesystem::path& hmeshAbs, std::vector<std::string>& outMaterials)
     {
         std::ifstream in(hmeshAbs);
-        if (!in) return false;
+        if (!in)
+            return false;
 
         outMaterials.clear();
 
@@ -264,7 +278,8 @@ namespace HRealEngine
         while (std::getline(in, line))
         {
             size_t start = line.find_first_not_of(" \t\r\n");
-            if (start == std::string::npos) continue;
+            if (start == std::string::npos)
+                continue;
             std::string s = line.substr(start);
 
             if (!inMaterials)
@@ -284,11 +299,78 @@ namespace HRealEngine
                 std::string val = s.substr(1);
 
                 size_t vstart = val.find_first_not_of(" \t");
-                if (vstart == std::string::npos) val = "";
-                else val = val.substr(vstart);
+                if (vstart == std::string::npos)
+                    val = "";
+                else
+                    val = val.substr(vstart);
 
-                if (val.empty()) val = "null";
+                if (val.empty())
+                    val = "null";
                 outMaterials.push_back(val);
+            }
+        }
+
+        return true;
+    }
+
+        bool ObjLoader::ParseHMeshMaterialHandles(const std::filesystem::path& hmeshAbs, /*std::vector<std::string>& outMaterials*/std::vector<AssetHandle>& outHandles)
+    {
+        std::ifstream in(hmeshAbs);
+        if (!in)
+            return false;
+
+        //outMaterials.clear();
+
+        std::string line;
+        //bool inMaterials = false;
+        bool inSection = false;
+
+        while (std::getline(in, line))
+        {
+            size_t start = line.find_first_not_of(" \t\r\n");
+            if (start == std::string::npos)
+                continue;
+            std::string s = line.substr(start);
+
+            if (!inSection)
+            {
+                if (s == "MaterialHandles:" || s.rfind("MaterialHandles:", 0) == 0)
+                    inSection = true;
+                continue;
+            }
+            
+            /*if (!inMaterials)
+            {
+                if (s == "Materials:" || s.rfind("Materials:", 0) == 0)
+                {
+                    inMaterials = true;
+                }
+                continue;
+            }*/
+            
+            if (start == 0 && s.find(':') != std::string::npos && s.rfind("-", 0) != 0)
+                break;
+            
+            if (s.rfind("-", 0) == 0)
+            {
+                /*std::string val = s.substr(1);
+
+                size_t vstart = val.find_first_not_of(" \t");
+                if (vstart == std::string::npos)
+                    val = "";
+                else
+                    val = val.substr(vstart);
+
+                if (val.empty())
+                    val = "null";
+                outMaterials.push_back(val);*/
+                std::string val = s.substr(1);
+                size_t vstart = val.find_first_not_of(" \t");
+                val = (vstart == std::string::npos) ? "" : val.substr(vstart);
+
+                uint64_t id = 0;
+                try { id = std::stoull(val); } catch (...) { id = 0; }
+                outHandles.push_back((AssetHandle)id);
             }
         }
 
@@ -322,10 +404,39 @@ namespace HRealEngine
         LOG_CORE_INFO("Loaded cooked mesh: {} (V={}, I={})", cookedAbs.string(), verts.size(), inds.size());
 
         Ref<MeshGPU> mesh = Renderer3D::BuildStaticMeshGPU(verts, inds, shader);
+
+        std::vector<AssetHandle> handles;
+        if (ParseHMeshMaterialHandles(hmeshAbs, handles))
+        {
+            mesh->MaterialHandles = std::move(handles);
+        }
+        else
+        {
+            std::vector<std::string> mats;
+            ParseHMeshMaterials(hmeshAbs, mats);
+
+            mesh->MaterialHandles.clear();
+            mesh->MaterialHandles.reserve(mats.size());
+
+            auto eam = Project::GetActive()->GetEditorAssetManager();
+            for (auto& m : mats)
+            {
+                if (m.empty() || m == "null")
+                {
+                    mesh->MaterialHandles.push_back(0);
+                    continue;
+                }
+
+                std::filesystem::path relHmat = m;
+                AssetHandle h = eam->GetHandleFromPath(relHmat);
+                mesh->MaterialHandles.push_back(h);
+
+                if (h == 0)
+                    LOG_CORE_WARN("HMAT not found in AssetRegistry: {}", relHmat.string());
+            }
+        }
         
-        std::vector<std::string> mats;
-        ParseHMeshMaterials(hmeshAbs, mats);
-        mesh->MaterialPaths = std::move(mats);
+        //mesh->MaterialPaths = std::move(mats);
 
         if (mesh)
             mesh->Submeshes = std::move(submeshes);

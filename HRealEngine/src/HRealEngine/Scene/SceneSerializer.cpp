@@ -7,6 +7,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+#include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/ObjLoader.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
@@ -181,8 +182,9 @@ namespace HRealEngine
             out << YAML::Key << "SpriteRendererComponent";
             out << YAML::BeginMap;
             out << YAML::Key << "Color" << YAML::Value << sprite.Color;
-            if (sprite.Texture)
-                out << YAML::Key << "TexturePath" << YAML::Value << sprite.Texture->GetPath();
+            /*if (sprite.Texture)
+                out << YAML::Key << "TexturePath" << YAML::Value << sprite.Texture->GetPath();*/
+            out << YAML::Key << "TextureHandle" << YAML::Value << sprite.Texture;
             out << YAML::Key << "TilingFactor" << YAML::Value << sprite.TilingFactor;
             out << YAML::Key << "OrderInLayer" << YAML::Value << sprite.OrderInLayer;
             out << YAML::EndMap;
@@ -192,13 +194,23 @@ namespace HRealEngine
             auto& mesh = entity.GetComponent<MeshRendererComponent>();
             out << YAML::Key << "MeshRendererComponent";
             out << YAML::BeginMap;
-            if (mesh.MeshAssetPath.empty() == false)
-                out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();
-
+            
+            /*if (mesh.MeshAssetPath.empty() == false)
+                out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();*/
+            out << YAML::Key << "MeshHandle" << YAML::Value << mesh.Mesh;
+            
             out << YAML::Key << "Color" << YAML::Value << mesh.Color;
-            if (mesh.Texture)
-                out << YAML::Key << "TexturePath" << YAML::Value << mesh.Texture->GetPath();
+            /*if (mesh.Texture)
+                out << YAML::Key << "TexturePath" << YAML::Value << mesh.Texture->GetPath();*/
+            out << YAML::Key << "TextureHandle" << YAML::Value << mesh.Texture;
             out << YAML::Key << "TilingFactor" << YAML::Value << mesh.TilingFactor;
+
+            out << YAML::Key << "MaterialHandleOverrides";
+            out << YAML::Value << YAML::BeginSeq;
+            for (AssetHandle h : mesh.MaterialHandleOverrides)
+                out << h;
+            out << YAML::EndSeq;
+            
             out << YAML::EndMap;
         }
         if (entity.HasComponent<CircleRendererComponent>())
@@ -351,7 +363,7 @@ namespace HRealEngine
         out << YAML::EndMap;
     }
 
-    void SceneSerializer::Serialize(const std::string& filepath)
+    void SceneSerializer::Serialize(const std::filesystem::path& filepath)
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
@@ -370,12 +382,12 @@ namespace HRealEngine
         fout << out.c_str();
     }
 
-    void SceneSerializer::SerializeRuntime(const std::string& filepath)
+    void SceneSerializer::SerializeRuntime(const std::filesystem::path& filepath)
     {
         
     }
 
-    bool SceneSerializer::Deserialize(const std::string& filepath)
+    bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
     {
         /*std::ifstream stream(filepath);
         std::stringstream strStream;
@@ -384,7 +396,7 @@ namespace HRealEngine
         YAML::Node data;
         try
         {
-            data = YAML::LoadFile(filepath);
+            data = YAML::LoadFile(filepath.string());
         }
         catch (YAML::ParserException e)
         {
@@ -489,7 +501,13 @@ namespace HRealEngine
                     auto& sprite = deserializedEntity.AddComponent<SpriteRendererComponent>();
                     sprite.Color = spriteRendererComponent["Color"].as<glm::vec4>();
                     if (spriteRendererComponent["TexturePath"])
-                        sprite.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                    {
+                        //sprite.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+                    }
+                    if (spriteRendererComponent["TextureHandle"])
+                    {
+                        sprite.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
+                    }
                     if (spriteRendererComponent["TilingFactor"])
                         sprite.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
                     if (spriteRendererComponent["OrderInLayer"])
@@ -498,20 +516,47 @@ namespace HRealEngine
                 if (auto meshRendererComponent = entity["MeshRendererComponent"])
                 {
                     auto& mesh = deserializedEntity.AddComponent<MeshRendererComponent>();
-                    if (meshRendererComponent["MeshPath"])
-                    {
-                        std::string path = meshRendererComponent["MeshPath"].as<std::string>();
-                        mesh.MeshAssetPath = path;
-
-                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
-                        mesh.Mesh = ObjLoader::GetOrLoad(path, "assets", shader);
-                    }
 
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
-                    if (meshRendererComponent["TexturePath"])
-                        mesh.Texture = Texture2D::Create(meshRendererComponent["TexturePath"].as<std::string>());
+                
+                    if (meshRendererComponent["TextureHandle"])
+                        mesh.Texture = meshRendererComponent["TextureHandle"].as<AssetHandle>();
+                
                     if (meshRendererComponent["TilingFactor"])
                         mesh.TilingFactor = meshRendererComponent["TilingFactor"].as<float>();
+                    
+                    if (meshRendererComponent["MeshHandle"])
+                    {
+                        mesh.Mesh = meshRendererComponent["MeshHandle"].as<AssetHandle>();
+                    }
+                    
+                    mesh.MaterialHandleOverrides.clear();
+                
+                    if (meshRendererComponent["MaterialHandleOverrides"] && meshRendererComponent["MaterialHandleOverrides"].IsSequence())
+                    {
+                        for (auto n : meshRendererComponent["MaterialHandleOverrides"])
+                            mesh.MaterialHandleOverrides.push_back(n.as<AssetHandle>());
+                    }
+                    
+                    if (mesh.Mesh != 0 && AssetManager::IsAssetHandleValid(mesh.Mesh))
+                    {
+                        Ref<MeshGPU> meshGPU = AssetManager::GetAsset<MeshGPU>(mesh.Mesh);
+                        if (meshGPU)
+                        {
+                            const size_t slotCount = meshGPU->MaterialHandles.size();
+                            if (slotCount > 0)
+                            {
+                                if (mesh.MaterialHandleOverrides.size() < slotCount)
+                                    mesh.MaterialHandleOverrides.resize(slotCount, 0);
+                
+                                for (size_t i = 0; i < slotCount; i++)
+                                {
+                                    if (mesh.MaterialHandleOverrides[i] == 0)
+                                        mesh.MaterialHandleOverrides[i] = meshGPU->MaterialHandles[i];
+                                }
+                            }
+                        }
+                    }
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {
@@ -569,7 +614,7 @@ namespace HRealEngine
         return true;
     }
 
-    bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
+    bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath)
     {
         return false;
     }

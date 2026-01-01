@@ -16,6 +16,7 @@
 #include <unordered_set>
 
 #include "HRealEngine/Core/Logger.h"
+#include "HRealEngine/Core/Buffer.h"
 
 #include <Jolt/Jolt.h>
 

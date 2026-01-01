@@ -6,7 +6,7 @@
 
 namespace HRealEngine
 {
-    Ref<Texture2D> Texture2D::Create(const std::string& filePath)
+    /*Ref<Texture2D> Texture2D::Create(const std::string& filePath)
     {
         switch (Renderer::GetAPI())
         {
@@ -29,6 +29,20 @@ namespace HRealEngine
                 return nullptr;
             case RendererAPI::API::OpenGL:
                 return CreateRef<OpenGLTexture2D>(width, height);
+        }
+        HREALENGINE_CORE_DEBUGBREAK(false, "Unknown RendererAPI!");
+        return nullptr;
+    }*/
+
+    Ref<Texture2D> Texture2D::Create(const TextureSpecification& spec, Buffer initialData)
+    {
+        switch (Renderer::GetAPI())
+        {
+            case RendererAPI::API::None:
+                HREALENGINE_CORE_DEBUGBREAK(false, "RendererAPI::None is not supported!");
+                return nullptr;
+            case RendererAPI::API::OpenGL:
+                return CreateRef<OpenGLTexture2D>(spec, initialData);
         }
         HREALENGINE_CORE_DEBUGBREAK(false, "Unknown RendererAPI!");
         return nullptr;

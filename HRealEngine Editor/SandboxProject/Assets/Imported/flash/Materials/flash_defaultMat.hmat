@@ -1,0 +1,4 @@
+Type: Material
+Shader: shaders/StaticMesh.glsl
+BaseColor: [1, 1, 1]
+AlbedoTextureHandle: 5594596817578114607

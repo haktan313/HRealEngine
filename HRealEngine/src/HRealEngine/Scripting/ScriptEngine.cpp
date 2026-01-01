@@ -98,7 +98,7 @@ namespace HRealEngine
         mono_image_close(image);
     
         // Don't forget to free the file data
-        delete[] fileData;
+        //delete[] fileData;
 
         return assembly;
     }
@@ -357,7 +357,7 @@ namespace HRealEngine
         UUID entityID = entity.GetUUID();
         if (s_Data->EntityInstances.find(entityID) == s_Data->EntityInstances.end())
         {
-            LOG_CORE_WARN("Script instance for entity {0} not found!", entityID);
+            LOG_CORE_WARN("Script instance for entity {0} not found!", (uint64_t)entityID);
             return;
         }
         Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
