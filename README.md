@@ -27,7 +27,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
   - C# scripting with Mono (hot reloadable assemblies)
 - Typical script events:
   - OnCreate, OnUpdate, OnDestroy, OnOverlapBegin, OnOverlapEnd, Destroy, etc.
-  - Overlap begin/end events (2D)
+  - Overlap begin/end events
   - Entity lifetime utilities (Destroy, etc.)
 
 ### Physics
@@ -44,18 +44,27 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Orthographic and Perspective cameras with controllers
 - **2D Renderer**
   - Batch renderer with textures and shaders
-- **3D Rendering (recently added)**
-  - Basic 3D mesh rendering pipeline (currently primitive meshes such as cubes)
-  - `MeshComponent` for rendering 3D entities
+- **3D Rendering**
+  - `MeshComponent` for rendering 3D entities using mesh and material assets
+  - `OBJ` mesh import and asset based rendering pipeline
+  - `Material` system with texture support
   - Texture assignment support for 3D meshes
+
+### Asset System
+- Centralized asset registry and asset handles
+- Import pipeline for meshes, materials, scenes, and textures
+- Asset based references used across rendering and scene systems
+
+### Project System
+- Project configuration and asset directory management
+- Per project asset registry and settings
+- Support for opening and switching projects inside the editor
 
 ### Core
 - Input handling and event system
 - Logging with spdlog
 
 ## Notes / Roadmap
-- OBJ mesh loading and asset pipeline improvements  
-- Asset / resource management system  
 - **My own Behavior Tree library implementation**
 - **My own Navigation Mesh library implementation**
 
@@ -278,4 +287,5 @@ HRealEngine uses the following libraries (all included as Git submodules):
 - **[stb_image](https://github.com/nothings/stb)** – Image loading
 - **[yaml-cpp](https://github.com/jbeder/yaml-cpp)** – Serialization
 - **[glm](https://github.com/g-truc/glm)** – Math library for graphics
+- **[asimp](https://github.com/AminAliari/assimp.git)** - for OBJ
 - **[filewatch](https://github.com/ThomasMonkman/filewatch)**
