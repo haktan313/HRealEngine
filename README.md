@@ -11,9 +11,11 @@
 https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
 ## 📸 Screenshots
-| 2D | 3D |
+| 3D | OBJ Mesh |
 |--------|-------------|
-| <img width="2555" height="1386" alt="image" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | <img width="1913" height="1137" alt="image" src="https://github.com/user-attachments/assets/8a9c1386-550d-4038-b17b-8183d732b641" /> |
+| <img width="1913" height="1137" alt="image" src="https://github.com/user-attachments/assets/8a9c1386-550d-4038-b17b-8183d732b641" /> | <img width="1894" height="1141" alt="Screenshot 2026-01-02 161346" src="https://github.com/user-attachments/assets/4f5b43d3-7c31-4e98-a4a6-6c5ec470f71d" /> |
+| 2D | Asset Registry |
+| <img width="2555" height="1386" alt="image" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | <img width="1324" height="937" alt="Screenshot 2026-01-02 161443" src="https://github.com/user-attachments/assets/61ad632f-7c6c-4ee9-8fea-8b7d2a2a99f6" /> |
 
 ### Editor & Workflow
 - ImGui-based scene editor with viewport and gizmos
