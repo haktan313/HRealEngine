@@ -7,6 +7,34 @@
 - If you cloned it without the `--recursive` flag, initialize submodules manually `git submodule update --init`
 
 - If you make changes to the build files or need to regenerate Visual Studio project files, run `scripts/Win-GenProjects.bat` this will call **premake5** and create the required `.sln` files.
+  
+## Table of Contents
+
+- [HRealEngine](#hrealengine)
+  - [BehaviorTreeLibrary Integration](#behaviortreelibrary-integration)
+  - [Screenshots](#-screenshots)
+  - [Editor & Workflow](#editor--workflow)
+  - [Scripting](#scripting)
+  - [Physics](#physics)
+  - [Rendering](#rendering)
+  - [Asset System](#asset-system)
+  - [Project System](#project-system)
+  - [Core](#core)
+  - [Notes / Roadmap](#notes--roadmap)
+  - [Script Example (Overlap Events)](#script-example-overlap-events)
+  - [Third-Party Submodules](#-third-party-submodules)
+
+### BehaviorTreeLibrary Integration
+**BehaviorTreeLibrary** Integration still in proccess and it is visible in behaviorTree branch.
+- As it is not yet complete, there are errors and some integration deficiencies. 
+
+- There is a new window for the behavior tree editor inside the engine, and this window is dockable.
+- There is a component for assigning behavior trees to entities. Behavior trees currently start running when runtime begins. 
+- Behavior Trees can be recognized from the asset manager, where you can drag and drop them from the content browser into the component. 
+
+
+https://github.com/user-attachments/assets/02698e7a-1b2d-4dbf-8792-ef2dad4175cf
+
 
 https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
@@ -70,7 +98,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - **My own Behavior Tree library implementation**
 - **My own Navigation Mesh library implementation**
 
-Script Example (Overlap Events)
+## Script Example (Overlap Events)
 
 ```cpp
         if (!m_CollisionBeginEvents.empty())
