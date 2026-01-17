@@ -10,6 +10,7 @@
 #include "HRealEngine/Renderer/Renderer.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
+#include "vendor/BehaviorTreeLibrary/src/BehaviorTreeThings/Core/PlatformUtilsBT.h"
 
 namespace HRealEngine
 {
@@ -26,6 +27,7 @@ namespace HRealEngine
 		
 		m_Window = Window::Create(WindowSettings(m_ApplicationSpecification.Name));
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		PlatformUtilsBT::SetWindow((GLFWwindow*)m_Window->GetNativeWindow());
 
 		Renderer::Init();
 		//ScriptEngine::Init();

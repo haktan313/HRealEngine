@@ -5,6 +5,13 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
 
+#include "BehaviorTreeThings/Core/NodeRegistry.h"
+#include "BehaviorTreeThings/CustomThings/CustomActions.h"
+#include "BehaviorTreeThings/CustomThings/CustomBlackboards.h"
+#include "BehaviorTreeThings/CustomThings/CustomConditions.h"
+#include "BehaviorTreeThings/CustomThings/CustomDecorators.h"
+#include "BehaviorTreeThings/Editor/EditorRoot.h"
+#include "BehaviorTreeThings/Editor/NodeEditorApp.h"
 #include "HRealEngine/Asset/AssetImporter.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/SceneImporter.h"
@@ -120,11 +127,24 @@ namespace HRealEngine
         m_IconStep = TextureImporter::LoadTexture("Resource/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
+
+        NodeRegistry::AddBlackBoardToEditor<MeleeEnemyBlackboard>("Melee Enemy Blackboard");
+        NodeRegistry::AddBlackBoardToEditor<RangedEnemyBlackboard>("Ranged Enemy Blackboard");
+    
+        NodeRegistry::AddActionNodeToBuilder<MoveToAction, MoveToParameters>("Move To Action");
+        NodeRegistry::AddActionNodeToBuilder<MeleeEnemyAttackAction, MeleeEnemyAttackActionParameters>("Melee Enemy Attack Action");
+        NodeRegistry::AddActionNodeToBuilder<HeavyAttackAction, HeavyAttackActionParameters>("Heavy Attack Action");
+    
+        NodeRegistry::AddConditionNodeToBuilder<IsPlayerInRangeCondition, IsPlayerInRangeParameters>("Is Player In Range Condition");
+        NodeRegistry::AddConditionNodeToBuilder<CanAttackCondition, CanAttackParameters>("Can Attack Condition");
+    
+        NodeRegistry::AddDecoratorNodeToBuilder<ChangeResultOfTheNodeDecorator, ChangeResultOfTheNodeParameters>("Change Result Of The Node Decorator");
+        NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");
     }
 
     void EditorLayer::OnDetach()
     {
-
+        EditorRoot::EditorRootStop();
     }
 
     void EditorLayer::OnUpdate(Timestep timestep)
@@ -340,6 +360,11 @@ namespace HRealEngine
                     ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Window"))
+            {
+                ImGui::MenuItem("Behavior Tree Editor", nullptr, &m_bShowBehaviorTreeEditor);
+                ImGui::EndMenu();
+            }
     
             ImGui::EndMenuBar();
         }
@@ -349,7 +374,19 @@ namespace HRealEngine
         
         ImGui::Begin("Profile Results");
 
-        auto name = m_HoveredEntity ? m_HoveredEntity.GetComponent<TagComponent>().Tag : "None";
+        std::string name = "None";
+        if (m_HoveredEntity)
+        {
+            if (m_ActiveScene->GetRegistry().valid((entt::entity)m_HoveredEntity))
+            {
+                if(m_HoveredEntity.HasComponent<TagComponent>())
+                    name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+            }
+            else
+            {
+                m_HoveredEntity = Entity();
+            }
+        }
         ImGui::Text("Hovered Entity: %s", name.c_str());
         
         auto stats = Renderer2D::GetStats();
@@ -398,6 +435,30 @@ namespace HRealEngine
                 OpenScene(sceneAssetHandle/*path*//*std::filesystem::path(g_AssetsDirectory) / path*/);
             }
             ImGui::EndDragDropTarget();
+        }
+        if (m_bShowBehaviorTreeEditor)
+        {
+            ImGui::Begin("Behavior Tree Editor", &m_bShowBehaviorTreeEditor);
+            
+            if (ImGui::BeginTable("BT_Table", 2, ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable))
+            {
+                ImGui::TableNextColumn();
+        
+                auto* app = EditorRoot::GetNodeEditorApp();
+                if (app)
+                {
+                    app->DrawToolbar();
+                    app->DrawGraph();
+                }
+                ImGui::TableNextColumn();
+        
+                if (app)
+                {
+                    app->DrawBlackboard();
+                }
+                ImGui::EndTable();
+            }
+            ImGui::End();
         }
 
         ImVec2 windowSize = ImGui::GetWindowSize();
@@ -629,6 +690,9 @@ namespace HRealEngine
                 OpenScene(startSceneHandle);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
             Project::SetContentBrowserPanel(m_ContentBrowserPanel.get());
+
+            EditorRoot::EditorRootStart();
+            EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);
         }
     }
 

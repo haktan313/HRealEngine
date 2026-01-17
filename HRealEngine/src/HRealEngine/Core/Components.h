@@ -77,6 +77,14 @@ namespace HRealEngine
         operator const glm::vec4& () const { return Color; }
     };
 
+    struct BehaviorTreeComponent
+    {
+        AssetHandle BehaviorTreeAsset = 0;
+        
+        BehaviorTreeComponent() = default;
+        BehaviorTreeComponent(const BehaviorTreeComponent&) = default;
+    };
+
     struct TagComponent
     {
         std::string Tag;
@@ -201,6 +209,7 @@ namespace HRealEngine
         CameraComponent,
         SpriteRendererComponent,
         MeshRendererComponent,
+        BehaviorTreeComponent,
         CircleRendererComponent,
         NativeScriptComponent,
         ScriptComponent,

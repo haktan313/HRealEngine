@@ -231,6 +231,7 @@ namespace HRealEngine
             ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
             ShowAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
+            ShowAddComponentEntry<BehaviorTreeComponent>("Behavior Tree Component");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
             ShowAddComponentEntry<Rigidbody3DComponent>("Rigidbody 3D");
@@ -947,6 +948,34 @@ namespace HRealEngine
             }
             else
                 ImGui::TextDisabled("Assign a .hmesh to see material slots.");
+        });
+        DrawComponent<BehaviorTreeComponent>("Behavior Tree Component", entity, [](auto& component)
+        {
+            ImGui::Text("Behavior Tree");
+            ImGui::Button("Drop .hbtree here", ImVec2(200, 0));
+                
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::BehaviorTree)
+                    {
+                        component.BehaviorTreeAsset = handle;
+                        LOG_CORE_INFO("Assigned behavior tree asset handle: {}", (uint64_t)handle);
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a behavior tree.");
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            if (component.BehaviorTreeAsset)
+            {
+                ImGui::SameLine();
+                ImGui::Text("Loaded");
+            }
         });
         DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
         {

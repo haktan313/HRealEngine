@@ -213,6 +213,14 @@ namespace HRealEngine
             
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<BehaviorTreeComponent>())
+        {
+            out << YAML::Key << "BehaviorTreeComponent";
+            out << YAML::BeginMap;
+            auto& bt = entity.GetComponent<BehaviorTreeComponent>();
+            out << YAML::Key << "BehaviorTreeHandle" << YAML::Value << bt.BehaviorTreeAsset;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<CircleRendererComponent>())
         {
             auto& circle = entity.GetComponent<CircleRendererComponent>();
@@ -557,6 +565,12 @@ namespace HRealEngine
                             }
                         }
                     }
+                }
+                if (auto btComponent = entity["BehaviorTreeComponent"])
+                {
+                    auto& bt = deserializedEntity.AddComponent<BehaviorTreeComponent>();
+                    if (btComponent["BehaviorTreeHandle"])
+                        bt.BehaviorTreeAsset = btComponent["BehaviorTreeHandle"].as<AssetHandle>();
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {
