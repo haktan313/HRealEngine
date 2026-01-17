@@ -18,10 +18,11 @@ public:
     
     void SetRootNode(std::unique_ptr<HNode> root) { m_RootNode = std::move(root); }
     void SetNodeEditorApp(NodeEditorApp* editorApp) { m_EditorApp = editorApp; }
+    void SetName(const std::string& name) { m_Name = name; }
     HNode* GetRootNode() const { return m_RootNode.get(); }
     HBlackboard* GetBlackboardRaw() const { return m_Blackboard.get(); }
     NodeEditorApp* GetEditorApp() const { return m_EditorApp; }
-    std::string GetName() const { return m_Name; }
+    const std::string& GetName() const { return m_Name; }
 
     template<typename OwnerType>
     void SetOwner(OwnerType* owner)
@@ -55,7 +56,7 @@ OwnerType* HNode::GetOwner() const
 class BehaviorTreeBuilder
 {
 public:
-    BehaviorTreeBuilder() : m_Tree(Root::CreateBehaviorTree("BehaviorTree")) {}
+    BehaviorTreeBuilder() : m_Tree(Root::CreateEditorBehaviorTree("BehaviorTree")) {}
     BehaviorTreeBuilder(BehaviorTree* tree) : m_Tree(tree) {}
 
     template<typename BlackboardType>

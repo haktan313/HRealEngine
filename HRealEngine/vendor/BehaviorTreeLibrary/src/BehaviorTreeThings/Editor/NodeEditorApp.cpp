@@ -647,6 +647,8 @@ void NodeEditorApp::ClearBuildData()
 {
     ClearNodeMappings();
     ClearActiveNodes();
+    if (m_BehaviorTree)
+        m_BehaviorTree->SetNodeEditorApp(nullptr);
     m_BehaviorTree = nullptr;
 }
 
@@ -734,7 +736,7 @@ void NodeEditorApp::DrawToolbar()
     if (ImGui::Button("Build", ImVec2(100, 30)))
         BuildBehaviorTree();
     ImGui::SameLine();
-    if (ImGui::Button("Start", ImVec2(100, 30)))
+    /*if (ImGui::Button("Start", ImVec2(100, 30)))
     {
         if (m_BehaviorTree)
             m_BehaviorTree->StartTree();
@@ -745,7 +747,8 @@ void NodeEditorApp::DrawToolbar()
         if (m_BehaviorTree)
             m_BehaviorTree->StopTree();
         m_NodeEditor->SetActiveNode(nullptr);
-    }
+    }*/
+    DrawDebugBehaviorTree();
     ImGui::Separator();
     if (ImGui::Button("Save", ImVec2(150, 30)))
     {
@@ -805,4 +808,40 @@ void NodeEditorApp::DrawGraph()
 void NodeEditorApp::DrawBlackboard()
 {
     BlackboardPanel();
+}
+
+void NodeEditorApp::DrawDebugBehaviorTree()
+{
+    auto allTrees = Root::GetBehaviorTrees();
+    const char* label = m_BehaviorTree ? m_BehaviorTree->GetName().c_str() : "Select Tree";
+
+    ImGui::SetNextItemWidth(220.0f);
+    if (ImGui::BeginCombo("##DebugTreeCombo", label))
+    {
+        for (auto& tree : allTrees)
+        {
+            if (ImGui::Selectable(tree->GetName().c_str(), m_BehaviorTree == tree))
+                CreateEditorTreeFromRuntimeTree(tree);
+
+            if (m_BehaviorTree == tree)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+}
+
+
+void NodeEditorApp::CreateEditorTreeFromRuntimeTree(BehaviorTree* runtimeTree)
+{
+    if (m_BehaviorTree)
+        m_BehaviorTree->SetNodeEditorApp(nullptr);
+
+    //runtimeTree->SetNodeEditorApp(this);
+    m_BehaviorTree = runtimeTree;
+
+    ClearNodeMappings();
+    ClearActiveNodes();
+
+    m_CopyBlackboard = m_BehaviorTree->GetBlackboardRaw();
+    m_SelectedBlackboardClassName = m_CopyBlackboard->GetName();
 }

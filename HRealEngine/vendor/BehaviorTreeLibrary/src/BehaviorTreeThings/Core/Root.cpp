@@ -2,6 +2,7 @@
 #include "Tree.h"
 
 std::vector<BehaviorTree*> Root::m_BehaviorTrees;
+BehaviorTree* Root::m_EditorBehaviorTree = nullptr;
 
 void Root::RootStart()
 {
@@ -58,6 +59,25 @@ BehaviorTree* Root::CreateBehaviorTree(const std::string& name)
     BehaviorTree* tree = new BehaviorTree(finalName);
     m_BehaviorTrees.push_back(tree);
     return tree;
+}
+
+BehaviorTree* Root::CreateEditorBehaviorTree(const std::string& name)
+{
+    if (m_EditorBehaviorTree)
+        DestroyEditorBehaviorTree();
+    
+    m_EditorBehaviorTree = new BehaviorTree(name);
+    return m_EditorBehaviorTree;
+}
+
+void Root::DestroyEditorBehaviorTree()
+{
+    if (m_EditorBehaviorTree)
+    {
+        m_EditorBehaviorTree->StopTree();
+        delete m_EditorBehaviorTree;
+        m_EditorBehaviorTree = nullptr;
+    }
 }
 
 void Root::DestroyBehaviorTree(BehaviorTree* tree)

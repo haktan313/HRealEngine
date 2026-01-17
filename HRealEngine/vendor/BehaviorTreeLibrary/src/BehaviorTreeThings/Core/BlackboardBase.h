@@ -8,7 +8,7 @@ public:
     HBlackboard(const std::string& name = "DefaultBlackboard") : m_BlackboardName(name) {}
     virtual ~HBlackboard() = default;
 
-    std::string GetName() const { return m_BlackboardName; }
+    const std::string& GetName() const { return m_BlackboardName; }
     
     bool GetBoolValue(const std::string& key) const;
     int GetIntValue(const std::string& key) const;

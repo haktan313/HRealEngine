@@ -16,6 +16,7 @@ public:
     void DrawToolbar();
     void DrawGraph();
     void DrawBlackboard();
+    void DrawDebugBehaviorTree();
     
     void OnStart();
     void Update();
@@ -53,6 +54,7 @@ private:
     void ClearBuildData();
     void BuildPlanForNode(Node* editorNode, std::vector<BuildOp>& ops);
     std::vector<BuildOp> CreateBuildPlan();
+    void CreateEditorTreeFromRuntimeTree(BehaviorTree* runtimeTree);
     
     bool m_bDecoratorSelected = false;
     bool m_bConditionSelected = false;
@@ -62,7 +64,8 @@ private:
     float s_RightPanelWidth = 320.0f;
     
     std::vector<HNode*> m_ActiveNodes;
-    
+
+    std::string m_SelectedDebugTreeName = "Select Tree";
     EditorDecorator* m_LastSelectedDecorator = nullptr;
     EditorCondition* m_LastSelectedCondition = nullptr;
     Node* m_LastHoveredNode = nullptr;

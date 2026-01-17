@@ -193,6 +193,7 @@ namespace HRealEngine
 
     void Scene::StartBTs()
     {
+        Root::RootClear();
         auto view = m_Registry.view<BehaviorTreeComponent>();
         for (auto e : view)
         {
@@ -204,8 +205,9 @@ namespace HRealEngine
                 {
                     auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
                     auto path = Project::GetAssetDirectory() / metaData.FilePath;
-                    YAML::Node data = YAML::LoadFile(path.string());
                     auto name = metaData.FilePath.stem().string();
+                    
+                    YAML::Node data = YAML::LoadFile(path.string());
                     
                     BehaviorTree* bt = Root::CreateBehaviorTree(name);
                     BTSerializer serializer(bt);
@@ -218,6 +220,7 @@ namespace HRealEngine
                     YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);/*m_BehaviorTreeCache[btComponent.BehaviorTreeAsset];*/
                     auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
                     auto name = metaData.FilePath.stem().string();
+                    
                     BehaviorTree* bt = Root::CreateBehaviorTree(name);
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);

@@ -1,17 +1,16 @@
 BehaviorTree:
   Blackboard:
-    ClassName: Melee Enemy Blackboard
+    ClassName: Ranged Enemy Blackboard
     Floats:
-      Stamina: 50
-      DistanceToPlayer: 200
+      DistanceToPlayer: 731
       Health: 100
     Ints:
-      AttackPower: 10
+      AmmoCount: 5
+      DamageAmount: 15
     Bools:
-      IsPlayerAttacking: false
-      IsPlayerInRange: false
-      CanAttack: true
-      IsAttacking: false
+      IsPlayerInSight: false
+      ShouldReload: false
+      CanShoot: true
     Strings:
       CurrentState: Idle
   EditorData:

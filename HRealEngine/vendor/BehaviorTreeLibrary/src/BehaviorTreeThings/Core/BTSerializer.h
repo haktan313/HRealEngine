@@ -17,7 +17,7 @@ public:
     bool Deserialize(const YAML::Node& data);
     bool Deserialize(const YAML::Node& data, NodeEditorApp* editorAppFromEditor);
     bool DeserializeData(const YAML::Node& data);
-    bool DeserializeData(const YAML::Node& data, NodeEditorApp* editorApp);
+    bool DeserializeData(const YAML::Node& data, NodeEditorApp* editorApp, const std::string& treeName = "BehaviorTree");
 private:
     static const char* NodeTypeToString(HNodeType type);
     static const char* PriorityToString(PriorityType p);
