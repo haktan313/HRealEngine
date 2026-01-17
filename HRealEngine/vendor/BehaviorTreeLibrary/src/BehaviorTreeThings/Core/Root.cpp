@@ -33,9 +33,29 @@ void Root::RootStop()
         tree->StopTree();
 }
 
-BehaviorTree* Root::CreateBehaviorTree()
+BehaviorTree* Root::CreateBehaviorTree(const std::string& name)
 {
-    BehaviorTree* tree = new BehaviorTree();
+    std::string finalName = name;
+    int counter = 1;
+    bool exists = true;
+
+    while (exists)
+    {
+        exists = false;
+
+        for (const auto* tree : m_BehaviorTrees)
+        {
+            if (tree->GetName() == finalName)
+            {
+                exists = true;
+                finalName = name + "_" + std::to_string(counter);
+                ++counter;
+                break;
+            }
+        }
+    }
+    
+    BehaviorTree* tree = new BehaviorTree(finalName);
     m_BehaviorTrees.push_back(tree);
     return tree;
 }

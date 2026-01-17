@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <xstring>
 
 class BehaviorTree;
 
@@ -11,7 +12,7 @@ public:
     static void RootClear();
     static void RootStop();
 
-    static BehaviorTree* CreateBehaviorTree();
+    static BehaviorTree* CreateBehaviorTree(const std::string& name);
     static void DestroyBehaviorTree(BehaviorTree* tree);
     static void AddBehaviorTree(BehaviorTree* tree) { m_BehaviorTrees.push_back(tree); }
 

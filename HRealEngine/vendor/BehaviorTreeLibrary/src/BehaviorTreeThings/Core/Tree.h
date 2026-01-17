@@ -9,7 +9,7 @@
 class BehaviorTree
 {
 public:
-    BehaviorTree() : m_Owner(nullptr), m_Blackboard(nullptr), m_EditorApp(nullptr) {}
+    BehaviorTree(const std::string& name) : m_Owner(nullptr), m_Blackboard(nullptr), m_EditorApp(nullptr), m_Name(name) {}
     ~BehaviorTree();
 
     void StartTree();
@@ -21,6 +21,7 @@ public:
     HNode* GetRootNode() const { return m_RootNode.get(); }
     HBlackboard* GetBlackboardRaw() const { return m_Blackboard.get(); }
     NodeEditorApp* GetEditorApp() const { return m_EditorApp; }
+    std::string GetName() const { return m_Name; }
 
     template<typename OwnerType>
     void SetOwner(OwnerType* owner)
@@ -37,6 +38,7 @@ private:
     bool m_bIsRunning = false;
     
     void* m_Owner;
+    std::string m_Name;
     
     std::unique_ptr<HNode> m_RootNode;
     std::unique_ptr<HBlackboard> m_Blackboard;
@@ -53,7 +55,7 @@ OwnerType* HNode::GetOwner() const
 class BehaviorTreeBuilder
 {
 public:
-    BehaviorTreeBuilder() : m_Tree(Root::CreateBehaviorTree()) {}
+    BehaviorTreeBuilder() : m_Tree(Root::CreateBehaviorTree("BehaviorTree")) {}
     BehaviorTreeBuilder(BehaviorTree* tree) : m_Tree(tree) {}
 
     template<typename BlackboardType>

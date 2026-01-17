@@ -205,8 +205,9 @@ namespace HRealEngine
                     auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
                     auto path = Project::GetAssetDirectory() / metaData.FilePath;
                     YAML::Node data = YAML::LoadFile(path.string());
+                    auto name = metaData.FilePath.stem().string();
                     
-                    BehaviorTree* bt = Root::CreateBehaviorTree();
+                    BehaviorTree* bt = Root::CreateBehaviorTree(name);
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
                     m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
@@ -215,7 +216,9 @@ namespace HRealEngine
                 else
                 {
                     YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);/*m_BehaviorTreeCache[btComponent.BehaviorTreeAsset];*/
-                    BehaviorTree* bt = Root::CreateBehaviorTree();
+                    auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
+                    auto name = metaData.FilePath.stem().string();
+                    BehaviorTree* bt = Root::CreateBehaviorTree(name);
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
                     bt->StartTree();

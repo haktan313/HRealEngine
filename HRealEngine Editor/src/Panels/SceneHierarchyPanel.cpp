@@ -952,7 +952,15 @@ namespace HRealEngine
         DrawComponent<BehaviorTreeComponent>("Behavior Tree Component", entity, [](auto& component)
         {
             ImGui::Text("Behavior Tree");
-            ImGui::Button("Drop .hbtree here", ImVec2(200, 0));
+            std::string buttonLabel = "Drop .hbtree here";
+            if (component.BehaviorTreeAsset)
+            {
+                const auto& metadata = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(component.BehaviorTreeAsset);
+                buttonLabel = metadata.FilePath.filename().string();
+            }
+
+            ImGui::Button(buttonLabel.c_str(), ImVec2(200, 0));
+            /*ImGui::Button("Drop .btree here", ImVec2(200, 0));*/
                 
             if (ImGui::BeginDragDropTarget())
             {
