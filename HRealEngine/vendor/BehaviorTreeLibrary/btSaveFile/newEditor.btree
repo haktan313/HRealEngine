@@ -1,0 +1,171 @@
+BehaviorTree:
+  Blackboard:
+    ClassName: Melee Enemy Blackboard
+    Floats:
+      Stamina: 50
+      DistanceToPlayer: 200
+      Health: 100
+    Ints:
+      AttackPower: 10
+    Bools:
+      IsPlayerAttacking: false
+      IsPlayerInRange: false
+      CanAttack: true
+      IsAttacking: false
+    Strings:
+      CurrentState: Idle
+  EditorData:
+    Nodes:
+      - ID: 1
+        Name: Root
+        Type: 1
+        Class: class HRootNode
+        PosX: 0
+        PosY: 0
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 3
+        Name: Sequence
+        Type: 2
+        Class: class SequenceNode
+        PosX: -31
+        PosY: 114
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 6
+        Name: Selector
+        Type: 3
+        Class: class SelectorNode
+        PosX: -199
+        PosY: 243
+        Decorators:
+          - Name: Change Result Of The Node Decorator
+            ClassName: Change Result Of The Node Decorator
+            Params:
+              NewResult: 0
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 9
+        Name: Move To Action
+        Type: 4
+        Class: class MoveToAction
+        PosX: 4
+        PosY: 250
+        Decorators:
+          []
+        Conditions:
+          - Name: Is Player In Range Condition
+            ClassName: Is Player In Range Condition
+            Params:
+              Priority: Self
+              Range: 1000
+              DistanceToPlayerKey: DistanceToPlayer
+        Params:
+          bToPlayer: false
+          StopDistance: 103
+          MoveSpeed: 5
+      - ID: 11
+        Name: Sequence
+        Type: 2
+        Class: class SequenceNode
+        PosX: 196
+        PosY: 250
+        Decorators:
+          - Name: Cooldown Decorator
+            ClassName: Cooldown Decorator
+            Params:
+              CooldownTime: 15
+        Conditions:
+          - Name: Can Attack Condition
+            ClassName: Can Attack Condition
+            Params:
+              Priority: Self
+              StaminaKey: Health
+              RequiredStamina: 20
+        Params:
+          {}
+    Links:
+      - ID: 14
+        StartNodeID: 1
+        EndNodeID: 3
+      - ID: 15
+        StartNodeID: 3
+        EndNodeID: 6
+      - ID: 16
+        StartNodeID: 3
+        EndNodeID: 9
+      - ID: 17
+        StartNodeID: 3
+        EndNodeID: 11
+  RuntimeData:
+    Name: Root
+    Type: Root
+    Class: class HRootNode
+    Children:
+      - Name: Sequence
+        Type: Composite
+        Class: class SequenceNode
+        Children:
+          - Name: Change Result Of The Node Decorator
+            Type: Decorator
+            Class: class ChangeResultOfTheNodeDecorator
+            Child:
+              Name: Selector
+              Type: Composite
+              Class: class SelectorNode
+              Children:
+                []
+              Params:
+                {}
+            Params:
+              NewResult: 0
+          - Name: Move To Action
+            Type: Action
+            Class: class MoveToAction
+            Conditions:
+              - Name: Is Player In Range Condition
+                Type: Condition
+                Class: class IsPlayerInRangeCondition
+                Priority: Self
+                Params:
+                  Range: 1000
+                  DistanceToPlayerKey: DistanceToPlayer
+            Params:
+              bToPlayer: false
+              StopDistance: 103
+              MoveSpeed: 5
+          - Name: Cooldown Decorator
+            Type: Decorator
+            Class: class CooldownDecorator
+            Child:
+              Name: Sequence
+              Type: Composite
+              Class: class SequenceNode
+              Conditions:
+                - Name: Can Attack Condition
+                  Type: Condition
+                  Class: class CanAttackCondition
+                  Priority: Self
+                  Params:
+                    StaminaKey: Health
+                    RequiredStamina: 20
+              Children:
+                []
+              Params:
+                {}
+            Params:
+              CooldownTime: 15
+        Params:
+          {}
+    Params:
+      {}
