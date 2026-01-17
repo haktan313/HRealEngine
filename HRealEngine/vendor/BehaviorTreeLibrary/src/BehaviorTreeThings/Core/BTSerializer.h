@@ -5,12 +5,19 @@
 class BTSerializer
 {
 public:
+    BTSerializer();
     BTSerializer(BehaviorTree*& tree);
     ~BTSerializer() = default;
 
+    void CreateBehaviorTreeFile(const std::string& filepath);
     void Serialize(const std::string& filepath);
+    
     bool Deserialize(const std::string& filepath);
     bool Deserialize(const std::string& filepath, NodeEditorApp* editorAppFromEditor);
+    bool Deserialize(const YAML::Node& data);
+    bool Deserialize(const YAML::Node& data, NodeEditorApp* editorAppFromEditor);
+    bool DeserializeData(const YAML::Node& data);
+    bool DeserializeData(const YAML::Node& data, NodeEditorApp* editorApp);
 private:
     static const char* NodeTypeToString(HNodeType type);
     static const char* PriorityToString(PriorityType p);
@@ -27,5 +34,5 @@ private:
     static void SerializeConditions(YAML::Emitter& out, const HNode* node);
     static void DeserializeCondition(const YAML::Node& condData, BehaviorTreeBuilder& builder);
 
-    BehaviorTree*& m_Tree;
+    BehaviorTree* m_Tree = nullptr;
 };

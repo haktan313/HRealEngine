@@ -16,8 +16,11 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 /*#include "box2d/b2_contact.h"*/
+#include "BehaviorTreeThings/Core/BTSerializer.h"
+#include "BehaviorTreeThings/Core/Tree.h"
 #include "HRealEngine/Physics/Box2DWorld.h"
 #include "HRealEngine/Physics/JoltWorld.h"
+#include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
@@ -164,6 +167,7 @@ namespace HRealEngine
              ScriptEngine::OnCreateEntity(entity);
            }
        }
+        StartBTs();
     }
 
     void Scene::OnRuntimeStop()
@@ -172,16 +176,58 @@ namespace HRealEngine
         
         OnPhysicsStop();
         ScriptEngine::OnRuntimeStop();
+        StopBTs();
     }
 
     void Scene::OnSimulationStart()
     {
         OnPhysicsStart();
+        StartBTs();
     }
 
     void Scene::OnSimulationStop()
     {
         OnPhysicsStop();
+        StopBTs();
+    }
+
+    void Scene::StartBTs()
+    {
+        auto view = m_Registry.view<BehaviorTreeComponent>();
+        for (auto e : view)
+        {
+            Entity entity = {e, this};
+            auto& btComponent = entity.GetComponent<BehaviorTreeComponent>();
+            if (btComponent.BehaviorTreeAsset)
+            {
+                if (m_BehaviorTreeCache.find(btComponent.BehaviorTreeAsset) == m_BehaviorTreeCache.end())
+                {
+                    auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
+                    auto path = Project::GetAssetDirectory() / metaData.FilePath;
+                    YAML::Node data = YAML::LoadFile(path.string());
+                    
+                    BehaviorTree* bt = Root::CreateBehaviorTree();
+                    BTSerializer serializer(bt);
+                    serializer.Deserialize(data);
+                    m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
+                    bt->StartTree();
+                }
+                else
+                {
+                    YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);/*m_BehaviorTreeCache[btComponent.BehaviorTreeAsset];*/
+                    BehaviorTree* bt = Root::CreateBehaviorTree();
+                    BTSerializer serializer(bt);
+                    serializer.Deserialize(data);
+                    bt->StartTree();
+                }
+            }
+        }
+    }
+
+    void Scene::StopBTs()
+    {
+        Root::RootClear();
+        m_BehaviorTreeCache.clear();
     }
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)
@@ -191,6 +237,7 @@ namespace HRealEngine
         else 
             m_JoltWorld->UpdateSimulation3D(deltaTime, m_StepFrames);
         RenderScene(camera);
+        Root::RootTick();
     }
 
 
@@ -284,6 +331,8 @@ namespace HRealEngine
             }
         }
         Renderer2D::EndScene();
+
+        Root::RootTick();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)

@@ -6,9 +6,7 @@
 #include "Nodes.h"
 #include "Root.h"
 
-#include "HRealEngine/Asset/Asset.h"
-
-class BehaviorTree : public HRealEngine::Asset
+class BehaviorTree
 {
 public:
     BehaviorTree() : m_Owner(nullptr), m_Blackboard(nullptr), m_EditorApp(nullptr) {}
@@ -23,9 +21,6 @@ public:
     HNode* GetRootNode() const { return m_RootNode.get(); }
     HBlackboard* GetBlackboardRaw() const { return m_Blackboard.get(); }
     NodeEditorApp* GetEditorApp() const { return m_EditorApp; }
-
-    static HRealEngine::AssetType GetStaticAssetType() { return HRealEngine::AssetType::Texture; }
-    virtual HRealEngine::AssetType GetType() const override { return GetStaticAssetType(); }
 
     template<typename OwnerType>
     void SetOwner(OwnerType* owner)

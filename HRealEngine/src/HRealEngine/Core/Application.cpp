@@ -5,12 +5,12 @@
 
 #include <filesystem>
 
+#include "BehaviorTreeThings/Core/PlatformUtilsBT.h"
 #include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
-#include "vendor/BehaviorTreeLibrary/src/BehaviorTreeThings/Core/PlatformUtilsBT.h"
 
 namespace HRealEngine
 {

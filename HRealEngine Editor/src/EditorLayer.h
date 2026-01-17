@@ -43,6 +43,9 @@ namespace HRealEngine
         void SaveSceneAs();
         void SaveScene();
 
+        void CreateBehaviorTree();
+        void LoadBehaviorTreeAsAnAsset();
+
         void SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path);
 
         void OnScenePlay();

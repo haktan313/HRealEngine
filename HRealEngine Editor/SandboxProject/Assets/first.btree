@@ -1,0 +1,83 @@
+BehaviorTree:
+  Blackboard:
+    ClassName: Melee Enemy Blackboard
+    Floats:
+      Stamina: 50
+      DistanceToPlayer: 200
+      Health: 100
+    Ints:
+      AttackPower: 10
+    Bools:
+      IsPlayerAttacking: false
+      IsPlayerInRange: false
+      CanAttack: true
+      IsAttacking: false
+    Strings:
+      CurrentState: Idle
+  EditorData:
+    Nodes:
+      - ID: 1
+        Name: Root
+        Type: 1
+        Class: class HRootNode
+        PosX: 0
+        PosY: 0
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 3
+        Name: Sequence
+        Type: 2
+        Class: class SequenceNode
+        PosX: -76
+        PosY: 129
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 6
+        Name: Move To Action
+        Type: 4
+        Class: class MoveToAction
+        PosX: -156
+        PosY: 234
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          bToPlayer: true
+          StopDistance: 10
+          MoveSpeed: 5
+    Links:
+      - ID: 8
+        StartNodeID: 1
+        EndNodeID: 3
+      - ID: 9
+        StartNodeID: 3
+        EndNodeID: 6
+  RuntimeData:
+    Name: Root
+    Type: Root
+    Class: class HRootNode
+    Children:
+      - Name: Sequence
+        Type: Composite
+        Class: class SequenceNode
+        Children:
+          - Name: Move To Action
+            Type: Action
+            Class: class MoveToAction
+            Params:
+              bToPlayer: true
+              StopDistance: 10
+              MoveSpeed: 5
+        Params:
+          {}
+    Params:
+      {}

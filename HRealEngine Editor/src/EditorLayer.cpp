@@ -5,6 +5,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
 
+#include "PlatformUtilsBT.h"
 #include "BehaviorTreeThings/Core/NodeRegistry.h"
 #include "BehaviorTreeThings/CustomThings/CustomActions.h"
 #include "BehaviorTreeThings/CustomThings/CustomBlackboards.h"
@@ -363,6 +364,14 @@ namespace HRealEngine
             if (ImGui::BeginMenu("Window"))
             {
                 ImGui::MenuItem("Behavior Tree Editor", nullptr, &m_bShowBehaviorTreeEditor);
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("AI System"))
+            {
+                if (ImGui::MenuItem("Create Behavior Tree"))
+                    CreateBehaviorTree();
+                if (ImGui::MenuItem("Load Behavior Tree As An Asset"))
+                    LoadBehaviorTreeAsAnAsset();
                 ImGui::EndMenu();
             }
     
@@ -770,6 +779,22 @@ namespace HRealEngine
             SerializeScene(m_ActiveScene, m_EditorScenePath);
         else
             SaveSceneAs();
+    }
+
+    void EditorLayer::CreateBehaviorTree()
+    {
+        auto path = PlatformUtilsBT::SaveFile("Behavior Tree Files\0*.btree\0");
+        Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+        if (!path.empty())
+            m_ContentBrowserPanel->RefreshAssetTree();
+    }
+
+    void EditorLayer::LoadBehaviorTreeAsAnAsset()
+    {
+        auto path = PlatformUtilsBT::OpenFile("Behavior Tree Files\0*.btree\0");
+        Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+        if (!path.empty())
+            m_ContentBrowserPanel->RefreshAssetTree();
     }
 
     void EditorLayer::SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path)

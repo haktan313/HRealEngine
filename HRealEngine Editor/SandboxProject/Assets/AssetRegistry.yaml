@@ -5,21 +5,21 @@ AssetRegistry:
   - Handle: 12326138095061292247
     FilePath: Textures/Checkerboard.png
     Type: AssetType::Texture
-  - Handle: 12681919880694640885
-    FilePath: Textures/joseMourinho.png
-    Type: AssetType::Texture
-  - Handle: 18121358212383785029
-    FilePath: Scenes/layertest.hrs
-    Type: AssetType::Scene
   - Handle: 2448669013783252797
     FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
     Type: AssetType::Mesh
-  - Handle: 4168462951297401035
-    FilePath: Scenes/3d level.hrs
+  - Handle: 18121358212383785029
+    FilePath: Scenes/layertest.hrs
     Type: AssetType::Scene
+  - Handle: 12681919880694640885
+    FilePath: Textures/joseMourinho.png
+    Type: AssetType::Texture
   - Handle: 1743220826890975547
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
     Type: AssetType::Texture
+  - Handle: 4168462951297401035
+    FilePath: Scenes/3d level.hrs
+    Type: AssetType::Scene
   - Handle: 8599235794369918790
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
     Type: AssetType::Material
@@ -35,3 +35,9 @@ AssetRegistry:
   - Handle: 1049105328473997768
     FilePath: flash.hmesh
     Type: AssetType::Mesh
+  - Handle: 17651351233163207450
+    FilePath: first.btree
+    Type: AssetType::BehaviorTree
+  - Handle: 3651139330124374326
+    FilePath: second.btree
+    Type: AssetType::BehaviorTree
