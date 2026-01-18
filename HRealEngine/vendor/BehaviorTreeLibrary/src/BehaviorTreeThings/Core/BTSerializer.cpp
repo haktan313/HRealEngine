@@ -303,6 +303,213 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
     return true;
 }
 
+bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditorApp* editorApp)
+{
+    if (!editorApp)
+        return false;
+
+    auto btNode = data["BehaviorTree"];
+    if (!btNode)
+        return false;
+    
+    editorApp->ClearNodeMappings();
+    editorApp->ClearActiveNodes();
+    editorApp->GetNodeEditorHelper().ClearDatas();
+
+    std::unordered_map<uintptr_t, uint64_t> editorIdToRuntimeUID;
+    std::unordered_map<int, nodeEditor::NodeId> idMap;
+    int maxID = 0;
+    
+    if (btNode["EditorData"] && btNode["EditorData"]["Nodes"])
+    {
+        for (auto node : btNode["EditorData"]["Nodes"])
+        {
+            int oldID = node["ID"].as<int>();
+            maxID = std::max(maxID, oldID);
+
+            std::string name = node["Name"].as<std::string>();
+            NodeType type = static_cast<NodeType>(node["Type"].as<int>());
+            ImVec2 pos(node["PosX"].as<float>(), node["PosY"].as<float>());
+
+            Node* newNode = nullptr;
+            auto& helper = editorApp->GetNodeEditorHelper();
+
+            switch (type)
+            {
+                case NodeType::Root:
+                    newNode = helper.SpawnRootNode();
+                break;
+                case NodeType::Sequence:
+                    newNode = helper.SpawnSequenceNode(pos);
+                    break;
+                case NodeType::Selector:
+                    newNode = helper.SpawnSelectorNode(pos);
+                    break;
+                case NodeType::Action:
+                    newNode = helper.SpawnActionNode(pos);
+                    break;
+                default:
+                    break;
+            }
+        
+            if (!newNode)
+                continue;
+            
+            uint64_t runtimeUID = 0;
+            if (node["RuntimeUID"])
+                runtimeUID = node["RuntimeUID"].as<uint64_t>();
+
+            editorIdToRuntimeUID[(uintptr_t)newNode->ID.Get()] = runtimeUID;
+            
+            newNode->Name = name;
+            nodeEditor::SetNodePosition(newNode->ID, pos);
+            idMap[oldID] = newNode->ID;
+
+            int nodeKey = (int)newNode->ID.Get();
+            
+            if (node["Decorators"])
+                for (auto d : node["Decorators"])
+                {
+                    std::string className = d["ClassName"].as<std::string>();
+                    auto& decoMap = NodeRegistry::GetDecoratorClassInfoMap();
+                    if (!decoMap.count(className))
+                        continue;
+
+                    editorApp->m_NodeToDecoratorClassId[nodeKey] = className;
+                    editorApp->m_NodeToDecoratorParams[nodeKey] = decoMap[className].CreateParamsFn();
+                    editorApp->m_NodeToDecoratorParams[nodeKey]->Deserialize(d["Params"]);
+
+                    EditorDecorator editorDeco(d["Name"].as<std::string>());
+                    editorDeco.ClassName = className;
+                    editorDeco.Params = editorApp->m_NodeToDecoratorParams[nodeKey].get();
+                    newNode->Decorators.push_back(editorDeco);
+                }
+            if (node["Conditions"])
+                for (auto c : node["Conditions"])
+                {
+                    std::string className = c["ClassName"].as<std::string>();
+                    auto& condMap = NodeRegistry::GetConditionClassInfoMap();
+                    if (!condMap.count(className))
+                        continue;
+
+                    editorApp->m_NodeToConditionClassId[nodeKey] = className;
+                    editorApp->m_NodeToConditionParams[nodeKey] = condMap[className].CreateParamsFn();
+                    editorApp->m_NodeToConditionParams[nodeKey]->Deserialize(c["Params"]);
+
+                    if (c["Params"] && c["Params"]["Priority"])
+                    {
+                        std::string priorityStr = c["Params"]["Priority"].as<std::string>();
+                        PriorityType priortyType = PriorityType::None;
+                        if (priorityStr == "Self")
+                            priortyType = PriorityType::Self;
+                        else if (priorityStr == "LowerPriority")
+                            priortyType = PriorityType::LowerPriority;
+                        else if (priorityStr == "Both")
+                            priortyType = PriorityType::Both;
+                        editorApp->m_NodeToConditionParams[nodeKey]->Priority = priortyType;
+                    }
+
+                    EditorCondition econd(c["Name"].as<std::string>());
+                    econd.ClassName = className;
+                    econd.Params = editorApp->m_NodeToConditionParams[nodeKey].get();
+                    newNode->Conditions.push_back(econd);
+                }
+            if (type == NodeType::Action && node["Params"])
+            {
+                std::string actionClassName = node["Name"].as<std::string>();
+                auto& actionMap = NodeRegistry::GetActionClassInfoMap();
+                if (actionMap.count(actionClassName))
+                {
+                    editorApp->m_NodeToActionClassId[nodeKey] = actionClassName;
+                    editorApp->m_NodeToParams[nodeKey] = actionMap[actionClassName].CreateParamsFn();
+                    editorApp->m_NodeToParams[nodeKey]->Deserialize(node["Params"]);
+                }
+            }
+        }
+    }
+    else
+        editorApp->GetNodeEditorHelper().SpawnRootNode();
+    
+    editorApp->GetNodeEditorHelper().BuildNodes();
+    
+    if (btNode["EditorData"] && btNode["EditorData"]["Links"])
+    {
+        auto& helper = editorApp->GetNodeEditorHelper();
+        for (auto links : btNode["EditorData"]["Links"])
+        {
+            int startOld = links["StartNodeID"].as<int>();
+            int endOld = links["EndNodeID"].as<int>();
+
+            auto itA = idMap.find(startOld);
+            auto itB = idMap.find(endOld);
+            if (itA == idMap.end() || itB == idMap.end())
+                continue;
+
+            Node* startNode = helper.FindNode(itA->second);
+            Node* endNode = helper.FindNode(itB->second);
+            if (!startNode || !endNode)
+                continue;
+
+            if (!startNode->Outputs.empty() && !endNode->Inputs.empty())
+            {
+                nodeEditor::PinId sp = startNode->Outputs[0].ID;
+                nodeEditor::PinId ep = endNode->Inputs[0].ID;
+                helper.GetLinks().emplace_back(Link(helper.GetNextLinkId(), sp, ep));
+            }
+        }
+    }
+    
+    BehaviorTree* runtimeTree = editorApp->m_BehaviorTree;
+    if (runtimeTree && runtimeTree->GetRootNode())
+    {
+        std::unordered_map<uint64_t, const HNode*> uidToRuntime;
+        CollectRuntimeNodesByUID(runtimeTree->GetRootNode(), uidToRuntime);
+        
+        auto& helper = editorApp->GetNodeEditorHelper();
+
+        for (auto node : btNode["EditorData"]["Nodes"])
+        {
+            int oldID = node["ID"].as<int>();
+
+            auto it = idMap.find(oldID);
+            if (it == idMap.end())
+                continue;
+
+            Node* edNode = helper.FindNode(it->second);
+            if (!edNode)
+                continue;
+
+            uint64_t uid = 0;
+            if (node["RuntimeUID"])
+                uid = node["RuntimeUID"].as<uint64_t>();
+
+            if (uid == 0)
+                continue;
+
+            auto rtIt = uidToRuntime.find(uid);
+            if (rtIt == uidToRuntime.end())
+                continue;
+
+            editorApp->RegisterNodeMapping(rtIt->second, edNode->ID);
+        }
+    }
+    return true;
+}
+
+void BTSerializer::CollectRuntimeNodesByUID(const HNode* node, std::unordered_map<uint64_t, const HNode*>& out)
+{
+    if (!node)
+        return;
+    out[node->GetID()] = node;
+    
+    for (auto* c : node->GetChildrensRaw())
+        CollectRuntimeNodesByUID(c, out);
+
+    for (auto* cond : node->GetConditionNodesRaw())
+        CollectRuntimeNodesByUID(cond, out);
+}
+
+
 const char* BTSerializer::NodeTypeToString(HNodeType type)
 {
     switch (type)
@@ -503,7 +710,12 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
         out << YAML::Key << "Type" << YAML::Value << static_cast<int>(node.Type);
         auto runtimeNode = editorApp->GetRuntimeNodeFor(node.ID);
         if (runtimeNode)
+        {
+            out << YAML::Key << "RuntimeUID" << YAML::Value << runtimeNode->GetID();
             out << YAML::Key << "Class" << YAML::Value << typeid(*runtimeNode).name();
+        }
+        else
+            out << YAML::Key << "RuntimeUID" << YAML::Value << (uint64_t)0;
         
         ImVec2 pos = nodeEditor::GetNodePosition(node.ID);
         out << YAML::Key << "PosX" << YAML::Value << pos.x;

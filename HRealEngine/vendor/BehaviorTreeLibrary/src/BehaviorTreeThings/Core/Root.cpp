@@ -1,6 +1,7 @@
 #include "Root.h"
 #include "Tree.h"
 
+std::unordered_map<BehaviorTree*, std::string> Root::m_BehaviorTreeMap;
 std::vector<BehaviorTree*> Root::m_BehaviorTrees;
 BehaviorTree* Root::m_EditorBehaviorTree = nullptr;
 
@@ -61,6 +62,13 @@ BehaviorTree* Root::CreateBehaviorTree(const std::string& name)
     return tree;
 }
 
+BehaviorTree* Root::CreateBehaviorTree(const std::string& name, const std::string& path)
+{
+    auto tree = CreateBehaviorTree(name);
+    m_BehaviorTreeMap[tree] = path;
+    return tree;
+}
+
 BehaviorTree* Root::CreateEditorBehaviorTree(const std::string& name)
 {
     if (m_EditorBehaviorTree)
@@ -78,6 +86,13 @@ void Root::DestroyEditorBehaviorTree()
         delete m_EditorBehaviorTree;
         m_EditorBehaviorTree = nullptr;
     }
+}
+
+std::string Root::GetBehaviorTreePath(BehaviorTree* tree)
+{
+    if (m_BehaviorTreeMap.find(tree) != m_BehaviorTreeMap.end())
+        return m_BehaviorTreeMap[tree];
+    return "";
 }
 
 void Root::DestroyBehaviorTree(BehaviorTree* tree)

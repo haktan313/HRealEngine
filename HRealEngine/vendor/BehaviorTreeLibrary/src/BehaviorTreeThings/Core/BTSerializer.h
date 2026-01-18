@@ -18,7 +18,10 @@ public:
     bool Deserialize(const YAML::Node& data, NodeEditorApp* editorAppFromEditor);
     bool DeserializeData(const YAML::Node& data);
     bool DeserializeData(const YAML::Node& data, NodeEditorApp* editorApp, const std::string& treeName = "BehaviorTree");
+
+    static bool DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditorApp* editorApp);
 private:
+    static void CollectRuntimeNodesByUID(const HNode* node, std::unordered_map<uint64_t, const HNode*>& out);
     static const char* NodeTypeToString(HNodeType type);
     static const char* PriorityToString(PriorityType p);
 

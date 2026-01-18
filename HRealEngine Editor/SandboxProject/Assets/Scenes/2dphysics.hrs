@@ -35,7 +35,7 @@ Entities:
       TilingFactor: 1
       OrderInLayer: 0
     BehaviorTreeComponent:
-      BehaviorTreeHandle: 17651351233163207450
+      BehaviorTreeHandle: 7627836704904900809
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -59,7 +59,7 @@ Entities:
       TilingFactor: 1
       OrderInLayer: 0
     BehaviorTreeComponent:
-      BehaviorTreeHandle: 17651351233163207450
+      BehaviorTreeHandle: 4764350240469491840
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false
@@ -83,7 +83,7 @@ Entities:
       TilingFactor: 1
       OrderInLayer: 0
     BehaviorTreeComponent:
-      BehaviorTreeHandle: 3651139330124374326
+      BehaviorTreeHandle: 7627836704904900809
     Rigidbody2DComponent:
       BodyType: Dynamic
       FixedRotation: false

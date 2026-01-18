@@ -2,7 +2,7 @@ BehaviorTree:
   Blackboard:
     ClassName: Ranged Enemy Blackboard
     Floats:
-      DistanceToPlayer: 731
+      DistanceToPlayer: 1500
       Health: 100
     Ints:
       AmmoCount: 5
@@ -18,6 +18,7 @@ BehaviorTree:
       - ID: 1
         Name: Root
         Type: 1
+        RuntimeUID: 1
         Class: class HRootNode
         PosX: 0
         PosY: 0
@@ -30,9 +31,10 @@ BehaviorTree:
       - ID: 3
         Name: Sequence
         Type: 2
+        RuntimeUID: 2
         Class: class SequenceNode
-        PosX: -76
-        PosY: 129
+        PosX: -60
+        PosY: 92
         Decorators:
           []
         Conditions:
@@ -40,11 +42,12 @@ BehaviorTree:
         Params:
           {}
       - ID: 6
-        Name: Move To Action
+        Name: Heavy Attack Action
         Type: 4
+        RuntimeUID: 3
         Class: class MoveToAction
-        PosX: -156
-        PosY: 234
+        PosX: -124
+        PosY: 282
         Decorators:
           []
         Conditions:

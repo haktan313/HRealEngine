@@ -82,7 +82,7 @@ public:
     BehaviorTreeBuilder& action(Args&&... args)
     {
         static_assert(std::is_base_of_v<HActionNode, ActionNodeType>, "ActionNodeType must derive from HAction");
-        auto action = std::make_unique<ActionNodeType>(std::forward<Args>(args)...);
+        auto action = MakeNode<ActionNodeType>(std::forward<Args>(args)...);
         
         m_LastCreatedNode = action.get();
         if (m_CurrentDecorator)
@@ -110,7 +110,7 @@ public:
     BehaviorTreeBuilder& condition(PriorityType priority, Args&&... args)
     {
         static_assert(std::is_base_of_v<HCondition, ConditionNodeType>, "ConditionNodeType must derive from HCondition");
-        auto condition = std::make_unique<ConditionNodeType>(std::forward<Args>(args)...);
+        auto condition = MakeNode<ConditionNodeType>(std::forward<Args>(args)...);
         
         if (m_LastCreatedNode)
         {
@@ -125,7 +125,7 @@ public:
     BehaviorTreeBuilder& decorator(Args&&... args)
     {
         static_assert(std::is_base_of_v<HDecorator, DecoratorNodeType>, "DecoratorNodeType must derive from HDecorator");
-        m_CurrentDecorator = std::make_unique<DecoratorNodeType>(std::forward<Args>(args)...);
+        m_CurrentDecorator = MakeNode<DecoratorNodeType>(std::forward<Args>(args)...);
         m_CurrentDecorator->SetTree(m_Tree);
         m_CurrentDecorator->SetType(HNodeType::Decorator);
         return *this;
@@ -139,4 +139,14 @@ private:
     HNode* m_LastCreatedNode = nullptr;
     std::unique_ptr<HDecorator> m_CurrentDecorator;
     std::vector<HNode*> m_NodeStack;
+    
+    uint64_t m_NextUID = 1;
+    template<typename TNode, typename... Args>
+    std::unique_ptr<TNode> MakeNode(Args&&... args)
+    {
+        auto node = std::make_unique<TNode>(std::forward<Args>(args)...);
+        node->SetID(m_NextUID++);
+        return node;
+    }
+
 };

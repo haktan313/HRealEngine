@@ -39,7 +39,7 @@ void BehaviorTree::StopTree()
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::root()
 {
-    auto rootNode = std::make_unique<HRootNode>();
+    auto rootNode = MakeNode<HRootNode>();
     rootNode->SetTree(m_Tree);
     
     HRootNode* rootNodePtr = rootNode.get();
@@ -54,7 +54,7 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::root()
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::sequence(const std::string& name)
 {
-    auto sequenceNode = std::make_unique<SequenceNode>(name);
+    auto sequenceNode = MakeNode<SequenceNode>(name);
     
     SequenceNode* sequenceNodePtr = sequenceNode.get();
     sequenceNodePtr->SetType(HNodeType::Composite);
@@ -78,7 +78,7 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::sequence(const std::string& name)
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::selector(const std::string& name)
 {
-    auto selectorNode = std::make_unique<SelectorNode>(name);
+    auto selectorNode = MakeNode<SelectorNode>(name);
     auto selectorNodePtr = selectorNode.get();
     
     selectorNodePtr->SetType(HNodeType::Composite);

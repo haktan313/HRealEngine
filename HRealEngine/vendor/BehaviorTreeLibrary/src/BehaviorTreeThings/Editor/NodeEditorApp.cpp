@@ -7,6 +7,8 @@
 #include "NodeRegistry.h"
 #include "PlatformUtilsBT.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include <filesystem>
+
 #include "imgui.h"
 
 NodeEditorApp::NodeEditorApp()
@@ -16,6 +18,17 @@ NodeEditorApp::NodeEditorApp()
 
 NodeEditorApp::~NodeEditorApp()
 {
+    m_CopyBlackboard = nullptr;
+    m_LastSelectedDecorator = nullptr;
+    m_LastSelectedCondition = nullptr;
+    m_LastHoveredNode = nullptr;
+    m_LastSelectedNode = nullptr;
+    m_SelectedBlackboardClassName.clear();
+
+    ClearBuildData();
+    if (m_NodeEditor)
+        m_NodeEditor->ClearDatas();
+    
     ClearNodeMappings();
 }
 
@@ -833,15 +846,27 @@ void NodeEditorApp::DrawDebugBehaviorTree()
 
 void NodeEditorApp::CreateEditorTreeFromRuntimeTree(BehaviorTree* runtimeTree)
 {
+    if (!runtimeTree)
+        return;
+    
     if (m_BehaviorTree)
         m_BehaviorTree->SetNodeEditorApp(nullptr);
 
-    //runtimeTree->SetNodeEditorApp(this);
     m_BehaviorTree = runtimeTree;
+    m_BehaviorTree->SetNodeEditorApp(this);
 
     ClearNodeMappings();
     ClearActiveNodes();
 
     m_CopyBlackboard = m_BehaviorTree->GetBlackboardRaw();
-    m_SelectedBlackboardClassName = m_CopyBlackboard->GetName();
+    if (m_CopyBlackboard)
+        m_SelectedBlackboardClassName = m_CopyBlackboard->GetName();
+
+    const std::string path = Root::GetBehaviorTreePath(m_BehaviorTree);
+    if (path.empty() || !std::filesystem::exists(path))
+        return;
+
+    YAML::Node data = YAML::LoadFile(path);
+    
+    BTSerializer::DeserializeEditorGraphOnly(data, this);
 }

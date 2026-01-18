@@ -3,7 +3,7 @@ BehaviorTree:
     ClassName: Melee Enemy Blackboard
     Floats:
       Stamina: 50
-      DistanceToPlayer: 200
+      DistanceToPlayer: 1200
       Health: 100
     Ints:
       AttackPower: 10
@@ -19,6 +19,7 @@ BehaviorTree:
       - ID: 1
         Name: Root
         Type: 1
+        RuntimeUID: 1
         Class: class HRootNode
         PosX: 0
         PosY: 0
@@ -31,36 +32,53 @@ BehaviorTree:
       - ID: 3
         Name: Sequence
         Type: 2
+        RuntimeUID: 2
         Class: class SequenceNode
-        PosX: -76
-        PosY: 129
+        PosX: -60
+        PosY: 92
         Decorators:
           []
         Conditions:
           []
         Params:
           {}
-      - ID: 6
+      - ID: 10
         Name: Melee Enemy Attack Action
         Type: 4
-        Class: class MoveToAction
-        PosX: -156
-        PosY: 234
+        RuntimeUID: 3
+        Class: class MeleeEnemyAttackAction
+        PosX: 180
+        PosY: 250
         Decorators:
           []
         Conditions:
           []
         Params:
-          bToPlayer: true
-          StopDistance: 10
-          MoveSpeed: 5
+          AttackPowerKey: AttackPower
+          AttackDuration: 10
+      - ID: 13
+        Name: Selector
+        Type: 3
+        RuntimeUID: 4
+        Class: class SelectorNode
+        PosX: 437
+        PosY: 255
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
     Links:
       - ID: 8
         StartNodeID: 1
         EndNodeID: 3
-      - ID: 9
+      - ID: 12
         StartNodeID: 3
-        EndNodeID: 6
+        EndNodeID: 10
+      - ID: 16
+        StartNodeID: 3
+        EndNodeID: 13
   RuntimeData:
     Name: Root
     Type: Root
@@ -70,13 +88,19 @@ BehaviorTree:
         Type: Composite
         Class: class SequenceNode
         Children:
-          - Name: Move To Action
+          - Name: Melee Enemy Attack Action
             Type: Action
-            Class: class MoveToAction
+            Class: class MeleeEnemyAttackAction
             Params:
-              bToPlayer: true
-              StopDistance: 10
-              MoveSpeed: 5
+              AttackPowerKey: AttackPower
+              AttackDuration: 10
+          - Name: Selector
+            Type: Composite
+            Class: class SelectorNode
+            Children:
+              []
+            Params:
+              {}
         Params:
           {}
     Params:

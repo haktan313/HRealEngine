@@ -40,6 +40,7 @@ public:
     NodeStatus GetStatus() const { return m_Status; }
     HNodeType GetType() const { return m_Type; }
     const Params& GetParams() const { return *m_Params; }
+    uint64_t GetID() const { return m_ID; }
     
     const std::string& GetName() const { return m_Name; }
     const std::vector<std::unique_ptr<HNode>>& GetChildrensUnique() const { return m_Childrens; }
@@ -83,6 +84,10 @@ protected:
     std::vector<std::unique_ptr<HCondition>> m_ConditionNodes;
 
     friend class BTSerializer;
+    friend class BehaviorTreeBuilder;
+private:
+    uint64_t m_ID = 0;
+    void SetID(uint64_t id) { m_ID = id; }
 };
 
 class HRootNode : public HNode
