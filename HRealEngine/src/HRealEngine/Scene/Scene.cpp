@@ -213,6 +213,7 @@ namespace HRealEngine
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
                     m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
+                    bt->SetOwner<Entity>(&entity);
                     bt->StartTree();
                 }
                 else
@@ -224,6 +225,7 @@ namespace HRealEngine
                     BehaviorTree* bt = Root::CreateBehaviorTree(name);
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
+                    bt->SetOwner<Entity>(&entity);
                     bt->StartTree();
                 }
             }
