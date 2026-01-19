@@ -35,17 +35,29 @@ public:
         return static_cast<OwnerType*>(m_Owner);
     }
 private:
+    void AddActiveNode(HNode* node) { m_ActiveNodes.push_back(node); }
+    void RemoveActiveNode(HNode* node) { m_ActiveNodes.erase(std::remove(m_ActiveNodes.begin(), m_ActiveNodes.end(), node), m_ActiveNodes.end());}
+    void ClearActiveNodes() { m_ActiveNodes.clear(); }
+    const std::vector<HNode*>& GetActiveNodes() const { return m_ActiveNodes; }
+    
     bool m_bOwnsBlackboard = false;
     bool m_bIsRunning = false;
     
     void* m_Owner;
     std::string m_Name;
+
+    std::vector<HNode*> m_ActiveNodes;
     
     std::unique_ptr<HNode> m_RootNode;
     std::unique_ptr<HBlackboard> m_Blackboard;
     NodeEditorApp* m_EditorApp;
 
     friend class BehaviorTreeBuilder;
+    friend class NodeEditorApp;
+    friend class SequenceNode;
+    friend class SelectorNode;
+    friend class HRootNode;
+    friend class HNode;
 };
 template<typename OwnerType>
 OwnerType* HNode::GetOwner() const

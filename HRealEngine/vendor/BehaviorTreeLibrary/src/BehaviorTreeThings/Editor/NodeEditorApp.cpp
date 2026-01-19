@@ -11,13 +11,9 @@
 
 #include "imgui.h"
 
-NodeEditorApp::NodeEditorApp()
+void NodeEditorApp::ClearDatas()
 {
-    m_NodeEditor = std::make_unique<NodeEditorHelper>(this);
-}
-
-NodeEditorApp::~NodeEditorApp()
-{
+    m_bIsRuntimeMode = false;
     m_CopyBlackboard = nullptr;
     m_LastSelectedDecorator = nullptr;
     m_LastSelectedCondition = nullptr;
@@ -30,6 +26,16 @@ NodeEditorApp::~NodeEditorApp()
         m_NodeEditor->ClearDatas();
     
     ClearNodeMappings();
+}
+
+NodeEditorApp::NodeEditorApp()
+{
+    m_NodeEditor = std::make_unique<NodeEditorHelper>(this);
+}
+
+NodeEditorApp::~NodeEditorApp()
+{
+    ClearDatas();
 }
 
 void NodeEditorApp::OnStart()
@@ -165,12 +171,16 @@ void NodeEditorApp::NodeSettingsPanel()
 
 void NodeEditorApp::FlowLinks()
 {
-    if (m_ActiveNodes.empty())
+    if (!m_BehaviorTree)
+        return;
+    
+    auto activeNodes = m_BehaviorTree->GetActiveNodes();
+    if (activeNodes.empty())
         m_NodeEditor->SetActiveNode(nullptr);
-    for (int i = 0; i + 1 < (int)m_ActiveNodes.size(); ++i)
+    for (int i = 0; i + 1 < (int)activeNodes.size(); ++i)
     {
-        HNode* activeNode = m_ActiveNodes[i];
-        HNode* nextNode = m_ActiveNodes[i + 1];
+        HNode* activeNode = activeNodes[i];
+        HNode* nextNode = activeNodes[i + 1];
 
         if (!activeNode || !nextNode)
             continue;
@@ -218,7 +228,7 @@ void NodeEditorApp::FlowLinks()
 
         if (linkExists && linkID != nodeEditor::LinkId::Invalid)
             nodeEditor::Flow(linkID); //in imgui_node_editor in line 2964 i changed the duration for fade out
-        auto lastActiveNode = m_ActiveNodes.back();
+        auto lastActiveNode = activeNodes.back();
         auto lastEditorNode = GetEditorNodeFor(lastActiveNode);
         m_NodeEditor->SetActiveNode(lastEditorNode);
     }
@@ -659,7 +669,7 @@ void NodeEditorApp::BuildAction(Node* node, BehaviorTreeBuilder& btBuilder)
 void NodeEditorApp::ClearBuildData()
 {
     ClearNodeMappings();
-    ClearActiveNodes();
+    /*ClearActiveNodes();*/
     if (m_BehaviorTree)
         m_BehaviorTree->SetNodeEditorApp(nullptr);
     m_BehaviorTree = nullptr;
@@ -761,7 +771,8 @@ void NodeEditorApp::DrawToolbar()
             m_BehaviorTree->StopTree();
         m_NodeEditor->SetActiveNode(nullptr);
     }*/
-    DrawDebugBehaviorTree();
+    if (IsRuntimeMode())
+        DrawDebugBehaviorTree();
     ImGui::Separator();
     if (ImGui::Button("Save", ImVec2(150, 30)))
     {
@@ -856,7 +867,7 @@ void NodeEditorApp::CreateEditorTreeFromRuntimeTree(BehaviorTree* runtimeTree)
     m_BehaviorTree->SetNodeEditorApp(this);
 
     ClearNodeMappings();
-    ClearActiveNodes();
+    /*ClearActiveNodes();*/
 
     m_CopyBlackboard = m_BehaviorTree->GetBlackboardRaw();
     if (m_CopyBlackboard)

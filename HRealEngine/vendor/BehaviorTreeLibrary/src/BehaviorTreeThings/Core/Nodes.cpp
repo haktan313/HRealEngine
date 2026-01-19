@@ -27,14 +27,18 @@ NodeStatus HNode::Tick()
 
 void HNode::OnStart()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->AddActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->AddActiveNode(this);*/
+    if (GetTree())
+        GetTree()->AddActiveNode(this);
 }
 
 void HNode::OnFinished()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->RemoveActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->RemoveActiveNode(this);*/#
+    if (GetTree())
+        GetTree()->RemoveActiveNode(this);
     
     for (auto& child : m_Childrens)
     {
@@ -46,8 +50,10 @@ void HNode::OnFinished()
 
 void HNode::OnAbort()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->RemoveActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->RemoveActiveNode(this);*/
+    if (GetTree())
+        GetTree()->RemoveActiveNode(this);
     
     for (auto& child : m_Childrens)
         if (child->GetStatus() == NodeStatus::RUNNING)
@@ -144,8 +150,10 @@ void HNode::CheckConditionsLowerPriorityMode(int& currentChildIndex, HNode* node
 
 void HRootNode::OnStart()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->AddActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->AddActiveNode(this);*/
+    if (GetTree())
+        GetTree()->AddActiveNode(this);
 }
 
 NodeStatus HRootNode::Update()
@@ -172,8 +180,10 @@ NodeStatus HRootNode::Update()
 void HRootNode::OnFinished()
 {
     m_bIsStarted = false;
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->RemoveActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->RemoveActiveNode(this);*/
+    if (GetTree())
+        GetTree()->RemoveActiveNode(this);
 }
 
 void HRootNode::OnAbort()

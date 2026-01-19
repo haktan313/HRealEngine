@@ -145,7 +145,9 @@ namespace HRealEngine
 
     void EditorLayer::OnDetach()
     {
+        EditorRoot::GetNodeEditorApp()->ClearDatas();
         EditorRoot::EditorRootStop();
+        Root::RootClear();
     }
 
     void EditorLayer::OnUpdate(Timestep timestep)
@@ -448,6 +450,11 @@ namespace HRealEngine
         if (m_bShowBehaviorTreeEditor)
         {
             ImGui::Begin("Behavior Tree Editor", &m_bShowBehaviorTreeEditor);
+            if (!EditorRoot::HasNodeEditorApp())
+            {
+                EditorRoot::EditorRootStart();
+                EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);
+            }
             
             if (ImGui::BeginTable("BT_Table", 2, ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable))
             {
@@ -700,8 +707,8 @@ namespace HRealEngine
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
             Project::SetContentBrowserPanel(m_ContentBrowserPanel.get());
 
-            EditorRoot::EditorRootStart();
-            EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);
+            /*EditorRoot::EditorRootStart();*/
+            /*EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);*/
         }
     }
 
@@ -824,6 +831,8 @@ namespace HRealEngine
         m_ActiveScene->OnRuntimeStart();
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -838,6 +847,7 @@ namespace HRealEngine
         m_ActiveScene->OnSimulationStart();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneStop() 
@@ -852,6 +862,7 @@ namespace HRealEngine
         m_ActiveScene = m_EditorScene;
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        EditorRoot::GetNodeEditorApp()->ClearDatas();
     }
 
     void EditorLayer::OnScenePause()

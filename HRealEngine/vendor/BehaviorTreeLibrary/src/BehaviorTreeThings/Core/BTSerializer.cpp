@@ -313,7 +313,7 @@ bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditor
         return false;
     
     editorApp->ClearNodeMappings();
-    editorApp->ClearActiveNodes();
+    /*editorApp->ClearActiveNodes();*/
     editorApp->GetNodeEditorHelper().ClearDatas();
 
     std::unordered_map<uintptr_t, uint64_t> editorIdToRuntimeUID;

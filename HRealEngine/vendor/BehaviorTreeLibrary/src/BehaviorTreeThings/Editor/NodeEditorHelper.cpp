@@ -13,6 +13,8 @@ void NodeEditorHelper::ClearDatas()
     m_NextId = 1;
     newLinkPin = nullptr;
     m_ActiveNode = nullptr;
+    SpawnRootNode();
+    BuildNodes();
 }
 
 NodeEditorHelper::NodeEditorHelper(NodeEditorApp* app) : m_App(app)
@@ -54,7 +56,7 @@ void NodeEditorHelper::OnStart()
     
     m_EditorContext = nodeEditor::CreateEditor(&config);
     nodeEditor::SetCurrentEditor(m_EditorContext);
-    //nodeEditor::NavigateToContent();
+    nodeEditor::NavigateToContent();
 
     SpawnRootNode();
     

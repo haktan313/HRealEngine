@@ -34,8 +34,10 @@ bool HCompositeNode::CanStart()
 // SequenceNode methods
 void SequenceNode::OnStart()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->AddActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->AddActiveNode(this);*/
+    if (GetTree())
+        GetTree()->AddActiveNode(this);
 }
 
 NodeStatus SequenceNode::Update()
@@ -63,8 +65,10 @@ void SequenceNode::OnFinished()
 {
     m_CurrentChildIndex = 0;
     m_bIsStarted = false;
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->RemoveActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->RemoveActiveNode(this);*/
+    if (GetTree())
+        GetTree()->RemoveActiveNode(this);
 }
 
 void SequenceNode::OnAbort()
@@ -80,8 +84,10 @@ void SequenceNode::OnAbort()
 //SelectorNode methods
 void SelectorNode::OnStart()
 {
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->AddActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->AddActiveNode(this);*/
+    if (GetTree())
+        GetTree()->AddActiveNode(this);
 }
 
 NodeStatus SelectorNode::Update()
@@ -113,8 +119,10 @@ void SelectorNode::OnFinished()
 {
     m_CurrentChildIndex = 0;
     m_bIsStarted = false;
-    if (GetTree() && GetTree()->GetEditorApp())
-        GetTree()->GetEditorApp()->RemoveActiveNode(this);
+    /*if (GetTree() && GetTree()->GetEditorApp())
+        GetTree()->GetEditorApp()->RemoveActiveNode(this);*/
+    if (GetTree())
+        GetTree()->RemoveActiveNode(this);
 }
 
 void SelectorNode::OnAbort()

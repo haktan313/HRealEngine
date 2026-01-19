@@ -5,14 +5,16 @@
 class NodeEditorApp
 {
 public:
-    void AddActiveNode(HNode* node) { m_ActiveNodes.push_back(node); }
+    /*void AddActiveNode(HNode* node) { m_ActiveNodes.push_back(node); }
     void RemoveActiveNode(HNode* node) { m_ActiveNodes.erase(std::remove(m_ActiveNodes.begin(), m_ActiveNodes.end(), node), m_ActiveNodes.end());}
-    void ClearActiveNodes() { m_ActiveNodes.clear(); }
+    void ClearActiveNodes() { m_ActiveNodes.clear(); }*/
     void ClearNodeMappings() { m_NodeToEditorIdMap.clear(); }
+    void ClearDatas();
     
     NodeEditorApp();
     ~NodeEditorApp();
     void SetEmbeddedMode(bool enabled) { m_bIsEmbedded = enabled; }
+    void SetRuntimeMode(bool enabled) { m_bIsRuntimeMode = enabled; }
     void DrawToolbar();
     void DrawGraph();
     void DrawBlackboard();
@@ -27,6 +29,7 @@ public:
     std::unordered_map<const HNode*, nodeEditor::NodeId>& GetNodeMappings() { return m_NodeToEditorIdMap; }
     NodeEditorHelper& GetNodeEditorHelper() { return *m_NodeEditor; }
     HBlackboard& GetBlackboard() { return *m_Blackboard; }
+    bool IsRuntimeMode() const { return m_bIsRuntimeMode; }
     
     void DecoratorNodeSelected(EditorDecorator& decorator);
     void ConditionNodeSelected(EditorCondition& condition);
@@ -55,7 +58,8 @@ private:
     void BuildPlanForNode(Node* editorNode, std::vector<BuildOp>& ops);
     std::vector<BuildOp> CreateBuildPlan();
     void CreateEditorTreeFromRuntimeTree(BehaviorTree* runtimeTree);
-    
+
+    bool m_bIsRuntimeMode = false;
     bool m_bDecoratorSelected = false;
     bool m_bConditionSelected = false;
     bool m_bIsEmbedded = false;
@@ -63,7 +67,7 @@ private:
     
     float s_RightPanelWidth = 320.0f;
     
-    std::vector<HNode*> m_ActiveNodes;
+    /*std::vector<HNode*> m_ActiveNodes;*/
 
     std::string m_SelectedDebugTreeName = "Select Tree";
     EditorDecorator* m_LastSelectedDecorator = nullptr;
