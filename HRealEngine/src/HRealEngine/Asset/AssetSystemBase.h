@@ -1,6 +1,8 @@
 #pragma once
 #include <filesystem>
-
+#include <unordered_map>
+#include <functional>
+#include "HRealEngine/Core/Core.h"    
 
 namespace HRealEngine
 {
@@ -19,7 +21,8 @@ namespace HRealEngine
         Texture,
         Scene,
         Mesh,
-        Material
+        Material,
+        BehaviorTree
     };
 
     struct AssetMetadata

@@ -26,3 +26,6 @@
 	path = HRealEngine/vendor/imgui
 	url = https://github.com/haktan313/imgui.git
 	branch = docking
+[submodule "HRealEngine/vendor/assimp"]
+    path = HRealEngine/vendor/assimp
+    url = https://github.com/haktan313/assimp.git

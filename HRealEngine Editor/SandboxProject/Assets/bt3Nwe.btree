@@ -1,0 +1,121 @@
+BehaviorTree:
+  Blackboard:
+    ClassName: Ranged Enemy Blackboard
+    Floats:
+      DistanceToPlayer: 300
+      Health: 100
+    Ints:
+      AmmoCount: 5
+      DamageAmount: 15
+    Bools:
+      IsPlayerInSight: false
+      ShouldReload: false
+      CanShoot: true
+    Strings:
+      CurrentState: Idle
+  EditorData:
+    Nodes:
+      - ID: 1
+        Name: Root
+        Type: 1
+        RuntimeUID: 1
+        Class: class HRootNode
+        PosX: 0
+        PosY: 0
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 3
+        Name: Selector
+        Type: 3
+        RuntimeUID: 2
+        Class: class SelectorNode
+        PosX: 115
+        PosY: 175
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          {}
+      - ID: 13
+        Name: Move To Action
+        Type: 4
+        RuntimeUID: 5
+        Class: class MoveToAction
+        PosX: 238
+        PosY: 277
+        Decorators:
+          []
+        Conditions:
+          []
+        Params:
+          bToPlayer: true
+          StopDistance: 10
+          MoveSpeed: 5
+      - ID: 16
+        Name: Melee Enemy Attack Action
+        Type: 4
+        RuntimeUID: 3
+        Class: class MeleeEnemyAttackAction
+        PosX: -85
+        PosY: 292
+        Decorators:
+          []
+        Conditions:
+          - Name: Is Player In Range Condition
+            ClassName: Is Player In Range Condition
+            Params:
+              Priority: LowerPriority
+              Range: 100
+              DistanceToPlayerKey: DistanceToPlayer
+        Params:
+          AttackPowerKey: DamageAmount
+          AttackDuration: 10
+    Links:
+      - ID: 10
+        StartNodeID: 1
+        EndNodeID: 3
+      - ID: 15
+        StartNodeID: 3
+        EndNodeID: 13
+      - ID: 18
+        StartNodeID: 3
+        EndNodeID: 16
+  RuntimeData:
+    Name: Root
+    Type: Root
+    Class: class HRootNode
+    Children:
+      - Name: Selector
+        Type: Composite
+        Class: class SelectorNode
+        Children:
+          - Name: Melee Enemy Attack Action
+            Type: Action
+            Class: class MeleeEnemyAttackAction
+            Conditions:
+              - Name: Is Player In Range Condition
+                Type: Condition
+                Class: class IsPlayerInRangeCondition
+                Priority: LowerPriority
+                Params:
+                  Range: 100
+                  DistanceToPlayerKey: DistanceToPlayer
+            Params:
+              AttackPowerKey: DamageAmount
+              AttackDuration: 10
+          - Name: Move To Action
+            Type: Action
+            Class: class MoveToAction
+            Params:
+              bToPlayer: true
+              StopDistance: 10
+              MoveSpeed: 5
+        Params:
+          {}
+    Params:
+      {}

@@ -5,6 +5,14 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <chrono>
 
+#include "PlatformUtilsBT.h"
+#include "BehaviorTreeThings/Core/NodeRegistry.h"
+#include "BehaviorTreeThings/CustomThings/CustomActions.h"
+#include "BehaviorTreeThings/CustomThings/CustomBlackboards.h"
+#include "BehaviorTreeThings/CustomThings/CustomConditions.h"
+#include "BehaviorTreeThings/CustomThings/CustomDecorators.h"
+#include "BehaviorTreeThings/Editor/EditorRoot.h"
+#include "BehaviorTreeThings/Editor/NodeEditorApp.h"
 #include "HRealEngine/Asset/AssetImporter.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/SceneImporter.h"
@@ -120,11 +128,26 @@ namespace HRealEngine
         m_IconStep = TextureImporter::LoadTexture("Resource/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
+
+        NodeRegistry::AddBlackBoardToEditor<MeleeEnemyBlackboard>("Melee Enemy Blackboard");
+        NodeRegistry::AddBlackBoardToEditor<RangedEnemyBlackboard>("Ranged Enemy Blackboard");
+    
+        NodeRegistry::AddActionNodeToBuilder<MoveToAction, MoveToParameters>("Move To Action");
+        NodeRegistry::AddActionNodeToBuilder<MeleeEnemyAttackAction, MeleeEnemyAttackActionParameters>("Melee Enemy Attack Action");
+        NodeRegistry::AddActionNodeToBuilder<HeavyAttackAction, HeavyAttackActionParameters>("Heavy Attack Action");
+    
+        NodeRegistry::AddConditionNodeToBuilder<IsPlayerInRangeCondition, IsPlayerInRangeParameters>("Is Player In Range Condition");
+        NodeRegistry::AddConditionNodeToBuilder<CanAttackCondition, CanAttackParameters>("Can Attack Condition");
+    
+        NodeRegistry::AddDecoratorNodeToBuilder<ChangeResultOfTheNodeDecorator, ChangeResultOfTheNodeParameters>("Change Result Of The Node Decorator");
+        NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");
     }
 
     void EditorLayer::OnDetach()
     {
-
+        EditorRoot::GetNodeEditorApp()->ClearDatas();
+        EditorRoot::EditorRootStop();
+        Root::RootClear();
     }
 
     void EditorLayer::OnUpdate(Timestep timestep)
@@ -340,6 +363,19 @@ namespace HRealEngine
                     ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Window"))
+            {
+                ImGui::MenuItem("Behavior Tree Editor", nullptr, &m_bShowBehaviorTreeEditor);
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("AI System"))
+            {
+                if (ImGui::MenuItem("Create Behavior Tree"))
+                    CreateBehaviorTree();
+                if (ImGui::MenuItem("Load Behavior Tree As An Asset"))
+                    LoadBehaviorTreeAsAnAsset();
+                ImGui::EndMenu();
+            }
     
             ImGui::EndMenuBar();
         }
@@ -349,7 +385,19 @@ namespace HRealEngine
         
         ImGui::Begin("Profile Results");
 
-        auto name = m_HoveredEntity ? m_HoveredEntity.GetComponent<TagComponent>().Tag : "None";
+        std::string name = "None";
+        if (m_HoveredEntity)
+        {
+            if (m_ActiveScene->GetRegistry().valid((entt::entity)m_HoveredEntity))
+            {
+                if(m_HoveredEntity.HasComponent<TagComponent>())
+                    name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+            }
+            else
+            {
+                m_HoveredEntity = Entity();
+            }
+        }
         ImGui::Text("Hovered Entity: %s", name.c_str());
         
         auto stats = Renderer2D::GetStats();
@@ -398,6 +446,35 @@ namespace HRealEngine
                 OpenScene(sceneAssetHandle/*path*//*std::filesystem::path(g_AssetsDirectory) / path*/);
             }
             ImGui::EndDragDropTarget();
+        }
+        if (m_bShowBehaviorTreeEditor)
+        {
+            ImGui::Begin("Behavior Tree Editor", &m_bShowBehaviorTreeEditor);
+            if (!EditorRoot::HasNodeEditorApp())
+            {
+                EditorRoot::EditorRootStart();
+                EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);
+            }
+            
+            if (ImGui::BeginTable("BT_Table", 2, ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable))
+            {
+                ImGui::TableNextColumn();
+        
+                auto* app = EditorRoot::GetNodeEditorApp();
+                if (app)
+                {
+                    app->DrawToolbar();
+                    app->DrawGraph();
+                }
+                ImGui::TableNextColumn();
+        
+                if (app)
+                {
+                    app->DrawBlackboard();
+                }
+                ImGui::EndTable();
+            }
+            ImGui::End();
         }
 
         ImVec2 windowSize = ImGui::GetWindowSize();
@@ -629,6 +706,9 @@ namespace HRealEngine
                 OpenScene(startSceneHandle);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
             Project::SetContentBrowserPanel(m_ContentBrowserPanel.get());
+
+            /*EditorRoot::EditorRootStart();*/
+            /*EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);*/
         }
     }
 
@@ -708,6 +788,22 @@ namespace HRealEngine
             SaveSceneAs();
     }
 
+    void EditorLayer::CreateBehaviorTree()
+    {
+        auto path = PlatformUtilsBT::SaveFile("Behavior Tree Files\0*.btree\0");
+        Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+        if (!path.empty())
+            m_ContentBrowserPanel->RefreshAssetTree();
+    }
+
+    void EditorLayer::LoadBehaviorTreeAsAnAsset()
+    {
+        auto path = PlatformUtilsBT::OpenFile("Behavior Tree Files\0*.btree\0");
+        Project::GetActive()->GetEditorAssetManager()->ImportAsset(path);
+        if (!path.empty())
+            m_ContentBrowserPanel->RefreshAssetTree();
+    }
+
     void EditorLayer::SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path)
     {
         /*SceneSerializer serializer(sceneRef);
@@ -735,6 +831,8 @@ namespace HRealEngine
         m_ActiveScene->OnRuntimeStart();
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -749,6 +847,7 @@ namespace HRealEngine
         m_ActiveScene->OnSimulationStart();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneStop() 
@@ -763,6 +862,7 @@ namespace HRealEngine
         m_ActiveScene = m_EditorScene;
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        EditorRoot::GetNodeEditorApp()->ClearDatas();
     }
 
     void EditorLayer::OnScenePause()

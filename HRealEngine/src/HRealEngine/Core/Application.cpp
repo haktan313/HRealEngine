@@ -5,6 +5,7 @@
 
 #include <filesystem>
 
+#include "BehaviorTreeThings/Core/PlatformUtilsBT.h"
 #include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer.h"
@@ -26,6 +27,7 @@ namespace HRealEngine
 		
 		m_Window = Window::Create(WindowSettings(m_ApplicationSpecification.Name));
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		PlatformUtilsBT::SetWindow((GLFWwindow*)m_Window->GetNativeWindow());
 
 		Renderer::Init();
 		//ScriptEngine::Init();

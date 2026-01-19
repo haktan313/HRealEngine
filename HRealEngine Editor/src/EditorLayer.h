@@ -43,6 +43,9 @@ namespace HRealEngine
         void SaveSceneAs();
         void SaveScene();
 
+        void CreateBehaviorTree();
+        void LoadBehaviorTreeAsAnAsset();
+
         void SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path);
 
         void OnScenePlay();
@@ -81,6 +84,8 @@ namespace HRealEngine
         bool m_ViewportHovered = false;
         bool m_ShowPhysicsColliders = false;
         bool m_bSetPhysics2DEnabled = false;
+        bool m_bShowBehaviorTreeEditor = false;
+
 
         Ref<Texture2D> m_JoseMourinhoTexture;
         Ref<Texture2D> m_CheckBoardTexture;

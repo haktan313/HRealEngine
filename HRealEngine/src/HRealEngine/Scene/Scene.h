@@ -3,9 +3,12 @@
 #pragma once
 #include <entt.hpp>
 
+#include "BehaviorTreeThings/Core/Nodes.h"
 #include "HRealEngine/Asset/Asset.h"
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
+
+class BehaviorTree;
 
 namespace HRealEngine
 {
@@ -34,10 +37,13 @@ namespace HRealEngine
 
         void OnSimulationStart();
         void OnSimulationStop();
+
+        void StartBTs();
+        void StopBTs();
         
         void OnUpdateEditor(Timestep deltaTime, EditorCamera& camera);
-        void OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera);
         void OnUpdateRuntime(Timestep deltaTime);
+        void OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
         Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
@@ -66,6 +72,8 @@ namespace HRealEngine
         int m_StepFrames = 0;
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
+
+        std::unordered_map<AssetHandle, YAML::Node> m_BehaviorTreeCache;
         
         entt::registry m_Registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;

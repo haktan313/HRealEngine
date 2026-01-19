@@ -10,8 +10,7 @@ project "HRealEngine Editor"
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
     
     files{"src/**.h", "src/**.cpp"}
-    includedirs
-    {
+    includedirs{
         "%{wks.location}/HRealEngine/vendor/spdlog/include",
         "%{wks.location}/HRealEngine/src",
         "%{wks.location}/HRealEngine/vendor",
@@ -21,13 +20,28 @@ project "HRealEngine Editor"
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.mono}",
         "%{IncludeDir.filewatch}",
-        "%{IncludeDir.JoltPhysics}"
+        "%{IncludeDir.JoltPhysics}",
+
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src",
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src/BehaviorTreeThings",
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src/BehaviorTreeThings/Core",
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src/BehaviorTreeThings/CustomThings",
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src/BehaviorTreeThings/Editor",
+        "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/libs/imgui-node-editor",
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir['yaml-cpp']}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.GLFW}"
     }
 
     buildoptions { "/utf-8" }
 
-    postbuildcommands
-    {
+    defines{
+        "YAML_CPP_STATIC_DEFINE"
+    }
+
+
+    postbuildcommands{
         '{COPYFILE} "%{wks.location}/HRealEngine Editor/imgui.ini" "%{cfg.targetdir}"',
         '{COPYDIR} "%{wks.location}/HRealEngine Editor/mono" "%{cfg.targetdir}/mono"',
         '{COPYDIR} "%{wks.location}/HRealEngine Editor/assets" "%{cfg.targetdir}/assets"',

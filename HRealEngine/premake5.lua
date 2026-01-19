@@ -50,7 +50,8 @@ project "HRealEngine"
         "%{IncludeDir.filewatch}",
         "%{IncludeDir.Jolt}",
         "%{IncludeDir.JoltPhysics}",
-        "%{IncludeDir.assimp}"
+        "%{IncludeDir.assimp}",
+        "%{IncludeDir.BehaviorTreeLibrary}"
     }
 
     links
@@ -63,7 +64,8 @@ project "HRealEngine"
         "Box2D",
         "%{Library.mono}",
         "JoltPhysics",
-        "assimp"
+        "assimp",
+        "BehaviorTreeLibrary"
     }
 
     buildoptions { "/utf-8" }
