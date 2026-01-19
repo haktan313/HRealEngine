@@ -18,7 +18,8 @@ namespace HRealEngine
     public:
         EditorLayer();
         virtual ~EditorLayer() = default;
-        
+
+        void RegisterBehaviorTreeStufs();
         void OnAttach() override;
         void OnDetach() override;
         

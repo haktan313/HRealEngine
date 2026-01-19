@@ -1,6 +1,7 @@
 # HRealEngine
 
-**HRealEngine** is a custom **Game Engine** written in C++ built with **OpenGL**. It started as a **2D focused engine**, and has been expanding toward **3D rendering** and **3D physics**.
+**HRealEngine** is a custom **Game Engine** written in C++ built with **OpenGL**. It started as a **2D focused engine**, and has been expanding toward **3D rendering**, **3D physics** and **AI driven** gameplay systems. 
+The primary long term goal of the engine is to serve as a playground for AI frameworks, including **Behavior Trees**, **Perception systems**, and **Navigation Meshes**, while remaining a fully functional general purpose engine.
 
 - Start with cloning the repo with `git clone --recursive https://github.com/haktan313/HRealEngine`
 
@@ -21,16 +22,25 @@
   - [Project System](#project-system)
   - [Core](#core)
   - [Notes / Roadmap](#notes--roadmap)
+  - [Script Example (BT integration in Scene.cpp)](#script-example-bt-integration-in-scenecpp)
   - [Script Example (Overlap Events)](#script-example-overlap-events)
   - [Third-Party Submodules](#-third-party-submodules)
 
 ### BehaviorTreeLibrary Integration
-**BehaviorTreeLibrary** Integration still in proccess and it is visible in behaviorTree branch.
-- As it is not yet complete, there are errors and some integration deficiencies. 
+> The integration is completed, but as an ongoing project there may still be minor bugs or missing edge cases.
 
-- There is a new window for the behavior tree editor inside the engine, and this window is dockable.
-- There is a component for assigning behavior trees to entities. Behavior trees currently start running when runtime begins. 
-- Behavior Trees can be recognized from the asset manager, where you can drag and drop them from the content browser into the component. 
+- A **dockable Behavior Tree Editor** window is available inside the engine.
+  - Open it from the editor menu: **Window → Behavior Tree Editor**.
+- A **BehaviorTreeComponent** lets you assign behavior trees to entities.
+  - Behavior Trees currently start running when **runtime begins**.
+- Behavior Tree assets are recognized by the **Asset Manager**.
+  - You can **drag & drop** a Behavior Tree asset from the Content Browser into the component.
+- Creating / importing Behavior Tree assets:
+  - Use **AI System → Create Behavior Tree** to create a new `.btree` asset.
+  - Use **AI System → Load Behavior Tree As An Asset** to import an existing behavior tree file into the project as an engine asset.
+- Custom nodes & blackboards:
+  - To register custom **Blackboards / Actions / Conditions / Decorators**, call `NodeRegistry` registration functions in EditorLayer.cpp and inside of the `RegisterBehaviorTreeStuffs()`.
+  - For more details and examples, check the **BehaviorTreeLibrary** documentation.
 
 
 https://github.com/user-attachments/assets/02698e7a-1b2d-4dbf-8792-ef2dad4175cf
@@ -39,8 +49,10 @@ https://github.com/user-attachments/assets/02698e7a-1b2d-4dbf-8792-ef2dad4175cf
 https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
 ## 📸 Screenshots
-| 3D | OBJ Mesh |
+| Behavior Tree | Behavior Tree Runtime Debug |
 |--------|-------------|
+| <img width="1911" height="1025" alt="Screenshot 2026-01-19 144030" src="https://github.com/user-attachments/assets/e0bd364a-96fc-4e4e-948b-18770dc65a2d" /> | <img width="1904" height="1025" alt="Screenshot 2026-01-19 143837" src="https://github.com/user-attachments/assets/91a8c784-79d0-4525-895d-98a4ed19e446" /> |
+| 3D | OBJ Mesh |
 | <img width="1913" height="1137" alt="image" src="https://github.com/user-attachments/assets/8a9c1386-550d-4038-b17b-8183d732b641" /> | <img width="1894" height="1141" alt="Screenshot 2026-01-02 161346" src="https://github.com/user-attachments/assets/4f5b43d3-7c31-4e98-a4a6-6c5ec470f71d" /> |
 | 2D | Asset Registry |
 | <img width="2555" height="1386" alt="image" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | <img width="1324" height="937" alt="Screenshot 2026-01-02 161443" src="https://github.com/user-attachments/assets/61ad632f-7c6c-4ee9-8fea-8b7d2a2a99f6" /> |
@@ -50,6 +62,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Content Browser + file dialogs
 - Scene serialization with YAML
 - Entity Component System (entt)
+- Behavior Tree tooling (editor + runtime debug)
 
 ### Scripting
 - Dual scripting support:
@@ -82,7 +95,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
 ### Asset System
 - Centralized asset registry and asset handles
-- Import pipeline for meshes, materials, scenes, and textures
+- Import pipeline for meshes, materials, scenes, textures, and Behavior Trees
 - Asset based references used across rendering and scene systems
 
 ### Project System
@@ -95,8 +108,59 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Logging with spdlog
 
 ## Notes / Roadmap
-- **My own Behavior Tree library implementation**
 - **My own Navigation Mesh library implementation**
+
+## Script Example (BT integration in Scene.cpp)
+
+```cpp
+    void Scene::StartBTs()
+    {
+        Root::RootClear();
+        auto view = m_Registry.view<BehaviorTreeComponent>();
+        for (auto e : view)
+        {
+            Entity entity = {e, this};
+            auto& btComponent = entity.GetComponent<BehaviorTreeComponent>();
+            if (btComponent.BehaviorTreeAsset)
+            {
+                if (m_BehaviorTreeCache.find(btComponent.BehaviorTreeAsset) == m_BehaviorTreeCache.end())
+                {
+                    auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
+                    auto path = Project::GetAssetDirectory() / metaData.FilePath;
+                    auto name = metaData.FilePath.stem().string();
+                    
+                    YAML::Node data = YAML::LoadFile(path.string());
+                    
+                    BehaviorTree* bt = Root::CreateBehaviorTree(name, path.string());
+                    BTSerializer serializer(bt);
+                    serializer.Deserialize(data);
+                    m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
+                    bt->SetOwner<Entity>(&entity);
+                    bt->StartTree();
+                }
+                else
+                {
+                    YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);/*m_BehaviorTreeCache[btComponent.BehaviorTreeAsset];*/
+                    auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
+                    auto path = Project::GetAssetDirectory() / metaData.FilePath;
+                    auto name = metaData.FilePath.stem().string();
+                    
+                    BehaviorTree* bt = Root::CreateBehaviorTree(name, path.string());
+                    BTSerializer serializer(bt);
+                    serializer.Deserialize(data);
+                    bt->SetOwner<Entity>(&entity);
+                    bt->StartTree();
+                }
+            }
+        }
+    }
+
+    void Scene::StopBTs()
+    {
+        Root::RootClear();
+        m_BehaviorTreeCache.clear();
+    }
+```
 
 ## Script Example (Overlap Events)
 
