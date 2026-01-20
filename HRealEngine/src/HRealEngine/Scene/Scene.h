@@ -84,6 +84,6 @@ namespace HRealEngine
 
         Scope<JoltWorld> m_JoltWorld;
         Scope<Box2DWorld> m_Box2DWorld;
-        bool m_b2PhysicsEnabled = true;
+        bool m_b2PhysicsEnabled = false;
     };
 }

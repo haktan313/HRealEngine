@@ -52,6 +52,11 @@ struct VertexOut
     float tilingFactor;
 };
 
+uniform int u_DebugView; 
+// 0 = normal render
+// 1 = UV debug
+// 2 = Normal debug
+
 layout (location = 0) in VertexOut Input;
 layout (location = 4) in flat int v_EntityIDOut;
 
@@ -59,6 +64,13 @@ layout (binding = 0) uniform sampler2D u_textureSamplers[32];
 
 void main()
 {
+    if (u_DebugView == 1)
+    {
+        v_color = vec4(fract(Input.texCoord), 0.0, 1.0);
+        objectID = v_EntityIDOut;
+        return;
+    }
+
     vec4 texColor = Input.color;
 
     switch(int(Input.texIndex))

@@ -1,5 +1,19 @@
 Scene: Untitled
 Entities:
+  - Entity: 4252773359772711178
+    TagComponent:
+      Tag: cube
+    TransformComponent:
+      Position: [3.1297188, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [0.26801476, 0.9145907, 0.17901243, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
   - Entity: 3125973510530094700
     TagComponent:
       Tag: f;asjjjj
@@ -30,15 +44,3 @@ Entities:
       MaterialHandleOverrides:
         - 0
         - 8599235794369918790
-  - Entity: 8767760679176938018
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [1.2136917, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      OrderInLayer: 0

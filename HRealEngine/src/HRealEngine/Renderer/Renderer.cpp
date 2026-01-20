@@ -8,6 +8,10 @@
 
 namespace HRealEngine
 {
+    int Renderer::s_DebugView = 0;
+    void Renderer::SetDebugView(int mode) { s_DebugView = mode; }
+    int Renderer::GetDebugView() { return s_DebugView; }
+    
     Scope<Renderer::SceneData> Renderer::s_SceneData = CreateScope<Renderer::SceneData>();
 
     void Renderer::Init()
@@ -42,6 +46,9 @@ namespace HRealEngine
         shaderRef->Bind();
         shaderRef->SetMat4("u_ViewProjection", s_SceneData->viewProjectionMatrix);
         shaderRef->SetMat4("u_Transform", transform);
+
+        shaderRef->SetInt("u_DebugView", Renderer::GetDebugView());
+
         
         vertexArray->Bind();
         RenderCommand::DrawIndexed(vertexArray);

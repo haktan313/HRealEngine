@@ -422,6 +422,15 @@ namespace HRealEngine
         {
             m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
         }
+        
+        static int debugView = 0;
+        ImGui::RadioButton("None", &debugView, 0);
+        ImGui::RadioButton("UV", &debugView, 1);
+        ImGui::RadioButton("Normal", &debugView, 2);
+
+        Renderer::SetDebugView(debugView);
+
+        
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});

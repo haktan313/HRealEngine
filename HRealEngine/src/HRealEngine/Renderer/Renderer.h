@@ -22,7 +22,11 @@ namespace HRealEngine
         static void Submit(const Ref<VertexArray>& vertexArray, const Ref<Shader>& shaderRef, const glm::mat4& transform = glm::mat4(1.0f));
         
         static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+
+        static void SetDebugView(int mode);
+        static int GetDebugView();
     private:
+        static int s_DebugView;
         struct SceneData
         {
             glm::mat4 viewProjectionMatrix;

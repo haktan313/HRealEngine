@@ -3,6 +3,7 @@
 
 #include "Material.h"
 #include "RenderCommand.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "UniformBuffer.h"
 #include "VertexArray.h"
@@ -179,6 +180,9 @@ namespace HRealEngine
             s_Data.TextureSlots[i]->Bind(i);
 
         s_Data.CubeShader->Bind();
+        
+        s_Data.CubeShader->SetInt("u_DebugView", Renderer::GetDebugView());
+        
         RenderCommand::DrawIndexed(s_Data.CubeVertexArray, s_Data.CubeIndexCount);
         
         // s_Data.Stats.DrawCalls++;
@@ -239,6 +243,8 @@ namespace HRealEngine
             meshGPU->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
             meshGPU->Shader->SetMat4("u_Transform", transform);
 
+            meshGPU->Shader->SetInt("u_DebugView", Renderer::GetDebugView());
+            
             if (!meshGPU->Submeshes.empty())
             {
                 for (const auto& sm : meshGPU->Submeshes)
