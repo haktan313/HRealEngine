@@ -465,6 +465,22 @@ HBlackboard& NodeEditorApp::SetBlackboardForEditor(const std::string& id, const 
 
 BehaviorTree* NodeEditorApp::BuildBehaviorTree()
 {
+    if (!m_Blackboard)
+        for (auto& [id, info] : NodeRegistry::GetBlackboardClassInfoMap())
+            if (id == m_SelectedBlackboardClassName)
+            {
+                m_SelectedBlackboardClassName = id;
+                m_Blackboard = info.CreateBlackboardFn();
+                if (m_Blackboard && m_CopyBlackboard && m_CopyBlackboard->GetName() == m_SelectedBlackboardClassName)
+                {
+                    m_Blackboard->SetBoolValues(m_CopyBlackboard->GetBoolValues());
+                    m_Blackboard->SetIntValues(m_CopyBlackboard->GetIntValues());
+                    m_Blackboard->SetFloatValues(m_CopyBlackboard->GetFloatValues());
+                    m_Blackboard->SetStringValues(m_CopyBlackboard->GetStringValues());
+                    m_CopyBlackboard = m_Blackboard.get();
+                }
+                break;
+            }
     m_NodeEditor->BuildNodes();
     ClearBuildData();
     

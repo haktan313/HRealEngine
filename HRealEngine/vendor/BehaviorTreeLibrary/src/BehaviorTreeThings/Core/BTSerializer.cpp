@@ -150,10 +150,7 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
         if (it != bbRegistry.end())
         {
             if (editorApp)
-            {
-                EditorRoot::GetNodeEditorApp()->SetBlackboardForEditor(bbClassName, it->second);
-                blackboard = &EditorRoot::GetNodeEditorApp()->SetBlackboardForEditor(bbClassName, it->second);
-            }
+                blackboard = &editorApp->SetBlackboardForEditor(bbClassName, it->second);
         }
     }
     if (!blackboard)
@@ -815,7 +812,6 @@ void BTSerializer::SerializeNode(YAML::Emitter& out, const HNode* node)
 
     if (node->GetType() == HNodeType::Decorator)
     {
-        std::cout << "DEC name=" << node->GetName() << " class=" << typeid(*node).name() << "\n";
         auto children = node->GetChildrensRaw();
 
         out << YAML::Key << "Child" << YAML::Value;
@@ -836,7 +832,6 @@ void BTSerializer::SerializeNode(YAML::Emitter& out, const HNode* node)
 
     if (node->GetType() == HNodeType::Condition)
     {
-        std::cout << "COND name=" << node->GetName() << " class=" << typeid(*node).name() << "\n";
         auto* cond = dynamic_cast<const HCondition*>(node);
         if (cond)
             out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond->GetPriorityMode());

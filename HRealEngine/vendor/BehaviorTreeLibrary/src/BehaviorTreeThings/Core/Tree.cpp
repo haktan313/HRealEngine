@@ -102,7 +102,6 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::selector(const std::string& name)
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::end()
 {
-    std::cout << "Ending Current Node" << std::endl;
     if (!m_NodeStack.empty())
         m_NodeStack.pop_back();
     return *this;

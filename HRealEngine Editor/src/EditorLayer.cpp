@@ -149,8 +149,11 @@ namespace HRealEngine
 
     void EditorLayer::OnDetach()
     {
-        EditorRoot::GetNodeEditorApp()->ClearDatas();
-        EditorRoot::EditorRootStop();
+        if (EditorRoot::HasNodeEditorApp())
+        {
+            EditorRoot::GetNodeEditorApp()->ClearDatas();
+            EditorRoot::EditorRootStop();
+        }
         Root::RootClear();
     }
 
@@ -836,7 +839,8 @@ namespace HRealEngine
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
+        if (EditorRoot::HasNodeEditorApp())
+            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -851,7 +855,8 @@ namespace HRealEngine
         m_ActiveScene->OnSimulationStart();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
+        if (EditorRoot::HasNodeEditorApp())
+            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneStop() 
@@ -866,7 +871,15 @@ namespace HRealEngine
         m_ActiveScene = m_EditorScene;
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        EditorRoot::GetNodeEditorApp()->ClearDatas();
+        if (EditorRoot::HasNodeEditorApp())
+        {
+            EditorRoot::GetNodeEditorApp()->ClearDatas();
+            if (EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().GetNodes().empty())
+            {
+                EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().SpawnRootNode();
+                EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().BuildNodes();
+            }
+        }
     }
 
     void EditorLayer::OnScenePause()

@@ -24,9 +24,13 @@ public:
     const std::unordered_map<std::string, std::string>& GetStringValues() const { return m_StringValues; }
     
     void SetBoolValue(const std::string& key, bool value);
+    void SetBoolValues(const std::unordered_map<std::string, bool>& values) { m_BoolValues = values; }
     void SetIntValue(const std::string& key, int value);
+    void SetIntValues(const std::unordered_map<std::string, int>& values) { m_IntValues = values; }
     void SetFloatValue(const std::string& key, float value);
+    void SetFloatValues(const std::unordered_map<std::string, float>& values) { m_FloatValues = values; }
     void SetStringValue(const std::string& key, const std::string& value);
+    void SetStringValues(const std::unordered_map<std::string, std::string>& values) { m_StringValues = values; }
 
     bool HasBoolValue(const std::string& key) const { return m_BoolValues.find(key) != m_BoolValues.end(); }
     bool HasIntValue(const std::string& key) const { return m_IntValues.find(key) != m_IntValues.end(); }

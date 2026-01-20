@@ -233,8 +233,10 @@ The node visuals are created using **imgui-node-editor**. You can find **example
 - You can check the `App.cpp` file for setup. You can find the instructions here.
 ```cpp
     //-------------------------------------------- Changable Part ------------------------------------------------//
+    // Root::RootStart() starts whole Behavior Trees.
     // Root::RootTick() call this inside the main loop.
     // Root::RootClear() call this before app shutdown.
+    // Root::RootStop() stops whole Behavior Trees.
     EditorRoot::EditorRootStart();//Initialize the Node Editor App, if you want you can work without editor app for that don't call this function
     // EditorRoot::EditorRootStop() call this before app shutdown.
     // EditorRoot::GetNodeEditorApp() to get the instance of the Node Editor App.
@@ -254,11 +256,10 @@ The node visuals are created using **imgui-node-editor**. You can find **example
     NodeRegistry::AddDecoratorNodeToBuilder<ChangeResultOfTheNodeDecorator, ChangeResultOfTheNodeParameters>("Change Result Of The Node Decorator");
     NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");
 
-    //Create the Enemy AI instance and set it as the owner of the Node Editor App, so we can access it inside the action, condition and decorator nodes.
-    //If you dont initialize the Node Editor App inside the Root, you need to set the owner to insiode of the behavior tree manually after building it,
+    // PlatformUtilsBT::SetWindow(m_Window); set the window for using in the Behavior Trees platform utils.
+    
     //you can find the example in the EnemyAI.cpp. "m_BehaviorTree->SetOwner(this);"
     m_EnemyAI = new EnemyAI();
-    EditorRoot::GetNodeEditorApp()->SetOwner<EnemyAI>(m_EnemyAI);
     //-------------------------------------------- Changable Part ------------------------------------------------//
 ```
 Script Example(Behavior Tree and Builder)
@@ -275,7 +276,7 @@ Script Example(Behavior Tree and Builder)
 class BehaviorTree
 {
 public:
-    BehaviorTree() : m_Owner(nullptr), m_Blackboard(nullptr), m_EditorApp(nullptr) {}
+    BehaviorTree(const std::string& name) : m_Owner(nullptr), m_Blackboard(nullptr), m_EditorApp(nullptr), m_Name(name) {}
     ~BehaviorTree();
 
     void StartTree();
@@ -284,9 +285,11 @@ public:
     
     void SetRootNode(std::unique_ptr<HNode> root) { m_RootNode = std::move(root); }
     void SetNodeEditorApp(NodeEditorApp* editorApp) { m_EditorApp = editorApp; }
+    void SetName(const std::string& name) { m_Name = name; }
     HNode* GetRootNode() const { return m_RootNode.get(); }
-    HBlackboard* GetBlackboard() const { return m_Blackboard; }
+    HBlackboard* GetBlackboardRaw() const { return m_Blackboard.get(); }
     NodeEditorApp* GetEditorApp() const { return m_EditorApp; }
+    const std::string& GetName() const { return m_Name; }
 
     template<typename OwnerType>
     void SetOwner(OwnerType* owner)
@@ -299,16 +302,28 @@ public:
         return static_cast<OwnerType*>(m_Owner);
     }
 private:
-    bool m_bOwnsBlackboard = false;
+    void AddActiveNode(HNode* node) { m_ActiveNodes.push_back(node); }
+    void RemoveActiveNode(HNode* node) { m_ActiveNodes.erase(std::remove(m_ActiveNodes.begin(), m_ActiveNodes.end(), node), m_ActiveNodes.end());}
+    void ClearActiveNodes() { m_ActiveNodes.clear(); }
+    const std::vector<HNode*>& GetActiveNodes() const { return m_ActiveNodes; }
+    
     bool m_bIsRunning = false;
     
     void* m_Owner;
+    std::string m_Name;
+
+    std::vector<HNode*> m_ActiveNodes;
     
     std::unique_ptr<HNode> m_RootNode;
-    HBlackboard* m_Blackboard;
+    std::unique_ptr<HBlackboard> m_Blackboard;
     NodeEditorApp* m_EditorApp;
 
     friend class BehaviorTreeBuilder;
+    friend class NodeEditorApp;
+    friend class SequenceNode;
+    friend class SelectorNode;
+    friend class HRootNode;
+    friend class HNode;
 };
 template<typename OwnerType>
 OwnerType* HNode::GetOwner() const
@@ -319,32 +334,32 @@ OwnerType* HNode::GetOwner() const
 class BehaviorTreeBuilder
 {
 public:
-    BehaviorTreeBuilder() : m_Tree(Root::CreateBehaviorTree()) {}
+    BehaviorTreeBuilder() : m_Tree(Root::CreateBehaviorTree("BehaviorTree")) {}
+    BehaviorTreeBuilder(BehaviorTree* tree) : m_Tree(tree) {}
 
     template<typename BlackboardType>
     BehaviorTreeBuilder& setBlackboard()
     {
         static_assert(std::is_base_of_v<HBlackboard, BlackboardType>, "BlackboardType must derive from HBlackboard");
-        auto blackboard = new BlackboardType();
-        m_Tree->m_Blackboard = blackboard;
-        m_Tree->m_bOwnsBlackboard = true;
+        //auto blackboard = new BlackboardType();
+        auto blackboard = std::make_unique<BlackboardType>();
+        m_Tree->m_Blackboard = std::move(blackboard);
         return *this;
     }
-    BehaviorTreeBuilder& setBlackboard(HBlackboard* blackboard)
+    BehaviorTreeBuilder& setBlackboard(std::unique_ptr<HBlackboard> blackboard)
     {
-        m_Tree->m_Blackboard = blackboard;
-        m_Tree->m_bOwnsBlackboard = false;
+        m_Tree->m_Blackboard = std::move(blackboard);
         return *this;
     }
-    BehaviorTreeBuilder& root(NodeEditorApp* editorApp);
+    BehaviorTreeBuilder& root();
     BehaviorTreeBuilder& sequence(const std::string& name);
     BehaviorTreeBuilder& selector(const std::string& name);
     template<typename ActionNodeType, typename... Args>
     BehaviorTreeBuilder& action(Args&&... args)
     {
         static_assert(std::is_base_of_v<HActionNode, ActionNodeType>, "ActionNodeType must derive from HAction");
-        auto action = std::make_unique<ActionNodeType>(std::forward<Args>(args)...);
-        std::cout << "Adding Action Node: " << action->GetName() << std::endl;
+        auto action = MakeNode<ActionNodeType>(std::forward<Args>(args)...);
+        
         m_LastCreatedNode = action.get();
         if (m_CurrentDecorator)
         {
@@ -371,8 +386,8 @@ public:
     BehaviorTreeBuilder& condition(PriorityType priority, Args&&... args)
     {
         static_assert(std::is_base_of_v<HCondition, ConditionNodeType>, "ConditionNodeType must derive from HCondition");
-        auto condition = std::make_unique<ConditionNodeType>(std::forward<Args>(args)...);
-        std::cout << "Adding Condition Node: " << condition->GetName() << std::endl;
+        auto condition = MakeNode<ConditionNodeType>(std::forward<Args>(args)...);
+        
         if (m_LastCreatedNode)
         {
             condition->SetTree(m_Tree);
@@ -386,8 +401,7 @@ public:
     BehaviorTreeBuilder& decorator(Args&&... args)
     {
         static_assert(std::is_base_of_v<HDecorator, DecoratorNodeType>, "DecoratorNodeType must derive from HDecorator");
-        m_CurrentDecorator = std::make_unique<DecoratorNodeType>(std::forward<Args>(args)...);
-        std::cout << "Adding Decorator Node: " << m_CurrentDecorator->GetName() << std::endl;
+        m_CurrentDecorator = MakeNode<DecoratorNodeType>(std::forward<Args>(args)...);
         m_CurrentDecorator->SetTree(m_Tree);
         m_CurrentDecorator->SetType(HNodeType::Decorator);
         return *this;
@@ -401,6 +415,16 @@ private:
     HNode* m_LastCreatedNode = nullptr;
     std::unique_ptr<HDecorator> m_CurrentDecorator;
     std::vector<HNode*> m_NodeStack;
+    
+    uint64_t m_NextUID = 1;
+    template<typename TNode, typename... Args>
+    std::unique_ptr<TNode> MakeNode(Args&&... args)
+    {
+        auto node = std::make_unique<TNode>(std::forward<Args>(args)...);
+        node->SetID(m_NextUID++);
+        return node;
+    }
+
 };
 
 #include "Tree.h"
@@ -409,20 +433,16 @@ private:
 //BehaviorTree methods
 BehaviorTree* BehaviorTreeBuilder::build() const 
 {
-    std::cout << "Behavior Tree Built" << std::endl;
     return m_Tree;
 }
 
 BehaviorTree::~BehaviorTree()
 {
-    if (m_bOwnsBlackboard)
-        delete m_Blackboard;
     m_Blackboard = nullptr;
 }
 
 void BehaviorTree::StartTree()
 {
-    std::cout << "Behavior Tree Started" << std::endl;
     m_bIsRunning = true;
 }
 
@@ -437,7 +457,6 @@ void BehaviorTree::TickTree()
 
 void BehaviorTree::StopTree()
 {
-    std::cout << "Behavior Tree Stopped" << std::endl;
     if (!m_bIsRunning)
         return;
     m_bIsRunning = false;
@@ -447,14 +466,16 @@ void BehaviorTree::StopTree()
 
 // BehaviorTreeBuilder methods
 
-BehaviorTreeBuilder& BehaviorTreeBuilder::root(NodeEditorApp* editorApp)
+BehaviorTreeBuilder& BehaviorTreeBuilder::root()
 {
-    std::cout << "Adding Root Node" << std::endl;
-    auto rootNode = std::make_unique<HRootNode>();
+    auto rootNode = MakeNode<HRootNode>();
     rootNode->SetTree(m_Tree);
+    
     HRootNode* rootNodePtr = rootNode.get();
     rootNodePtr->SetType(HNodeType::Root);
+    
     m_LastCreatedNode = rootNodePtr;
+    
     m_Tree->SetRootNode(std::move(rootNode));
     m_NodeStack.push_back(rootNodePtr);
     return *this;
@@ -462,11 +483,12 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::root(NodeEditorApp* editorApp)
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::sequence(const std::string& name)
 {
-    std::cout << "Adding Sequence Node: " << name << std::endl;
-    auto sequenceNode = std::make_unique<SequenceNode>(name);
+    auto sequenceNode = MakeNode<SequenceNode>(name);
+    
     SequenceNode* sequenceNodePtr = sequenceNode.get();
     sequenceNodePtr->SetType(HNodeType::Composite);
     sequenceNodePtr->SetTree(m_Tree);
+    
     m_LastCreatedNode = sequenceNodePtr;
     if (m_CurrentDecorator)
     {
@@ -485,11 +507,12 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::sequence(const std::string& name)
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::selector(const std::string& name)
 {
-    std::cout << "Adding Selector Node: " << name << std::endl;
-    auto selectorNode = std::make_unique<SelectorNode>(name);
+    auto selectorNode = MakeNode<SelectorNode>(name);
     auto selectorNodePtr = selectorNode.get();
+    
     selectorNodePtr->SetType(HNodeType::Composite);
     selectorNodePtr->SetTree(m_Tree);
+    
     m_LastCreatedNode = selectorNodePtr;
     if (m_CurrentDecorator)
     {
@@ -508,12 +531,10 @@ BehaviorTreeBuilder& BehaviorTreeBuilder::selector(const std::string& name)
 
 BehaviorTreeBuilder& BehaviorTreeBuilder::end()
 {
-    std::cout << "Ending Current Node" << std::endl;
     if (!m_NodeStack.empty())
         m_NodeStack.pop_back();
     return *this;
 }
-
 
 ```
 

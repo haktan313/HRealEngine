@@ -40,11 +40,11 @@ The primary long term goal of the engine is to serve as a playground for AI fram
   - Use **AI System → Load Behavior Tree As An Asset** to import an existing behavior tree file into the project as an engine asset.
 - Custom nodes & blackboards:
   - To register custom **Blackboards / Actions / Conditions / Decorators**, call `NodeRegistry` registration functions in EditorLayer.cpp and inside of the `RegisterBehaviorTreeStuffs()`.
-  - For more details and examples, check the **BehaviorTreeLibrary** documentation.
+  - For more details and examples, check the **BehaviorTreeLibrary** documentation **https://github.com/haktan313/BehaviorTreeLibrary**
 
+https://github.com/user-attachments/assets/07c87738-2202-4d6c-8949-1bdc5601b3f6
 
-https://github.com/user-attachments/assets/02698e7a-1b2d-4dbf-8792-ef2dad4175cf
-
+https://github.com/user-attachments/assets/8d94ccb6-fb48-44e6-83d7-c2b3afed06c8
 
 https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 

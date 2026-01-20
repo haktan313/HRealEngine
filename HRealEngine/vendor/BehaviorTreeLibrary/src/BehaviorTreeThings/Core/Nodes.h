@@ -82,8 +82,7 @@ protected:
 
     std::vector<std::unique_ptr<HNode>> m_Childrens;
     std::vector<std::unique_ptr<HCondition>> m_ConditionNodes;
-
-    friend class BTSerializer;
+    
     friend class BehaviorTreeBuilder;
 private:
     uint64_t m_ID = 0;

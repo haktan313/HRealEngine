@@ -13,8 +13,6 @@ void NodeEditorHelper::ClearDatas()
     m_NextId = 1;
     newLinkPin = nullptr;
     m_ActiveNode = nullptr;
-    SpawnRootNode();
-    BuildNodes();
 }
 
 NodeEditorHelper::NodeEditorHelper(NodeEditorApp* app) : m_App(app)
@@ -188,7 +186,6 @@ void NodeEditorHelper::SpawnConditionNode(Node* parentNode)
 {
     if (!parentNode)
         return;
-    std::cout << "Spawned Condition Node for Parent Node: " << parentNode->Name << " (ID: " << parentNode->ID.Get() << ")" << std::endl;
     EditorCondition condition("Condition");
     parentNode->Conditions.push_back(condition);
 }
@@ -197,7 +194,6 @@ void NodeEditorHelper::SpawnDecoratorNode(Node* parentNode)
 {
     if (!parentNode)
         return;
-    std::cout << "Spawned Decorator Node for Parent Node: " << parentNode->Name << " (ID: " << parentNode->ID.Get() << ")" << std::endl;
     EditorDecorator decorator("Decorator");
     parentNode->Decorators.push_back(decorator);
 }

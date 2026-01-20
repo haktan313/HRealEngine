@@ -2,7 +2,7 @@ BehaviorTree:
   Blackboard:
     ClassName: Ranged Enemy Blackboard
     Floats:
-      DistanceToPlayer: 300
+      DistanceToPlayer: 187
       Health: 100
     Ints:
       AmmoCount: 5
@@ -41,7 +41,7 @@ BehaviorTree:
           []
         Params:
           {}
-      - ID: 13
+      - ID: 6
         Name: Move To Action
         Type: 4
         RuntimeUID: 5
@@ -56,7 +56,7 @@ BehaviorTree:
           bToPlayer: true
           StopDistance: 10
           MoveSpeed: 5
-      - ID: 16
+      - ID: 8
         Name: Melee Enemy Attack Action
         Type: 4
         RuntimeUID: 3
@@ -79,12 +79,12 @@ BehaviorTree:
       - ID: 10
         StartNodeID: 1
         EndNodeID: 3
-      - ID: 15
+      - ID: 11
         StartNodeID: 3
-        EndNodeID: 13
-      - ID: 18
+        EndNodeID: 6
+      - ID: 12
         StartNodeID: 3
-        EndNodeID: 16
+        EndNodeID: 8
   RuntimeData:
     Name: Root
     Type: Root
