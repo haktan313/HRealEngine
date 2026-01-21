@@ -74,54 +74,28 @@ namespace HRealEngine
 
         if (root["AlbedoTextureHandle"])
         {
-            AssetHandle handle = (AssetHandle)root["AlbedoTextureHandle"].as<uint64_t>(0);
-
-            if (handle != 0 && AssetManager::IsAssetHandleValid(handle))
-            {
-                Ref<Texture2D> tex = AssetManager::GetAsset<Texture2D>(handle);
-                if (tex && tex->IsLoaded())
-                    mat->AlbedoTexture = tex;
-                else
-                    LOG_CORE_WARN("Texture handle exists but failed to load: {}", (uint64_t)handle);
-            }
+            AssetHandle h = (AssetHandle)root["AlbedoTextureHandle"].as<uint64_t>(0);
+            mat->AlbedoTextureHandle = h;
         }
 
-
-        /*if (root["AlbedoTexture"])
+        if (root["SpecularTextureHandle"])
         {
-            /*std::string texStr = root["AlbedoTexture"].as<std::string>();
-            if (!texStr.empty() && texStr != "null")
-            {
-                std::filesystem::path relTexPath = texStr;
-                std::filesystem::path absTexPath = MakeAbs(assetsRoot, relTexPath);
+            AssetHandle h = (AssetHandle)root["SpecularTextureHandle"].as<uint64_t>(0);
+            mat->SpecularTextureHandle = h;
+        }
 
-                //Ref<Texture2D> tex = Texture2D::Create(absTexPath.string());
-                //Ref<Texture2D> tex = TextureImporter::LoadTexture(absTexPath);
-                Ref<Texture2D> tex = AssetManager::GetAsset<Texture2D>(TextureImporter::LoadTexture(absTexPath)->Handle);
-                if (tex && tex->IsLoaded())
-                    mat->AlbedoTexture = tex;
-                else
-                    LOG_CORE_WARN("Failed to load albedo texture: {}", absTexPath.string());
-            }#1#
-            std::filesystem::path relTexPath = root["AlbedoTexture"].as<std::string>();
+        if (root["Shininess"])
+        {
+            mat->Shininess = root["Shininess"].as<float>(32.0f);
+        }
 
-            auto eam = Project::GetActive()->GetEditorAssetManager();
-            AssetHandle handle = eam->GetHandleFromPath(relTexPath);
+        if (root["NormalTextureHandle"])
+        {
+            AssetHandle h = (AssetHandle)root["NormalTextureHandle"].as<uint64_t>(0);
+            mat->NormalTextureHandle = h;
+        }
 
-            if (handle != 0 && AssetManager::IsAssetHandleValid(handle))
-            {
-                Ref<Texture2D> tex = AssetManager::GetAsset<Texture2D>(handle);
-                if (tex && tex->IsLoaded())
-                    mat->AlbedoTexture = tex;
-                else
-                    LOG_CORE_WARN("Texture exists in registry but failed to load: {}", relTexPath.string());
-            }
-            else
-            {
-                LOG_CORE_WARN("Texture not found in AssetRegistry: {}", relTexPath.string());
-            }
-        }*/
-
+        
         return mat;
     }
 

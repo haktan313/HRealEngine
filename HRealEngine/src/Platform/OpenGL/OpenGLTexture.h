@@ -34,5 +34,6 @@ namespace HRealEngine
         uint32_t m_RendererID;
         uint32_t m_Width, m_Height;
         GLenum m_InternalFormat, m_DataFormat;
+        uint32_t m_MipLevels = 1;
     };
 }

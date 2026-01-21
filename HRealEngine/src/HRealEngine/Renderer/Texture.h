@@ -18,6 +18,12 @@ namespace HRealEngine
         RGBA32F
     };
 
+    enum class TextureFilter
+    {
+        Nearest,
+        Linear
+    };
+
     struct TextureSpecification
     {
         uint32_t Width = 1;
@@ -26,6 +32,8 @@ namespace HRealEngine
         ImageFormat Format = ImageFormat::RGBA8;
         
         bool GenerateMips = true;
+        TextureFilter MinFilter = TextureFilter::Linear;
+        TextureFilter MagFilter = TextureFilter::Linear;
     };
     
     class Texture : public Asset

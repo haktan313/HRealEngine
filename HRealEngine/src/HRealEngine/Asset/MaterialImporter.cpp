@@ -8,7 +8,9 @@ namespace HRealEngine
 {
     Ref<Asset> MaterialImporter::ImportMaterial(AssetHandle assetHandle, const AssetMetadata& metaData)
     {
-        Ref<Asset> asset = MaterialLibrary::GetOrLoad(metaData.FilePath, Project::GetActive()->GetAssetDirectory());
-        return asset;
+        auto mat = MaterialLibrary::GetOrLoad(metaData.FilePath, Project::GetActive()->GetAssetDirectory());
+        if (mat)
+            mat->Handle = assetHandle;
+        return mat;
     }
 }

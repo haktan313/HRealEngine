@@ -1,5 +1,35 @@
 Scene: Untitled
 Entities:
+  - Entity: 10334013345553825234
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshHandle: 17687728352928453814
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 3896460072906561073
+  - Entity: 3125973510530094700
+    TagComponent:
+      Tag: f;asjjjj
+    TransformComponent:
+      Position: [0.3907424, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.9999999, 0.9999999, 1]
+    MeshRendererComponent:
+      MeshHandle: 2081254087837291163
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 1963896322472532970
   - Entity: 4252773359772711178
     TagComponent:
       Tag: cube
@@ -9,38 +39,8 @@ Entities:
       Scale: [1, 1, 1]
     MeshRendererComponent:
       MeshHandle: 0
-      Color: [0.26801476, 0.9145907, 0.17901243, 1]
-      TextureHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 12326138095061292247
       TilingFactor: 1
       MaterialHandleOverrides:
         []
-  - Entity: 3125973510530094700
-    TagComponent:
-      Tag: f;asjjjj
-    TransformComponent:
-      Position: [0.3907424, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0.9999999, 0.9999999, 1]
-    MeshRendererComponent:
-      MeshHandle: 1049105328473997768
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 13301379573216789227
-  - Entity: 10334013345553825234
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshRendererComponent:
-      MeshHandle: 2448669013783252797
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 8599235794369918790

@@ -7,6 +7,7 @@
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Renderer/Material.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace HRealEngine
@@ -921,6 +922,71 @@ namespace HRealEngine
                             ImGui::TextDisabled("Using Default");           
                         ImGui::Separator();
                         ImGui::PopID();*/
+                        AssetHandle activeMatHandle = (overrideHandle != 0) ? overrideHandle : defaultHandle;
+
+                        if (activeMatHandle != 0 && AssetManager::IsAssetHandleValid(activeMatHandle))
+                        {
+                            Ref<HMaterial> mat = AssetManager::GetAsset<HMaterial>(activeMatHandle);
+                            if (mat)
+                            {
+                                if (ImGui::TreeNodeEx("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
+                                {
+                                    ImGui::ColorEdit4("Base Color", glm::value_ptr(mat->Color));
+                                    ImGui::SliderFloat("Shininess", &mat->Shininess, 1.0f, 256.0f);
+
+                                    auto TextureDropButton = [&](const char* label, AssetHandle& texHandle)
+                                    {
+                                        ImGui::Text("%s: %llu", label, (uint64_t)texHandle);
+                                        ImGui::SameLine();
+                                        ImGui::Button(("Drop " + std::string(label)).c_str(), ImVec2(160, 0));
+
+                                        if (ImGui::BeginDragDropTarget())
+                                        {
+                                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                                            {
+                                                AssetHandle h = *(AssetHandle*)payload->Data;
+                                                if (AssetManager::GetAssetType(h) == AssetType::Texture)
+                                                {
+                                                    texHandle = h;
+                                                    
+                                                    if (std::string(label) == "Albedo")
+                                                        mat->AlbedoTextureCache = nullptr;
+                                                    if (std::string(label) == "Specular")
+                                                        mat->SpecularTextureCache = nullptr;
+                                                    if (std::string(label) == "Normal")
+                                                        mat->NormalTextureCache = nullptr;
+                                                       
+                                                } 
+                                                else
+                                                {
+                                                    LOG_CORE_WARN("Dropped asset is not a texture.");
+                                                }
+                                            }
+                                            ImGui::EndDragDropTarget();
+                                        }
+
+                                        ImGui::SameLine();
+                                        if (ImGui::SmallButton(("Clear##" + std::string(label)).c_str()))
+                                        {
+                                            texHandle = 0;
+                                            if (std::string(label) == "Albedo")
+                                                mat->AlbedoTextureCache = nullptr;
+                                            if (std::string(label) == "Specular")
+                                                mat->SpecularTextureCache = nullptr;
+                                            if (std::string(label) == "Normal")
+                                                mat->NormalTextureCache = nullptr;
+                                        }
+                                    };
+
+                                    TextureDropButton("Albedo",   mat->AlbedoTextureHandle);
+                                    TextureDropButton("Specular", mat->SpecularTextureHandle);
+                                    TextureDropButton("Normal",   mat->NormalTextureHandle);
+
+                                    ImGui::TreePop();
+                                }
+                            }
+                        }
+
                         auto GetLabel = [](AssetHandle h) -> std::string
                         {
                             if (h == 0)

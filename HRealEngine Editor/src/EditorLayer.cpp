@@ -426,8 +426,10 @@ namespace HRealEngine
         static int debugView = 0;
         ImGui::RadioButton("None", &debugView, 0);
         ImGui::RadioButton("UV", &debugView, 1);
-        ImGui::RadioButton("Normal", &debugView, 2);
-
+        ImGui::RadioButton("VertexNormal", &debugView, 2);
+        ImGui::RadioButton("Specular", &debugView, 3);
+        ImGui::RadioButton("NormalTexture", &debugView, 4);
+        
         Renderer::SetDebugView(debugView);
 
         

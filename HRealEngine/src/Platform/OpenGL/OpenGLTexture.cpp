@@ -85,16 +85,37 @@ namespace HRealEngine
         return 0;
     }
 
+    static uint32_t CalculateMipCount(uint32_t width, uint32_t height)
+    {
+        uint32_t levels = 1;
+        while (width > 1 || height > 1)
+        {
+            width  = width  > 1 ? width  / 2 : 1;
+            height = height > 1 ? height / 2 : 1;
+            levels++;
+        }
+        return levels;
+    }
+
     OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec, Buffer initialData) : m_Specification(spec), m_Width(spec.Width), m_Height(spec.Height)
     {
         m_InternalFormat = ImageFormatToGLInternalFormat(m_Specification.Format);
         m_DataFormat = ImageFormatToGLDataFormat(m_Specification.Format);
+        m_MipLevels = m_Specification.GenerateMips ? CalculateMipCount(m_Width, m_Height) : 1;
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-        glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
+        glTextureStorage2D(m_RendererID, m_MipLevels, m_InternalFormat, m_Width, m_Height);
+        
+        GLint mag = m_Specification.MagFilter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR;
 
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLint min = 0;
+        if (m_Specification.GenerateMips && m_MipLevels > 1)
+            min = m_Specification.MinFilter == TextureFilter::Nearest ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+        else
+            min = m_Specification.MinFilter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR;
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, min);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, mag);
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -107,6 +128,10 @@ namespace HRealEngine
         uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
         HREALENGINE_CORE_DEBUGBREAK(data.Size == m_Width * m_Height * bpp, "Data must be entire texture!");
         glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data.Data);
+        
+        if (m_Specification.GenerateMips && m_MipLevels > 1)
+            glGenerateTextureMipmap(m_RendererID);
+        
         m_bIsLoaded = true;
     }
 

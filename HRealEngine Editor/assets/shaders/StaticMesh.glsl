@@ -30,6 +30,14 @@ uniform int u_DebugView;
 // 0 = normal render
 // 1 = UV debug
 // 2 = Normal debug
+// 3 = Specular debug
+uniform sampler2D u_Specular;
+uniform int u_HasSpecular = 0;
+
+uniform float u_Shininess;
+
+uniform sampler2D u_Normal;
+uniform int u_HasNormal = 0;
 
 
 uniform vec4 u_Color = vec4(1.0);
@@ -47,6 +55,25 @@ void main()
     {
         vec3 n = normalize(v_Normal) * 0.5 + 0.5;
         o_Color = vec4(n, 1.0);
+        return;
+    }
+    if (u_DebugView == 3)
+    {
+        if (u_HasSpecular == 1)
+            o_Color = vec4(texture(u_Specular, v_TexCoord).rrr, 1.0);
+        else
+            o_Color = vec4(1.0, 0.0, 1.0, 1.0);
+        return;
+    }
+    if (u_DebugView == 4)
+    {
+        if (u_HasNormal == 1)
+        {
+            vec3 nm = texture(u_Normal, v_TexCoord).xyz;
+            o_Color = vec4(nm, 1.0);
+        }
+        else
+            o_Color = vec4(1.0, 0.0, 1.0, 1.0);
         return;
     }
 

@@ -254,37 +254,6 @@ namespace HRealEngine
             
                     const uint32_t slot = sm.MaterialIndex;
                     
-                    /*std::filesystem::path chosenMat;
-                    
-                    if (slot < meshRenderer.MaterialOverrides.size() && !meshRenderer.MaterialOverrides[slot].empty()
-                        && meshRenderer.MaterialOverrides[slot] != "null")
-                    {
-                        chosenMat = meshRenderer.MaterialOverrides[slot];
-                    }
-                    else if (slot < meshGPU->MaterialPaths.size() && !meshGPU->MaterialPaths[slot].empty()
-                        && meshGPU->MaterialPaths[slot] != "null")
-                    {
-                        chosenMat = meshGPU->MaterialPaths[slot];
-                    }
-                    
-                    if (!chosenMat.empty())
-                    {
-                        Ref<HMaterial> mat = MaterialLibrary::GetOrLoad(chosenMat, Project::GetAssetDirectory());
-                        if (mat)
-                        {
-                            mat->Apply(meshGPU->Shader);
-                        }
-                        else
-                        {
-                            meshGPU->Shader->SetInt("u_HasAlbedo", 0);
-                            meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
-                        }
-                    }
-                    else
-                    {
-                        meshGPU->Shader->SetInt("u_HasAlbedo", 0);
-                        meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
-                    }*/
                     AssetHandle matHandle = 0;
                     if (slot < meshRenderer.MaterialHandleOverrides.size())
                         matHandle = meshRenderer.MaterialHandleOverrides[slot];

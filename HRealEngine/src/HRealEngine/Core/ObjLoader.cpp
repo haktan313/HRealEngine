@@ -183,6 +183,10 @@ namespace HRealEngine
             hm << "BaseColor: [" << kd.r << ", " << kd.g << ", " << kd.b << "]\n";
             hm << "AlbedoTextureHandle: " << (uint64_t)albedoHandle << "\n";
             //hm << "AlbedoTexture: " << albedoTexRel << "\n";
+            
+            hm << "SpecularTextureHandle: " << (uint64_t)0 << "\n";
+            hm << "NormalTextureHandle: "   << (uint64_t)0 << "\n";
+            hm << "Shininess: " << 32.0f << "\n";
             hm.close();
 
             materialRelPaths[i] = std::filesystem::relative(hmatAbs, assetsRoot).generic_string();
