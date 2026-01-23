@@ -18,6 +18,8 @@
 /*#include "box2d/b2_contact.h"*/
 #include "BehaviorTreeThings/Core/BTSerializer.h"
 #include "BehaviorTreeThings/Core/Tree.h"
+#include "HRealEngine/Asset/AssetManager.h"
+#include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Physics/Box2DWorld.h"
 #include "HRealEngine/Physics/JoltWorld.h"
 #include "HRealEngine/Project/Project.h"
@@ -63,6 +65,21 @@ namespace HRealEngine
         CopyComponentIfExists<Component...>(dst, src);
     }
 
+    static int LightTypeToGPU(LightComponent::LightType t)
+    {
+        switch (t)
+        {
+        case LightComponent::LightType::Directional:
+            return 0;
+        case LightComponent::LightType::Point:   
+            return 1;
+        case LightComponent::LightType::Spot:
+            return 2;
+        }
+        return 0;
+    }
+
+
     Ref<Scene> Scene::Copy(Ref<Scene> other)
     {
         Ref<Scene> newScene = CreateRef<Scene>();
@@ -83,6 +100,7 @@ namespace HRealEngine
         }
 
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<LightComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
@@ -309,7 +327,9 @@ namespace HRealEngine
         
         if (!mainCamera)
             return;
-
+        
+        LightningAndShadowSetup(glm::vec3(cameraTransform[3]));
+        
         Renderer3D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
             auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
@@ -472,6 +492,7 @@ namespace HRealEngine
 
     void Scene::RenderScene(EditorCamera& camera)
     {
+        LightningAndShadowSetup(camera.GetPosition());
         Renderer3D::BeginScene(camera);
         {
             auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
@@ -505,6 +526,56 @@ namespace HRealEngine
         Renderer2D::EndScene();
     }
 
+    void Scene::LightningAndShadowSetup(const glm::vec3& cameraPosition)
+    {
+        Renderer3D::SetViewPosition(cameraPosition);
+        std::vector<Renderer3D::LightGPU> lights;
+        lights.reserve(16);
+
+        // Find first directional light that casts shadows
+        bool doShadows = false;
+        glm::vec3 shadowDir(0.0f, -1.0f, 0.0f);
+        
+        auto lightView = m_Registry.view<TransformComponent, LightComponent>();
+        for (auto e : lightView)
+        {
+            auto [tc, lc] = lightView.get<TransformComponent, LightComponent>(e);
+            
+            if (!doShadows && lc.Type == LightComponent::LightType::Directional && lc.CastShadows)
+            {
+                shadowDir = lc.Direction;
+                doShadows = true;
+            }
+
+            if ((int)lights.size() >= 16)
+                continue;
+
+            Renderer3D::LightGPU gpu{};
+            gpu.Type = LightTypeToGPU(lc.Type);
+            gpu.Position = tc.Position;
+            gpu.Direction = lc.Direction;
+            gpu.Color = lc.Color;
+            gpu.Intensity = lc.Intensity;
+            gpu.Radius = lc.Radius;
+            gpu.CastShadows = lc.CastShadows ? 1 : 0;
+
+            lights.push_back(gpu);
+        }
+        Renderer3D::SetLights(lights);
+        
+        if (doShadows)
+        {
+            Renderer3D::BeginShadowPass(shadowDir, cameraPosition);
+            auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : viewShadow)
+            {
+                auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMeshShadow(transform.GetTransform(), meshRenderer);
+            }
+            Renderer3D::EndShadowPass();
+        }
+    }
+
     void Scene::RecalculateRenderListSprite()
     {
         m_RenderList.clear();
@@ -529,6 +600,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<EntityIDComponent>(Entity entity, EntityIDComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<LightComponent>(Entity entity, LightComponent& component)
     {
     }
     template<>

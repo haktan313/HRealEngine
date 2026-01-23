@@ -16,8 +16,32 @@ namespace HRealEngine
         static void EndScene();
         static void StartBatch();
         static void Flush();
+
+        struct LightGPU
+        {
+            int Type;
+            glm::vec3 Position;
+            glm::vec3 Direction;
+            glm::vec3 Color;
+            float Intensity;
+            float Radius;
+            int CastShadows;
+        };
+
+        static void SetLights(const std::vector<LightGPU>& lights);
+        static void SetViewPosition(const glm::vec3& pos);
         
         static Ref<MeshGPU> BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices,const Ref<Shader>& shader);
         static void DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID = -1);
+
+
+        static void BeginShadowPass(const glm::vec3& lightDirection, const glm::vec3& focusPosition);
+        static void EndShadowPass();
+        static void DrawMeshShadow(const glm::mat4& transform, MeshRendererComponent& meshRenderer);
+
+        static bool HasShadowMap();
+        static uint32_t GetShadowMapRendererID();
+        static const glm::mat4& GetLightSpaceMatrix();
+
     };
 }

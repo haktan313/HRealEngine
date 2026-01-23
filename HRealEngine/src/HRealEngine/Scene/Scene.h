@@ -63,6 +63,7 @@ namespace HRealEngine
         void OnPhysicsStart();
         void OnPhysicsStop();
         void RenderScene(EditorCamera& camera);
+        void LightningAndShadowSetup(const glm::vec3& cameraPosition);
 
         void RecalculateRenderListSprite();
         std::vector<entt::entity> m_RenderList;

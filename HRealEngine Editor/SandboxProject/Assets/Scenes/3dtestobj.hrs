@@ -1,46 +1,122 @@
 Scene: Untitled
 Entities:
-  - Entity: 10334013345553825234
+  - Entity: 17946033611301411440
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [0.33692163, 2.3059862, 2.9363403]
+      Rotation: [2.5675806e-06, 0, 1.5419067e-06]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Directional
+      Color: [1, 1, 1]
+      Direction: [-0.08, -0.25, -0.27]
+      Intensity: 0.7
+      Radius: 5.2
+      CastShadows: true
+  - Entity: 17578333643475291096
     TagComponent:
       Tag: Empty Entity
     TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshRendererComponent:
-      MeshHandle: 17687728352928453814
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 3896460072906561073
-  - Entity: 3125973510530094700
-    TagComponent:
-      Tag: f;asjjjj
-    TransformComponent:
-      Position: [0.3907424, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0.9999999, 0.9999999, 1]
-    MeshRendererComponent:
-      MeshHandle: 2081254087837291163
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 1963896322472532970
-  - Entity: 4252773359772711178
-    TagComponent:
-      Tag: cube
-    TransformComponent:
-      Position: [3.1297188, 0, 0]
+      Position: [2.2735631, 0.98185265, 0.8531421]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
       MeshHandle: 0
-      Color: [1, 1, 1, 1]
-      TextureHandle: 12326138095061292247
+      Color: [0.83629894, 0.38689986, 0.38689986, 1]
+      TextureHandle: 0
       TilingFactor: 1
       MaterialHandleOverrides:
         []
+  - Entity: 8541079047686451945
+    TagComponent:
+      Tag: camera
+    TransformComponent:
+      Position: [0, 5.1867557, 5.139484]
+      Rotation: [-0.72732043, 0, 0]
+      Scale: [1, 0.9999999, 0.9999999]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 13144157712970970766
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [-1.111809, 1.524144, -1.9755859]
+      Rotation: [0, 0, 0]
+      Scale: [13.893241, 6.1650925, 0.41331267]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    Rigidbody3DComponent:
+      BodyType: Static
+      CollisionShape: Box
+      FixedRotation: false
+  - Entity: 10334013345553825234
+    TagComponent:
+      Tag: rf
+    TransformComponent:
+      Position: [0.01817754, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshHandle: 14657949245417854136
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 7215668967160534147
+    Rigidbody3DComponent:
+      BodyType: Dynamic
+      CollisionShape: Box
+      FixedRotation: false
+  - Entity: 3125973510530094700
+    TagComponent:
+      Tag: flash
+    TransformComponent:
+      Position: [1.4288565, 0, 0.91786873]
+      Rotation: [0, 0, 0]
+      Scale: [1.6215125, 1.4877838, 1.7185451]
+    MeshRendererComponent:
+      MeshHandle: 4558623264958611649
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 14595291826790597398
+    Rigidbody3DComponent:
+      BodyType: Dynamic
+      CollisionShape: Box
+      FixedRotation: false
+  - Entity: 4252773359772711178
+    TagComponent:
+      Tag: cube
+    TransformComponent:
+      Position: [-0.57018054, -1.3358526, 1.231401]
+      Rotation: [0, 0, 0]
+      Scale: [14.88225, 1, 8.026314]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    Rigidbody3DComponent:
+      BodyType: Static
+      CollisionShape: Box
+      FixedRotation: false

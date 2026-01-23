@@ -66,14 +66,6 @@ namespace HRealEngine
                 v.Position = ToVec3(mesh->mVertices[i]);
                 v.Normal = hasNormals ? ToVec3(mesh->mNormals[i]) : glm::vec3(0,1,0);
                 v.UV = hasUV0 ? ToVec2(mesh->mTextureCoords[0][i]) : glm::vec2(0);
-                if (hasTangents)
-                    v.Tangent = ToVec3(mesh->mTangents[i]);
-                v.Color = glm::vec3(1.0f);
-                if (hasColors0)
-                {
-                    const aiColor4D c = mesh->mColors[0][i];
-                    v.Color = glm::vec3(c.r, c.g, c.b);
-                }
                 outVertices.push_back(v);
             }
 

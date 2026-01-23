@@ -227,7 +227,8 @@ namespace HRealEngine
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("AddComponent");
         if (ImGui::BeginPopup("AddComponent"))
-        {  
+        {
+            ShowAddComponentEntry<LightComponent>("Light Component");
             ShowAddComponentEntry<CameraComponent>("Camera Component");
             ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
@@ -250,6 +251,24 @@ namespace HRealEngine
             DrawVec3Control("Rotation", rotation);
             component.Rotation = glm::radians(rotation);
             DrawVec3Control("Scale", component.Scale, 1.0f);
+        });
+        DrawComponent<LightComponent>("Light Component", entity, [](auto& component)
+        {
+            const char* types[] = { "Directional", "Point", "Spot" };
+            int type = (int)component.Type;
+            if (ImGui::Combo("Type", &type, types, 3))
+                component.Type = (LightComponent::LightType)type;
+
+            ImGui::ColorEdit3("Color", glm::value_ptr(component.Color));
+            ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 100.0f);
+
+            if (component.Type == LightComponent::LightType::Directional || component.Type == LightComponent::LightType::Spot)
+                ImGui::DragFloat3("Direction", glm::value_ptr(component.Direction), 0.01f, -1.0f, 1.0f);
+
+            if (component.Type == LightComponent::LightType::Point || component.Type == LightComponent::LightType::Spot)
+                ImGui::DragFloat("Radius", &component.Radius, 0.1f, 0.0f, 1000.0f);
+
+            ImGui::Checkbox("Cast Shadows", &component.CastShadows);
         });
         DrawComponent<CameraComponent>("Camera",entity, [](auto& component)
         {

@@ -40,6 +40,19 @@ namespace HRealEngine
             return glm::translate(glm::mat4(1.0f), Position) * rotation * glm::scale(glm::mat4(1.0f), Scale);
         }
     };
+    struct LightComponent
+    {
+        enum class LightType { Directional = 0, Point, Spot };
+        LightType Type = LightType::Point;
+        glm::vec3 Color {1.0f, 1.0f, 1.0f};
+        glm::vec3 Direction {0.0f, -1.0f, 0.0f};
+        float Intensity = 1.0f;
+        float Radius = 1.0f;
+        bool CastShadows = true;
+
+        LightComponent() = default;
+        LightComponent(const LightComponent&) = default;
+    };
 
     struct SpriteRendererComponent
     {
@@ -206,6 +219,7 @@ namespace HRealEngine
     using AllComponents = ComponentGroup<
         TransformComponent,
         TagComponent,
+        LightComponent,
         CameraComponent,
         SpriteRendererComponent,
         MeshRendererComponent,
