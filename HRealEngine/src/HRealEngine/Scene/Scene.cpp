@@ -6,19 +6,11 @@
 #include "HRealEngine/Core/Entity.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 
-/*#include "box2d/b2_world.h"
-#include "box2d/b2_body.h"
-#include "box2d/b2_circle_shape.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"*/
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-/*#include "box2d/b2_contact.h"*/
 #include "BehaviorTreeThings/Core/BTSerializer.h"
 #include "BehaviorTreeThings/Core/Tree.h"
-#include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Physics/Box2DWorld.h"
 #include "HRealEngine/Physics/JoltWorld.h"
@@ -532,19 +524,37 @@ namespace HRealEngine
         std::vector<Renderer3D::LightGPU> lights;
         lights.reserve(16);
 
-        // Find first directional light that casts shadows
+        /*// Find first directional light that casts shadows
         bool doShadows = false;
-        glm::vec3 shadowDir(0.0f, -1.0f, 0.0f);
+        glm::vec3 shadowDir(0.0f, -1.0f, 0.0f);*/
+
+        // Directional shadow
+        bool doDirShadows = false;
+        glm::vec3 dirShadowDir(0.0f, -1.0f, 0.0f);
+
+        // Point shadow
+        bool doPointShadows = false;
+        glm::vec3 pointShadowPos(0.0f);
+        float pointFarPlane = 25.0f;
         
         auto lightView = m_Registry.view<TransformComponent, LightComponent>();
         for (auto e : lightView)
         {
             auto [tc, lc] = lightView.get<TransformComponent, LightComponent>(e);
             
-            if (!doShadows && lc.Type == LightComponent::LightType::Directional && lc.CastShadows)
+            if (!/*doShadows*/doDirShadows && lc.Type == LightComponent::LightType::Directional && lc.CastShadows)
             {
-                shadowDir = lc.Direction;
-                doShadows = true;
+                if (glm::length(lc.Direction) > 0.0001f)
+                {
+                    dirShadowDir/*shadowDir*/ = lc.Direction;
+                    /*doShadows*/doDirShadows = true;
+                }
+            }
+            if (!doPointShadows && lc.Type == LightComponent::LightType::Point && lc.CastShadows)
+            {
+                pointShadowPos = tc.Position;
+                pointFarPlane = (lc.Radius > 0.01f) ? lc.Radius : 25.0f;
+                doPointShadows = true;
             }
 
             if ((int)lights.size() >= 16)
@@ -563,9 +573,9 @@ namespace HRealEngine
         }
         Renderer3D::SetLights(lights);
         
-        if (doShadows)
+        if (doDirShadows/*doShadows*/)
         {
-            Renderer3D::BeginShadowPass(shadowDir, cameraPosition);
+            Renderer3D::BeginShadowPass(/*shadowDir*/dirShadowDir, cameraPosition);
             auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
             for (auto entity : viewShadow)
             {
@@ -574,6 +584,21 @@ namespace HRealEngine
             }
             Renderer3D::EndShadowPass();
         }
+        
+        if (doPointShadows)
+        {
+            Renderer3D::BeginPointShadowPass(pointShadowPos, pointFarPlane);
+
+            auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
+            for (auto entity : viewShadow)
+            {
+                auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMeshPointShadow(transform.GetTransform(), meshRenderer);
+            }
+
+            Renderer3D::EndPointShadowPass();
+        }
+
     }
 
     void Scene::RecalculateRenderListSprite()

@@ -67,7 +67,7 @@ uniform int u_DebugView;
 layout (location = 0) in VertexOut Input;
 layout (location = 6) in flat int v_EntityIDOut;
 
-layout (binding = 0) uniform sampler2D u_textureSamplers[32];
+layout (binding = 0) uniform sampler2D u_textureSamplers[30];
 
 #define MAX_LIGHTS 16
 struct Light
@@ -116,6 +116,25 @@ float ComputeShadow(vec3 worldPos, vec3 normal, vec3 lightDir)
     return shadow;
 }
 
+uniform int u_HasPointShadowMap = 0;
+uniform samplerCube u_PointShadowMap;
+uniform vec3  u_PointShadowLightPos;
+uniform float u_PointShadowFarPlane;
+float ComputePointShadow(vec3 worldPos)
+{
+    vec3 fragToLight = worldPos - u_PointShadowLightPos;
+    float currentDepth = length(fragToLight);
+
+    // sample stored depth (0..1) then scale back to world distance
+    float closestDepth = texture(u_PointShadowMap, fragToLight).r * u_PointShadowFarPlane;
+
+    // basic bias (you can tune)
+    float bias = 0.05;
+
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
+}
+
 
 void main()
 {
@@ -152,8 +171,8 @@ void main()
         case 27: texColor *= texture(u_textureSamplers[27], Input.texCoord * Input.tilingFactor); break;
         case 28: texColor *= texture(u_textureSamplers[28], Input.texCoord * Input.tilingFactor); break;
         case 29: texColor *= texture(u_textureSamplers[29], Input.texCoord * Input.tilingFactor); break;
-        case 30: texColor *= texture(u_textureSamplers[30], Input.texCoord * Input.tilingFactor); break;
-        case 31: texColor *= texture(u_textureSamplers[31], Input.texCoord * Input.tilingFactor); break;
+        //case 30: texColor *= texture(u_textureSamplers[30], Input.texCoord * Input.tilingFactor); break;
+        //case 31: texColor *= texture(u_textureSamplers[31], Input.texCoord * Input.tilingFactor); break;
     }
 
     if(texColor.a < 0.1)
@@ -216,6 +235,15 @@ void main()
         float shadow = 0.0;
         if (u_HasShadowMap == 1 && light.Type == 0 && light.CastShadows == 1)
             shadow = ComputeShadow(Input.worldPos, normal, lightDirection);
+        if (u_HasPointShadowMap == 1 && light.Type == 1 && light.CastShadows == 1)
+        {
+            float distToShadowCaster = length(light.Position - u_PointShadowLightPos);
+            
+            if (distToShadowCaster < 0.05) 
+            {
+                shadow = max(shadow, ComputePointShadow(Input.worldPos)); 
+            }
+        }
 
 		lit += (diffuse + specular) * lightColor * atten * (1.0 - shadow);
     }

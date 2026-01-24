@@ -93,6 +93,25 @@ float ComputeShadow(vec3 worldPos, vec3 normal, vec3 lightDir)
     return shadow;
 }
 
+uniform int u_HasPointShadowMap = 0;
+uniform samplerCube u_PointShadowMap;
+uniform vec3  u_PointShadowLightPos;
+uniform float u_PointShadowFarPlane;
+float ComputePointShadow(vec3 worldPos)
+{
+    vec3 fragToLight = worldPos - u_PointShadowLightPos;
+    float currentDepth = length(fragToLight);
+
+    // sample stored depth (0..1) then scale back to world distance
+    float closestDepth = texture(u_PointShadowMap, fragToLight).r * u_PointShadowFarPlane;
+
+    // basic bias (you can tune)
+    float bias = 0.05;
+
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
+}
+
 
 void main()
 {
@@ -174,7 +193,15 @@ void main()
         float shadow = 0.0;
         if (u_HasShadowMap == 1 && light.Type == 0 && light.CastShadows == 1)
             shadow = ComputeShadow(v_WorldPos, normal, lightDirection);
-
+        if (u_HasPointShadowMap == 1 && light.Type == 1 && light.CastShadows == 1)
+        {
+            float distToShadowCaster = length(light.Position - u_PointShadowLightPos);
+            
+            if (distToShadowCaster < 0.05) 
+            {
+                shadow = max(shadow, ComputePointShadow(v_WorldPos)); 
+            }
+        }
 		lit += (diffuse + specular) * lightColor * atten * (1.0 - shadow);
     }
     o_Color = vec4(lit, u_Color.a);   

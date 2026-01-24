@@ -43,5 +43,17 @@ namespace HRealEngine
         static uint32_t GetShadowMapRendererID();
         static const glm::mat4& GetLightSpaceMatrix();
 
+
+        // Renderer3D.h
+        static void BeginPointShadowPass(const glm::vec3& lightPosition, float farPlane);
+        static void EndPointShadowPass();
+        static void DrawMeshPointShadow(const glm::mat4& transform, MeshRendererComponent& meshRenderer);
+
+        static bool HasPointShadowMap();
+        static uint32_t GetPointShadowMapRendererID();
+        static const glm::vec3& GetPointShadowLightPos();
+        static float GetPointShadowFarPlane();
+
+
     };
 }
