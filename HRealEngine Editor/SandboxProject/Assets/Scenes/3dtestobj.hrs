@@ -78,7 +78,7 @@ Entities:
     TagComponent:
       Tag: camera
     TransformComponent:
-      Position: [0, 5.1867557, 5.139484]
+      Position: [0, 4.2982345, 7.7275877]
       Rotation: [-0.72732043, 0, 0]
       Scale: [1, 0.9999999, 0.9999999]
     CameraComponent:
@@ -86,7 +86,7 @@ Entities:
       FixedAspectRatio: false
       Camera:
         ProjectionType: 0
-        PerspectiveFOV: 0.7853982
+        PerspectiveFOV: 1.3089969
         PerspectiveNear: 0.01
         PerspectiveFar: 1000
         OrthographicSize: 10
@@ -110,7 +110,7 @@ Entities:
     TagComponent:
       Tag: light6
     TransformComponent:
-      Position: [-4.72135, 2.3059795, 4.568773]
+      Position: [-22.41738, 2.3059504, 4.97651]
       Rotation: [2.5675806e-06, 0, 1.5419067e-06]
       Scale: [1, 1, 1]
     LightComponent:
@@ -124,29 +124,29 @@ Entities:
     TagComponent:
       Tag: light2
     TransformComponent:
-      Position: [23.024801, 0.99610984, -6.974785]
+      Position: [-1.939562, 0.99610984, 1.6467438]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:
       Type: Point
-      Color: [1, 1, 1]
+      Color: [0, 1, 0.54092526]
       Direction: [0, -1, 0]
-      Intensity: 8.6
-      Radius: 6.8
+      Intensity: 2
+      Radius: 7.6
       CastShadows: true
   - Entity: 5914020284527656264
     TagComponent:
       Tag: light3
     TransformComponent:
-      Position: [-3.9235597, 2.8910394, -6.981311]
+      Position: [-3.9235597, 2.8910394, 3.328796]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:
       Type: Point
       Color: [0.85765123, 0.2228062, 0.2228062]
       Direction: [0, -1, 0]
-      Intensity: 2.2
-      Radius: 7.7
+      Intensity: 2.9
+      Radius: 9.2
       CastShadows: true
   - Entity: 15121850108385962197
     TagComponent:
@@ -166,7 +166,7 @@ Entities:
     TagComponent:
       Tag: light5
     TransformComponent:
-      Position: [-0.841784, 1.5029516, 2.9995897]
+      Position: [-3.2338815, 1.5029516, 2.9995897]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:

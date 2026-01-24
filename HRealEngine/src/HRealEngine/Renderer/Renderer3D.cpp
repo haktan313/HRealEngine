@@ -872,4 +872,20 @@ namespace HRealEngine
 
         StartBatch();
     }
+
+    void Renderer3D::EndPointShadowAtlas()
+    {
+        Flush();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, s_Data.OldFBO);
+        glViewport(s_Data.OldViewport[0], s_Data.OldViewport[1], s_Data.OldViewport[2], s_Data.OldViewport[3]);
+
+        glCullFace(GL_BACK);
+    }
+
+    void Renderer3D::EndPointShadowCaster()
+    {
+        Flush();
+        StartBatch();
+    }
 }
