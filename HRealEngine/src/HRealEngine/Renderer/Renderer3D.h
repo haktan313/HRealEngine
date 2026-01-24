@@ -54,6 +54,11 @@ namespace HRealEngine
         static const glm::vec3& GetPointShadowLightPos();
         static float GetPointShadowFarPlane();
 
+        static void BeginPointShadowAtlas();
+        static void BeginPointShadowCaster(uint32_t casterIndex, int lightIndex, const glm::vec3& lightPosition, float farPlane);
+        static void EndPointShadowCaster();
+        static void EndPointShadowAtlas();
+
 
     };
 }

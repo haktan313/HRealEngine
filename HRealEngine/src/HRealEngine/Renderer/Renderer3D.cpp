@@ -86,8 +86,14 @@ namespace HRealEngine
         Ref<Shader> PointShadowDepthShader;
 
         bool PointShadowValid = false;
-        glm::vec3 PointShadowLightPos = glm::vec3(0.0f);
-        float PointShadowFarPlane = 25.0f;
+        /*glm::vec3 PointShadowLightPos = glm::vec3(0.0f);
+        float PointShadowFarPlane = 25.0f;*/
+
+        uint32_t MaxPointShadowCasters = 8;
+        uint32_t PointShadowDepthCubemapArray = 0;
+        std::array<int, 16> PointShadowIndex{};
+        std::array<glm::vec3, 16> PointShadowLightPos{};
+        std::array<float, 16> PointShadowFarPlane{};
     };
     static Renderer3DData s_Data;
 
@@ -128,7 +134,7 @@ namespace HRealEngine
 
         glGenFramebuffers(1, &s_Data.PointShadowFBO);
 
-        glGenTextures(1, &s_Data.PointShadowDepthCubemap);
+        /*glGenTextures(1, &s_Data.PointShadowDepthCubemap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, s_Data.PointShadowDepthCubemap);
 
         for (unsigned int i = 0; i < 6; i++)
@@ -145,14 +151,61 @@ namespace HRealEngine
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
         glBindFramebuffer(GL_FRAMEBUFFER, s_Data.PointShadowFBO);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, s_Data.PointShadowDepthCubemap, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, s_Data.PointShadowDepthCubemap, 0);*/
+        glGenTextures(1, &s_Data.PointShadowDepthCubemapArray);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, s_Data.PointShadowDepthCubemapArray);
+        
+        const GLsizei depthLayers = (GLsizei)(6 * s_Data.MaxPointShadowCasters);
+
+        glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT24,
+            (GLsizei)s_Data.PointShadowMapSize, (GLsizei)s_Data.PointShadowMapSize, depthLayers,
+            0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, s_Data.PointShadowFBO);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, s_Data.PointShadowDepthCubemapArray, 0);
+
 
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0);
+
     }
+    static void UploadPointShadowArrayToShader(const Ref<Shader>& shader)
+    {
+        if (Renderer3D::HasPointShadowMap())
+        {
+            shader->SetInt("u_HasPointShadowMap", 1);
+
+            const int slot = Renderer3DData::ReservedPointShadowSlot; // 30
+            shader->SetInt("u_PointShadowMaps", slot);
+
+            glActiveTexture(GL_TEXTURE0 + slot);
+            glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, s_Data.PointShadowDepthCubemapArray);
+
+            for (int i = 0; i < 16; i++)
+            {
+                shader->SetInt   ("u_PointShadowIndex[" + std::to_string(i) + "]", s_Data.PointShadowIndex[i]);
+                shader->SetFloat3("u_PointShadowLightPos[" + std::to_string(i) + "]", s_Data.PointShadowLightPos[i]);
+                shader->SetFloat ("u_PointShadowFarPlane[" + std::to_string(i) + "]", s_Data.PointShadowFarPlane[i]);
+            }
+        }
+        else
+        {
+            shader->SetInt("u_HasPointShadowMap", 0);
+            for (int i = 0; i < 16; i++)
+                shader->SetInt("u_PointShadowIndex[" + std::to_string(i) + "]", -1);
+        }
+    }
+
 
     
     static void UploadLightsToShader(const Ref<Shader>& shader)
@@ -302,11 +355,17 @@ namespace HRealEngine
         s_Data.ShadowDepthShader = nullptr;
         s_Data.ShadowValid = false;
 
-        if (s_Data.PointShadowDepthCubemap)
+        /*if (s_Data.PointShadowDepthCubemap)
         {
             glDeleteTextures(1, &s_Data.PointShadowDepthCubemap);
             s_Data.PointShadowDepthCubemap = 0;
+        }*/
+        if (s_Data.PointShadowDepthCubemapArray)
+        {
+            glDeleteTextures(1, &s_Data.PointShadowDepthCubemapArray);
+            s_Data.PointShadowDepthCubemapArray = 0;
         }
+
         if (s_Data.PointShadowFBO)
         {
             glDeleteFramebuffers(1, &s_Data.PointShadowFBO);
@@ -350,7 +409,15 @@ namespace HRealEngine
         s_Data.CubeVertexBufferPtr = s_Data.CubeVertexBufferBase;
         s_Data.TextureSlotIndex = 1;
     }
-
+    
+    static bool IsDirectionalShadowPass(uint32_t currentFBO)
+    {
+        return s_Data.ShadowValid && currentFBO == s_Data.ShadowFBO;
+    }
+    static bool IsPointShadowPass(uint32_t currentFBO)
+    {
+        return s_Data.PointShadowValid && currentFBO == s_Data.PointShadowFBO;
+    }
     void Renderer3D::Flush()
     {
         if (s_Data.CubeIndexCount == 0)
@@ -358,61 +425,56 @@ namespace HRealEngine
 
         const uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.CubeVertexBufferPtr - (uint8_t*)s_Data.CubeVertexBufferBase);
         s_Data.CubeVertexBuffer->SetData(s_Data.CubeVertexBufferBase, dataSize);
+
+        GLint currentFBOi = 0;
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &currentFBOi);
+        const uint32_t currentFBO = (uint32_t)currentFBOi;
+
+        const bool dirShadowPass = IsDirectionalShadowPass(currentFBO);
+        const bool pointShadowPass = IsPointShadowPass(currentFBO);
+
+        if (dirShadowPass)
+        {
+            s_Data.ShadowDepthShader->Bind();
+            RenderCommand::DrawIndexed(s_Data.CubeVertexArray, s_Data.CubeIndexCount);
+            return;
+        }
+        if (pointShadowPass)
+        {
+            s_Data.PointShadowDepthShader->Bind();
+            RenderCommand::DrawIndexed(s_Data.CubeVertexArray, s_Data.CubeIndexCount);
+            return;
+        }
         
-        GLint currentFBO = 0;
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &currentFBO);
-        const bool isShadowPass = (s_Data.ShadowValid && (uint32_t)currentFBO == s_Data.ShadowFBO);
-        
-        if (!isShadowPass)
-            for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-                s_Data.TextureSlots[i]->Bind(i);
+        for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+            s_Data.TextureSlots[i]->Bind(i);
 
         s_Data.CubeShader->Bind();
 
-        if (!isShadowPass)
+        int32_t samplers[30];
+        for (int i = 0; i < 30; i++)
+            samplers[i] = i;
+        s_Data.CubeShader->SetIntArray("u_textureSamplers", samplers, 30);
+
+        s_Data.CubeShader->SetInt("u_DebugView", Renderer::GetDebugView());
+
+        UploadLightsToShader(s_Data.CubeShader);
+        
+        if (HasShadowMap())
         {
-            int32_t samplers[30];
-            for (int i = 0; i < 30; i++)
-                samplers[i] = i;
-            s_Data.CubeShader->SetIntArray("u_textureSamplers", samplers, 30);
+            s_Data.CubeShader->SetInt("u_HasShadowMap", 1);
+            s_Data.CubeShader->SetMat4("u_LightSpaceMatrix", GetLightSpaceMatrix());
 
-            s_Data.CubeShader->SetInt("u_DebugView", Renderer::GetDebugView());
+            const int shadowMapSlot = Renderer3DData::ReservedDirShadowSlot;
+            s_Data.CubeShader->SetInt("u_ShadowMap", shadowMapSlot);
 
-            UploadLightsToShader(s_Data.CubeShader);
-
-            if (HasShadowMap())
-            {
-                s_Data.CubeShader->SetInt("u_HasShadowMap", 1);
-                s_Data.CubeShader->SetMat4("u_LightSpaceMatrix", GetLightSpaceMatrix());
-
-                const int shadowMapSlot = 31;
-                s_Data.CubeShader->SetInt("u_ShadowMap", shadowMapSlot);
-
-                glActiveTexture(GL_TEXTURE0 + shadowMapSlot);
-                glBindTexture(GL_TEXTURE_2D, GetShadowMapRendererID());
-            }
-            else
-                s_Data.CubeShader->SetInt("u_HasShadowMap", 0);
-            if (HasPointShadowMap())
-            {
-                s_Data.CubeShader->SetInt("u_HasPointShadowMap", 1);
-                s_Data.CubeShader->SetFloat3("u_PointShadowLightPos", GetPointShadowLightPos());
-                s_Data.CubeShader->SetFloat("u_PointShadowFarPlane", GetPointShadowFarPlane());
-
-                const int pointShadowSlot = 30; // pick a free slot (you used 15 for 2D shadow map)
-                s_Data.CubeShader->SetInt("u_PointShadowMap", pointShadowSlot);
-
-                glActiveTexture(GL_TEXTURE0 + pointShadowSlot);
-                glBindTexture(GL_TEXTURE_CUBE_MAP, GetPointShadowMapRendererID());
-            }
-            else
-            {
-                s_Data.CubeShader->SetInt("u_HasPointShadowMap", 0);
-            }
-
+            glActiveTexture(GL_TEXTURE0 + shadowMapSlot);
+            glBindTexture(GL_TEXTURE_2D, GetShadowMapRendererID());
         }
         else
             s_Data.CubeShader->SetInt("u_HasShadowMap", 0);
+
+        UploadPointShadowArrayToShader(s_Data.CubeShader);
 
         RenderCommand::DrawIndexed(s_Data.CubeVertexArray, s_Data.CubeIndexCount);
         // s_Data.Stats.DrawCalls++;
@@ -503,7 +565,7 @@ namespace HRealEngine
             }
             else
                 meshGPU->Shader->SetInt("u_HasShadowMap", 0);
-            if (HasPointShadowMap())
+            /*if (HasPointShadowMap())
             {
                 meshGPU->Shader->SetInt("u_HasPointShadowMap", 1);
                 meshGPU->Shader->SetFloat3("u_PointShadowLightPos", GetPointShadowLightPos());
@@ -518,7 +580,8 @@ namespace HRealEngine
             else
             {
                 meshGPU->Shader->SetInt("u_HasPointShadowMap", 0);
-            }
+            }*/
+            UploadPointShadowArrayToShader(meshGPU->Shader);
 
             
             if (!meshGPU->Submeshes.empty())
@@ -627,10 +690,10 @@ namespace HRealEngine
         const glm::vec3 dir = glm::normalize(lightDirection);
         s_Data.ShadowLightDir = dir;
             
-        const float orthoRange = 35.0f;
-        const float nearPlane  = -50.0f;
-        const float farPlane   =  50.0f;
-            
+        const float orthoRange = 120.0f;
+        const float nearPlane = -200.0f;
+        const float farPlane = 200.0f;
+        
         const glm::vec3 up = (glm::abs(dir.y) > 0.99f) ? glm::vec3(0, 0, 1) : glm::vec3(0, 1, 0);
             
         const glm::vec3 lightPos = focusPosition - dir * 30.0f;
@@ -750,8 +813,8 @@ namespace HRealEngine
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
 
-        s_Data.PointShadowLightPos = lightPosition;
-        s_Data.PointShadowFarPlane = farPlane;
+        /*s_Data.PointShadowLightPos = lightPosition;
+        s_Data.PointShadowFarPlane = farPlane;*/
 
         glViewport(0, 0, (GLsizei)s_Data.PointShadowMapSize, (GLsizei)s_Data.PointShadowMapSize);
         glBindFramebuffer(GL_FRAMEBUFFER, s_Data.PointShadowFBO);
@@ -821,7 +884,8 @@ namespace HRealEngine
         CubeVertex* ptr = s_Data.CubeVertexBufferBase;
         for (size_t i = 0; i < 24; i++)
         {
-            ptr->Position = glm::vec3(s_Data.VertexPos[i]); 
+            glm::vec4 wp = transform * s_Data.VertexPos[i];
+            ptr->Position = glm::vec3(wp);
 
             ptr->Normal = glm::vec3(0.0f); 
             ptr->Color = glm::vec4(0.0f);
@@ -841,22 +905,112 @@ namespace HRealEngine
 
     bool Renderer3D::HasPointShadowMap()
     {
-        return s_Data.PointShadowValid && s_Data.PointShadowDepthCubemap != 0;
+        return /*s_Data.PointShadowValid && s_Data.PointShadowDepthCubemap != 0;*/s_Data.PointShadowValid && s_Data.PointShadowDepthCubemapArray != 0;
     }
 
     uint32_t Renderer3D::GetPointShadowMapRendererID()
     {
-        return s_Data.PointShadowDepthCubemap;
+        return /*s_Data.PointShadowDepthCubemap;*/s_Data.PointShadowDepthCubemapArray;
     }
 
     const glm::vec3& Renderer3D::GetPointShadowLightPos()
     {
-        return s_Data.PointShadowLightPos;
+        return /*s_Data.PointShadowLightPos;*/ s_Data.PointShadowLightPos[0];
     }
 
     float Renderer3D::GetPointShadowFarPlane()
     {
-        return s_Data.PointShadowFarPlane;
+        return /*s_Data.PointShadowFarPlane;*/ s_Data.PointShadowFarPlane[0];
+    }
+
+    void Renderer3D::BeginPointShadowAtlas()
+    {
+        CreatePointShadowResources();
+
+        // reset
+        for (int i = 0; i < 16; i++)
+        {
+            s_Data.PointShadowIndex[i] = -1;
+            s_Data.PointShadowLightPos[i] = glm::vec3(0.0f);
+            s_Data.PointShadowFarPlane[i] = 1.0f;
+        }
+
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &s_Data.OldFBO);
+        glGetIntegerv(GL_VIEWPORT, s_Data.OldViewport);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+
+        glViewport(0, 0, (GLsizei)s_Data.PointShadowMapSize, (GLsizei)s_Data.PointShadowMapSize);
+        glBindFramebuffer(GL_FRAMEBUFFER, s_Data.PointShadowFBO);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+
+        s_Data.PointShadowValid = true;
+    }
+
+
+    void Renderer3D::BeginPointShadowCaster(uint32_t casterIndex, int lightIndex,
+        const glm::vec3& lightPosition, float farPlane)
+    {
+        if (casterIndex >= s_Data.MaxPointShadowCasters)
+            return;
+        if (lightIndex < 0 || lightIndex >= 16)
+            return;
+
+        const int layerOffset = (int)casterIndex * 6;
+
+        // Clear only this caster’s 6 layers
+        const float clearDepth = 1.0f;
+        glClearTexSubImage(s_Data.PointShadowDepthCubemapArray, 0,
+            0, 0, layerOffset,
+            (GLsizei)s_Data.PointShadowMapSize, (GLsizei)s_Data.PointShadowMapSize, 6,
+            GL_DEPTH_COMPONENT, GL_FLOAT, &clearDepth);
+
+        // Build shadow matrices
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, farPlane);
+        glm::mat4 shadowTransforms[6] = {
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3( 1, 0, 0), glm::vec3(0,-1, 0)),
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1, 0, 0), glm::vec3(0,-1, 0)),
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0, 1, 0), glm::vec3(0, 0, 1)),
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0,-1, 0), glm::vec3(0, 0,-1)),
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0, 0, 1), glm::vec3(0,-1, 0)),
+            shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3( 0, 0,-1), glm::vec3(0,-1, 0))
+        };
+
+        s_Data.PointShadowDepthShader->Bind();
+        for (int i = 0; i < 6; i++)
+            s_Data.PointShadowDepthShader->SetMat4("u_ShadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+
+        s_Data.PointShadowDepthShader->SetFloat3("u_LightPos", lightPosition);
+        s_Data.PointShadowDepthShader->SetFloat("u_FarPlane", farPlane);
+        s_Data.PointShadowDepthShader->SetInt("u_LayerOffset", layerOffset);
+
+        // Store per-light lookup for shading
+        s_Data.PointShadowIndex[lightIndex] = (int)casterIndex;
+        s_Data.PointShadowLightPos[lightIndex] = lightPosition;
+        s_Data.PointShadowFarPlane[lightIndex] = farPlane;
+
+        StartBatch();
+    }
+
+
+    void Renderer3D::EndPointShadowCaster()
+    {
+        Flush();
+        StartBatch();
+    }
+
+    void Renderer3D::EndPointShadowAtlas()
+    {
+        Flush();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, s_Data.OldFBO);
+        glViewport(s_Data.OldViewport[0], s_Data.OldViewport[1], s_Data.OldViewport[2], s_Data.OldViewport[3]);
+
+        glCullFace(GL_BACK);
     }
 
 }

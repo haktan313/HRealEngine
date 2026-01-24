@@ -524,18 +524,12 @@ namespace HRealEngine
         std::vector<Renderer3D::LightGPU> lights;
         lights.reserve(16);
 
-        /*// Find first directional light that casts shadows
-        bool doShadows = false;
-        glm::vec3 shadowDir(0.0f, -1.0f, 0.0f);*/
-
         // Directional shadow
         bool doDirShadows = false;
         glm::vec3 dirShadowDir(0.0f, -1.0f, 0.0f);
 
-        // Point shadow
-        bool doPointShadows = false;
-        glm::vec3 pointShadowPos(0.0f);
-        float pointFarPlane = 25.0f;
+        std::vector<std::tuple<int, glm::vec3, float>> pointShadowCasters; // (gpuLightIndex, pos, farPlane)
+        pointShadowCasters.reserve(16);
         
         auto lightView = m_Registry.view<TransformComponent, LightComponent>();
         for (auto e : lightView)
@@ -550,13 +544,6 @@ namespace HRealEngine
                     /*doShadows*/doDirShadows = true;
                 }
             }
-            if (!doPointShadows && lc.Type == LightComponent::LightType::Point && lc.CastShadows)
-            {
-                pointShadowPos = tc.Position;
-                pointFarPlane = (lc.Radius > 0.01f) ? lc.Radius : 25.0f;
-                doPointShadows = true;
-            }
-
             if ((int)lights.size() >= 16)
                 continue;
 
@@ -570,6 +557,14 @@ namespace HRealEngine
             gpu.CastShadows = lc.CastShadows ? 1 : 0;
 
             lights.push_back(gpu);
+            
+            const int gpuIndex = (int)lights.size() - 1;
+
+            if (lc.Type == LightComponent::LightType::Point && lc.CastShadows)
+            {
+                float farPlane = (lc.Radius > 0.01f) ? lc.Radius : 25.0f;
+                pointShadowCasters.emplace_back(gpuIndex, tc.Position, farPlane);
+            }
         }
         Renderer3D::SetLights(lights);
         
@@ -585,20 +580,29 @@ namespace HRealEngine
             Renderer3D::EndShadowPass();
         }
         
-        if (doPointShadows)
+        if (!pointShadowCasters.empty())
         {
-            Renderer3D::BeginPointShadowPass(pointShadowPos, pointFarPlane);
+            Renderer3D::BeginPointShadowAtlas();
 
             auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
-            for (auto entity : viewShadow)
+
+            for (uint32_t casterIndex = 0; casterIndex < pointShadowCasters.size() && casterIndex < 8; casterIndex++)
             {
-                auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMeshPointShadow(transform.GetTransform(), meshRenderer);
+                auto [lightIndex, pos, farPlane] = pointShadowCasters[casterIndex];
+
+                Renderer3D::BeginPointShadowCaster(casterIndex, lightIndex, pos, farPlane);
+
+                for (auto entity : viewShadow)
+                {
+                    auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
+                    Renderer3D::DrawMeshPointShadow(transform.GetTransform(), meshRenderer);
+                }
+
+                Renderer3D::EndPointShadowCaster();
             }
 
-            Renderer3D::EndPointShadowPass();
+            Renderer3D::EndPointShadowAtlas();
         }
-
     }
 
     void Scene::RecalculateRenderListSprite()

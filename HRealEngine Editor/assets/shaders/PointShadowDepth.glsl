@@ -23,12 +23,13 @@ in vec3 v_WorldPos[];
 out vec3 g_WorldPos;
 
 uniform mat4 u_ShadowMatrices[6];
+uniform int  u_LayerOffset;//cubemap array layer offset (casterIndex * 6)
 
 void main()
 {
     for (int face = 0; face < 6; face++)
     {
-        gl_Layer = face;
+        gl_Layer = u_LayerOffset + face;
 
         for (int i = 0; i < 3; i++)
         {

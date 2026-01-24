@@ -67,6 +67,7 @@ uniform vec3 u_ViewPos;
 uniform int u_HasShadowMap = 0;
 uniform sampler2D u_ShadowMap;//depth map
 uniform mat4 u_LightSpaceMatrix;
+uniform float u_ShadowBias;
 
 float ComputeShadow(vec3 worldPos, vec3 normal, vec3 lightDir)
 {
@@ -78,7 +79,7 @@ float ComputeShadow(vec3 worldPos, vec3 normal, vec3 lightDir)
          return 0.0;
         
     float currentDepth = proj.z;
-    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.0005);  
+    float bias = max(u_ShadowBias * (1.0 - dot(normal, lightDir)), u_ShadowBias * 0.1);
 
     float shadow = 0.0;
     vec2 texturePixelSize = 1.0 / textureSize(u_ShadowMap, 0);
@@ -94,23 +95,27 @@ float ComputeShadow(vec3 worldPos, vec3 normal, vec3 lightDir)
 }
 
 uniform int u_HasPointShadowMap = 0;
-uniform samplerCube u_PointShadowMap;
-uniform vec3  u_PointShadowLightPos;
-uniform float u_PointShadowFarPlane;
-float ComputePointShadow(vec3 worldPos)
+uniform samplerCubeArray u_PointShadowMaps;
+uniform vec3  u_PointShadowLightPos[MAX_LIGHTS];
+uniform float u_PointShadowFarPlane[MAX_LIGHTS];
+uniform int   u_PointShadowIndex[MAX_LIGHTS];
+
+float ComputePointShadow(vec3 worldPos, int lightIndex)
 {
-    vec3 fragToLight = worldPos - u_PointShadowLightPos;
+    int shadowIdx = u_PointShadowIndex[lightIndex];
+    if (shadowIdx < 0) 
+        return 0.0;
+
+    vec3 fragToLight = worldPos - u_PointShadowLightPos[lightIndex];
     float currentDepth = length(fragToLight);
 
-    // sample stored depth (0..1) then scale back to world distance
-    float closestDepth = texture(u_PointShadowMap, fragToLight).r * u_PointShadowFarPlane;
+    float closestDepth = texture(u_PointShadowMaps, vec4(fragToLight, float(shadowIdx))).r
+                         * u_PointShadowFarPlane[lightIndex];
 
-    // basic bias (you can tune)
     float bias = 0.05;
-
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-    return shadow;
+    return (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
 }
+
 
 
 void main()
@@ -195,12 +200,7 @@ void main()
             shadow = ComputeShadow(v_WorldPos, normal, lightDirection);
         if (u_HasPointShadowMap == 1 && light.Type == 1 && light.CastShadows == 1)
         {
-            float distToShadowCaster = length(light.Position - u_PointShadowLightPos);
-            
-            if (distToShadowCaster < 0.05) 
-            {
-                shadow = max(shadow, ComputePointShadow(v_WorldPos)); 
-            }
+            shadow = max(shadow, ComputePointShadow(v_WorldPos, i));
         }
 		lit += (diffuse + specular) * lightColor * atten * (1.0 - shadow);
     }
