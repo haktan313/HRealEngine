@@ -22,6 +22,7 @@ namespace HRealEngine
 
         const AssetMetadata& GetAssetMetadata(AssetHandle assetHandle) const;
         const std::filesystem::path& GetAssetFilePath(AssetHandle assetHandle) const { return GetAssetMetadata(assetHandle).FilePath; }
+        const AssetRegistry& GetAssetRegistry() override { return m_AssetRegistry; }
     private:
         AssetMap m_LoadedAssets;
         AssetRegistry m_AssetRegistry;

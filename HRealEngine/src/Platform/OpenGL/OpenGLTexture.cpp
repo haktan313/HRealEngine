@@ -135,6 +135,17 @@ namespace HRealEngine
         m_bIsLoaded = true;
     }
 
+    void OpenGLTexture2D::ApplySampling(bool enableMipmaps, int minFilter, int magFilter)
+    {
+        m_Specification.GenerateMips = enableMipmaps;
+        
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, (GLint)minFilter);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, (GLint)magFilter);
+
+        if (enableMipmaps)
+            glGenerateTextureMipmap(m_RendererID);
+    }
+
     OpenGLTexture2D::~OpenGLTexture2D()
     {
         glDeleteTextures(1, &m_RendererID);

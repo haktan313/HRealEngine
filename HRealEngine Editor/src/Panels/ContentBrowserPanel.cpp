@@ -28,7 +28,7 @@ namespace HRealEngine
         m_FileIcon = TextureImporter::LoadTexture("Resource/fileIcon.png");
         m_FolderIcon = TextureImporter::LoadTexture("Resource/folderIcon.png");
         RefreshAssetTree();
-        m_Mode = Mode::FileSystem;
+        m_Mode = Mode::Asset;
     }
 
     void ContentBrowserPanel::OnImGuiRender()

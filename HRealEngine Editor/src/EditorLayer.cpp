@@ -34,7 +34,34 @@ namespace HRealEngine
 {
     struct StaticMeshVertex;
     extern const std::filesystem::path g_AssetsDirectory;
-    
+
+    static GLint ToGLMinFilter(int idx, bool mipmapsEnabled)
+    {
+        // idx: 0 Linear, 1 Nearest, 2 LinearMipmapLinear, 3 LinearMipmapNearest, 4 NearestMipmapLinear, 5 NearestMipmapNearest
+        if (!mipmapsEnabled)
+            return (idx == 1) ? GL_NEAREST : GL_LINEAR;
+
+        switch (idx)
+        {
+            case 1:
+             return GL_NEAREST;
+            case 2:
+             return GL_LINEAR_MIPMAP_LINEAR;
+            case 3:
+             return GL_LINEAR_MIPMAP_NEAREST;
+            case 4:
+             return GL_NEAREST_MIPMAP_LINEAR;
+            case 5:
+             return GL_NEAREST_MIPMAP_NEAREST;
+            default:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        }
+    }
+
+    static GLint ToGLMagFilter(int idx)
+    {
+        return (idx == 1) ? GL_NEAREST : GL_LINEAR;
+    }
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
     {
         
@@ -418,6 +445,42 @@ namespace HRealEngine
         ImGui::Text("Quads: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+        static const char* s_MinFilters[] =
+        {
+            "Linear",
+            "Nearest",
+            "Linear Mipmap Linear",
+            "Linear Mipmap Nearest",
+            "Nearest Mipmap Linear",
+            "Nearest Mipmap Nearest"
+        };
+        static const char* s_MagFilters[] =
+        {
+            "Linear",
+            "Nearest"
+        };
+
+        ImGui::Checkbox("Enable Mipmaps", &m_MipmapSettings.EnableMipmaps);
+        ImGui::Combo("Min Filter", &m_MipmapSettings.MinFilter, s_MinFilters, IM_ARRAYSIZE(s_MinFilters));
+        ImGui::Combo("Mag Filter", &m_MipmapSettings.MagFilter, s_MagFilters, IM_ARRAYSIZE(s_MagFilters));
+
+        if (ImGui::Button("Apply To All Textures"))
+        {
+            if (m_MipmapSettings.EnableMipmaps)
+            {
+                GLint glMin = ToGLMinFilter(m_MipmapSettings.MinFilter, m_MipmapSettings.EnableMipmaps);
+                GLint glMag = ToGLMagFilter(m_MipmapSettings.MagFilter);
+                
+                for (auto handle : AssetManager::GetAllAssetsOfType(AssetType::Texture))
+                {
+                    auto tex = AssetManager::GetAsset<Texture2D>(handle);
+                    if (tex)
+                        tex->ApplySampling(m_MipmapSettings.EnableMipmaps, glMin, glMag);
+                }
+            }
+        }
+        
         ImGui::End();
 
         ImGui::Begin("Settings");

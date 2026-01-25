@@ -12,5 +12,6 @@ namespace HRealEngine
         virtual bool IsAssetHandleValid(AssetHandle assetHandle) const = 0;
         virtual bool IsAssetLoaded(AssetHandle assetHandle) const = 0;
         virtual AssetType GetAssetType(AssetHandle assetHandle) const = 0;
+        virtual const AssetRegistry& GetAssetRegistry() = 0;
     };
 }

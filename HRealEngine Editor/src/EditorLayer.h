@@ -103,6 +103,16 @@ namespace HRealEngine
         Ref<SubTexture2D> m_TextureTree;
         Ref<SubTexture2D> m_TextureBarrel;
 
+        struct MipmapSettings
+        {
+            bool EnableMipmaps = true;
+
+            int MinFilter = 0;//index -> enum list
+            int MagFilter = 0;//0: Linear, 1: Nearest
+        };
+        MipmapSettings m_MipmapSettings;
+
+
         struct ProfileResult
         {
             const char* Name;

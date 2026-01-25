@@ -63,5 +63,7 @@ namespace HRealEngine
 
         static AssetType GetStaticAssetType() { return AssetType::Texture; }
         virtual AssetType GetType() const override { return GetStaticAssetType(); }
+
+        virtual void ApplySampling(bool enableMipmaps, int minFilter, int magFilter) = 0;
     };
 }
