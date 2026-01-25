@@ -22,6 +22,7 @@
 #include "HRealEngine/Core/MouseButtonCodes.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
+#include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
@@ -690,8 +691,20 @@ namespace HRealEngine
         {
             if (selectedEntity.HasComponent<TransformComponent>())
             {
-                TransformComponent transformComponent = selectedEntity.GetComponent<TransformComponent>();
-                Renderer2D::DrawRect(transformComponent.GetTransform(), glm::vec4(1.0f,0.5f,0.0f,1.0f));
+                auto& tc = selectedEntity.GetComponent<TransformComponent>();
+                
+                if (selectedEntity.HasComponent<MeshRendererComponent>())
+                {
+                    auto& meshComp = selectedEntity.GetComponent<MeshRendererComponent>();
+                    auto meshAsset = AssetManager::GetAsset<MeshGPU>(meshComp.Mesh);
+                
+                    if (meshAsset)
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(),  meshAsset->BoundsMin,  meshAsset->BoundsMax,  glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                    else
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(), glm::vec3(-0.5f), glm::vec3(0.5f), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                }
+                else
+                    Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
             }
         }
         Renderer2D::EndScene();
@@ -795,6 +808,8 @@ namespace HRealEngine
         {
             SerializeScene(m_ActiveScene, filePath);
             m_EditorScenePath = filePath;
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
+            m_ContentBrowserPanel->RefreshAssetTree();
         }
     }
 

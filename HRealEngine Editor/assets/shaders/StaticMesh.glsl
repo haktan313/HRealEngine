@@ -156,7 +156,6 @@ void main()
     vec3 normal = normalize(v_Normal);
     vec3 viewDirection = normalize(u_ViewPos - v_WorldPos);
 
-    float shininess = max(u_Shininess, 1.0);
     vec3 lit = 0.05 * baseColor;
 
     for (int i = 0; i < u_LightCount; i++)
@@ -183,12 +182,20 @@ void main()
 
         float NdotL = max(dot(normal, lightDirection), 0.0);
 
+        float specMask = 1.0;
+        float shininess = max(u_Shininess, 1.0);
+
+        if (u_HasSpecular == 1)
+        {
+            vec4 specTex = texture(u_Specular, v_TexCoord);
+            specMask = specTex.r;
+
+            float shininess01 = specTex.g;
+            shininess = mix(1.0, 256.0, shininess01);
+        }
+
         vec3 halfVector = normalize(lightDirection + viewDirection);
         float specPow = pow(max(dot(normal, halfVector), 0.0), shininess);
-
-        float specMask = 1.0;
-        if (u_HasSpecular == 1)
-            specMask = texture(u_Specular, v_TexCoord).r;
 
         vec3 diffuse  = baseColor * NdotL;
         vec3 specular = vec3(specPow) * specMask;

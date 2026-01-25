@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "RenderCommand.h"
 #include "Renderer.h"
+#include "Renderer2D.h"
 #include "Shader.h"
 #include "UniformBuffer.h"
 #include "VertexArray.h"
@@ -347,6 +348,34 @@ namespace HRealEngine
 
     }
 
+    void Renderer3D::DrawSelectionBounds(const glm::mat4& transform, const glm::vec3& min, const glm::vec3& max, const glm::vec4& color)
+    {
+        glm::vec3 corners[8] = {
+            {min.x, min.y, min.z}, {max.x, min.y, min.z},
+            {max.x, max.y, min.z}, {min.x, max.y, min.z},
+            {min.x, min.y, max.z}, {max.x, min.y, max.z},
+            {max.x, max.y, max.z}, {min.x, max.y, max.z}
+        };
+        
+        for (int i = 0; i < 8; i++)
+            corners[i] = glm::vec3(transform * glm::vec4(corners[i], 1.0f));
+        
+        Renderer2D::DrawLine(corners[0], corners[1], color);
+        Renderer2D::DrawLine(corners[1], corners[2], color);
+        Renderer2D::DrawLine(corners[2], corners[3], color);
+        Renderer2D::DrawLine(corners[3], corners[0], color);
+
+        Renderer2D::DrawLine(corners[4], corners[5], color);
+        Renderer2D::DrawLine(corners[5], corners[6], color);
+        Renderer2D::DrawLine(corners[6], corners[7], color);
+        Renderer2D::DrawLine(corners[7], corners[4], color);
+
+        Renderer2D::DrawLine(corners[0], corners[4], color);
+        Renderer2D::DrawLine(corners[1], corners[5], color);
+        Renderer2D::DrawLine(corners[2], corners[6], color);
+        Renderer2D::DrawLine(corners[3], corners[7], color);
+    }
+
     void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
         s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetProjectionMatrix() * glm::inverse(transform);
@@ -458,11 +487,13 @@ namespace HRealEngine
     }
 
 
-    Ref<MeshGPU> Renderer3D::BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Shader>& shader)
+    Ref<MeshGPU> Renderer3D::BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Shader>& shader, glm::vec3& inMin, glm::vec3& inMax)
     {
         Ref<MeshGPU> mesh = CreateRef<MeshGPU>();
         mesh->VAO = VertexArray::Create();
         mesh->Shader = shader;
+        mesh->BoundsMax = inMax;
+        mesh->BoundsMin = inMin;
 
         constexpr uint32_t kFloatsPerVertex = 14;
 

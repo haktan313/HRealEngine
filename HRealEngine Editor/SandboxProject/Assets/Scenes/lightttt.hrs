@@ -1,0 +1,107 @@
+Scene: Untitled
+Entities:
+  - Entity: 207738034840210573
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [1.408661, 0.7114354, 2.3365667]
+      Rotation: [0, -0.80105865, 0]
+      Scale: [0.9999999, 1, 0.9999999]
+    MeshRendererComponent:
+      MeshHandle: 14657949245417854136
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 7215668967160534147
+    Rigidbody3DComponent:
+      BodyType: Static
+      CollisionShape: Box
+      FixedRotation: false
+  - Entity: 8475750940144893249
+    TagComponent:
+      Tag: flash
+    TransformComponent:
+      Position: [0.3474766, 0.51803786, 1.931746]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+    MeshRendererComponent:
+      MeshHandle: 4558623264958611649
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 14595291826790597398
+  - Entity: 11183090496195074328
+    TagComponent:
+      Tag: light3
+    TransformComponent:
+      Position: [1.571752, 1.9580606, 0.5008899]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0, 0.19928837, 1]
+      Direction: [0, -1, 0]
+      Intensity: 5.4
+      Radius: 11.1
+      CastShadows: true
+  - Entity: 8946406338662942332
+    TagComponent:
+      Tag: light2
+    TransformComponent:
+      Position: [-5.756364, 3.8633606, 0.5170723]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 0.9210623, 0.03558719]
+      Direction: [0, -1, 0]
+      Intensity: 1.5
+      Radius: 12.2
+      CastShadows: true
+  - Entity: 2901681944158320963
+    TagComponent:
+      Tag: penguen
+    TransformComponent:
+      Position: [-1.7168162, 0.5617785, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.04, 0.04, 0.04]
+    MeshRendererComponent:
+      MeshHandle: 16084852904154095776
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 8851475640134271655
+  - Entity: 9901135082595543956
+    TagComponent:
+      Tag: isik
+    TransformComponent:
+      Position: [-1.9930118, 3.9417202, 1.8644168]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 1
+      Radius: 13.9
+      CastShadows: true
+  - Entity: 4947219126651420568
+    TagComponent:
+      Tag: ground
+    TransformComponent:
+      Position: [-1.7816272, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [14.579073, 1, 12.694155]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []

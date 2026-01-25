@@ -14,12 +14,15 @@ AssetRegistry:
   - Handle: 12681919880694640885
     FilePath: Textures/joseMourinho.png
     Type: AssetType::Texture
-  - Handle: 7215668967160534147
-    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
-    Type: AssetType::Material
+  - Handle: 1975227560343378185
+    FilePath: Imported/TPenguin_Diffuse.png
+    Type: AssetType::Texture
   - Handle: 4764350240469491840
     FilePath: newbT2.btree
     Type: AssetType::BehaviorTree
+  - Handle: 5464968924908894050
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
+    Type: AssetType::Material
   - Handle: 4168462951297401035
     FilePath: Scenes/3d level.hrs
     Type: AssetType::Scene
@@ -32,9 +35,6 @@ AssetRegistry:
   - Handle: 2326926188452044375
     FilePath: Imported/FL_CW_N_1.png
     Type: AssetType::Texture
-  - Handle: 4558623264958611649
-    FilePath: flash.hmesh
-    Type: AssetType::Mesh
   - Handle: 5885954185279832949
     FilePath: Imported/FL_CW_S_1.png
     Type: AssetType::Texture
@@ -44,15 +44,33 @@ AssetRegistry:
   - Handle: 18100531321925507779
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_N.png
     Type: AssetType::Texture
-  - Handle: 9235893503007020159
-    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
+  - Handle: 10850074012930165883
+    FilePath: Imported/TPenguin_Normal.png
     Type: AssetType::Texture
-  - Handle: 14657949245417854136
-    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
-    Type: AssetType::Mesh
-  - Handle: 16787151091888931199
+  - Handle: 17151754967117703511
+    FilePath: Scenes/asdfsadasdas.hrs
+    Type: AssetType::Scene
+  - Handle: 6547136974437529389
+    FilePath: Imported/Penguin/Textures/TPenguin_Diffuse.png
+    Type: AssetType::Texture
+  - Handle: 1312069811868287053
     FilePath: Imported/flash/Textures/FL_CW_A_1.png
     Type: AssetType::Texture
-  - Handle: 14595291826790597398
+  - Handle: 12859171972571548336
     FilePath: Imported/flash/Materials/flash_defaultMat.hmat
     Type: AssetType::Material
+  - Handle: 4078180095595489149
+    FilePath: flash.hmesh
+    Type: AssetType::Mesh
+  - Handle: 972678566340647931
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
+    Type: AssetType::Texture
+  - Handle: 10835761365549043433
+    FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
+    Type: AssetType::Mesh
+  - Handle: 2742870482941391390
+    FilePath: Imported/Penguin/Materials/Penguin_TPenguin_Diffuse.png.hmat
+    Type: AssetType::Material
+  - Handle: 15984410996131286419
+    FilePath: Penguin.hmesh
+    Type: AssetType::Mesh
