@@ -1,6 +1,8 @@
 #include "HRpch.h"
 #include "Material.h"
 
+#include <fstream>
+
 #include "HRealEngine/Core/Logger.h"
 #include <yaml-cpp/yaml.h>
 
@@ -17,6 +19,48 @@ namespace HRealEngine
             return maybeRel;
 
         return assetsRoot / maybeRel;
+    }
+
+    void HMaterial::SaveToFile()
+    {
+        auto relPath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(this->Handle);
+        if (relPath.empty())
+            return;
+
+        std::filesystem::path outPath = relPath;
+        if (!outPath.is_absolute())
+            outPath = Project::GetAssetDirectory() / outPath;
+
+        std::error_code ec;
+        std::filesystem::create_directories(outPath.parent_path(), ec);
+        if (ec)
+        {
+            LOG_CORE_ERROR("Failed to create directories for HMAT: {} ({})", outPath.string(), ec.message());
+            return;
+        }
+
+        std::ofstream hm(outPath, std::ios::out | std::ios::trunc);
+        if (!hm.is_open())
+        {
+            LOG_CORE_ERROR("Failed to open HMAT for write: {}", outPath.string());
+            return;
+        }
+
+        hm << "Type: Material\n";
+        hm << "Shader: shaders/StaticMesh.glsl\n";
+        hm << "BaseColor: [" << Color.r << ", " << Color.g << ", " << Color.b << "]\n";
+        hm << "AlbedoTextureHandle: " << (uint64_t)AlbedoTextureHandle   << "\n";
+        hm << "SpecularTextureHandle: " << (uint64_t)SpecularTextureHandle << "\n";
+        hm << "NormalTextureHandle: " << (uint64_t)NormalTextureHandle   << "\n";
+        hm << "Shininess: " << Shininess << "\n";
+
+        hm.close();
+    }
+
+
+    void HMaterial::LoadFromFile()
+    {
+        
     }
 
     Ref<HMaterial> MaterialLibrary::GetOrLoad(const std::filesystem::path& relHmatPath, const std::filesystem::path& assetsRoot)

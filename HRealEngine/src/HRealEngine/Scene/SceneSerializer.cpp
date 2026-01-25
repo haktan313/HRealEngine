@@ -9,6 +9,7 @@
 
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Renderer/Material.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace YAML
@@ -228,7 +229,14 @@ namespace HRealEngine
             out << YAML::Key << "MaterialHandleOverrides";
             out << YAML::Value << YAML::BeginSeq;
             for (AssetHandle h : mesh.MaterialHandleOverrides)
+            {
                 out << h;
+                if (h == 0 || !AssetManager::IsAssetHandleValid(h))
+                    continue;
+                auto material = AssetManager::GetAsset<HMaterial>(h);
+                if (material)
+                    material->SaveToFile();
+            }
             out << YAML::EndSeq;
             
             out << YAML::EndMap;

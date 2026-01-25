@@ -79,6 +79,9 @@ namespace HRealEngine
 
         static AssetType GetStaticType() { return AssetType::Material; }
         AssetType GetType() const override { return GetStaticType(); }
+
+        void SaveToFile();
+        void LoadFromFile();
     };
 
     class MaterialLibrary
@@ -86,7 +89,6 @@ namespace HRealEngine
     public:
         static Ref<HMaterial> GetOrLoad(const std::filesystem::path& relHmatPath, const std::filesystem::path& assetsRoot);
         static void Clear();
-
     private:
         static Ref<HMaterial> LoadFromFile(const std::filesystem::path& absPath, const std::filesystem::path& assetsRoot);
 
