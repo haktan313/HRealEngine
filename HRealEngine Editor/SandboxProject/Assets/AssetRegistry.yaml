@@ -47,9 +47,6 @@ AssetRegistry:
   - Handle: 10850074012930165883
     FilePath: Imported/TPenguin_Normal.png
     Type: AssetType::Texture
-  - Handle: 17151754967117703511
-    FilePath: Scenes/asdfsadasdas.hrs
-    Type: AssetType::Scene
   - Handle: 6547136974437529389
     FilePath: Imported/Penguin/Textures/TPenguin_Diffuse.png
     Type: AssetType::Texture
@@ -74,3 +71,6 @@ AssetRegistry:
   - Handle: 15984410996131286419
     FilePath: Penguin.hmesh
     Type: AssetType::Mesh
+  - Handle: 15543066515406465927
+    FilePath: Scenes/penTest.hrs
+    Type: AssetType::Scene

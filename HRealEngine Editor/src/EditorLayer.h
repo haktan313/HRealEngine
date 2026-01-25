@@ -41,8 +41,9 @@ namespace HRealEngine
         void NewScene();
         void OpenScene();
         void OpenScene(AssetHandle assetHandle);
-        void SaveSceneAs();
+        void SaveSceneAs(); 
         void SaveScene();
+        void LoadSceneFromFile();
 
         void CreateBehaviorTree();
         void LoadBehaviorTreeAsAnAsset();

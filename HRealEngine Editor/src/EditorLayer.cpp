@@ -351,6 +351,10 @@ namespace HRealEngine
                 {
                     SaveSceneAs();
                 }
+                if (ImGui::MenuItem("Load Scene From File"))
+                {
+                    LoadSceneFromFile();
+                }
                 ImGui::Separator();
                 /*if (ImGui::MenuItem("Save", "Ctrl+S"))
                 {
@@ -819,6 +823,16 @@ namespace HRealEngine
             SerializeScene(m_ActiveScene, m_EditorScenePath);
         else
             SaveSceneAs();
+    }
+
+    void EditorLayer::LoadSceneFromFile()
+    {
+        std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
+        if (!filePath.empty())
+        {
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
+            m_ContentBrowserPanel->RefreshAssetTree();
+        }
     }
 
     void EditorLayer::CreateBehaviorTree()
