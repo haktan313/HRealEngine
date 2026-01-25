@@ -37,6 +37,9 @@ namespace HRealEngine
         template<typename T>
         bool HasComponent() const
         {
+            auto& registry = m_Scene->GetRegistry();
+            if (!registry.valid(m_EntityHandle))
+                return false;
             return m_Scene->GetRegistry().all_of<T>(m_EntityHandle);
         }
         template<typename T>

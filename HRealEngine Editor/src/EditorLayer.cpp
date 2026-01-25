@@ -22,6 +22,7 @@
 #include "HRealEngine/Core/MouseButtonCodes.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
+#include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
@@ -33,7 +34,34 @@ namespace HRealEngine
 {
     struct StaticMeshVertex;
     extern const std::filesystem::path g_AssetsDirectory;
-    
+
+    static GLint ToGLMinFilter(int idx, bool mipmapsEnabled)
+    {
+        // idx: 0 Linear, 1 Nearest, 2 LinearMipmapLinear, 3 LinearMipmapNearest, 4 NearestMipmapLinear, 5 NearestMipmapNearest
+        if (!mipmapsEnabled)
+            return (idx == 1) ? GL_NEAREST : GL_LINEAR;
+
+        switch (idx)
+        {
+            case 1:
+             return GL_NEAREST;
+            case 2:
+             return GL_LINEAR_MIPMAP_LINEAR;
+            case 3:
+             return GL_LINEAR_MIPMAP_NEAREST;
+            case 4:
+             return GL_NEAREST_MIPMAP_LINEAR;
+            case 5:
+             return GL_NEAREST_MIPMAP_NEAREST;
+            default:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        }
+    }
+
+    static GLint ToGLMagFilter(int idx)
+    {
+        return (idx == 1) ? GL_NEAREST : GL_LINEAR;
+    }
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
     {
         
@@ -350,6 +378,10 @@ namespace HRealEngine
                 {
                     SaveSceneAs();
                 }
+                if (ImGui::MenuItem("Load Scene From File"))
+                {
+                    LoadSceneFromFile();
+                }
                 ImGui::Separator();
                 /*if (ImGui::MenuItem("Save", "Ctrl+S"))
                 {
@@ -413,6 +445,42 @@ namespace HRealEngine
         ImGui::Text("Quads: %d", stats.QuadCount);
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+        static const char* s_MinFilters[] =
+        {
+            "Linear",
+            "Nearest",
+            "Linear Mipmap Linear",
+            "Linear Mipmap Nearest",
+            "Nearest Mipmap Linear",
+            "Nearest Mipmap Nearest"
+        };
+        static const char* s_MagFilters[] =
+        {
+            "Linear",
+            "Nearest"
+        };
+
+        ImGui::Checkbox("Enable Mipmaps", &m_MipmapSettings.EnableMipmaps);
+        ImGui::Combo("Min Filter", &m_MipmapSettings.MinFilter, s_MinFilters, IM_ARRAYSIZE(s_MinFilters));
+        ImGui::Combo("Mag Filter", &m_MipmapSettings.MagFilter, s_MagFilters, IM_ARRAYSIZE(s_MagFilters));
+
+        if (ImGui::Button("Apply To All Textures"))
+        {
+            if (m_MipmapSettings.EnableMipmaps)
+            {
+                GLint glMin = ToGLMinFilter(m_MipmapSettings.MinFilter, m_MipmapSettings.EnableMipmaps);
+                GLint glMag = ToGLMagFilter(m_MipmapSettings.MagFilter);
+                
+                for (auto handle : AssetManager::GetAllAssetsOfType(AssetType::Texture))
+                {
+                    auto tex = AssetManager::GetAsset<Texture2D>(handle);
+                    if (tex)
+                        tex->ApplySampling(m_MipmapSettings.EnableMipmaps, glMin, glMag);
+                }
+            }
+        }
+        
         ImGui::End();
 
         ImGui::Begin("Settings");
@@ -422,6 +490,17 @@ namespace HRealEngine
         {
             m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
         }
+        
+        static int debugView = 0;
+        ImGui::RadioButton("None", &debugView, 0);
+        ImGui::RadioButton("UV", &debugView, 1);
+        ImGui::RadioButton("VertexNormal", &debugView, 2);
+        ImGui::RadioButton("Specular", &debugView, 3);
+        ImGui::RadioButton("NormalTexture", &debugView, 4);
+        
+        Renderer::SetDebugView(debugView);
+
+        
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -679,8 +758,20 @@ namespace HRealEngine
         {
             if (selectedEntity.HasComponent<TransformComponent>())
             {
-                TransformComponent transformComponent = selectedEntity.GetComponent<TransformComponent>();
-                Renderer2D::DrawRect(transformComponent.GetTransform(), glm::vec4(1.0f,0.5f,0.0f,1.0f));
+                auto& tc = selectedEntity.GetComponent<TransformComponent>();
+                
+                if (selectedEntity.HasComponent<MeshRendererComponent>())
+                {
+                    auto& meshComp = selectedEntity.GetComponent<MeshRendererComponent>();
+                    auto meshAsset = AssetManager::GetAsset<MeshGPU>(meshComp.Mesh);
+                
+                    if (meshAsset)
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(),  meshAsset->BoundsMin,  meshAsset->BoundsMax,  glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                    else
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(), glm::vec3(-0.5f), glm::vec3(0.5f), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                }
+                else
+                    Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
             }
         }
         Renderer2D::EndScene();
@@ -784,6 +875,8 @@ namespace HRealEngine
         {
             SerializeScene(m_ActiveScene, filePath);
             m_EditorScenePath = filePath;
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
+            m_ContentBrowserPanel->RefreshAssetTree();
         }
     }
 
@@ -793,6 +886,16 @@ namespace HRealEngine
             SerializeScene(m_ActiveScene, m_EditorScenePath);
         else
             SaveSceneAs();
+    }
+
+    void EditorLayer::LoadSceneFromFile()
+    {
+        std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
+        if (!filePath.empty())
+        {
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
+            m_ContentBrowserPanel->RefreshAssetTree();
+        }
     }
 
     void EditorLayer::CreateBehaviorTree()

@@ -1,6 +1,8 @@
 Type: StaticMesh
 Source: Imported/flash/Source/flash.obj
 Cooked: cache/flash.hmeshbin
+BoundsMin: [-3.61442, -0.022725, -0.339045]
+BoundsMax: [-1.67918, 2.14522, 0.097346]
 Import:
   Triangulate: true
   GenSmoothNormals: true
@@ -9,4 +11,4 @@ Import:
   Scale: 1.0
 MaterialHandles:
   - 0
-  - 13301379573216789227
+  - 12859171972571548336

@@ -28,7 +28,7 @@ namespace HRealEngine
         m_FileIcon = TextureImporter::LoadTexture("Resource/fileIcon.png");
         m_FolderIcon = TextureImporter::LoadTexture("Resource/folderIcon.png");
         RefreshAssetTree();
-        m_Mode = Mode::FileSystem;
+        m_Mode = Mode::Asset;
     }
 
     void ContentBrowserPanel::OnImGuiRender()
@@ -367,8 +367,9 @@ namespace HRealEngine
     {
         std::vector<MeshVertex> verts;
         std::vector<uint32_t> inds;
-        std::vector<HMeshBinSubmesh> submeshes;     
-        if (!ObjLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes))
+        std::vector<HMeshBinSubmesh> submeshes;
+        glm::vec3 bMin, bMax;
+        if (!ObjLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes, bMin, bMax))
         {
             LOG_CORE_INFO("OBJ load failed: {}", dstObj.string());
             return;
@@ -378,7 +379,7 @@ namespace HRealEngine
         std::filesystem::create_directories(cookedPath);        
         cookedPath /= dstObj.stem();
         cookedPath += ".hmeshbin";      
-        if (!ObjLoader::WriteHMeshBin(cookedPath, verts, inds, submeshes))
+        if (!ObjLoader::WriteHMeshBin(cookedPath, verts, inds, submeshes, bMin, bMax))
         {
             LOG_CORE_INFO("Cook write failed: {}", cookedPath.string());
             return;
@@ -409,6 +410,8 @@ namespace HRealEngine
         out << "Type: StaticMesh\n";
         out << "Source: " << sourceRel << "\n";
         out << "Cooked: " << cookedRel << "\n";
+        out << "BoundsMin: [" << bMin.x << ", " << bMin.y << ", " << bMin.z << "]\n";
+        out << "BoundsMax: [" << bMax.x << ", " << bMax.y << ", " << bMax.z << "]\n";
         out << "Import:\n";
         out << "  Triangulate: true\n";
         out << "  GenSmoothNormals: true\n";

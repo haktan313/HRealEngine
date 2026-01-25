@@ -8,6 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "BehaviorTreeThings/Core/Nodes.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 
@@ -19,7 +20,7 @@ namespace HRealEngine
     glm::vec2 ToVec2(const aiVector3D& v) { return { v.x, v.y }; }
 
     bool ObjLoader::LoadMeshFromFile(const std::string& path,
-        std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes)
+        std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax)
     {
         Assimp::Importer importer;
 
@@ -41,6 +42,9 @@ namespace HRealEngine
         outVertices.clear();
         outIndices.clear();
         outSubmeshes->clear();
+
+        outBoundsMin = glm::vec3(FLT_MAX);
+        outBoundsMax = glm::vec3(-FLT_MAX);
 
         for (unsigned m = 0; m < scene->mNumMeshes; ++m)
         {
@@ -66,14 +70,18 @@ namespace HRealEngine
                 v.Position = ToVec3(mesh->mVertices[i]);
                 v.Normal = hasNormals ? ToVec3(mesh->mNormals[i]) : glm::vec3(0,1,0);
                 v.UV = hasUV0 ? ToVec2(mesh->mTextureCoords[0][i]) : glm::vec2(0);
-                if (hasTangents)
-                    v.Tangent = ToVec3(mesh->mTangents[i]);
-                v.Color = glm::vec3(1.0f);
-                if (hasColors0)
+
+                if (i == 0 && m == 0)
                 {
-                    const aiColor4D c = mesh->mColors[0][i];
-                    v.Color = glm::vec3(c.r, c.g, c.b);
+                    outBoundsMin = v.Position;
+                    outBoundsMax = v.Position;
                 }
+                else
+                {
+                    outBoundsMin = glm::min(outBoundsMin, v.Position);
+                    outBoundsMax = glm::max(outBoundsMax, v.Position);
+                }
+                
                 outVertices.push_back(v);
             }
 
@@ -183,6 +191,10 @@ namespace HRealEngine
             hm << "BaseColor: [" << kd.r << ", " << kd.g << ", " << kd.b << "]\n";
             hm << "AlbedoTextureHandle: " << (uint64_t)albedoHandle << "\n";
             //hm << "AlbedoTexture: " << albedoTexRel << "\n";
+            
+            hm << "SpecularTextureHandle: " << (uint64_t)0 << "\n";
+            hm << "NormalTextureHandle: "   << (uint64_t)0 << "\n";
+            hm << "Shininess: " << 32.0f << "\n";
             hm.close();
 
             materialRelPaths[i] = std::filesystem::relative(hmatAbs, assetsRoot).generic_string();
@@ -196,7 +208,7 @@ namespace HRealEngine
     }
 
     bool ObjLoader::WriteHMeshBin(const std::filesystem::path& path, const std::vector<MeshVertex>& vertices,
-        const std::vector<uint32_t>& indices, const std::vector<HMeshBinSubmesh>& submeshes)
+        const std::vector<uint32_t>& indices, const std::vector<HMeshBinSubmesh>& submeshes, const glm::vec3& boundsMin, const glm::vec3& boundsMax)
     {
         std::filesystem::create_directories(path.parent_path());
 
@@ -209,6 +221,8 @@ namespace HRealEngine
         header.VertexCount = (uint32_t)vertices.size();
         header.IndexCount  = (uint32_t)indices.size();
         header.SubmeshCount = (uint32_t)submeshes.size();
+        header.BoundsMin = boundsMin;
+        header.BoundsMax = boundsMax;
 
         out.write((const char*)&header, sizeof(header));
         if (!submeshes.empty())
@@ -219,7 +233,7 @@ namespace HRealEngine
     }
 
     bool ObjLoader::ReadHMeshBin(const std::filesystem::path& path, std::vector<MeshVertex>& outVertices,
-        std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes)
+        std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax)
     {
         std::ifstream in(path, std::ios::binary);
         if (!in)
@@ -233,6 +247,9 @@ namespace HRealEngine
 
         if (header.Magic != 0x48534D48 || header.Version != 2)
             return false;
+
+        outBoundsMin = header.BoundsMin;
+        outBoundsMax = header.BoundsMax;
 
         std::vector<HMeshBinSubmesh> localSubmeshes;
         localSubmeshes.resize(header.SubmeshCount);
@@ -376,7 +393,7 @@ namespace HRealEngine
 
         return true;
     }
-
+    
     Ref<MeshGPU> ObjLoader::LoadHMeshAsset(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot,
         const Ref<Shader>& shader)
     {
@@ -394,8 +411,9 @@ namespace HRealEngine
         std::vector<MeshVertex> verts;
         std::vector<uint32_t> inds;
         std::vector<HMeshBinSubmesh> submeshes;
+        glm::vec3 bMin, bMax;
         
-        if (!ReadHMeshBin(cookedAbs, verts, inds, &submeshes))
+        if (!ReadHMeshBin(cookedAbs, verts, inds, &submeshes, bMin, bMax))
         {
             LOG_CORE_ERROR("Failed to read cooked mesh: {}", cookedAbs.string());
             return nullptr;
@@ -403,7 +421,7 @@ namespace HRealEngine
 
         LOG_CORE_INFO("Loaded cooked mesh: {} (V={}, I={})", cookedAbs.string(), verts.size(), inds.size());
 
-        Ref<MeshGPU> mesh = Renderer3D::BuildStaticMeshGPU(verts, inds, shader);
+        Ref<MeshGPU> mesh = Renderer3D::BuildStaticMeshGPU(verts, inds, shader, bMin, bMax);
 
         std::vector<AssetHandle> handles;
         if (ParseHMeshMaterialHandles(hmeshAbs, handles))

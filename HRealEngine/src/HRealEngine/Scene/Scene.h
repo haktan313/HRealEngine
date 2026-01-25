@@ -63,6 +63,7 @@ namespace HRealEngine
         void OnPhysicsStart();
         void OnPhysicsStop();
         void RenderScene(EditorCamera& camera);
+        void LightningAndShadowSetup(const glm::vec3& cameraPosition);
 
         void RecalculateRenderListSprite();
         std::vector<entt::entity> m_RenderList;
@@ -84,6 +85,6 @@ namespace HRealEngine
 
         Scope<JoltWorld> m_JoltWorld;
         Scope<Box2DWorld> m_Box2DWorld;
-        bool m_b2PhysicsEnabled = true;
+        bool m_b2PhysicsEnabled = false;
     };
 }

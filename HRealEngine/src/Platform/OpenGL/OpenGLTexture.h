@@ -2,6 +2,7 @@
 
 #pragma once
 #include "OpenGLShader.h"
+#include "glad/glad.h"
 #include "HRealEngine/Renderer/Texture.h"
 
 namespace HRealEngine
@@ -19,6 +20,7 @@ namespace HRealEngine
 
         //void SetData(void* data, uint32_t size) override;
         void SetData(Buffer data) override;
+        void ApplySampling(bool enableMipmaps, int minFilter, int magFilter) override;
 
         uint32_t GetWidth() const override { return m_Width; }
         uint32_t GetHeight() const override { return m_Height; }
@@ -34,5 +36,6 @@ namespace HRealEngine
         uint32_t m_RendererID;
         uint32_t m_Width, m_Height;
         GLenum m_InternalFormat, m_DataFormat;
+        uint32_t m_MipLevels = 1;
     };
 }

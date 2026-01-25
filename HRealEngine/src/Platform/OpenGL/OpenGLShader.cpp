@@ -15,6 +15,8 @@ namespace HRealEngine
 			return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
+		if (type == "geometry" || type == "geom")
+			return GL_GEOMETRY_SHADER;
 		HREALENGINE_CORE_DEBUGBREAK(false, "Unknown shader type!");
 		return 0;
 	}
@@ -85,9 +87,13 @@ namespace HRealEngine
 	void OpenGLShader::Compile(const std::unordered_map<GLenum,std::string>& shaderSources)
     {
 		GLuint program = glCreateProgram();
-		HREALENGINE_CORE_DEBUGBREAK(shaderSources.size() <= 2, "only 2 shaders are supported (vertex and fragment)");
-		std::array<GLenum,2> glShaderIDs;
-		int glShaderIDIndex = 0;
+		/*HREALENGINE_CORE_DEBUGBREAK(shaderSources.size() <= 2, "only 2 shaders are supported (vertex and fragment)");*/
+		HREALENGINE_CORE_DEBUGBREAK(shaderSources.find(GL_VERTEX_SHADER) != shaderSources.end(), "Missing vertex shader!");
+		HREALENGINE_CORE_DEBUGBREAK(shaderSources.find(GL_FRAGMENT_SHADER) != shaderSources.end(), "Missing fragment shader!");
+		//std::array<GLenum,2> glShaderIDs;
+		std::vector<GLuint> glShaderIDs;
+		//int glShaderIDIndex = 0;
+		glShaderIDs.reserve(shaderSources.size());
 		for (auto& shaderSource : shaderSources)
 		{
 			GLenum shaderType = shaderSource.first;
@@ -111,12 +117,17 @@ namespace HRealEngine
 				LOG_CORE_ERROR("Shader Compile Error: {0}", infoLog.data());
 			
 				glDeleteShader(shader);
+
+				for (auto shaderID : glShaderIDs)
+					glDeleteShader(shaderID);
+				
 				return;
 			}
 			glAttachShader(program, shader);
-			glShaderIDs[glShaderIDIndex++] = shader;
+			//glShaderIDs[glShaderIDIndex++] = shader;
+			glShaderIDs.push_back(shader);
 		}
-		m_RendererID = program;
+		//m_RendererID = program;
         glLinkProgram(program);
     	
         GLint isLinked = 0;
@@ -136,7 +147,12 @@ namespace HRealEngine
             return;
         }
 		for (auto shaderID : glShaderIDs)
+		{
 			glDetachShader(program, shaderID);
+
+			glDeleteShader(shaderID);
+		}
+		m_RendererID = program;
     }
 
 

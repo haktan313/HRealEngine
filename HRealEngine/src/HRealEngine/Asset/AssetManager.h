@@ -29,5 +29,17 @@ namespace HRealEngine
         {
             return Project::GetActive()->GetAssetManager()->GetAssetType(handle);
         }
+
+        static std::vector<AssetHandle> GetAllAssetsOfType(AssetType type)
+        {
+            std::vector<AssetHandle> handles;
+            const AssetRegistry& registry = Project::GetActive()->GetAssetManager()->GetAssetRegistry();
+            for (const auto& [handle, metadata] : registry)
+            {
+                if (metadata.Type == type)
+                    handles.push_back(handle);
+            }
+            return handles;
+        }
     };
 }

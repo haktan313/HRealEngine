@@ -9,6 +9,7 @@
 
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Renderer/Material.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
 namespace YAML
@@ -176,6 +177,26 @@ namespace HRealEngine
             out << YAML::Key << "Scale" << YAML::Value << YAML::Flow << YAML::BeginSeq << transform.Scale.x << transform.Scale.y << transform.Scale.z << YAML::EndSeq;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<LightComponent>())
+        {
+            out << YAML::Key << "LightComponent";
+            out << YAML::BeginMap;
+            auto& light = entity.GetComponent<LightComponent>();
+            std::string type;
+            switch (light.Type)
+            {
+                case LightComponent::LightType::Directional: type = "Directional"; break;
+                case LightComponent::LightType::Point: type = "Point"; break;
+                case LightComponent::LightType::Spot: type = "Spot"; break;
+            }
+            out << YAML::Key << "Type" << YAML::Value << type;
+            out << YAML::Key << "Color" << YAML::Value << light.Color;
+            out << YAML::Key << "Direction" << YAML::Value << light.Direction;
+            out << YAML::Key << "Intensity" << YAML::Value << light.Intensity;
+            out << YAML::Key << "Radius" << YAML::Value << light.Radius;
+            out << YAML::Key << "CastShadows" << YAML::Value << light.CastShadows;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<SpriteRendererComponent>())
         {
             auto& sprite = entity.GetComponent<SpriteRendererComponent>();
@@ -208,7 +229,14 @@ namespace HRealEngine
             out << YAML::Key << "MaterialHandleOverrides";
             out << YAML::Value << YAML::BeginSeq;
             for (AssetHandle h : mesh.MaterialHandleOverrides)
+            {
                 out << h;
+                if (h == 0 || !AssetManager::IsAssetHandleValid(h))
+                    continue;
+                auto material = AssetManager::GetAsset<HMaterial>(h);
+                if (material)
+                    material->SaveToFile();
+            }
             out << YAML::EndSeq;
             
             out << YAML::EndMap;
@@ -435,6 +463,22 @@ namespace HRealEngine
                     transform.Position = transformComponent["Position"].as<glm::vec3>();
                     transform.Rotation = transformComponent["Rotation"].as<glm::vec3>();
                     transform.Scale = transformComponent["Scale"].as<glm::vec3>();
+                }
+                if (auto lightComponent = entity["LightComponent"])
+                {
+                    auto& light = deserializedEntity.AddComponent<LightComponent>();
+                    std::string type = lightComponent["Type"].as<std::string>();
+                    if (type == "Directional")
+                        light.Type = LightComponent::LightType::Directional;
+                    else if (type == "Point")
+                        light.Type = LightComponent::LightType::Point;
+                    else if (type == "Spot")
+                        light.Type = LightComponent::LightType::Spot;
+                    light.Color = lightComponent["Color"].as<glm::vec3>();
+                    light.Direction = lightComponent["Direction"].as<glm::vec3>();
+                    light.Intensity = lightComponent["Intensity"].as<float>();
+                    light.Radius = lightComponent["Radius"].as<float>();
+                    light.CastShadows = lightComponent["CastShadows"].as<bool>();
                 }
                 if (auto cameraComponent = entity["CameraComponent"])
                 {
