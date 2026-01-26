@@ -8,7 +8,7 @@
 #include <fstream>
 
 #include "HRealEngine/Asset/AssetManager.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 #include "HRealEngine/Renderer/Material.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 

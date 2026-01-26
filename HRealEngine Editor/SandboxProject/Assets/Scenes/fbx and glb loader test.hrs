@@ -1,0 +1,86 @@
+Scene: Untitled
+Entities:
+  - Entity: 5239503431462370163
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [0, 3.0506942, 1.3997355]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 6.2
+      Radius: 5.3
+      CastShadows: true
+  - Entity: 15729628409124158550
+    TagComponent:
+      Tag: ground
+    TransformComponent:
+      Position: [0, -1.2724674, 0]
+      Rotation: [0, 0, 0]
+      Scale: [6.667528, 1, 5.116613]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 16544538743204161057
+    TagComponent:
+      Tag: test mesh
+    TransformComponent:
+      Position: [-1.7890389, -0.5767727, 0.49282554]
+      Rotation: [1.6618937, -0.11269913, 3.1415923]
+      Scale: [0.059999645, 0.06000018, 0.06000003]
+    MeshRendererComponent:
+      MeshHandle: 5154898530978400542
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 17784954797248014013
+        - 6699244373983290827
+        - 6632444675603844925
+        - 1497612216104054601
+        - 5701048163993762348
+        - 3181681651711512313
+        - 0
+  - Entity: 18393959846965517566
+    TagComponent:
+      Tag: test mesh fbx
+    TransformComponent:
+      Position: [0.12856269, -0.53884315, -0.07779042]
+      Rotation: [-1.492591, 0, 0]
+      Scale: [1, 0.9999902, 0.9999902]
+    MeshRendererComponent:
+      MeshHandle: 12226871529418448954
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 8745511868759145477
+        - 9608109418760909440
+        - 11900873067325347170
+        - 5666733842852065156
+        - 13926232513120691429
+  - Entity: 15561385096523091108
+    TagComponent:
+      Tag: test ofbjectfbx2
+    TransformComponent:
+      Position: [2.0685513, -0.66796434, -3.9813777e-08]
+      Rotation: [-1.5707991, -0.42595175, 4.2544548e-07]
+      Scale: [0.19999997, 0.19999763, 0.19999872]
+    MeshRendererComponent:
+      MeshHandle: 11326137523494829754
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 16352811734816640351
+        - 17970450279696123386
+        - 6705492760471614893
+        - 13025062296057122960
+        - 11013443883952132024

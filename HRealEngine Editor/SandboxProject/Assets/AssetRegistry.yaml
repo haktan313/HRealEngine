@@ -1,45 +1,72 @@
 AssetRegistry:
+  - Handle: 5876693894168414897
+    FilePath: Scenes/2dphysics.hrs
+    Type: AssetType::Scene
   - Handle: 13162726800191861572
     FilePath: Scenes/3dtestobj.hrs
     Type: AssetType::Scene
   - Handle: 18121358212383785029
     FilePath: Scenes/layertest.hrs
     Type: AssetType::Scene
-  - Handle: 5876693894168414897
-    FilePath: Scenes/2dphysics.hrs
-    Type: AssetType::Scene
   - Handle: 12326138095061292247
     FilePath: Textures/Checkerboard.png
-    Type: AssetType::Texture
-  - Handle: 12681919880694640885
-    FilePath: Textures/joseMourinho.png
-    Type: AssetType::Texture
-  - Handle: 1975227560343378185
-    FilePath: Imported/TPenguin_Diffuse.png
     Type: AssetType::Texture
   - Handle: 4764350240469491840
     FilePath: newbT2.btree
     Type: AssetType::BehaviorTree
-  - Handle: 5464968924908894050
-    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
-    Type: AssetType::Material
+  - Handle: 1975227560343378185
+    FilePath: Imported/TPenguin_Diffuse.png
+    Type: AssetType::Texture
+  - Handle: 4500228280806412834
+    FilePath: Imported/internal_ground_ao_texture.jpeg
+    Type: AssetType::Texture
+  - Handle: 12681919880694640885
+    FilePath: Textures/joseMourinho.png
+    Type: AssetType::Texture
+  - Handle: 7510954135958771054
+    FilePath: Imported/HisokaUV_001_Clothing_Light_Albedo.png
+    Type: AssetType::Texture
   - Handle: 4168462951297401035
     FilePath: Scenes/3d level.hrs
     Type: AssetType::Scene
+  - Handle: 5464968924908894050
+    FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Materials/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_INJ_iOS_CHR_ETH_MET_B.hmat
+    Type: AssetType::Material
   - Handle: 5053407872055411390
     FilePath: newBT.btree
     Type: AssetType::BehaviorTree
+  - Handle: 1643486437598966914
+    FilePath: Imported/pennywise_low_03_mat_eyes_Emissive_1.png
+    Type: AssetType::Texture
   - Handle: 7627836704904900809
     FilePath: bt3Nwe.btree
     Type: AssetType::BehaviorTree
   - Handle: 2326926188452044375
     FilePath: Imported/FL_CW_N_1.png
     Type: AssetType::Texture
+  - Handle: 17784954797248014013
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_Skirt.001.hmat
+    Type: AssetType::Material
+  - Handle: 4880042260608696378
+    FilePath: Imported/kratos_model_gow_1/Textures/embedded_2.png
+    Type: AssetType::Texture
+  - Handle: 3536599965045458340
+    FilePath: Imported/mat_face_albedo.jpeg
+    Type: AssetType::Texture
+  - Handle: 12094469807159904320
+    FilePath: Scenes/fbx and glb loader test.hrs
+    Type: AssetType::Scene
   - Handle: 5885954185279832949
     FilePath: Imported/FL_CW_S_1.png
     Type: AssetType::Texture
+  - Handle: 6705492760471614893
+    FilePath: Imported/model/Materials/model_mat_eyes.hmat
+    Type: AssetType::Material
   - Handle: 14044764669183542823
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_S.png
+    Type: AssetType::Texture
+  - Handle: 2253014427256782517
+    FilePath: Imported/HisokaUV_001_Skin_Light_Albedo.png
     Type: AssetType::Texture
   - Handle: 18100531321925507779
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_N.png
@@ -47,30 +74,117 @@ AssetRegistry:
   - Handle: 10850074012930165883
     FilePath: Imported/TPenguin_Normal.png
     Type: AssetType::Texture
-  - Handle: 6547136974437529389
-    FilePath: Imported/Penguin/Textures/TPenguin_Diffuse.png
-    Type: AssetType::Texture
   - Handle: 1312069811868287053
     FilePath: Imported/flash/Textures/FL_CW_A_1.png
     Type: AssetType::Texture
+  - Handle: 6547136974437529389
+    FilePath: Imported/Penguin/Textures/TPenguin_Diffuse.png
+    Type: AssetType::Texture
+  - Handle: 5701048163993762348
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_maiFskinh2.001.hmat
+    Type: AssetType::Material
+  - Handle: 11326137523494829754
+    FilePath: Imported/model.hmesh
+    Type: AssetType::Mesh
   - Handle: 12859171972571548336
     FilePath: Imported/flash/Materials/flash_defaultMat.hmat
     Type: AssetType::Material
+  - Handle: 16791753567910257679
+    FilePath: Imported/pennywise_low_04_mat_hair_Normal.png
+    Type: AssetType::Texture
   - Handle: 4078180095595489149
     FilePath: flash.hmesh
     Type: AssetType::Mesh
   - Handle: 972678566340647931
     FilePath: Imported/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman/Textures/INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman_Body_D.png
     Type: AssetType::Texture
+  - Handle: 11900873067325347170
+    FilePath: Imported/Hisoka_Sketchfab/Materials/Hisoka_Sketchfab_Skin.hmat
+    Type: AssetType::Material
   - Handle: 10835761365549043433
     FilePath: INJ_iOS_CHARACTER_Eobard_Thawne_Reverse_Flash_Metahuman.hmesh
     Type: AssetType::Mesh
+  - Handle: 15558320492822203474
+    FilePath: Imported/pennywise_low_04_mat_hair_BaseColor.png
+    Type: AssetType::Texture
   - Handle: 2742870482941391390
     FilePath: Imported/Penguin/Materials/Penguin_TPenguin_Diffuse.png.hmat
     Type: AssetType::Material
   - Handle: 15984410996131286419
     FilePath: Penguin.hmesh
     Type: AssetType::Mesh
+  - Handle: 1497612216104054601
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_maiFskinh.001.hmat
+    Type: AssetType::Material
   - Handle: 15543066515406465927
     FilePath: Scenes/penTest.hrs
     Type: AssetType::Scene
+  - Handle: 2017527205664745500
+    FilePath: Imported/HisokaUV_001_Hair_Light_Albedo.png
+    Type: AssetType::Texture
+  - Handle: 2824017275532204937
+    FilePath: Imported/pennywise_low_04_mat_clothes_BaseColor.png
+    Type: AssetType::Texture
+  - Handle: 16205661084507558448
+    FilePath: Imported/kratos_model_gow_1/Textures/embedded_0.png
+    Type: AssetType::Texture
+  - Handle: 17569833652528497227
+    FilePath: Imported/kratos_model_gow_1/Textures/embedded_1.png
+    Type: AssetType::Texture
+  - Handle: 6699244373983290827
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_maiFclh.001.hmat
+    Type: AssetType::Material
+  - Handle: 6632444675603844925
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_maiFcll.001.hmat
+    Type: AssetType::Material
+  - Handle: 3181681651711512313
+    FilePath: Imported/kratos_model_gow_1/Materials/kratos_model_gow_1_MAT_maiFskinl2.001.hmat
+    Type: AssetType::Material
+  - Handle: 5154898530978400542
+    FilePath: kratos_model_gow_1.hmesh
+    Type: AssetType::Mesh
+  - Handle: 17970450279696123386
+    FilePath: Imported/model/Materials/model_mat_teeth.hmat
+    Type: AssetType::Material
+  - Handle: 8745511868759145477
+    FilePath: Imported/Hisoka_Sketchfab/Materials/Hisoka_Sketchfab_Outline.hmat
+    Type: AssetType::Material
+  - Handle: 10311368668881005357
+    FilePath: Imported/pennywise_low_04_mat_teeth_Normal.png
+    Type: AssetType::Texture
+  - Handle: 9608109418760909440
+    FilePath: Imported/Hisoka_Sketchfab/Materials/Hisoka_Sketchfab_Eye.hmat
+    Type: AssetType::Material
+  - Handle: 5666733842852065156
+    FilePath: Imported/Hisoka_Sketchfab/Materials/Hisoka_Sketchfab_Hair.hmat
+    Type: AssetType::Material
+  - Handle: 13926232513120691429
+    FilePath: Imported/Hisoka_Sketchfab/Materials/Hisoka_Sketchfab_Clothing.hmat
+    Type: AssetType::Material
+  - Handle: 13025062296057122960
+    FilePath: Imported/model/Materials/model_mat_clothes.hmat
+    Type: AssetType::Material
+  - Handle: 12226871529418448954
+    FilePath: Hisoka_Sketchfab.hmesh
+    Type: AssetType::Mesh
+  - Handle: 16287673224269096113
+    FilePath: Imported/HisokaUV_001_EyeLight_Albedo_1.png
+    Type: AssetType::Texture
+  - Handle: 16352811734816640351
+    FilePath: Imported/model/Materials/model_mat_face.hmat
+    Type: AssetType::Material
+  - Handle: 11013443883952132024
+    FilePath: Imported/model/Materials/model_mat_hair.hmat
+    Type: AssetType::Material
+  - Handle: 10854009397870872370
+    FilePath: Imported/pennywise_low_03_mat_eyes_Emissive.png
+    Type: AssetType::Texture
+  - Handle: 123029356008129422
+    FilePath: Imported/mat_teeth_albedo.jpeg
+    Type: AssetType::Texture
+  - Handle: 5877104455535177565
+    FilePath: Imported/pennywise_low_04_mat_face_Normal.png
+    Type: AssetType::Texture
+  - Handle: 8606575965301151664
+    FilePath: Imported/pennywise_low_04_mat_clothes_Normal.png
+    Type: AssetType::Texture

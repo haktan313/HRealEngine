@@ -10,7 +10,7 @@
 #include "VertexArray.h"
 #include "glad/glad.h"
 #include "HRealEngine/Asset/AssetManager.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 
 namespace HRealEngine
 {

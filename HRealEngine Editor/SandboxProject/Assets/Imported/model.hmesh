@@ -1,0 +1,17 @@
+Type: StaticMesh
+Source: Imported/Imported/model/Source/model.fbx
+Cooked: cache/model.hmeshbin
+BoundsMin: [-2.83178, -1.39106, 0.0520105]
+BoundsMax: [2.83178, 1.29697, 11.5726]
+Import:
+  Triangulate: true
+  GenSmoothNormals: true
+  CalcTangents: true
+  FlipUVs: false
+  Scale: 1.0
+MaterialHandles:
+  - 16352811734816640351
+  - 17970450279696123386
+  - 6705492760471614893
+  - 13025062296057122960
+  - 11013443883952132024

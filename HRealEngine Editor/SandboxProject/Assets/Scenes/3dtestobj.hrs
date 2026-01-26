@@ -1,12 +1,144 @@
 Scene: Untitled
 Entities:
-  - Entity: 4252773359772711178
+  - Entity: 2493219481796066299
     TagComponent:
-      Tag: cube
+      Tag: flash
     TransformComponent:
-      Position: [-0.57018054, -1.342015, -0.2564274]
+      Position: [3.9029443, -0.4568345, 0.91078436]
       Rotation: [0, 0, 0]
-      Scale: [70.5503, 1, 21.540089]
+      Scale: [2, 2, 2]
+    MeshRendererComponent:
+      MeshHandle: 4078180095595489149
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 12859171972571548336
+  - Entity: 15616024380950422966
+    TagComponent:
+      Tag: penguen
+    TransformComponent:
+      Position: [-4.6753283, -0.706144, 3.354887]
+      Rotation: [0, 0, 0]
+      Scale: [0.020000031, 0.02000001, 0.019999145]
+    MeshRendererComponent:
+      MeshHandle: 15984410996131286419
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 0
+        - 2742870482941391390
+  - Entity: 5925817816104526436
+    TagComponent:
+      Tag: light5
+    TransformComponent:
+      Position: [-5.7392254, 2.9127753, 6.8999243]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 2.6
+      Radius: 13.7
+      CastShadows: true
+  - Entity: 15121850108385962197
+    TagComponent:
+      Tag: light4
+    TransformComponent:
+      Position: [0.2507167, 0, -4.944351]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Directional
+      Color: [1, 0, 0.76868343]
+      Direction: [-0.23, -0.51, 0.1]
+      Intensity: 0.2
+      Radius: 1
+      CastShadows: true
+  - Entity: 5914020284527656264
+    TagComponent:
+      Tag: light3
+    TransformComponent:
+      Position: [-3.1492567, 2.8910394, 3.328796]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0.85765123, 0.2228062, 0.2228062]
+      Direction: [0, -1, 0]
+      Intensity: 2.9
+      Radius: 9.2
+      CastShadows: true
+  - Entity: 3635060232250787184
+    TagComponent:
+      Tag: light2
+    TransformComponent:
+      Position: [2.115148, 0.99610984, 1.6467438]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0, 1, 0.54092526]
+      Direction: [0, -1, 0]
+      Intensity: 2
+      Radius: 7.6
+      CastShadows: true
+  - Entity: 17946033611301411440
+    TagComponent:
+      Tag: light6
+    TransformComponent:
+      Position: [4.5982084, 2.3059888, 4.97651]
+      Rotation: [2.5675806e-06, 0, 1.5419067e-06]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0, 0.37010694, 1]
+      Direction: [-0.08, -0.25, -0.27]
+      Intensity: 0.6
+      Radius: 18.2
+      CastShadows: true
+  - Entity: 17578333643475291096
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [2.2735631, 0.98185265, 0.8531421]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [0.83629894, 0.38689986, 0.38689986, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 8541079047686451945
+    TagComponent:
+      Tag: camera
+    TransformComponent:
+      Position: [0, 4.2982345, 7.7275877]
+      Rotation: [-0.72732043, 0, 0]
+      Scale: [1, 0.9999999, 0.9999999]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.3089969
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 13144157712970970766
+    TagComponent:
+      Tag: box
+    TransformComponent:
+      Position: [-1.111809, 1.524144, -1.9755859]
+      Rotation: [0, 0, 0]
+      Scale: [63.86835, 6.1650925, 0.41331267]
     MeshRendererComponent:
       MeshHandle: 0
       Color: [1, 1, 1, 1]
@@ -18,20 +150,6 @@ Entities:
       BodyType: Static
       CollisionShape: Box
       FixedRotation: false
-  - Entity: 6632952075898137711
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [7.414552, 0, 0.42772412]
-      Rotation: [-0.042774543, -0.2072836, 5.0439834e-08]
-      Scale: [1.5875239, 0.9842009, 1.4166582]
-    MeshRendererComponent:
-      MeshHandle: 0
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        []
   - Entity: 10334013345553825234
     TagComponent:
       Tag: rf
@@ -51,13 +169,27 @@ Entities:
       BodyType: Dynamic
       CollisionShape: Box
       FixedRotation: false
-  - Entity: 13144157712970970766
+  - Entity: 6632952075898137711
     TagComponent:
-      Tag: box
+      Tag: Empty Entity
     TransformComponent:
-      Position: [-1.111809, 1.524144, -1.9755859]
+      Position: [7.414552, 0, 0.42772412]
+      Rotation: [-0.042774543, -0.2072836, 5.0439834e-08]
+      Scale: [1.5875239, 0.9842009, 1.4166582]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 4252773359772711178
+    TagComponent:
+      Tag: cube
+    TransformComponent:
+      Position: [-0.57018054, -1.342015, -0.2564274]
       Rotation: [0, 0, 0]
-      Scale: [63.86835, 6.1650925, 0.41331267]
+      Scale: [70.5503, 1, 21.540089]
     MeshRendererComponent:
       MeshHandle: 0
       Color: [1, 1, 1, 1]
@@ -69,135 +201,3 @@ Entities:
       BodyType: Static
       CollisionShape: Box
       FixedRotation: false
-  - Entity: 8541079047686451945
-    TagComponent:
-      Tag: camera
-    TransformComponent:
-      Position: [0, 4.2982345, 7.7275877]
-      Rotation: [-0.72732043, 0, 0]
-      Scale: [1, 0.9999999, 0.9999999]
-    CameraComponent:
-      PrimaryCamera: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 1.3089969
-        PerspectiveNear: 0.01
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-  - Entity: 17578333643475291096
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Position: [2.2735631, 0.98185265, 0.8531421]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshRendererComponent:
-      MeshHandle: 0
-      Color: [0.83629894, 0.38689986, 0.38689986, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        []
-  - Entity: 17946033611301411440
-    TagComponent:
-      Tag: light6
-    TransformComponent:
-      Position: [4.5982084, 2.3059888, 4.97651]
-      Rotation: [2.5675806e-06, 0, 1.5419067e-06]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [0, 0.37010694, 1]
-      Direction: [-0.08, -0.25, -0.27]
-      Intensity: 0.6
-      Radius: 18.2
-      CastShadows: true
-  - Entity: 3635060232250787184
-    TagComponent:
-      Tag: light2
-    TransformComponent:
-      Position: [2.115148, 0.99610984, 1.6467438]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [0, 1, 0.54092526]
-      Direction: [0, -1, 0]
-      Intensity: 2
-      Radius: 7.6
-      CastShadows: true
-  - Entity: 5914020284527656264
-    TagComponent:
-      Tag: light3
-    TransformComponent:
-      Position: [-3.1492567, 2.8910394, 3.328796]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [0.85765123, 0.2228062, 0.2228062]
-      Direction: [0, -1, 0]
-      Intensity: 2.9
-      Radius: 9.2
-      CastShadows: true
-  - Entity: 15121850108385962197
-    TagComponent:
-      Tag: light4
-    TransformComponent:
-      Position: [0.2507167, 0, -4.944351]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Directional
-      Color: [1, 0, 0.76868343]
-      Direction: [-0.23, -0.51, 0.1]
-      Intensity: 0.2
-      Radius: 1
-      CastShadows: true
-  - Entity: 5925817816104526436
-    TagComponent:
-      Tag: light5
-    TransformComponent:
-      Position: [-5.7392254, 2.9127753, 6.8999243]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [1, 1, 1]
-      Direction: [0, -1, 0]
-      Intensity: 2.6
-      Radius: 13.7
-      CastShadows: true
-  - Entity: 15616024380950422966
-    TagComponent:
-      Tag: penguen
-    TransformComponent:
-      Position: [-4.6753283, -0.706144, 3.354887]
-      Rotation: [0, 0, 0]
-      Scale: [0.020000031, 0.02000001, 0.019999145]
-    MeshRendererComponent:
-      MeshHandle: 15984410996131286419
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 2742870482941391390
-  - Entity: 2493219481796066299
-    TagComponent:
-      Tag: flash
-    TransformComponent:
-      Position: [3.9029443, -0.4568345, 0.91078436]
-      Rotation: [0, 0, 0]
-      Scale: [2, 2, 2]
-    MeshRendererComponent:
-      MeshHandle: 4078180095595489149
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        - 0
-        - 12859171972571548336

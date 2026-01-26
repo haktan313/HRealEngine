@@ -2,7 +2,7 @@
 #include "MeshImporter.h"
 
 #include "AssetManager.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 
 namespace HRealEngine
 {
@@ -19,12 +19,12 @@ namespace HRealEngine
 
         if (ext == ".hmesh")
         {
-            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
+            asset = MeshLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
         }
-        else if (ext == ".obj")
+        else if (ext == ".obj" || ext == ".fbx" || ext == ".gltf" || ext == ".glb")
         {
             //Project::GetContentBrowserPanel()->ImportOBJ(Project::GetAssetFileSystemPath(metaData.FilePath));
-            asset = ObjLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
+            asset = MeshLoader::LoadHMeshAsset(metaData.FilePath, Project::GetActive()->GetAssetDirectory(), s_DefaultMeshShader);
         }
         else
         {

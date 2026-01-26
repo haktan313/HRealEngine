@@ -18,11 +18,11 @@ namespace HRealEngine
         void RefreshAssetTree();
         void ImportOBJ(const std::filesystem::path& srcObj);
     private:
-        void ImportOBJ();
+        void ImportMesh();
         void CreateDirectoriesIfNotExists(const std::filesystem::path& srcObj, std::filesystem::path& dstObj, std::filesystem::path& lastCopiedTexAbs,
             std::vector<std::filesystem::path>& texturePaths);
-        void ImportDataFromOBJ(const std::filesystem::path& dstObj, const std::filesystem::path& lastCopiedTexAbs,
-            const std::vector<std::filesystem::path>& texturePaths);
+        void ImportDataFromMeshFile(const std::filesystem::path& dstObj, const std::filesystem::path& lastCopiedTexAbs,
+                                    const std::vector<std::filesystem::path>& texturePaths);
         std::filesystem::path MakeUniquePath(const std::filesystem::path& p) const;
         
         std::filesystem::path m_CurrentDirectory;

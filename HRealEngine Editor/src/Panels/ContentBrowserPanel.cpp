@@ -8,7 +8,7 @@
 
 #include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Core/Logger.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 
@@ -35,8 +35,8 @@ namespace HRealEngine
     {
         ImGui::Begin("Content Browser");
 
-        if (ImGui::Button("Import OBJ"))
-            ImportOBJ();
+        if (ImGui::Button("Import Mesh"))
+            ImportMesh();
         ImGui::SameLine();
         ImGui::TextDisabled("%s", m_CurrentDirectory.string().c_str());
         ImGui::Separator();
@@ -220,9 +220,9 @@ namespace HRealEngine
         }
     }
 
-    void ContentBrowserPanel::ImportOBJ()
+    void ContentBrowserPanel::ImportMesh()
     {
-        std::string selected = FileDialogs::OpenFile("OBJ (*.obj)\0*.obj\0");
+        std::string selected = FileDialogs::OpenFile("Model (*.obj;*.fbx;*.gltf;*.glb)\0*.obj;*.fbx;*.gltf;*.glb\0");
         if (selected.empty())
             return;
         
@@ -235,14 +235,14 @@ namespace HRealEngine
         }
         catch (...)
         {
-            m_LastError = "Could not read OBJ file size.";
+            m_LastError = "Could not read file size.";
             m_OpenErrorPopup = true;
             return;
         }
         
         if (fileSize > kMaxImportFileBytes)
         {
-            m_LastError = "OBJ file is too large for import budget.";
+            m_LastError = "file is too large for import budget.";
             m_OpenErrorPopup = true;
             return;
         }
@@ -251,7 +251,7 @@ namespace HRealEngine
         std::filesystem::path lastCopiedTexAbs;
         std::vector<std::filesystem::path> texturePaths;
         CreateDirectoriesIfNotExists(srcObj, dstObj, lastCopiedTexAbs, texturePaths);   
-        ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
+        ImportDataFromMeshFile(dstObj, lastCopiedTexAbs, texturePaths);
         RefreshAssetTree();
     }
 
@@ -281,7 +281,7 @@ namespace HRealEngine
         std::filesystem::path lastCopiedTexAbs;
         std::vector<std::filesystem::path> texturePaths;
         CreateDirectoriesIfNotExists(srcObj, dstObj, lastCopiedTexAbs, texturePaths);   
-        ImportDataFromOBJ(dstObj, lastCopiedTexAbs, texturePaths);
+        ImportDataFromMeshFile(dstObj, lastCopiedTexAbs, texturePaths);
         RefreshAssetTree();
     }
 
@@ -300,32 +300,37 @@ namespace HRealEngine
 
         dstObj = sourceDir / srcObj.filename();
         dstObj = MakeUniquePath(dstObj);        
-        if (!ObjLoader::CopyFileSafe(srcObj, dstObj))
+        if (!MeshLoader::CopyFileSafe(srcObj, dstObj))
         {
-            m_LastError = "Failed to copy OBJ into assets Imported/Source.";
+            m_LastError = "Failed to copy mesh file into assets Imported/Source.";
             m_OpenErrorPopup = true;
             return;
-        }       
+        }
+        
+        std::string ext = srcObj.extension().string();
+        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        if (ext != ".obj")
+            return; 
 
-        std::vector<std::string> mtllibs = ObjLoader::ParseObjMtllibs(srcObj);
+        std::vector<std::string> mtllibs = MeshLoader::ParseObjMtllibs(srcObj);
         if (!mtllibs.empty())
-            LOG_CORE_INFO("OBJ mtllib count = {}", (int)mtllibs.size());
+            LOG_CORE_INFO("mtllib count = {}", (int)mtllibs.size());
         
         for (const std::string& mtlRel : mtllibs)
         {
             std::filesystem::path srcMtlAbs = srcObj.parent_path() / mtlRel;
             if (!std::filesystem::exists(srcMtlAbs))
             {
-                LOG_CORE_WARN("MTL missing next to OBJ: {}", srcMtlAbs.string());
+                LOG_CORE_WARN("MTL missing next to: {}", srcMtlAbs.string());
                 continue;
             }       
 
             std::filesystem::path dstMtlAbs = sourceDir / srcMtlAbs.filename();     
             std::vector<std::string> texRefs;
-            if (!ObjLoader::RewriteMtlAndCollectTextures(srcMtlAbs, dstMtlAbs, texRefs))
+            if (!MeshLoader::RewriteMtlAndCollectTextures(srcMtlAbs, dstMtlAbs, texRefs))
             {
                 LOG_CORE_WARN("Failed to rewrite/copy MTL: {}", srcMtlAbs.string());
-                ObjLoader::CopyFileSafe(srcMtlAbs, dstMtlAbs);
+                MeshLoader::CopyFileSafe(srcMtlAbs, dstMtlAbs);
                 continue;
             }       
 
@@ -349,7 +354,7 @@ namespace HRealEngine
                 }
                 
                 lastCopiedTexAbs = texDir / srcTexAbs.filename();        
-                if (!ObjLoader::CopyFileSafe(srcTexAbs, lastCopiedTexAbs))
+                if (!MeshLoader::CopyFileSafe(srcTexAbs, lastCopiedTexAbs))
                     LOG_CORE_WARN("Failed to copy texture: {} -> {}", srcTexAbs.string(), lastCopiedTexAbs.string());
                 else
                 {
@@ -362,16 +367,16 @@ namespace HRealEngine
         }    
     }
 
-    void ContentBrowserPanel::ImportDataFromOBJ(const std::filesystem::path& dstObj,const std::filesystem::path& lastCopiedTexAbs,
+    void ContentBrowserPanel::ImportDataFromMeshFile(const std::filesystem::path& dstObj,const std::filesystem::path& lastCopiedTexAbs,
         const std::vector<std::filesystem::path>& texturePaths)
     {
         std::vector<MeshVertex> verts;
         std::vector<uint32_t> inds;
         std::vector<HMeshBinSubmesh> submeshes;
         glm::vec3 bMin, bMax;
-        if (!ObjLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes, bMin, bMax))
+        if (!MeshLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes, bMin, bMax))
         {
-            LOG_CORE_INFO("OBJ load failed: {}", dstObj.string());
+            LOG_CORE_INFO("Mesh load failed: {}", dstObj.string());
             return;
         }       
 
@@ -379,7 +384,7 @@ namespace HRealEngine
         std::filesystem::create_directories(cookedPath);        
         cookedPath /= dstObj.stem();
         cookedPath += ".hmeshbin";      
-        if (!ObjLoader::WriteHMeshBin(cookedPath, verts, inds, submeshes, bMin, bMax))
+        if (!MeshLoader::WriteHMeshBin(cookedPath, verts, inds, submeshes, bMin, bMax))
         {
             LOG_CORE_INFO("Cook write failed: {}", cookedPath.string());
             return;
@@ -391,7 +396,10 @@ namespace HRealEngine
         auto sourceRel = std::filesystem::relative(dstObj, Project::GetAssetDirectory()).generic_string();
         auto cookedRel = std::filesystem::relative(cookedPath, Project::GetAssetDirectory()).generic_string();     
 
-        auto materials = ObjLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);
+        //auto materials = MeshLoader::ImportObjMaterialsToHMat(dstObj, m_CurrentDirectory, lastCopiedTexAbs, texturePaths);
+        auto assetsRoot = Project::GetAssetDirectory();
+        auto materials = MeshLoader::ImportObjMaterialsToHMat(dstObj, assetsRoot, lastCopiedTexAbs, texturePaths);
+
         std::vector<AssetHandle> materialHandles;
         materialHandles.reserve(materials.size());
 

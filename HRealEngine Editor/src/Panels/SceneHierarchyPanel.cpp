@@ -6,7 +6,7 @@
 
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/Logger.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 #include "HRealEngine/Renderer/Material.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 
@@ -795,7 +795,7 @@ namespace HRealEngine
                         std::filesystem::path droppedPath = metaData.FilePath;
                         component.MeshAssetPath = droppedPath;
                         
-                        auto meshGPU = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
+                        auto meshGPU = MeshLoader::GetOrLoad(droppedPath, "assets", shader);
                         if (meshGPU)
                         {
                             //const size_t slotCount = meshGPU->MaterialPaths.size();

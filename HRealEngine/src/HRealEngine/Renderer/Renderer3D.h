@@ -1,7 +1,7 @@
 #pragma once
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Components.h"
-#include "HRealEngine/Core/ObjLoader.h"
+#include "HRealEngine/Core/MeshLoader.h"
 
 namespace HRealEngine
 {
