@@ -405,6 +405,8 @@ namespace HRealEngine
             }
             if (ImGui::BeginMenu("Script"))
             {
+                if (ImGui::MenuItem("Initialize C# Script Engine"))
+                    ScriptEngine::InitCSharpProject();
                 if (ImGui::MenuItem("Reload C# Assembly"))
                     ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
@@ -875,7 +877,7 @@ namespace HRealEngine
         cfg.Type = type;
         cfg.AssetDirectory = "assets";
         cfg.AssetRegistryPath = "AssetRegistry.yaml";
-        cfg.ScriptModulePath = (type == ProjectType::CSHARP) ? "Scripts/Binaries/Sandbox.dll" : "";
+        cfg.ScriptModulePath = type == ProjectType::CSHARP ? "Scripts/Binaries/" + projectName + ".dll" : "";
 
         Project::SaveActive(newProjectFile);
 
@@ -929,11 +931,6 @@ namespace HRealEngine
             AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
             if (startSceneHandle)
                 OpenScene(startSceneHandle);
-            else
-            {
-                NewScene();
-                SaveScene();
-            }
         }
     }
 

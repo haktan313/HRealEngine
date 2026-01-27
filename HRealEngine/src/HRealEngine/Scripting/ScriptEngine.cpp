@@ -165,6 +165,15 @@ namespace HRealEngine
     
     void ScriptEngine::Init()
     {
+        auto scriptDir = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+        LOG_CORE_WARN("AppAssemblyPath = {}", scriptDir.string());
+        LOG_CORE_WARN("  exists? {}", std::filesystem::exists(scriptDir) ? "YES" : "NO");
+        if (!std::filesystem::exists(scriptDir))
+        {
+            LOG_CORE_ERROR("Script assembly does not exist: {}", scriptDir.string());
+            return;
+        }
+        
         s_Data = new ScriptEngineData();
         InitMono();
         auto corePath = Application::Get().GetSpecification().EditorAssetsPath / "scriptcore/HRealEngine-ScriptCore.dll";
@@ -173,14 +182,6 @@ namespace HRealEngine
         if (!bstatus)
         {
             LOG_CORE_ERROR("Failed to load HRealEngine-ScriptCore.dll");
-            return;
-        }
-        auto scriptDir = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
-        LOG_CORE_WARN("AppAssemblyPath = {}", scriptDir.string());
-        LOG_CORE_WARN("  exists? {}", std::filesystem::exists(scriptDir) ? "YES" : "NO");
-        if (!std::filesystem::exists(scriptDir))
-        {
-            LOG_CORE_ERROR("Script assembly does not exist: {}", scriptDir.string());
             return;
         }
 
@@ -293,6 +294,11 @@ namespace HRealEngine
             }
         }
         auto& entityClasses = s_Data->EntityClasses;
+    }
+
+    void ScriptEngine::InitCSharpProject()
+    {
+        Init();
     }
 
     void ScriptEngine::ReloadAssembly()

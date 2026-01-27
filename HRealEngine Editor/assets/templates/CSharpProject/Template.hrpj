@@ -4,4 +4,4 @@ Project:
   AssetDirectory: assets
   AssetRegistryPath: AssetRegistry.yaml
   ScriptModulePath: Scripts/Binaries/Sandbox.dll
-  StartScene: 0
+  StartScene: 832115492279930486

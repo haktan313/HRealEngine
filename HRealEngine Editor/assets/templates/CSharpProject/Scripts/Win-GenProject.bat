@@ -46,7 +46,10 @@ pushd "%SCRIPT_DIR%"
 REM Optional: allow custom workspace name via first arg
 REM Example: Win-GenProject.bat MyGame
 set "WS_NAME=%~1"
-if "%WS_NAME%"=="" set "WS_NAME=SandboxProject"
+if "%WS_NAME%"=="" (
+    for %%i in ("%SCRIPT_DIR%..") do set "WS_NAME=%%~nxi"
+)
+
 
 "%PREMAKE_EXE%" vs2022 --file=premake5.lua --workspace="%WS_NAME%"
 if errorlevel 1 (

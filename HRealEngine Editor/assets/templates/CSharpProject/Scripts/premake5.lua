@@ -23,12 +23,12 @@ local scriptCoreDir = path.getdirectory(scriptCoreDll)
 
 workspace (wsName)
     architecture "x86_64"
-    startproject "Sandbox"
+    startproject (wsName)
 
     configurations { "Debug", "Release", "Dist" }
     flags { "MultiProcessorCompile" }
 
-project "Sandbox"
+project (wsName)
     kind "SharedLib"-- C# class library (.dll)
     language "C#"
     dotnetframework "4.7.2"
