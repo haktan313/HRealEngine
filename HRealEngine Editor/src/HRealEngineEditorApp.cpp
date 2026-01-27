@@ -21,6 +21,7 @@ namespace HRealEngine
 		ApplicationSpecification spec;
 		spec.Name = "HRealEngine Editor";
 		spec.CommandLineArgs = args;
+		spec.EditorAssetsPath = "assets";
 
 		//Project::New()->SaveActive("Untitled.hrpj");
 

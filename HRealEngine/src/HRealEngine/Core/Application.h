@@ -28,8 +28,9 @@ namespace HRealEngine
 	struct ApplicationSpecification
 	{
 		std::string Name = "HRealEngine Application";
-		std::string WorkingDirectory;
 		AppCommandLineArgs CommandLineArgs;
+
+		std::filesystem::path EditorAssetsPath = "assets";
 	};
 	class HREALENGINE_API Application
 	{

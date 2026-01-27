@@ -1,5 +1,6 @@
 Project:
   Name: Untitled
+  Type: CSHARP
   StartScene: 13162726800191861572
   AssetDirectory: "assets"
   AssetRegistryPath: "AssetRegistry.yaml"

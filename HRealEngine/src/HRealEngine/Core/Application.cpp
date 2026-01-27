@@ -21,9 +21,12 @@ namespace HRealEngine
 	{
 		HREALENGINE_CORE_DEBUGBREAK(!s_InstanceOfApp, "App already exist!");
 		s_InstanceOfApp = this;
+
+		m_ApplicationSpecification.EditorAssetsPath = std::filesystem::absolute(m_ApplicationSpecification.EditorAssetsPath);
+		LOG_CORE_WARN("EditorAssetsPath = {}", m_ApplicationSpecification.EditorAssetsPath.string());
 		
-		if (!m_ApplicationSpecification.WorkingDirectory.empty())
-			std::filesystem::current_path(m_ApplicationSpecification.WorkingDirectory);
+		/*if (!m_ApplicationSpecification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_ApplicationSpecification.WorkingDirectory);*/
 		
 		m_Window = Window::Create(WindowSettings(m_ApplicationSpecification.Name));
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));

@@ -71,8 +71,12 @@ namespace HRealEngine
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
-		io.Fonts->AddFontFromFileTTF("assets/fonts/Story_Script/StoryScript-Regular.ttf", 20.0f);
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Story_Script/StoryScript-Regular.ttf", 20.0f);
+		Application& app = Application::Get();
+		auto base = app.GetSpecification().EditorAssetsPath;
+		auto fontPath = (base / "fonts/Story_Script/StoryScript-Regular.ttf").string();
+
+		//io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 20.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 20.0f);
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
@@ -88,7 +92,6 @@ namespace HRealEngine
 
 		SetDarkThemeColors();
 
-		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 		
 		// Setup Platform/Renderer backends

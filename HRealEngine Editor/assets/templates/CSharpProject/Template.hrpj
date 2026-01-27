@@ -1,0 +1,7 @@
+Project:
+  Name: Template
+  Type: CSHARP
+  AssetDirectory: assets
+  AssetRegistryPath: AssetRegistry.yaml
+  ScriptModulePath: Scripts/Binaries/Sandbox.dll
+  StartScene: 0

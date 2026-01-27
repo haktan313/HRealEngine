@@ -167,13 +167,23 @@ namespace HRealEngine
     {
         s_Data = new ScriptEngineData();
         InitMono();
-        bool bstatus = LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
+        auto corePath = Application::Get().GetSpecification().EditorAssetsPath / "scriptcore/HRealEngine-ScriptCore.dll";
+        bool bstatus = LoadAssembly(corePath);
+        //bool bstatus = LoadAssembly("Resources/Scripts/HRealEngine-ScriptCore.dll");
         if (!bstatus)
         {
             LOG_CORE_ERROR("Failed to load HRealEngine-ScriptCore.dll");
             return;
         }
         auto scriptDir = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+        LOG_CORE_WARN("AppAssemblyPath = {}", scriptDir.string());
+        LOG_CORE_WARN("  exists? {}", std::filesystem::exists(scriptDir) ? "YES" : "NO");
+        if (!std::filesystem::exists(scriptDir))
+        {
+            LOG_CORE_ERROR("Script assembly does not exist: {}", scriptDir.string());
+            return;
+        }
+
         bstatus = LoadAppAssembly(scriptDir);
         if (!bstatus)
         {
@@ -231,6 +241,7 @@ namespace HRealEngine
             }
         });
         s_Data->bAssemblyReloadPending = false;
+        return true;
     }
 
     void ScriptEngine::LoadAssemblyClasses()

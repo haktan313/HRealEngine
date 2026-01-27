@@ -20,7 +20,7 @@ namespace HRealEngine
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    }
+    }*/
 
     OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : m_FilePath(path)
     {
@@ -59,7 +59,7 @@ namespace HRealEngine
             glTextureSubImage2D(m_RendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         }
-    }*/
+    }
 
     static GLenum ImageFormatToGLDataFormat(ImageFormat format)
     {
