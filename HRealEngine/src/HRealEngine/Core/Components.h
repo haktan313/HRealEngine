@@ -167,6 +167,14 @@ namespace HRealEngine
         Rigidbody3DComponent() = default;
         Rigidbody3DComponent(const Rigidbody3DComponent&) = default;
     };
+    struct BoxCollider3DComponent
+    {
+        glm::vec3 Offset = {0.0f, 0.0f, 0.0f};
+        glm::vec3 Size = {0.5f, 0.5f, 0.5f};
+
+        BoxCollider3DComponent() = default;
+        BoxCollider3DComponent(const BoxCollider3DComponent&) = default;
+    };
 
     struct BoxCollider2DComponent
     {

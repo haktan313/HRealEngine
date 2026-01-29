@@ -472,6 +472,33 @@ namespace HRealEngine
         // s_Data.Stats.DrawCalls++;
     }
 
+    void Renderer3D::DrawWireCube(const glm::mat4& transform, const glm::vec4& color)
+    {
+        glm::vec3 corners[8] = {
+            {-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f},
+            { 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f},
+            {-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f},
+            { 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f}
+        };
+        for (int i = 0; i < 8; i++)
+            corners[i] = glm::vec3(transform * glm::vec4(corners[i], 1.0f));
+
+        Renderer2D::DrawLine(corners[0], corners[1], color);
+        Renderer2D::DrawLine(corners[1], corners[2], color);
+        Renderer2D::DrawLine(corners[2], corners[3], color);
+        Renderer2D::DrawLine(corners[3], corners[0], color);
+
+        Renderer2D::DrawLine(corners[4], corners[5], color);
+        Renderer2D::DrawLine(corners[5], corners[6], color);
+        Renderer2D::DrawLine(corners[6], corners[7], color);
+        Renderer2D::DrawLine(corners[7], corners[4], color);
+
+        Renderer2D::DrawLine(corners[0], corners[4], color);
+        Renderer2D::DrawLine(corners[1], corners[5], color);
+        Renderer2D::DrawLine(corners[2], corners[6], color);
+        Renderer2D::DrawLine(corners[3], corners[7], color);
+    }
+
     void Renderer3D::SetViewPosition(const glm::vec3& pos)
     {
         s_Data.ViewPos = pos;

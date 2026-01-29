@@ -237,6 +237,7 @@ namespace HRealEngine
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
             ShowAddComponentEntry<Rigidbody3DComponent>("Rigidbody 3D");
+            ShowAddComponentEntry<BoxCollider3DComponent>("Box Collider 3D");
             ShowAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
             ShowAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
             ImGui::EndPopup();
@@ -1136,6 +1137,11 @@ namespace HRealEngine
                 ImGui::EndCombo();
             }
             ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+        });
+        DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
+        {
+            ImGui::DragFloat3("Offset", glm::value_ptr(component.Offset));
+            ImGui::DragFloat3("Size", glm::value_ptr(component.Size));
         });
         DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
         {

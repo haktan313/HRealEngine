@@ -368,6 +368,15 @@ namespace HRealEngine
             out << YAML::Key << "FixedRotation" << YAML::Value << rb3d.FixedRotation;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<BoxCollider3DComponent>())
+        {
+            out << YAML::Key << "BoxCollider3DComponent";
+            out << YAML::BeginMap;
+            auto& bc3d = entity.GetComponent<BoxCollider3DComponent>();
+            out << YAML::Key << "Offset" << YAML::Value << bc3d.Offset;
+            out << YAML::Key << "Size" << YAML::Value << bc3d.Size;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<BoxCollider2DComponent>())
         {
             out << YAML::Key << "BoxCollider2DComponent";
@@ -646,6 +655,12 @@ namespace HRealEngine
                     else if (collisionShape == "Triangle")  rb3d.Shape = Rigidbody3DComponent::CollisionShape::Triangle;
 
                     rb3d.FixedRotation = rb3dComponent["FixedRotation"].as<bool>();
+                }
+                if (auto boxCollider3DComponent = entity["BoxCollider3DComponent"])
+                {
+                    auto& bc3d = deserializedEntity.AddComponent<BoxCollider3DComponent>();
+                    bc3d.Offset = boxCollider3DComponent["Offset"].as<glm::vec3>();
+                    bc3d.Size = boxCollider3DComponent["Size"].as<glm::vec3>();
                 }
                 if (auto boxCollider2DComponent = entity["BoxCollider2DComponent"])
                 {

@@ -682,6 +682,10 @@ namespace HRealEngine
     {
     }
     template<>
+    void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
+    {
+    }
+    template<>
     void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
     {
     }
