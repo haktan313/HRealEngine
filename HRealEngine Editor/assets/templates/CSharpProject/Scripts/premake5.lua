@@ -1,35 +1,28 @@
--- premake5.lua (Scripts/premake5.lua)
--- Generates a C# class library that outputs Sandbox.dll into Scripts/Binaries
-
 newoption {
     trigger     = "workspace",
     value       = "NAME",
-    description = "Workspace name"
+    description = "Workspace/Project name (passed from Win-GenProjects.bat)"
 }
 
-newoption {
-    trigger     = "scriptcore",
-    value       = "PATH",
-    description = "Path to HRealEngine-ScriptCore.dll (optional override)"
-}
+local function getProjectRootName()
+    local scriptDir   = path.getdirectory(_SCRIPT)
+    local projectRoot = path.getabsolute(path.join(scriptDir, ".."))
+    return path.getname(projectRoot) 
+end
 
-local wsName = _OPTIONS["workspace"] or "SandboxProject"
+local wsName = _OPTIONS["workspace"] or getProjectRootName()
 
--- Default: Scripts/References/HRealEngine-ScriptCore.dll (relative to this premake file)
-local scriptDir = path.getdirectory(_SCRIPT)
-local defaultScriptCore = path.join(scriptDir, "References", "HRealEngine-ScriptCore.dll")
-local scriptCoreDll = _OPTIONS["scriptcore"] or defaultScriptCore
+local scriptDir     = path.getdirectory(_SCRIPT)
+local scriptCoreDll = path.join(scriptDir, "References", "HRealEngine-ScriptCore.dll")
 local scriptCoreDir = path.getdirectory(scriptCoreDll)
 
 workspace (wsName)
     architecture "x86_64"
+    configurations { "Debug", "Release", "Dist" }
     startproject (wsName)
 
-    configurations { "Debug", "Release", "Dist" }
-    flags { "MultiProcessorCompile" }
-
 project (wsName)
-    kind "SharedLib"-- C# class library (.dll)
+    kind "SharedLib"
     language "C#"
     dotnetframework "4.7.2"
 
@@ -41,9 +34,8 @@ project (wsName)
         "Properties/**.cs"
     }
 
-    -- Reference ScriptCore DLL (no engine source dependency)
     libdirs { scriptCoreDir }
-    links { "HRealEngine-ScriptCore" }
+    links  { "HRealEngine-ScriptCore" }
 
     filter "configurations:Debug"
         optimize "Off"
