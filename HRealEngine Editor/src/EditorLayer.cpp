@@ -389,6 +389,8 @@ namespace HRealEngine
                 {
                     LoadSceneFromFile();
                 }
+                if (ImGui::MenuItem("Set Default Scene For Project"))
+                    SetDefaultSceneForProject();
                 ImGui::Separator();
                 /*if (ImGui::MenuItem("Save", "Ctrl+S"))
                 {
@@ -1013,6 +1015,24 @@ namespace HRealEngine
         {
             Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
             m_ContentBrowserPanel->RefreshAssetTree();
+        }
+    }
+
+    void EditorLayer::SetDefaultSceneForProject()
+    {
+        std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
+        if (!filePath.empty())
+        {
+            auto eam = Project::GetActive()->GetEditorAssetManager();
+            auto currentScenePath = eam->GetAssetFilePath(Project::GetActive()->GetConfig().StartScene);
+            
+            std::filesystem::path assetsPath = Project::GetActive()->GetAssetDirectory();
+            std::filesystem::path selectedPath = std::filesystem::absolute(filePath);
+
+            std::filesystem::path relativePath = std::filesystem::relative(selectedPath, assetsPath);
+            auto scene = eam->GetHandleFromPath(relativePath.string());
+            if (scene)
+                Project::SetStartScene(scene);
         }
     }
 

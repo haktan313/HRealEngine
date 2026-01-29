@@ -55,6 +55,7 @@ namespace HRealEngine
         static Ref<Project> Load(const std::filesystem::path& path);
         static bool SaveActive(const std::filesystem::path& path);
         static void SetContentBrowserPanel(ContentBrowserPanel* panel) { m_ContentBrowserPanel = panel; }
+        static void SetStartScene(AssetHandle sceneHandle);
 
         static bool CreateFromTemplate(const std::filesystem::path& templateDir, const std::filesystem::path& destinationDir,
             const std::string& projectName, std::string* outError = nullptr);

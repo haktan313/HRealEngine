@@ -1,4 +1,7 @@
 AssetRegistry:
+  - Handle: 832115492279930486
+    FilePath: DefaultScene.hrs
+    Type: AssetType::Scene
   - Handle: 5876693894168414897
     FilePath: Scenes/2dphysics.hrs
     Type: AssetType::Scene

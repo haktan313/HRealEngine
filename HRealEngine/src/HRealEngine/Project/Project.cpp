@@ -63,8 +63,14 @@ namespace HRealEngine
         return false;
     }
 
-    bool Project::CreateFromTemplate(const std::filesystem::path& templateDir,
-        const std::filesystem::path& destinationDir, const std::string& projectName, std::string* outError)
+    void Project::SetStartScene(AssetHandle sceneHandle)
+    {
+        HREALENGINE_CORE_DEBUGBREAK(s_ActiveProject, "No active project!");
+        s_ActiveProject->GetConfig().StartScene = sceneHandle;
+        SaveActive(s_ActiveProject->m_ProjectDirectory / (s_ActiveProject->GetConfig().Name + ".hrpj"));
+    }
+
+    bool Project::CreateFromTemplate(const std::filesystem::path& templateDir, const std::filesystem::path& destinationDir, const std::string& projectName, std::string* outError)
     {
         (void)projectName;
 

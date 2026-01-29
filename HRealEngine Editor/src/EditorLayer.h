@@ -46,6 +46,7 @@ namespace HRealEngine
         void SaveSceneAs(); 
         void SaveScene();
         void LoadSceneFromFile();
+        void SetDefaultSceneForProject();
 
         void CreateBehaviorTree();
         void LoadBehaviorTreeAsAnAsset();
