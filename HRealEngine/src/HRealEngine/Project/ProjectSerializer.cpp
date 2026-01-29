@@ -23,7 +23,6 @@ namespace HRealEngine
             {
                 out << YAML::BeginMap;// Project
                 out << YAML::Key << "Name" << YAML::Value << config.Name;
-                out << YAML::Key << "Type" << YAML::Value << (config.Type == ProjectType::CSHARP ? "CSharp" : "CPP");
                 out << YAML::Key << "StartScene" << YAML::Value << (uint64_t)config.StartScene;
                 out << YAML::Key << "AssetDirectory" << YAML::Value << config.AssetDirectory.string();
                 out << YAML::Key << "AssetRegistryPath" << YAML::Value << config.AssetRegistryPath.string();
@@ -59,13 +58,6 @@ namespace HRealEngine
             return false;
 
         config.Name = projectNode["Name"].as<std::string>();
-        std::string typeString = projectNode["Type"].as<std::string>();
-        if (typeString == "CSharp")
-            config.Type = ProjectType::CSHARP;
-        else if (typeString == "CPP")
-            config.Type = ProjectType::CPP;
-        else
-            HREALENGINE_CORE_DEBUGBREAK("Unknown project type '{0}'", typeString);
         config.StartScene = projectNode["StartScene"].as<uint64_t>();
         config.AssetDirectory = projectNode["AssetDirectory"].as<std::string>();
         if (projectNode["AssetRegistryPath"])

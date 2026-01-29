@@ -5,22 +5,17 @@
 
 namespace HRealEngine
 {
-    Ref<Project> Project::New(const std::filesystem::path& projectFilePath, ProjectType type)
+    Ref<Project> Project::New(const std::filesystem::path& projectFilePath)
     {
         s_ActiveProject = CreateRef<Project>();
         s_ActiveProject->m_ProjectDirectory = projectFilePath.parent_path();
 
         auto& config = s_ActiveProject->GetConfig();
         config.Name = projectFilePath.stem().string();
-        config.Type = type;
 
         config.AssetDirectory = "assets";
         config.AssetRegistryPath = "AssetRegistry.yaml";
-
-        if (type == ProjectType::CSHARP)
-            config.ScriptModulePath = "Scripts/Binaries/Sandbox.dll";
-        else
-            config.ScriptModulePath = "";
+        config.ScriptModulePath = "Scripts/Binaries/Sandbox.dll";
 
         auto editorAssetManager = CreateRef<EditorAssetManager>();
         s_ActiveProject->m_AssetManager = editorAssetManager;

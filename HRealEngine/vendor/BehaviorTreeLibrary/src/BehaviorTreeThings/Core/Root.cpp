@@ -13,8 +13,6 @@ void Root::RootStart()
 
 void Root::RootTick()
 {
-    auto amount = m_BehaviorTrees.size();
-    std::cout << "Ticking " << amount << " behavior trees." << std::endl;
     for (BehaviorTree* tree : m_BehaviorTrees)
         tree->TickTree();
 }

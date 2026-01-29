@@ -788,7 +788,7 @@ namespace HRealEngine
 
     void EditorLayer::DrawProjectBrowser()
     {
-        ImGui::SetNextWindowSize(ImVec2(520, 240), ImGuiCond_Appearing);
+        ImGui::SetNextWindowSize(ImVec2(720, 150), ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
@@ -800,14 +800,9 @@ namespace HRealEngine
             ImGui::Spacing();
 
             if (ImGui::Button("New Project (C#)", ImVec2(220, 40)))
-                CreateNewProject(ProjectType::CSHARP);
+                CreateNewProject();
 
             ImGui::SameLine();
-
-            if (ImGui::Button("New Project (C++)", ImVec2(220, 40)))
-                CreateNewProject(ProjectType::CPP);
-
-            ImGui::Spacing();
 
             if (ImGui::Button("Open Project", ImVec2(220, 40)))
                 OpenProject();
@@ -825,7 +820,7 @@ namespace HRealEngine
         ImGui::End();
     }
 
-    void EditorLayer::CreateNewProject(ProjectType type)
+    void EditorLayer::CreateNewProject()
     {
         std::string hrpjPathStr = FileDialogs::SaveFile("HRealEngine Project (*.hrpj)\0*.hrpj\0");
         if (hrpjPathStr.empty())
@@ -837,7 +832,7 @@ namespace HRealEngine
         
         auto& app = Application::Get();
         std::filesystem::path editorBase = app.GetSpecification().EditorAssetsPath;
-        std::filesystem::path templateDir = type == ProjectType::CSHARP ? editorBase / "templates" / "CSharpProject" : editorBase / "templates" / "CPPProject";
+        std::filesystem::path templateDir = editorBase / "templates" / "CSharpProject";
 
         
         std::string err;
@@ -874,10 +869,9 @@ namespace HRealEngine
 
         auto& cfg = Project::GetActive()->GetConfig();
         cfg.Name = projectName;
-        cfg.Type = type;
         cfg.AssetDirectory = "assets";
         cfg.AssetRegistryPath = "AssetRegistry.yaml";
-        cfg.ScriptModulePath = type == ProjectType::CSHARP ? "Scripts/Binaries/" + projectName + ".dll" : "";
+        cfg.ScriptModulePath = "Scripts/Binaries/" + projectName + ".dll";
 
         Project::SaveActive(newProjectFile);
 

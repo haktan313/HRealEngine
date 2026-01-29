@@ -8,11 +8,9 @@
 
 namespace HRealEngine
 {
-    enum class ProjectType { CSHARP, CPP };
     struct ProjectConfig
     {
         std::string Name = "Untitled";
-        ProjectType Type = ProjectType::CSHARP;
 
         AssetHandle StartScene;
 
@@ -52,7 +50,7 @@ namespace HRealEngine
         static Ref<Project> GetActive() { return s_ActiveProject; }
         static ContentBrowserPanel* GetContentBrowserPanel() { return m_ContentBrowserPanel; }
 
-        static Ref<Project> New(const std::filesystem::path& projectFilePath, ProjectType type);
+        static Ref<Project> New(const std::filesystem::path& projectFilePath);
         static Ref<Project> New();
         static Ref<Project> Load(const std::filesystem::path& path);
         static bool SaveActive(const std::filesystem::path& path);

@@ -34,7 +34,7 @@ namespace HRealEngine
         void OnOverlayRender();
         
         void DrawProjectBrowser();
-        void CreateNewProject(ProjectType type);
+        void CreateNewProject();
         void NewProject();
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
