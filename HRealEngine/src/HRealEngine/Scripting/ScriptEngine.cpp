@@ -165,6 +165,8 @@ namespace HRealEngine
     
     void ScriptEngine::Init()
     {
+        if (IsInitialized())
+            return;
         auto scriptDir = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
         LOG_CORE_WARN("AppAssemblyPath = {}", scriptDir.string());
         LOG_CORE_WARN("  exists? {}", std::filesystem::exists(scriptDir) ? "YES" : "NO");
@@ -201,8 +203,27 @@ namespace HRealEngine
 
     void ScriptEngine::Shutdown()
     {
+        if (!s_Data)
+            return;
+
+        s_Data->AppAssemblyWatcher.reset();
+        s_Data->bAssemblyReloadPending = false;
+
+        s_Data->EntityInstances.clear();
+        s_Data->EntityScriptFieldMaps.clear();
+        s_Data->EntityClasses.clear();
+        s_Data->SceneContext = nullptr;
+        s_Data->body_interface = nullptr;
+
         ShutdownMono();
+
         delete s_Data;
+        s_Data = nullptr;
+    }
+
+    bool ScriptEngine::IsInitialized()
+    {
+        return s_Data != nullptr;
     }
 
     bool ScriptEngine::LoadAssembly(const std::filesystem::path& assemblyPath)
@@ -457,18 +478,32 @@ namespace HRealEngine
         mono_set_assemblies_path("mono/lib/mono/4.5");
 
         MonoDomain* rootDomain = mono_jit_init("HRealEngineJITRuntime");
-        HREALENGINE_CORE_DEBUGBREAK(domain, "Failed to initialize Mono JIT Runtime!");
-
+        HREALENGINE_CORE_DEBUGBREAK(rootDomain, "Failed to initialize Mono JIT Runtime!");
         s_Data->RootDomain = rootDomain;
     }
 
     void ScriptEngine::ShutdownMono()
     {
-        mono_domain_set(mono_get_root_domain(), false);
+        /*mono_domain_set(mono_get_root_domain(), false);
         mono_domain_unload(s_Data->AppDomain);
         s_Data->AppDomain = nullptr;
         mono_jit_cleanup(s_Data->RootDomain);
-        s_Data->RootDomain = nullptr;
+        s_Data->RootDomain = nullptr;*/
+        if (!s_Data)
+            return;
+
+        if (s_Data->AppDomain)
+        {
+            mono_domain_set(mono_get_root_domain(), false);
+            mono_domain_unload(s_Data->AppDomain);
+            s_Data->AppDomain = nullptr;
+        }
+
+        if (s_Data->RootDomain)
+        {
+            mono_jit_cleanup(s_Data->RootDomain);
+            s_Data->RootDomain = nullptr;
+        }
     }
 
     MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
