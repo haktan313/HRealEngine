@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <imgui/imgui.h>
 
+#include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Asset/TextureImporter.h"
 #include "HRealEngine/Core/Logger.h"
 #include "HRealEngine/Core/MeshLoader.h"
@@ -25,8 +26,12 @@ namespace HRealEngine
         /*m_FileIcon = Texture2D::Create("assets/textures/fileIcon.png");
         m_FolderIcon = Texture2D::Create("assets/textures/folderIcon.png");*/
         m_TreeNodes.push_back(TreeNode(".", 0)); // root node
-        m_FileIcon = TextureImporter::LoadTexture("Resource/fileIcon.png");
-        m_FolderIcon = TextureImporter::LoadTexture("Resource/folderIcon.png");
+        /*m_FileIcon = TextureImporter::LoadTexture("Resource/fileIcon.png");
+        m_FolderIcon = TextureImporter::LoadTexture("Resource/folderIcon.png");*/
+        auto& app = Application::Get();
+        auto base = app.GetSpecification().EditorAssetsPath;
+        m_FileIcon = Texture2D::Create((base / "textures/icons/fileIcon.png").string());
+        m_FolderIcon = Texture2D::Create((base / "textures/icons/folderIcon.png").string());
         RefreshAssetTree();
         m_Mode = Mode::Asset;
     }

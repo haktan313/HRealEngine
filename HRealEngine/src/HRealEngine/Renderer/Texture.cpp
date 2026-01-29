@@ -6,7 +6,7 @@
 
 namespace HRealEngine
 {
-    /*Ref<Texture2D> Texture2D::Create(const std::string& filePath)
+    Ref<Texture2D> Texture2D::Create(const std::string& filePath)
     {
         switch (Renderer::GetAPI())
         {
@@ -20,7 +20,7 @@ namespace HRealEngine
         return nullptr;
     }
 
-    Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+    /*Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
     {
         switch (Renderer::GetAPI())
         {

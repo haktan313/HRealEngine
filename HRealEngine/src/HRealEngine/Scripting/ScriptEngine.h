@@ -191,10 +191,12 @@ namespace HRealEngine
         static void Init();
         static void Shutdown();
 
+        static bool IsInitialized();
         static bool LoadAssembly(const std::filesystem::path& assemblyPath);
         static bool LoadAppAssembly(const std::filesystem::path& assemblyPath);
         static void LoadAssemblyClasses(/*MonoAssembly* assembly*/);
 
+        static void InitCSharpProject();
         static void ReloadAssembly();
 
         static void OnRuntimeStart(Scene* scene);

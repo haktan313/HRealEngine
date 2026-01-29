@@ -32,7 +32,9 @@ namespace HRealEngine
         bool OnWindowDrop(WindowDropEvent& event);
 
         void OnOverlayRender();
-
+        
+        void DrawProjectBrowser();
+        void CreateNewProject();
         void NewProject();
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
@@ -44,6 +46,7 @@ namespace HRealEngine
         void SaveSceneAs(); 
         void SaveScene();
         void LoadSceneFromFile();
+        void SetDefaultSceneForProject();
 
         void CreateBehaviorTree();
         void LoadBehaviorTreeAsAnAsset();
@@ -87,6 +90,7 @@ namespace HRealEngine
         bool m_ShowPhysicsColliders = false;
         bool m_bSetPhysics2DEnabled = false;
         bool m_bShowBehaviorTreeEditor = false;
+        bool m_bShowProjectBrowser = false;
 
 
         Ref<Texture2D> m_JoseMourinhoTexture;

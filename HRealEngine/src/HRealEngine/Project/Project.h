@@ -50,11 +50,18 @@ namespace HRealEngine
         static Ref<Project> GetActive() { return s_ActiveProject; }
         static ContentBrowserPanel* GetContentBrowserPanel() { return m_ContentBrowserPanel; }
 
+        static Ref<Project> New(const std::filesystem::path& projectFilePath);
         static Ref<Project> New();
         static Ref<Project> Load(const std::filesystem::path& path);
         static bool SaveActive(const std::filesystem::path& path);
         static void SetContentBrowserPanel(ContentBrowserPanel* panel) { m_ContentBrowserPanel = panel; }
+        static void SetStartScene(AssetHandle sceneHandle);
+
+        static bool CreateFromTemplate(const std::filesystem::path& templateDir, const std::filesystem::path& destinationDir,
+            const std::string& projectName, std::string* outError = nullptr);
     private:
+        static bool CopyDirectoryRecursive(const std::filesystem::path& src, const std::filesystem::path& dst, std::string* outError);
+        static bool ShouldSkipPath(const std::filesystem::path& p);
         ProjectConfig m_Config;
         std::filesystem::path m_ProjectDirectory;
         Ref<AssetManagerBase> m_AssetManager;

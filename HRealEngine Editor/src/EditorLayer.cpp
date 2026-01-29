@@ -119,11 +119,10 @@ namespace HRealEngine
         }
         else
         {
-            //NewProject();
+            /*//NewProject();
             if (!OpenProject())
-            {
-                Application::Get().Close();
-            }
+                Application::Get().Close();*/
+            m_bShowProjectBrowser = true;
         }
         
         m_EditorCamera = EditorCamera(30.f, 1.778f/*1920/1080*/, 0.1f, 1000.f);
@@ -165,14 +164,14 @@ namespace HRealEngine
         m_IconPause = Texture2D::Create("assets/textures/PauseButton.png");
         m_IconStep = Texture2D::Create("assets/textures/StepButton.png");*/
         
-        m_IconPlay = TextureImporter::LoadTexture("Resource/StartButton.png");
+        /*m_IconPlay = TextureImporter::LoadTexture("Resource/StartButton.png");
         m_IconStop = TextureImporter::LoadTexture("Resource/stopButton.png");
         m_IconSimulate = TextureImporter::LoadTexture("Resource/SimulateButton.png");
         m_IconPause = TextureImporter::LoadTexture("Resource/PauseButton.png");
         m_IconStep = TextureImporter::LoadTexture("Resource/StepButton.png");
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         Renderer2D::SetLineWidth(4.f);
-        RegisterBehaviorTreeStufs();
+        RegisterBehaviorTreeStufs();*/
     }
 
     void EditorLayer::OnDetach()
@@ -187,6 +186,8 @@ namespace HRealEngine
 
     void EditorLayer::OnUpdate(Timestep timestep)
     {
+        if (m_bShowProjectBrowser)
+            return;
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
@@ -346,7 +347,13 @@ namespace HRealEngine
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
         }
         style.WindowMinSize.x = minWinSizeX;
-    
+
+        if (m_bShowProjectBrowser)
+        {
+            DrawProjectBrowser();
+            ImGui::End();
+            return;
+        }
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -382,6 +389,8 @@ namespace HRealEngine
                 {
                     LoadSceneFromFile();
                 }
+                if (ImGui::MenuItem("Set Default Scene For Project"))
+                    SetDefaultSceneForProject();
                 ImGui::Separator();
                 /*if (ImGui::MenuItem("Save", "Ctrl+S"))
                 {
@@ -398,6 +407,8 @@ namespace HRealEngine
             }
             if (ImGui::BeginMenu("Script"))
             {
+                if (ImGui::MenuItem("Initialize C# Script Engine"))
+                    ScriptEngine::InitCSharpProject();
                 if (ImGui::MenuItem("Reload C# Assembly"))
                     ScriptEngine::ReloadAssembly();
                 ImGui::EndMenu();
@@ -777,6 +788,99 @@ namespace HRealEngine
         Renderer2D::EndScene();
     }
 
+    void EditorLayer::DrawProjectBrowser()
+    {
+        ImGui::SetNextWindowSize(ImVec2(720, 150), ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+        if (ImGui::Begin("Project Browser", &m_bShowProjectBrowser, flags))
+        {
+            ImGui::Text("Select a project option:");
+            ImGui::Separator();
+
+            ImGui::Spacing();
+
+            if (ImGui::Button("New Project (C#)", ImVec2(220, 40)))
+                CreateNewProject();
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Open Project", ImVec2(220, 40)))
+                OpenProject();
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Close", ImVec2(220, 40)))
+                Application::Get().Close();
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            ImGui::TextDisabled("Tip: You can also drag & drop a .hrpj onto the window later.");
+        }
+        ImGui::End();
+    }
+
+    void EditorLayer::CreateNewProject()
+    {
+        std::string hrpjPathStr = FileDialogs::SaveFile("HRealEngine Project (*.hrpj)\0*.hrpj\0");
+        if (hrpjPathStr.empty())
+            return;
+
+        std::filesystem::path hrpjPath = hrpjPathStr;
+        std::string projectName = hrpjPath.stem().string();
+        std::filesystem::path projectDir = hrpjPath.parent_path() / projectName;
+        
+        auto& app = Application::Get();
+        std::filesystem::path editorBase = app.GetSpecification().EditorAssetsPath;
+        std::filesystem::path templateDir = editorBase / "templates" / "CSharpProject";
+
+        
+        std::string err;
+        if (!Project::CreateFromTemplate(templateDir, projectDir, projectName, &err))
+        {
+            LOG_CORE_ERROR("CreateFromTemplate failed: {}", err);
+            return;
+        }
+
+        std::filesystem::path templateProjectFile = projectDir / "Template.hrpj";
+        if (!std::filesystem::exists(templateProjectFile))
+        {
+            LOG_CORE_ERROR("Template project file not found: {}", templateProjectFile.string());
+            return;
+        }
+
+        std::filesystem::path newProjectFile = projectDir / (projectName + ".hrpj");
+
+        std::error_code ec;
+        std::filesystem::rename(templateProjectFile, newProjectFile, ec);
+        if (ec)
+        {
+            LOG_CORE_ERROR("Failed to rename project file: {} -> {} ({})",
+                templateProjectFile.string(), newProjectFile.string(), ec.message());
+            return;
+        }
+
+
+        if (!Project::Load(newProjectFile))
+        {
+            LOG_CORE_ERROR("Failed to load new project after template copy: {}", newProjectFile.string());
+            return;
+        }
+
+        auto& cfg = Project::GetActive()->GetConfig();
+        cfg.Name = projectName;
+        cfg.AssetDirectory = "assets";
+        cfg.AssetRegistryPath = "AssetRegistry.yaml";
+        cfg.ScriptModulePath = "Scripts/Binaries/" + projectName + ".dll";
+
+        Project::SaveActive(newProjectFile);
+
+        OpenProject(newProjectFile);
+        m_bShowProjectBrowser = false;
+    }
+
     void EditorLayer::NewProject()
     {
         Project::New();
@@ -787,9 +891,10 @@ namespace HRealEngine
         std::string filepath = FileDialogs::OpenFile("HRealEngine Project (*.hrpj)\0*.hrpj\0");
         if (filepath.empty())
             return false;
-
         OpenProject(filepath);
-        return true;
+        
+        m_bShowProjectBrowser = Project::GetActive() == nullptr;
+        return Project::GetActive() != nullptr;
     }
 
     void EditorLayer::OpenProject(const std::filesystem::path& path)
@@ -799,14 +904,29 @@ namespace HRealEngine
             ScriptEngine::Init();
             /*auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
             OpenScene(startScenePath);*/
-            AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
-            if (startSceneHandle)
-                OpenScene(startSceneHandle);
             m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
             Project::SetContentBrowserPanel(m_ContentBrowserPanel.get());
 
             /*EditorRoot::EditorRootStart();*/
             /*EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);*/
+
+            auto& app = Application::Get();
+            auto base = app.GetSpecification().EditorAssetsPath; 
+            /*m_IconPlay = TextureImporter::LoadTexture("Resource/StartButton.png");
+            m_IconStop = TextureImporter::LoadTexture("Resource/stopButton.png");
+            m_IconSimulate = TextureImporter::LoadTexture("Resource/SimulateButton.png");
+            m_IconPause = TextureImporter::LoadTexture("Resource/PauseButton.png");
+            m_IconStep = TextureImporter::LoadTexture("Resource/StepButton.png");*/
+            m_IconPlay = Texture2D::Create((base / "textures/icons/StartButton.png").string());
+            m_IconStop = Texture2D::Create((base / "textures/icons/stopButton.png").string());
+            m_IconSimulate = Texture2D::Create((base / "textures/icons/SimulateButton.png").string());
+            m_IconPause = Texture2D::Create((base / "textures/icons/PauseButton.png").string());
+            m_IconStep = Texture2D::Create((base / "textures/icons/StepButton.png").string());
+            Renderer2D::SetLineWidth(4.f);
+            RegisterBehaviorTreeStufs();
+            AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
+            if (startSceneHandle)
+                OpenScene(startSceneHandle);
         }
     }
 
@@ -895,6 +1015,24 @@ namespace HRealEngine
         {
             Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
             m_ContentBrowserPanel->RefreshAssetTree();
+        }
+    }
+
+    void EditorLayer::SetDefaultSceneForProject()
+    {
+        std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
+        if (!filePath.empty())
+        {
+            auto eam = Project::GetActive()->GetEditorAssetManager();
+            auto currentScenePath = eam->GetAssetFilePath(Project::GetActive()->GetConfig().StartScene);
+            
+            std::filesystem::path assetsPath = Project::GetActive()->GetAssetDirectory();
+            std::filesystem::path selectedPath = std::filesystem::absolute(filePath);
+
+            std::filesystem::path relativePath = std::filesystem::relative(selectedPath, assetsPath);
+            auto scene = eam->GetHandleFromPath(relativePath.string());
+            if (scene)
+                Project::SetStartScene(scene);
         }
     }
 
