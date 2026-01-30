@@ -102,6 +102,7 @@ namespace HRealEngine
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody3DComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<BoxCollider3DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         

@@ -354,17 +354,6 @@ namespace HRealEngine
                 case Rigidbody3DComponent::BodyType::Kinematic: bodyType = "Kinematic"; break;
             }
             out << YAML::Key << "BodyType" << YAML::Value << bodyType;
-            std::string collisionShape;
-            switch (rb3d.Shape)
-            {
-                case Rigidbody3DComponent::CollisionShape::Box:       collisionShape = "Box"; break;
-                case Rigidbody3DComponent::CollisionShape::Sphere:    collisionShape = "Sphere"; break;
-                case Rigidbody3DComponent::CollisionShape::Capsule:   collisionShape = "Capsule"; break;
-                case Rigidbody3DComponent::CollisionShape::Cylinder:  collisionShape = "Cylinder"; break;
-                case Rigidbody3DComponent::CollisionShape::Plane:     collisionShape = "Plane"; break;
-                case Rigidbody3DComponent::CollisionShape::Triangle:  collisionShape = "Triangle"; break;
-            }
-            out << YAML::Key << "CollisionShape" << YAML::Value << collisionShape;
             out << YAML::Key << "FixedRotation" << YAML::Value << rb3d.FixedRotation;
             out << YAML::EndMap;
         }
@@ -645,14 +634,6 @@ namespace HRealEngine
                     if (bodyType == "Static")        rb3d.Type = Rigidbody3DComponent::BodyType::Static;
                     else if (bodyType == "Dynamic")  rb3d.Type = Rigidbody3DComponent::BodyType::Dynamic;
                     else if (bodyType == "Kinematic")rb3d.Type = Rigidbody3DComponent::BodyType::Kinematic;
-
-                    std::string collisionShape = rb3dComponent["CollisionShape"].as<std::string>();
-                    if (collisionShape == "Box")         rb3d.Shape = Rigidbody3DComponent::CollisionShape::Box;
-                    else if (collisionShape == "Sphere")    rb3d.Shape = Rigidbody3DComponent::CollisionShape::Sphere;
-                    else if (collisionShape == "Capsule")   rb3d.Shape = Rigidbody3DComponent::CollisionShape::Capsule;
-                    else if (collisionShape == "Cylinder")  rb3d.Shape = Rigidbody3DComponent::CollisionShape::Cylinder;
-                    else if (collisionShape == "Plane")     rb3d.Shape = Rigidbody3DComponent::CollisionShape::Plane;
-                    else if (collisionShape == "Triangle")  rb3d.Shape = Rigidbody3DComponent::CollisionShape::Triangle;
 
                     rb3d.FixedRotation = rb3dComponent["FixedRotation"].as<bool>();
                 }
