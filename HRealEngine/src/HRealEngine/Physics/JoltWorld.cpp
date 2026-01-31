@@ -194,7 +194,7 @@ namespace HRealEngine
             Entity entity = { e, m_Scene };
             auto& transform = entity.GetComponent<TransformComponent>();
             auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-            if (rb3d.Type != Rigidbody3DComponent::BodyType::Dynamic)
+            if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
                 continue;
 
             auto body = (JPH::Body*)rb3d.RuntimeBody;
@@ -250,7 +250,7 @@ namespace HRealEngine
                 Entity entity = { e, m_Scene };
                 auto& transform = entity.GetComponent<TransformComponent>();
                 auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-                if (rb3d.Type != Rigidbody3DComponent::BodyType::Dynamic)
+                if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
                     continue;
 
                 auto body = (JPH::Body*)rb3d.RuntimeBody;
