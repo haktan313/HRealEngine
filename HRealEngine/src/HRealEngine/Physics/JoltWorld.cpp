@@ -164,6 +164,29 @@ namespace HRealEngine
 
     void JoltWorld::Step3DWorld(Timestep deltaTime)
     {
+        {
+            auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+            for (auto e : view)
+            {
+                Entity entity{ e, m_Scene };
+                auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+                if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
+                    continue;
+
+                JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
+                if (!body)
+                    continue;
+
+                auto& tc = entity.GetComponent<TransformComponent>();
+                
+                glm::quat q = glm::quat(tc.Rotation);
+                JPH::Quat rot(q.x, q.y, q.z, q.w);
+                JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+
+                body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
+            }
+        }
+        
         m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
         auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
         for (auto e : view)
@@ -171,6 +194,8 @@ namespace HRealEngine
             Entity entity = { e, m_Scene };
             auto& transform = entity.GetComponent<TransformComponent>();
             auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+            if (rb3d.Type != Rigidbody3DComponent::BodyType::Dynamic)
+                continue;
 
             auto body = (JPH::Body*)rb3d.RuntimeBody;
             JPH::RVec3 position;
@@ -196,6 +221,28 @@ namespace HRealEngine
     {
         if (!m_Scene->IsPaused() || stepFrames-- > 0)
         {
+            {
+                auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+                for (auto e : view)
+                {
+                    Entity entity{ e, m_Scene };
+                    auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+                    if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
+                        continue;
+
+                    JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
+                    if (!body)
+                        continue;
+
+                    auto& tc = entity.GetComponent<TransformComponent>();
+                
+                    glm::quat q = glm::quat(tc.Rotation);
+                    JPH::Quat rot(q.x, q.y, q.z, q.w);
+                    JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+
+                    body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
+                }
+            }
             m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
             auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
             for (auto e : view)
@@ -203,6 +250,8 @@ namespace HRealEngine
                 Entity entity = { e, m_Scene };
                 auto& transform = entity.GetComponent<TransformComponent>();
                 auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+                if (rb3d.Type != Rigidbody3DComponent::BodyType::Dynamic)
+                    continue;
 
                 auto body = (JPH::Body*)rb3d.RuntimeBody;
                 JPH::RVec3 position;
@@ -213,17 +262,12 @@ namespace HRealEngine
                 transform.Position.y = position.GetY();
                 transform.Position.z = position.GetZ();
             
-                //glm::quat q(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
                 glm::quat q;
                 q.x = rotation.GetX();
                 q.y = rotation.GetY();
                 q.z = rotation.GetZ();
                 q.w = rotation.GetW();
-
-                /*glm::vec3 euler = glm::eulerAngles(q);
-                transform.Rotation.x = euler.x;
-                transform.Rotation.y = euler.y;
-                transform.Rotation.z = euler.z;*/
+                
                 glm::vec3 euler = glm::eulerAngles(q);
                 transform.Rotation = euler;
             }
