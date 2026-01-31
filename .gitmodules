@@ -7,9 +7,9 @@
 [submodule "HRealEngine/vendor/glm"]
 	path = HRealEngine/vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "HRealEngine/vendor/yaml-cpp/yaml-cpp"]
-	path = HRealEngine/vendor/yaml-cpp/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "HRealEngine/vendor/yaml-cpp"]
+	path = HRealEngine/vendor/yaml-cpp
+	url = https://github.com/haktan313/yaml-cpp.git
 [submodule "HRealEngine/vendor/ImGuizmo/ImGuizmo"]
 	path = HRealEngine/vendor/ImGuizmo/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
@@ -19,9 +19,6 @@
 [submodule "HRealEngine/vendor/JoltPhysics"]
 	path = HRealEngine/vendor/JoltPhysics
 	url = https://github.com/haktan313/JoltPhysics.git
-[submodule "HRealEngine/vendor/stb"]
-	path = HRealEngine/vendor/stb
-	url = https://github.com/AminAliari/assimp.git
 [submodule "HRealEngine/vendor/imgui"]
 	path = HRealEngine/vendor/imgui
 	url = https://github.com/haktan313/imgui.git
