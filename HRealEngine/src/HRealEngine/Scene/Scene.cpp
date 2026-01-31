@@ -102,6 +102,7 @@ namespace HRealEngine
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody3DComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<BoxCollider3DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BoxCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleCollider2DComponent>(dstRegistry, srcRegistry, entityMap);
         
@@ -679,6 +680,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<Rigidbody3DComponent>(Entity entity, Rigidbody3DComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<BoxCollider3DComponent>(Entity entity, BoxCollider3DComponent& component)
     {
     }
     template<>

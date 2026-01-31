@@ -14,9 +14,17 @@ namespace HRealEngine
         ~JoltWorld();
         void Init();
 
+        void CreatePhysicsBodies();
+        void CreateBoxCollider();
+        void CreateEmptyBody();
+
+        void UpdateSimulation3DForKinematicBodies(Timestep deltaTime);
         void UpdateSimulation3D(Timestep deltaTime, int& stepFrames);
+        void UpdateSimulation3DForNonKinematicBodies();
         void UpdateRuntime3D();
+        void Step3DWorldForKinematicBodies(Timestep deltaTime);
         void Step3DWorld(Timestep deltaTime);
+        void Step3DWorldForNonKinematicBodies();
         void DestroyEntityPhysics(Entity entity);
         void Stop3DPhysics();
         

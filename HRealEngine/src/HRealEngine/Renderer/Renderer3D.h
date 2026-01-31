@@ -19,6 +19,8 @@ namespace HRealEngine
         static void StartBatch();
         static void Flush();
 
+        static void DrawWireCube(const glm::mat4& transform, const glm::vec4& color);
+
         struct LightGPU
         {
             int Type;

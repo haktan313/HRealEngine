@@ -237,6 +237,7 @@ namespace HRealEngine
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
             ShowAddComponentEntry<Rigidbody3DComponent>("Rigidbody 3D");
+            ShowAddComponentEntry<BoxCollider3DComponent>("Box Collider 3D");
             ShowAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
             ShowAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
             ImGui::EndPopup();
@@ -1103,7 +1104,6 @@ namespace HRealEngine
             const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
             const char* bodyShapeStrings[] = { "Box", "Sphere", "Capsule", "Cylinder", "Plane", "Triangle" };
             const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
-            const char* currentBodyShapeString = bodyShapeStrings[(int)component.Shape];
             
             if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
             {
@@ -1120,22 +1120,12 @@ namespace HRealEngine
                 }
                 ImGui::EndCombo();
             }
-            if (ImGui::BeginCombo("Collision Shape", currentBodyShapeString))
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    bool isSelected = currentBodyShapeString == bodyShapeStrings[i];
-                    if (ImGui::Selectable(bodyShapeStrings[i], isSelected))
-                    {
-                        currentBodyShapeString = bodyShapeStrings[i];
-                        component.Shape = (Rigidbody3DComponent::CollisionShape)i;
-                    }
-                    if (isSelected)
-                        ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndCombo();
-            }
             ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+        });
+        DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
+        {
+            ImGui::DragFloat3("Offset", glm::value_ptr(component.Offset));
+            ImGui::DragFloat3("Size", glm::value_ptr(component.Size));
         });
         DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
         {

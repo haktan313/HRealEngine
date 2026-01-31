@@ -763,6 +763,25 @@ namespace HRealEngine
                     Renderer2D::DrawCircle(colliderTransform, { 0.f, 1.f, 0.f, 1.f }, 0.01f);
                 }
             }
+            {
+                auto view = m_ActiveScene->GetRegistry().view<BoxCollider3DComponent, TransformComponent>();
+                for (auto entity : view)
+                {
+                    auto [boxCollider, transform] = view.get<BoxCollider3DComponent, TransformComponent>(entity);
+                    
+                    glm::vec3 scaledOffset = glm::abs(transform.Scale) * boxCollider.Offset;
+                    glm::quat rotation = glm::quat(transform.Rotation);// Euler(rad) -> quat
+                    glm::mat3 rotM = glm::mat3_cast(rotation);// quat -> 3x3 rot
+                    glm::vec3 worldOffset = rotM * scaledOffset;  
+                    glm::vec3 pos = transform.Position + worldOffset;
+                    glm::vec3 scale = glm::abs(transform.Scale) * (boxCollider.Size * 2.0f);
+                    
+                    glm::mat4 rot4 = glm::mat4_cast(rotation);
+                    glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0f), pos) * rot4 * glm::scale(glm::mat4(1.0f), scale);
+                    
+                    Renderer3D::DrawWireCube(colliderTransform, { 0.f, 1.f, 0.f, 1.f });
+                }
+            }
         }
 
         if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())

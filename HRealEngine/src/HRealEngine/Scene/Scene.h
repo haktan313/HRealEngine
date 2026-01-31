@@ -48,6 +48,7 @@ namespace HRealEngine
         Entity GetEntityByUUID(UUID uuid);
         Entity GetPrimaryCameraEntity();
         Entity FindEntityByName(std::string_view name);
+        JoltWorld* GetJoltWorld() { return m_JoltWorld.get(); }
         bool IsRunning() const { return m_bIsRunning; }
         bool IsPaused() const { return m_bIsPaused; }
         void SetPaused(bool paused) { m_bIsPaused = paused; }
