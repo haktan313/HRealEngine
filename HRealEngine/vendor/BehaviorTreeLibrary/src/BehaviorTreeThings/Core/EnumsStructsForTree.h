@@ -54,7 +54,7 @@ struct Params
     void DrawStringValue(const std::string& label, std::string& value)
     {
         char buffer[256];
-        std::strncpy(buffer, value.c_str(), sizeof(buffer));
+        strncpy_s(buffer, value.c_str(), sizeof(buffer));
         if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
         {
             value = std::string(buffer);

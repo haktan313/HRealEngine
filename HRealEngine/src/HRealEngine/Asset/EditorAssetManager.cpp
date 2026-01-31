@@ -186,6 +186,7 @@ namespace HRealEngine
         }
         catch (const YAML::Exception& e)
         {
+            LOG_CORE_ERROR("Failed to load asset registry '{}': {}", path.string(), e.what());
             HREALENGINE_CORE_DEBUGBREAK("Failed to load asset registry file '{0}'\n     {1}", path, e.what());
             return false;
         }

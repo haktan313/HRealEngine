@@ -99,7 +99,7 @@ namespace HRealEngine
     OpenGLFramebuffer::~OpenGLFramebuffer()
     {
         glDeleteFramebuffers(1, &m_rendererID);
-        glDeleteTextures(m_ColorAttachments.size(), m_ColorAttachments.data());
+        glDeleteTextures(static_cast<GLsizei>(m_ColorAttachments.size()), m_ColorAttachments.data());
         glDeleteTextures(1, &m_DepthAttachment);
     }
 
@@ -108,7 +108,7 @@ namespace HRealEngine
         if (m_rendererID)
         {
             glDeleteFramebuffers(1, &m_rendererID);
-            glDeleteTextures(m_ColorAttachments.size(), m_ColorAttachments.data());
+            glDeleteTextures(static_cast<GLsizei>(m_ColorAttachments.size()), m_ColorAttachments.data());
             glDeleteTextures(1, &m_DepthAttachment);
 
             m_ColorAttachments.clear();
@@ -122,17 +122,19 @@ namespace HRealEngine
         if (m_ColorAttachmentSpecs.size())
         {
             m_ColorAttachments.resize(m_ColorAttachmentSpecs.size());
-            CreateTextures(bMultisample, m_ColorAttachments.data(), m_ColorAttachments.size());
+            CreateTextures(bMultisample, m_ColorAttachments.data(), static_cast<uint32_t>(m_ColorAttachments.size()));
             for (size_t i = 0; i < m_ColorAttachments.size(); i++)
             {
                 BindTexture(bMultisample, m_ColorAttachments[i]);
                 switch (m_ColorAttachmentSpecs[i].TextureFormat)
                 {
                     case FramebufferTextureFormat::RGBA8:
-                        AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
+                        AttachColorTexture(m_ColorAttachments[i], static_cast<int>(m_Specification.Samples), GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height,
+                                           static_cast<int>(i));
                         break;
                     case FramebufferTextureFormat::RED_INTEGER:
-                        AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
+                        AttachColorTexture(m_ColorAttachments[i], static_cast<int>(m_Specification.Samples), GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height,
+                                           static_cast<int>(i));
                         break;
                 }
             }

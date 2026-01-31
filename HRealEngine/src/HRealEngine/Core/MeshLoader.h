@@ -55,13 +55,13 @@ namespace HRealEngine
     public:
         static bool LoadMeshFromFile(const std::string& path, std::vector<MeshVertex>& outVertices,
             std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax);
-        static std::vector<std::string> ImportObjMaterialsToHMat(const std::filesystem::path& objPathInAssets, const std::filesystem::path& assetsRoot, const std::filesystem::path&
-                                                                 lastCopiedTexAbs, const std::vector<std::filesystem::path>& texturePaths);
+        static std::vector<std::string> ImportObjMaterialsToHMat(const std::filesystem::path& objPathInAssets, const std::filesystem::path& assetsRoot,
+            const std::filesystem::path& lastCopiedTexAbs, const std::vector<std::filesystem::path>& texturePaths);
         static Ref<MeshGPU> LoadHMeshAsset(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);
         static bool WriteHMeshBin(const std::filesystem::path& path,
             const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<HMeshBinSubmesh>& submeshes, const glm::vec3& boundsMin, const glm::vec3& boundsMax);
-        static bool ReadHMeshBin(const std::filesystem::path& path,
-            std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes = nullptr, glm::vec3& outBoundsMin = glm::vec3(0), glm::vec3& outBoundsMax = glm::vec3(0));
+        static bool ReadHMeshBin(const std::filesystem::path& path, std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices,
+            std::vector<HMeshBinSubmesh>* outSubmeshes = nullptr, glm::vec3& outBoundsMin = glm::vec3(0), glm::vec3& outBoundsMax = glm::vec3(0));
         static Ref<MeshGPU> GetOrLoad(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);
         static bool ParseHMeshMaterials(const std::filesystem::path& hmeshAbs, std::vector<std::string>& outMaterials);
         static bool ParseHMeshMaterialHandles(const std::filesystem::path& hmeshAbs, std::vector<AssetHandle>& outHandles);

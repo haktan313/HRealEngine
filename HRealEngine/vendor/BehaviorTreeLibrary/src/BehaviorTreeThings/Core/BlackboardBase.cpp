@@ -24,9 +24,13 @@ float HBlackboard::GetFloatValue(const std::string& key) const
 
 const std::string& HBlackboard::GetStringValue(const std::string& key) const
 {
-    if (m_StringValues.find(key) != m_StringValues.end())
-        return m_StringValues.at(key);
-    return "";
+    static const std::string EmptyGetStringValue;
+
+    auto it = m_StringValues.find(key);
+    if (it != m_StringValues.end())
+        return it->second;
+
+    return EmptyGetStringValue;
 }
 
 void HBlackboard::SetBoolValue(const std::string& key, bool value)
@@ -82,7 +86,7 @@ void HBlackboard::DrawImGui()
     for (auto& [key, value] : m_StringValues)
     {
         char buffer[256];
-        std::strncpy(buffer, value.c_str(), sizeof(buffer));
+        strncpy_s(buffer, value.c_str(), sizeof(buffer));
         if (ImGui::InputText(key.c_str(), buffer, sizeof(buffer)))
             m_StringValues[key] = std::string(buffer);
     }

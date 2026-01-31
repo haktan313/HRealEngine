@@ -22,25 +22,22 @@ project "yaml-cpp"
 	{
 		"YAML_CPP_STATIC_DEFINE"
 	}
-    staticruntime "on" 
 
-	filter "system:windows"
-		systemversion "latest"
-		cppdialect "C++17"
-		staticruntime "off"
+    disablewarnings { "4267", "4244" }
 
-	filter "system:linux"
-		pic "On"
-		systemversion "latest"
-		cppdialect "C++17"
-		staticruntime "off"
+    filter "system:windows"
+        systemversion "latest"
 
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
+    filter "system:linux"
+        systemversion "latest"
+        pic "On"
 
-	filter "configurations:Release"
-		runtime "Release"
-		optimize "on"
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+    filter "configurations:Release"
+        runtime "Release"
+        optimize "on"
 
 

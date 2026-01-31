@@ -57,7 +57,6 @@ project "HRealEngine"
     links
     {
         "GLFW",
-        "opengl32.lib",
         "Glad",
         "ImGui",
         "yaml-cpp",
@@ -73,7 +72,7 @@ project "HRealEngine"
     filter "system:windows"
         systemversion "latest"
         defines { "HREALENGINE_PLATFORM_WINDOWS" }
-        links { "%{Library.WinSock}", "%{Library.WinMM}", "%{Library.WinVersion}", "%{Library.Bcrypt}" }
+        disablewarnings { "4068" }
     
     filter "configurations:Debug"
         defines { "HREALENGINE_DEBUG", "JPH_DEBUG", "JPH_ENABLE_ASSERTS" }

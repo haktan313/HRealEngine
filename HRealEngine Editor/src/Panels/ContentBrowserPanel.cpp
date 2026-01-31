@@ -217,8 +217,8 @@ namespace HRealEngine
                     newNode.Parent = currentNodeIndex;
                     m_TreeNodes.push_back(newNode);
 
-                    m_TreeNodes[currentNodeIndex].Children[p] = m_TreeNodes.size() - 1;
-                    currentNodeIndex = m_TreeNodes.size() - 1;
+                    m_TreeNodes[currentNodeIndex].Children[p] = static_cast<unsigned int>(m_TreeNodes.size()) - 1;
+                    currentNodeIndex = static_cast<uint32_t>(m_TreeNodes.size()) - 1;
                 }
 
             }

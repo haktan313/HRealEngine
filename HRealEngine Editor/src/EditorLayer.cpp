@@ -13,6 +13,7 @@
 #include "BehaviorTreeThings/CustomThings/CustomDecorators.h"
 #include "BehaviorTreeThings/Editor/EditorRoot.h"
 #include "BehaviorTreeThings/Editor/NodeEditorApp.h"
+#include "glad/glad.h"
 #include "HRealEngine/Asset/AssetImporter.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/SceneImporter.h"
@@ -532,7 +533,7 @@ namespace HRealEngine
         }
 
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image(static_cast<uint32_t>(textureID), ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
         if (ImGui::BeginDragDropTarget())
         {

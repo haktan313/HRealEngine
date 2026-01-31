@@ -14,7 +14,7 @@
 
 namespace HRealEngine
 {
-    struct MeshGPU;
+    class MeshGPU;
 
     struct EntityIDComponent
     {

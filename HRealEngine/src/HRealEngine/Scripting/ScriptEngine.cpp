@@ -84,7 +84,7 @@ namespace HRealEngine
         // NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
         MonoImageOpenStatus status;
         //MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
-        MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
+        MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), static_cast<uint32_t>(fileData.Size()), 1, &status, 0);
 
         if (status != MONO_IMAGE_OK)
         {

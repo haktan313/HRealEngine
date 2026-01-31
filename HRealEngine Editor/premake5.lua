@@ -49,26 +49,38 @@ project "HRealEngine Editor"
     }
 
     
-    links{"HRealEngine"}
+    links{
+        "HRealEngine",
+        "opengl32.lib",
+        "%{Library.WinSock}",
+        "%{Library.WinMM}",
+        "%{Library.WinVersion}",
+        "%{Library.Bcrypt}"
+    }
+
     
-    	filter "system:windows"
-    		systemversion "latest"
-    		defines { "HREALENGINE_PLATFORM_WINDOWS" }
+    filter "system:windows"
+    	systemversion "latest"
+    	defines { "HREALENGINE_PLATFORM_WINDOWS" }
+            linkoptions {
+                "/IGNORE:4099", -- PDB not found (Mono)
+                "/IGNORE:4098"  -- CRT conflict
+            }
     
-    	filter "configurations:Debug"
-    		defines { "HREALENGINE_DEBUG", "JPH_DEBUG", "JPH_ENABLE_ASSERTS" }
-    		runtime "Debug"
-    		symbols "on"
+    filter "configurations:Debug"
+    	defines { "HREALENGINE_DEBUG", "JPH_DEBUG", "JPH_ENABLE_ASSERTS" }
+    	runtime "Debug"
+    	symbols "on"
     
-    	filter "configurations:Release"
-    		defines { "HREALENGINE_RELEASE", "JPH_RELEASE" }
-    		runtime "Release"
-    		optimize "on"
+    filter "configurations:Release"
+    	defines { "HREALENGINE_RELEASE", "JPH_RELEASE" }
+    	runtime "Release"
+    	optimize "on"
     
-    	filter "configurations:Dist"
-    		defines { "HREALENGINE_DIST", "JPH_DIST" }
-    		runtime "Release"
-    		optimize "on"
+    filter "configurations:Dist"
+    	defines { "HREALENGINE_DIST", "JPH_DIST" }
+    	runtime "Release"
+    	optimize "on"
     		
     		
     		

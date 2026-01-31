@@ -66,7 +66,7 @@ namespace HRealEngine
                 {
                     glEnableVertexAttribArray(m_VertexBufferIndex);
                     glVertexAttribPointer(m_VertexBufferIndex, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
-                        element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (const void*)element.Offset);
+                        element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (const void*)(uintptr_t)element.Offset);
                     m_VertexBufferIndex++;
                     break;
                 }
@@ -77,8 +77,8 @@ namespace HRealEngine
                 case ShaderDataType::Bool:
                 {
                     glEnableVertexAttribArray(m_VertexBufferIndex);
-                    glVertexAttribIPointer(m_VertexBufferIndex, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type),
-                        layout.GetStride(), (const void*)element.Offset);
+                    glVertexAttribIPointer(m_VertexBufferIndex, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToOpenGLBaseType(element.Type),
+                        static_cast<GLsizei>(layout.GetStride()), (const void*)(uintptr_t)element.Offset);
                     m_VertexBufferIndex++;
                     break;
                 }
