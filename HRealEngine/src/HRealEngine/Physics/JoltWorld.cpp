@@ -44,6 +44,12 @@ namespace HRealEngine
 
     void JoltWorld::CreatePhysicsBodies()
     {
+        CreateBoxCollider();
+        CreateEmptyBody();
+    }
+
+    void JoltWorld::CreateBoxCollider()
+    {
         auto view = m_Scene->GetRegistry().view<BoxCollider3DComponent>();
         for (auto e : view)
         {
@@ -64,8 +70,7 @@ namespace HRealEngine
                 glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
                 if (glm::length(localOffset) > 0.0001f)
                     boxShape = new JPH::RotatedTranslatedShape(JPH::Vec3(localOffset.x, localOffset.y, localOffset.z), JPH::Quat::sIdentity(), boxShape);
-
-
+                
                 JPH::EMotionType motionType = JPH::EMotionType::Static;
                 auto layer = Layers::NON_MOVING;
                 bool bAllowSleep = false;
@@ -140,6 +145,61 @@ namespace HRealEngine
         }
     }
 
+    void JoltWorld::CreateEmptyBody()
+    {
+                auto viewRB = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+        for (auto e : viewRB)
+        {
+            Entity entity{ e, m_Scene };
+            if (entity.HasComponent<BoxCollider3DComponent>())
+                continue;
+            
+            auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+            auto& transform = entity.GetComponent<TransformComponent>();
+
+            JPH::EmptyShapeSettings emptyShapeSettings;
+            emptyShapeSettings.SetEmbedded();
+            JPH::ShapeSettings::ShapeResult emptyShapeResult = emptyShapeSettings.Create();
+            JPH::ShapeRefC emptyShape = emptyShapeResult.Get();
+            LOG_CORE_WARN("Rigidbody3D without collider, emptyShapeBody created: Entity UUID {}", (uint32_t)entity.GetUUID());
+            
+            JPH::EMotionType motionType = JPH::EMotionType::Static;
+            auto layer = Layers::NON_MOVING;
+            bool bAllowSleep = false;
+            switch (rb3d.Type)
+            {
+            case Rigidbody3DComponent::BodyType::Static:
+                motionType = JPH::EMotionType::Static;
+                layer = Layers::NON_MOVING;
+                bAllowSleep = true;
+                break;
+            case Rigidbody3DComponent::BodyType::Dynamic:
+                motionType = JPH::EMotionType::Dynamic;
+                layer = Layers::MOVING;
+                bAllowSleep = false;
+                break;
+            case Rigidbody3DComponent::BodyType::Kinematic:
+                motionType = JPH::EMotionType::Kinematic;
+                layer = Layers::MOVING;
+                bAllowSleep = false;
+                break;
+            }
+            
+            glm::quat q = glm::quat(transform.Rotation); // (pitch/yaw/roll) rad
+            JPH::Quat joltRot(q.x, q.y, q.z, q.w);
+            
+            JPH::BodyCreationSettings bodySettings(emptyShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
+                joltRot, motionType, layer);            
+            bodySettings.mAllowSleeping = bAllowSleep;
+            
+            JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
+            body->SetUserData(entity.GetUUID());
+            auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
+            body_interface->AddBody(body->GetID(), activation);         
+            rb3d.RuntimeBody = body;
+        }
+    }
+
     void JoltWorld::DestroyEntityPhysics(Entity entity)
     {
         if (entity.HasComponent<Rigidbody3DComponent>())
@@ -162,31 +222,39 @@ namespace HRealEngine
         m_JoltWorldHelper = nullptr;
     }
 
+    void JoltWorld::Step3DWorldForKinematicBodies(Timestep deltaTime)
+    {
+        auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+        for (auto e : view)
+        {
+            Entity entity{ e, m_Scene };
+            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+            if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
+                continue;
+
+            JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
+            if (!body)
+                continue;
+
+            auto& tc = entity.GetComponent<TransformComponent>();
+                
+            glm::quat q = glm::quat(tc.Rotation);
+            JPH::Quat rot(q.x, q.y, q.z, q.w);
+            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+
+            body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
+        }
+    }
+    
     void JoltWorld::Step3DWorld(Timestep deltaTime)
     {
-        {
-            auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
-            for (auto e : view)
-            {
-                Entity entity{ e, m_Scene };
-                auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-                if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
-                    continue;
-
-                JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
-                if (!body)
-                    continue;
-
-                auto& tc = entity.GetComponent<TransformComponent>();
-                
-                glm::quat q = glm::quat(tc.Rotation);
-                JPH::Quat rot(q.x, q.y, q.z, q.w);
-                JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
-
-                body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
-            }
-        }
+        Step3DWorldForKinematicBodies(deltaTime);
         m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
+        Step3DWorldForNonKinematicBodies();
+    }
+
+    void JoltWorld::Step3DWorldForNonKinematicBodies()
+    {
         {
             auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
             for (auto e : view)
@@ -249,91 +317,98 @@ namespace HRealEngine
         }
     }
 
+    void JoltWorld::UpdateSimulation3DForKinematicBodies(Timestep deltaTime)
+    {
+        auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+        for (auto e : view)
+        {
+            Entity entity{ e, m_Scene };
+            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+            if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
+                continue;
+
+            JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
+            if (!body)
+                continue;
+
+            auto& tc = entity.GetComponent<TransformComponent>();
+                
+            glm::quat q = glm::quat(tc.Rotation);
+            JPH::Quat rot(q.x, q.y, q.z, q.w);
+            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+
+            body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
+        }
+    }
+
     void JoltWorld::UpdateSimulation3D(Timestep deltaTime, int& stepFrames)
     {
         if (!m_Scene->IsPaused() || stepFrames-- > 0)
         {
-            {
-                auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
-                for (auto e : view)
-                {
-                    Entity entity{ e, m_Scene };
-                    auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-                    if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
-                        continue;
-
-                    JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
-                    if (!body)
-                        continue;
-
-                    auto& tc = entity.GetComponent<TransformComponent>();
-                
-                    glm::quat q = glm::quat(tc.Rotation);
-                    JPH::Quat rot(q.x, q.y, q.z, q.w);
-                    JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
-
-                    body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
-                }
-            }
+            UpdateSimulation3DForKinematicBodies(deltaTime);
             m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
-            {
-                auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
-                for (auto e : view)
-                {
-                    Entity entity = { e, m_Scene };
-                    auto& transform = entity.GetComponent<TransformComponent>();
-                    auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-                    if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
-                        continue;
+            UpdateSimulation3DForNonKinematicBodies();
+        }
+    }
 
-                    auto body = (JPH::Body*)rb3d.RuntimeBody;
+    void JoltWorld::UpdateSimulation3DForNonKinematicBodies()
+    {
+        {
+            auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, m_Scene };
+                auto& transform = entity.GetComponent<TransformComponent>();
+                auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+                if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
+                    continue;           
+                auto body = (JPH::Body*)rb3d.RuntimeBody;
+                JPH::RVec3 position;
+                JPH::Quat rotation;
+            
+                body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
+                transform.Position.x = position.GetX();
+                transform.Position.y = position.GetY();
+                transform.Position.z = position.GetZ();
+            
+                glm::quat q;
+                q.x = rotation.GetX();
+                q.y = rotation.GetY();
+                q.z = rotation.GetZ();
+                q.w = rotation.GetW();
+            
+                glm::vec3 euler = glm::eulerAngles(q);
+                transform.Rotation = euler;
+            }
+        }
+        {
+            auto view = m_Scene->GetRegistry().view<BoxCollider3DComponent, TransformComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, m_Scene };
+                if (entity.HasComponent<Rigidbody3DComponent>())
+                    continue;
+                auto& transform = entity.GetComponent<TransformComponent>();
+                auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+                if (boxCollider.RuntimeBody)
+                {
+                    JPH::Body* body = (JPH::Body*)boxCollider.RuntimeBody;
                     JPH::RVec3 position;
                     JPH::Quat rotation;
-            
+                        
                     body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
                     transform.Position.x = position.GetX();
                     transform.Position.y = position.GetY();
                     transform.Position.z = position.GetZ();
-            
+                        
                     glm::quat q;
                     q.x = rotation.GetX();
                     q.y = rotation.GetY();
                     q.z = rotation.GetZ();
                     q.w = rotation.GetW();
-                
+                        
                     glm::vec3 euler = glm::eulerAngles(q);
                     transform.Rotation = euler;
-                }
-            }
-            {
-                auto view = m_Scene->GetRegistry().view<BoxCollider3DComponent, TransformComponent>();
-                for (auto e : view)
-                {
-                    Entity entity = { e, m_Scene };
-                    if (entity.HasComponent<Rigidbody3DComponent>())
-                        continue;
-                    auto& transform = entity.GetComponent<TransformComponent>();
-                    auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
-                    if (boxCollider.RuntimeBody)
-                    {
-                        JPH::Body* body = (JPH::Body*)boxCollider.RuntimeBody;
-                        JPH::RVec3 position;
-                        JPH::Quat rotation;
-                        
-                        body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
-                        transform.Position.x = position.GetX();
-                        transform.Position.y = position.GetY();
-                        transform.Position.z = position.GetZ();
-                        
-                        glm::quat q;
-                        q.x = rotation.GetX();
-                        q.y = rotation.GetY();
-                        q.z = rotation.GetZ();
-                        q.w = rotation.GetW();
-                        
-                        glm::vec3 euler = glm::eulerAngles(q);
-                        transform.Rotation = euler;
-                    }
                 }
             }
         }
