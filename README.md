@@ -21,6 +21,7 @@ The primary long term goal of the engine is to serve as a playground for AI fram
   - [Asset System](#asset-system)
   - [Project System](#project-system)
   - [Core](#core)
+  - [Project Setup (C# Workflow)](#project-setup-c-workflow)
   - [Notes / Roadmap](#notes--roadmap)
   - [Script Example (BT integration in Scene.cpp)](#script-example-bt-integration-in-scenecpp)
   - [Script Example (Overlap Events)](#script-example-overlap-events)
@@ -42,6 +43,8 @@ The primary long term goal of the engine is to serve as a playground for AI fram
   - To register custom **Blackboards / Actions / Conditions / Decorators**, call `NodeRegistry` registration functions in EditorLayer.cpp and inside of the `RegisterBehaviorTreeStuffs()`.
   - For more details and examples, check the **BehaviorTreeLibrary** documentation **https://github.com/haktan313/BehaviorTreeLibrary**
 
+https://github.com/user-attachments/assets/4c010b09-0b99-43da-9000-b52fa8ad2800
+
 https://github.com/user-attachments/assets/07c87738-2202-4d6c-8949-1bdc5601b3f6
 
 https://github.com/user-attachments/assets/8d94ccb6-fb48-44e6-83d7-c2b3afed06c8
@@ -56,6 +59,8 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 | <img width="1913" height="1137" alt="image" src="https://github.com/user-attachments/assets/8a9c1386-550d-4038-b17b-8183d732b641" /> | <img width="1894" height="1141" alt="Screenshot 2026-01-02 161346" src="https://github.com/user-attachments/assets/4f5b43d3-7c31-4e98-a4a6-6c5ec470f71d" /> |
 | 2D | Asset Registry |
 | <img width="2555" height="1386" alt="image" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | <img width="1324" height="937" alt="Screenshot 2026-01-02 161443" src="https://github.com/user-attachments/assets/61ad632f-7c6c-4ee9-8fea-8b7d2a2a99f6" /> |
+| Lighting | Project UI |
+| <img width="2552" height="1385" alt="Screenshot 2026-02-01 174512" src="https://github.com/user-attachments/assets/2a6c5d52-2fd5-4770-990a-511ac1253682" /> | <img width="2057" height="1194" alt="Screenshot 2026-02-01 172746" src="https://github.com/user-attachments/assets/7301902b-b582-48a2-bcca-8b1666992f95" /> |
 
 ### Editor & Workflow
 - ImGui-based scene editor with viewport and gizmos
@@ -66,7 +71,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
 ### Scripting
 - Dual scripting support:
-  - C++ Native scripts
+  - C++ Native scripts (engine side scripting)
   - C# scripting with Mono (hot reloadable assemblies)
 - Typical script events:
   - OnCreate, OnUpdate, OnDestroy, OnOverlapBegin, OnOverlapEnd, Destroy, etc.
@@ -77,9 +82,12 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - **2D Physics (Box2D)**
   - Rigidbody2D and collider components integrated into the ECS
   - Collision and overlap events forwarded to scripts
-- **3D Physics (Jolt Physics)(recently added)**
+- **3D Physics (Jolt Physics)**
   - Initial 3D physics pipeline
-  - Rigidbody3D and basic 3D collider support
+  - Separation between **Rigidbody3D** and **Collider components**
+  - Supports **Static**, **Dynamic**, and **Kinematic** bodies
+  - Collision and overlap events forwarded to both C++ and C# scripts
+  - Debug collision visualization support
 
 ### Rendering
 - OpenGL rendering
@@ -89,25 +97,70 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
   - Batch renderer with textures and shaders
 - **3D Rendering**
   - `MeshComponent` for rendering 3D entities using mesh and material assets
-  - `OBJ` mesh import and asset based rendering pipeline
-  - `Material` system with texture support
+  - `OBJ`, `FBX`, `GLB` mesh import and asset based rendering pipeline
+  - Material system supporting:
+    - **Albedo textures**
+    - **Normal maps**
+    - **Specular maps**
   - Texture assignment support for 3D meshes
+  - Debug views for normals and UVs
+  - Improved lighting interaction with materials
 
 ### Asset System
 - Centralized asset registry and asset handles
 - Import pipeline for meshes, materials, scenes, textures, and Behavior Trees
 - Asset based references used across rendering and scene systems
+- Supports importing 3D assets using **Assimp**
+- Supported formats include:
+  - OBJ
+  - FBX
+  - GLB / GLTF
+- Imported meshes and materials are converted into engine-native asset formats
 
 ### Project System
-- Project configuration and asset directory management
-- Per project asset registry and settings
-- Support for opening and switching projects inside the editor
+- Added a dedicated **Project System** with an engine startup screen.
+- Users can:
+  - **Create a New Project C#**
+  - **Open an Existing Project**
+- New projects can be created from **template projects**.
+- **C#** projects are integrated with the scripting workflow (Mono + hot reloadable assemblies)
+- Improved project startup flow, including default scene selection.
 
 ### Core
 - Input handling and event system
 - Logging with spdlog
 
+## Project Setup (C# Workflow)
+### Creating a New Project
+1. Launch **HRealEngine Editor**.  
+   The **Project Browser** window will appear on startup.
+2. Select **New Project (C#)**.
+3. Choose a project location and name.  
+   A `.hprj` file will be created to represent the project.
+4. The editor will open with a default scene and initial project layout.
+
+### Generating the C# Script Project
+5. Navigate to the project’s `Scripts` directory.
+6. Run `Win-GenProject.bat`.  
+   This will:
+   - Invoke **Premake**
+   - Generate a Visual Studio **C# solution**
+   - Create the required `.sln` and `.csproj` files
+7. Open the generated solution in **Visual Studio** or **JetBrains Rider**.
+
+### Building Scripts
+8. Build the C# solution.  
+   On a successful build:
+   - The script assembly (`.dll`) will be generated under  
+     `Scripts/Binaries/`
+   - Debug symbols (`.pdb`) will also be produced
+9. Restart the editor or reload the project.  
+   The engine will automatically detect and load the compiled script assembly.
+
+
 ## Notes / Roadmap
+- **Implementing Animations**
+- **Creating an Unreal like Perception System**
 - **My own Navigation Mesh library implementation**
 
 ## Script Example (BT integration in Scene.cpp)
@@ -381,5 +434,5 @@ HRealEngine uses the following libraries (all included as Git submodules):
 - **[stb_image](https://github.com/nothings/stb)** – Image loading
 - **[yaml-cpp](https://github.com/jbeder/yaml-cpp)** – Serialization
 - **[glm](https://github.com/g-truc/glm)** – Math library for graphics
-- **[asimp](https://github.com/AminAliari/assimp.git)** - for OBJ
+- **[assimp](https://github.com/assimp/assimp)** - Asset importing (OBJ/FBX/GLB/GLTF)
 - **[filewatch](https://github.com/ThomasMonkman/filewatch)**
