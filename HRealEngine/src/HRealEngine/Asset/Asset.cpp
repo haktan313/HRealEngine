@@ -19,6 +19,8 @@ namespace HRealEngine
                 return "AssetType::Material";
             case AssetType::BehaviorTree:
                 return "AssetType::BehaviorTree";
+            case AssetType::Skeleton:
+                return "AssetType::Skeleton";
         }
 
         return "AssetType::<Invalid>";
@@ -38,6 +40,8 @@ namespace HRealEngine
             return AssetType::Material;
         if (assetType == "AssetType::BehaviorTree")
             return AssetType::BehaviorTree;
+        if (assetType == "AssetType::Skeleton")
+            return AssetType::Skeleton;
 
         return AssetType::None;
     }

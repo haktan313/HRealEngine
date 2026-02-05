@@ -88,10 +88,156 @@ namespace HRealEngine
         outHandle = Project::GetActive()->GetEditorAssetManager()->GetHandleFromPath(rel);
         return outHandle != 0;
     }
+    
+    static glm::mat4 ToMat4(const aiMatrix4x4& m)
+    {
+        glm::mat4 r;
+        r[0][0] = m.a1; r[1][0] = m.a2; r[2][0] = m.a3; r[3][0] = m.a4;
+        r[0][1] = m.b1; r[1][1] = m.b2; r[2][1] = m.b3; r[3][1] = m.b4;
+        r[0][2] = m.c1; r[1][2] = m.c2; r[2][2] = m.c3; r[3][2] = m.c4;
+        r[0][3] = m.d1; r[1][3] = m.d2; r[2][3] = m.d3; r[3][3] = m.d4;
+        return r;
+    }
+    static void DecomposeTRS(const glm::mat4& m, glm::vec3& outT, glm::quat& outR, glm::vec3& outS)
+    {
+        outT = glm::vec3(m[3]);
 
+        glm::vec3 col0 = glm::vec3(m[0]);
+        glm::vec3 col1 = glm::vec3(m[1]);
+        glm::vec3 col2 = glm::vec3(m[2]);
 
-    bool MeshLoader::LoadMeshFromFile(const std::string& path,
-        std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax)
+        outS = glm::vec3(glm::length(col0), glm::length(col1), glm::length(col2));
+
+        glm::mat3 rot(1.0f);
+        if (outS.x != 0)
+            rot[0] = col0 / outS.x;
+        if (outS.y != 0)
+            rot[1] = col1 / outS.y;
+        if (outS.z != 0)
+            rot[2] = col2 / outS.z;
+
+        outR = glm::quat_cast(rot);
+    }
+    static void WriteString(std::ofstream& out, const std::string& s)
+    {
+        uint32_t len = (uint32_t)s.size();
+        out.write((const char*)&len, sizeof(len));
+        if (len)
+            out.write(s.data(), len);
+    }
+    static bool ReadString(std::ifstream& in, std::string& outStr)
+    {
+        uint32_t len = 0;
+        in.read((char*)&len, sizeof(len));
+        if (!in)
+            return false;
+        outStr.resize(len);
+        if (len)
+            in.read(outStr.data(), len);
+        return (bool)in;
+    }
+    static int AddBoneToSkeleton(const std::string& name, int parentIndex, const glm::mat4& localM, const std::unordered_map<std::string, glm::mat4>& invBindByName, Skeleton& skel)
+    {
+        int newIndex = (int)skel.Bones.size();
+        skel.Bones.push_back({});
+        Bone& out = skel.Bones.back();
+
+        out.Name = name;
+        out.ParentIndex = parentIndex;
+
+        DecomposeTRS(localM, out.LocalT, out.LocalR, out.LocalS);
+
+        auto itIB = invBindByName.find(name);
+        out.InverseBind = (itIB != invBindByName.end()) ? itIB->second : glm::mat4(1.0f);
+
+        skel.BoneIndexByName[name] = newIndex;
+        return newIndex;
+    }
+    static void WalkNodesAndBuildSkeleton(aiNode* node, int parentBoneIndex, const std::unordered_set<std::string>& usedBones, const std::unordered_map<std::string, glm::mat4>& invBindByName, Skeleton& skel)
+    {
+        if (!node)
+            return;
+
+        std::string nodeName = node->mName.C_Str();
+        int myBoneIndex = parentBoneIndex;
+
+        if (!nodeName.empty() && usedBones.find(nodeName) != usedBones.end())
+        {
+            auto it = skel.BoneIndexByName.find(nodeName);
+            if (it == skel.BoneIndexByName.end())
+            {
+                glm::mat4 localM = ToMat4(node->mTransformation);
+                myBoneIndex = AddBoneToSkeleton(nodeName, parentBoneIndex, localM, invBindByName, skel);
+            }
+            else
+                myBoneIndex = it->second;
+        }
+        for (unsigned i = 0; i < node->mNumChildren; ++i)
+            WalkNodesAndBuildSkeleton(node->mChildren[i], myBoneIndex, usedBones, invBindByName, skel);
+    }
+    
+    Ref<Skeleton> MeshLoader::ExtractSkeletonFromScene(const aiScene* scene)
+    {
+        if (!scene || !scene->mRootNode)
+            return nullptr;
+
+        std::unordered_set<std::string> usedBones;
+        usedBones.reserve(256);
+
+        std::unordered_map<std::string, glm::mat4> invBindByName;
+        invBindByName.reserve(256);
+        
+        for (unsigned m = 0; m < scene->mNumMeshes; ++m)
+        {
+            aiMesh* mesh = scene->mMeshes[m];
+            if (!mesh)
+                continue;
+
+            for (unsigned b = 0; b < mesh->mNumBones; ++b)
+            {
+                aiBone* bone = mesh->mBones[b];
+                if (!bone) continue;
+
+                std::string name = bone->mName.C_Str();
+                if (name.empty()) continue;
+
+                usedBones.insert(name);
+                invBindByName[name] = ToMat4(bone->mOffsetMatrix);
+            }
+        }
+
+        if (usedBones.empty())
+            return nullptr;
+
+        Ref<Skeleton> skelRef = CreateRef<Skeleton>();
+        Skeleton& skel = *skelRef;
+        skel.Bones.clear();
+        skel.BoneIndexByName.clear();
+
+        WalkNodesAndBuildSkeleton(scene->mRootNode, -1, usedBones, invBindByName, skel);
+
+        if (skel.Bones.empty())
+        {
+            skel.Bones.reserve(usedBones.size());
+            int idx = 0;
+            for (const auto& name : usedBones)
+            {
+                Bone b{};
+                b.Name = name;
+                b.ParentIndex = -1;
+
+                auto itIB = invBindByName.find(name);
+                b.InverseBind = (itIB != invBindByName.end()) ? itIB->second : glm::mat4(1.0f);
+
+                skel.Bones.push_back(b);
+                skel.BoneIndexByName[name] = idx++;
+            }
+        }
+        return skelRef;
+    }
+
+    bool MeshLoader::LoadMeshFromFile(const std::string& path, std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes,
+        glm::vec3& outBoundsMin, glm::vec3& outBoundsMax, Ref<Skeleton>& outSkeleton)
     {
         Assimp::Importer importer;
 
@@ -174,7 +320,11 @@ namespace HRealEngine
             if (outSubmeshes && submesh.IndexCount > 0)
                 outSubmeshes->push_back(submesh);
         }
+        outSkeleton = ExtractSkeletonFromScene(scene);
 
+        if (outSkeleton)
+            LOG_CORE_INFO("Extracted Skeleton: Bones={}", (int)outSkeleton->Bones.size());
+        
         std::cout << "Loaded: " << path << " | V: " << outVertices.size() << " | I: " << outIndices.size() << "\n";
         return true;
     }
@@ -314,8 +464,80 @@ namespace HRealEngine
         return true;
     }
 
+    bool MeshLoader::WriteHSkeletonBin(const std::filesystem::path& path, const Ref<Skeleton>& skeleton)
+    {
+        if (!skeleton)
+            return false;
+
+        std::filesystem::create_directories(path.parent_path());
+
+        std::ofstream out(path, std::ios::binary);
+        if (!out)
+            return false;
+
+        HSkeletonBinHeader h;
+        h.Magic = 0x4C454B53;
+        h.BoneCount = (uint32_t)skeleton->Bones.size();
+        out.write((const char*)&h, sizeof(h));
+
+        for (const auto& b : skeleton->Bones)
+        {
+            WriteString(out, b.Name);
+
+            int32_t parent = (int32_t)b.ParentIndex;
+            out.write((const char*)&parent, sizeof(parent));
+
+            out.write((const char*)&b.LocalT, sizeof(glm::vec3));
+            out.write((const char*)&b.LocalR, sizeof(glm::quat));
+            out.write((const char*)&b.LocalS, sizeof(glm::vec3));
+
+            out.write((const char*)&b.InverseBind, sizeof(glm::mat4));
+        }
+
+        return true;
+    }
+
+    Ref<Skeleton> MeshLoader::ReadHSkeletonBin(const std::filesystem::path& path)
+    {
+        std::ifstream in(path, std::ios::binary);
+        if (!in)
+            return nullptr;
+
+        HSkeletonBinHeader h{};
+        in.read((char*)&h, sizeof(h));
+        if (!in) return nullptr;
+
+        if (h.Magic != 0x4C454B53 || h.Version != 1)
+            return nullptr;
+
+        Ref<Skeleton> skel = CreateRef<Skeleton>();
+        skel->Bones.resize(h.BoneCount);
+
+        for (uint32_t i = 0; i < h.BoneCount; i++)
+        {
+            Bone b{};
+            if (!ReadString(in, b.Name)) return nullptr;
+
+            int32_t parent = -1;
+            in.read((char*)&parent, sizeof(parent));
+            b.ParentIndex = (int)parent;
+
+            in.read((char*)&b.LocalT, sizeof(glm::vec3));
+            in.read((char*)&b.LocalR, sizeof(glm::quat));
+            in.read((char*)&b.LocalS, sizeof(glm::vec3));
+            in.read((char*)&b.InverseBind, sizeof(glm::mat4));
+
+            if (!in) return nullptr;
+
+            skel->Bones[i] = b;
+            skel->BoneIndexByName[b.Name] = (int)i;
+        }
+
+        return skel;
+    }
+
     bool MeshLoader::ReadHMeshBin(const std::filesystem::path& path, std::vector<MeshVertex>& outVertices,
-        std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax)
+                                  std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax)
     {
         std::ifstream in(path, std::ios::binary);
         if (!in)

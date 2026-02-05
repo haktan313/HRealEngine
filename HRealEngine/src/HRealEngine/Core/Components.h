@@ -89,6 +89,16 @@ namespace HRealEngine
         operator glm::vec4& () { return Color; }
         operator const glm::vec4& () const { return Color; }
     };
+    struct SkeletalMeshRendererComponent
+    {
+        AssetHandle Skeleton = 0;
+        AssetHandle Mesh = 0;
+        std::filesystem::path MeshAssetPath;
+        std::vector<AssetHandle> MaterialHandleOverrides;
+        
+        SkeletalMeshRendererComponent() = default;
+        SkeletalMeshRendererComponent(const SkeletalMeshRendererComponent&) = default;
+    };
 
     struct BehaviorTreeComponent
     {

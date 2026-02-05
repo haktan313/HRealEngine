@@ -5,6 +5,7 @@
 #include "MaterialImporter.h"
 #include "MeshImporter.h"
 #include "SceneImporter.h"
+#include "SkeletonImporter.h"
 #include "TextureImporter.h"
 
 namespace HRealEngine
@@ -14,7 +15,8 @@ namespace HRealEngine
         { AssetType::Scene, SceneImporter::ImportScene },
         { AssetType::Mesh, MeshImporter::ImportMesh },
         { AssetType::Material, MaterialImporter::ImportMaterial },
-        {AssetType::BehaviorTree, BehaviorTreeImporter::ImportBehaviorTree }
+        {AssetType::BehaviorTree, BehaviorTreeImporter::ImportBehaviorTree },
+        { AssetType::Skeleton, SkeletonImporter::ImportSkeleton }
     };
     
     Ref<Asset> AssetImporter::ImportAsset(AssetHandle assetHandle, const AssetMetadata& metaData)

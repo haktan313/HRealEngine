@@ -3,10 +3,13 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include "glm/detail/type_quat.hpp"
 #include "HRealEngine/Asset/Asset.h"
 #include "HRealEngine/Core/Core.h"
 #include "HRealEngine/Renderer/Shader.h"
 #include "HRealEngine/Renderer/VertexArray.h"
+
+struct aiScene;
 
 namespace HRealEngine
 {
@@ -50,16 +53,48 @@ namespace HRealEngine
         glm::vec3 BoundsMin = { 0,0,0 };
         glm::vec3 BoundsMax = { 0,0,0 };
     };
+    
+    struct Bone
+    {
+        std::string Name;
+        int ParentIndex = -1;
+        
+        glm::vec3 LocalT = {0,0,0};
+        glm::quat LocalR = {1,0,0,0};
+        glm::vec3 LocalS = {1,1,1};
+        
+        glm::mat4 InverseBind = glm::mat4(1.0f);
+    };
+    struct HSkeletonBinHeader
+    {
+        uint32_t Magic = 0x48534B4C;
+        uint32_t Version = 1;
+        uint32_t BoneCount = 0;
+    };
+    class Skeleton : public Asset
+    {
+    public:
+        virtual ~Skeleton() = default;
+        
+        static AssetType GetStaticType() { return AssetType::Skeleton; }
+        AssetType GetType() const override { return GetStaticType(); }
+
+        std::vector<Bone> Bones;
+        std::unordered_map<std::string, int> BoneIndexByName;
+    };
     class MeshLoader
     {
     public:
+        static Ref<Skeleton> ExtractSkeletonFromScene(const aiScene* scene);
         static bool LoadMeshFromFile(const std::string& path, std::vector<MeshVertex>& outVertices,
-            std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax);
+            std::vector<uint32_t>& outIndices, std::vector<HMeshBinSubmesh>* outSubmeshes, glm::vec3& outBoundsMin, glm::vec3& outBoundsMax, Ref<Skeleton>& outSkeleton);
         static std::vector<std::string> ImportObjMaterialsToHMat(const std::filesystem::path& objPathInAssets, const std::filesystem::path& assetsRoot,
             const std::filesystem::path& lastCopiedTexAbs, const std::vector<std::filesystem::path>& texturePaths);
         static Ref<MeshGPU> LoadHMeshAsset(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);
         static bool WriteHMeshBin(const std::filesystem::path& path,
             const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<HMeshBinSubmesh>& submeshes, const glm::vec3& boundsMin, const glm::vec3& boundsMax);
+        static bool WriteHSkeletonBin(const std::filesystem::path& path, const Ref<Skeleton>& skeleton);
+        static Ref<Skeleton> ReadHSkeletonBin(const std::filesystem::path& path);
         static bool ReadHMeshBin(const std::filesystem::path& path, std::vector<MeshVertex>& outVertices, std::vector<uint32_t>& outIndices,
             std::vector<HMeshBinSubmesh>* outSubmeshes = nullptr, glm::vec3& outBoundsMin = glm::vec3(0), glm::vec3& outBoundsMax = glm::vec3(0));
         static Ref<MeshGPU> GetOrLoad(const std::filesystem::path& hmeshPath, const std::filesystem::path& assetsRoot, const Ref<Shader>& shader);

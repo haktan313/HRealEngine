@@ -22,7 +22,8 @@ namespace HRealEngine
         Scene,
         Mesh,
         Material,
-        BehaviorTree
+        BehaviorTree,
+        Skeleton
     };
 
     struct AssetMetadata

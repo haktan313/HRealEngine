@@ -17,7 +17,8 @@ namespace HRealEngine
         {".hmesh", AssetType::Mesh },
         {".hmat", AssetType::Material},
         {".mtl", AssetType::Material},
-        {".btree", AssetType::BehaviorTree}
+        {".btree", AssetType::BehaviorTree},
+        {".hskeleton", AssetType::Skeleton}
     };
     static AssetType GetAssetTypeFromFileExtension(const std::filesystem::path& extension)
     {

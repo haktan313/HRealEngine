@@ -379,11 +379,59 @@ namespace HRealEngine
         std::vector<uint32_t> inds;
         std::vector<HMeshBinSubmesh> submeshes;
         glm::vec3 bMin, bMax;
-        if (!MeshLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes, bMin, bMax))
+        Ref<Skeleton> skeleton;
+        if (!MeshLoader::LoadMeshFromFile(dstObj.string(), verts, inds, &submeshes, bMin, bMax, skeleton))
         {
             LOG_CORE_INFO("Mesh load failed: {}", dstObj.string());
             return;
-        }       
+        }
+        if (skeleton)
+        {
+            LOG_CORE_INFO("Skeleton present. BoneCount={}", (int)skeleton->Bones.size());
+            for (int i = 0; i < (int)skeleton->Bones.size() && i < 80; i++)
+                LOG_CORE_INFO("Bone[{}] {} Parent={}", i, skeleton->Bones[i].Name, skeleton->Bones[i].ParentIndex);
+        }
+        else
+        {
+            LOG_CORE_INFO("No skeleton (static mesh).");
+        }
+
+        if (skeleton)
+        {
+            std::filesystem::path skelCookedPath = Project::GetAssetDirectory() / "cache";
+            std::filesystem::create_directories(skelCookedPath);
+            skelCookedPath /= dstObj.stem();
+            skelCookedPath += ".hskeletonbin";
+
+            if (!MeshLoader::WriteHSkeletonBin(skelCookedPath, skeleton))
+            {
+                LOG_CORE_WARN("Failed to write skeleton cook: {}", skelCookedPath.string());
+            }
+            else
+            {
+                LOG_CORE_INFO("Cooked skeleton: {}", skelCookedPath.string());
+                
+                std::filesystem::path outSkel = m_CurrentDirectory / (dstObj.stem().string() + ".hskeleton");
+                outSkel = MakeUniquePath(outSkel);
+
+                auto assetsRoot = Project::GetAssetDirectory();
+                auto skelCookedRel = std::filesystem::relative(skelCookedPath, assetsRoot).generic_string();
+                auto sourceRel2 = std::filesystem::relative(dstObj, assetsRoot).generic_string();
+
+                std::ofstream s(outSkel);
+                s << "Type: Skeleton\n";
+                s << "Source: " << sourceRel2 << "\n";
+                s << "Cooked: " << skelCookedRel << "\n";
+                s << "BoneCount: " << (uint32_t)skeleton->Bones.size() << "\n";
+                if (!skeleton->Bones.empty())
+                    s << "RootBone: " << skeleton->Bones[0].Name << "\n";
+                s.close();
+
+                LOG_CORE_INFO("Created skeleton asset: {}", outSkel.string());
+                Project::GetActive()->GetEditorAssetManager()->ImportAsset(outSkel);
+            }
+        }
+
 
         std::filesystem::path cookedPath = Project::GetAssetDirectory() / "cache";
         std::filesystem::create_directories(cookedPath);        
