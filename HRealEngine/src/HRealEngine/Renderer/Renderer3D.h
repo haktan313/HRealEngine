@@ -37,6 +37,7 @@ namespace HRealEngine
         
         static Ref<MeshGPU> BuildStaticMeshGPU(const std::vector<MeshVertex>& vertices, const std::vector<uint32_t>& indices,const Ref<Shader>& shader, glm::vec3& inMin, glm::vec3& inMax);
         static void DrawMesh(const glm::mat4& transform, MeshRendererComponent& meshRenderer, int entityID = -1);
+        static void DrawMesh(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer, int entityID = -1);
         
         static void BeginShadowPass(const glm::vec3& lightDirection, const glm::vec3& focusPosition);
         static void EndShadowPass();

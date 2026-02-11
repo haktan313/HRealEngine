@@ -697,6 +697,150 @@ namespace HRealEngine
         // s_Data.Stats.CubeCount++;
     }
 
+    void Renderer3D::DrawMesh(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer, int entityID)
+    {
+        // Draw with MeshGPU if available
+        if (meshRenderer.Mesh /*&& meshRenderer.Mesh->VAO && meshRenderer.Mesh->Shader && meshRenderer.Mesh->IndexCount > 0*/)
+        {
+            auto meshGPU = AssetManager::GetAsset<MeshGPU>(meshRenderer.Mesh);
+            if (!meshGPU)
+                return;
+            meshGPU->Shader->Bind();
+            meshGPU->Shader->SetInt("u_EntityID", entityID);
+            //meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
+            meshGPU->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
+            meshGPU->Shader->SetMat4("u_Transform", transform);
+            meshGPU->Shader->SetInt("u_DebugView", Renderer::GetDebugView());
+            
+            if (s_Data.LightsDirty)
+            {
+                UploadLightsToShader(meshGPU->Shader);
+                s_Data.LightsDirty = false;
+            }
+            
+            if (s_Data.ShadowValid && s_Data.ShadowDepthTexture != 0)
+            {
+                meshGPU->Shader->SetInt("u_HasShadowMap", 1);
+                meshGPU->Shader->SetMat4("u_LightSpaceMatrix", s_Data.LightSpaceMatrix);
+                meshGPU->Shader->SetFloat("u_ShadowBias", s_Data.ShadowBias);
+                
+                meshGPU->Shader->SetInt("u_ShadowMap", 31);
+                glActiveTexture(GL_TEXTURE0 + 31);
+                glBindTexture(GL_TEXTURE_2D, s_Data.ShadowDepthTexture);
+            }
+            else
+                meshGPU->Shader->SetInt("u_HasShadowMap", 0);
+            /*if (HasPointShadowMap())
+            {
+                meshGPU->Shader->SetInt("u_HasPointShadowMap", 1);
+                meshGPU->Shader->SetFloat3("u_PointShadowLightPos", GetPointShadowLightPos());
+                meshGPU->Shader->SetFloat("u_PointShadowFarPlane", GetPointShadowFarPlane());
+
+                const int pointShadowSlot = 30; // pick a free slot (you used 15 for 2D shadow map)
+                meshGPU->Shader->SetInt("u_PointShadowMap", pointShadowSlot);
+
+                glActiveTexture(GL_TEXTURE0 + pointShadowSlot);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, GetPointShadowMapRendererID());
+            }
+            else
+            {
+                meshGPU->Shader->SetInt("u_HasPointShadowMap", 0);
+            }*/
+            UploadPointShadowArrayToShader(meshGPU->Shader);
+
+            
+            if (!meshGPU->Submeshes.empty())
+            {
+                for (const auto& sm : meshGPU->Submeshes)
+                {
+                    if (sm.IndexCount == 0)
+                        continue;
+            
+                    const uint32_t slot = sm.MaterialIndex;
+                    
+                    AssetHandle matHandle = 0;
+                    if (slot < meshRenderer.MaterialHandleOverrides.size())
+                        matHandle = meshRenderer.MaterialHandleOverrides[slot];
+                    if (matHandle != 0)
+                    {
+                        Ref<HMaterial> mat = AssetManager::GetAsset<HMaterial>(matHandle);
+                        if (mat)
+                            mat->Apply(meshGPU->Shader);
+                        else
+                        {
+                            meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                            meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                        }
+                    }
+                    else
+                    {
+                        meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                        meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                    }
+
+                    RenderCommand::DrawIndexed(meshGPU->VAO, sm.IndexCount, sm.IndexOffset);
+                }
+            }
+            else
+            {
+                meshGPU->Shader->SetInt("u_HasAlbedo", 0);
+                meshGPU->Shader->SetFloat4("u_Color", meshRenderer.Color);
+                RenderCommand::DrawIndexed(meshGPU->VAO, meshGPU->IndexCount);
+            }
+            return;
+        }
+
+        if (s_Data.CubeIndexCount >= s_Data.MaxIndices)
+        {
+            Flush();
+            StartBatch();
+        }
+        
+        float textureIndex = 0.0f;
+        if(meshRenderer.Texture)
+        {
+            Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(meshRenderer.Texture);
+            for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+            {
+                if (*s_Data.TextureSlots[i] == *texture)
+                {
+                    textureIndex = (float)i;
+                    break;
+                }
+            }
+            if (textureIndex == 0.0f)
+            {
+                if (s_Data.TextureSlotIndex >= s_Data.MaxUserTextureSlots/*MaxTextureSlots*/)
+                {
+                    Flush();
+                    StartBatch();
+                }
+                textureIndex = (float)s_Data.TextureSlotIndex;
+                s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+                s_Data.TextureSlotIndex++;
+            }
+        }
+        
+        const glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(transform)));
+        for (size_t i = 0; i < 24; i++)
+        {
+            const glm::vec4 worldPos4 = transform * s_Data.VertexPos[i];
+
+            s_Data.CubeVertexBufferPtr->Position = glm::vec3(worldPos4);
+            s_Data.CubeVertexBufferPtr->Normal = glm::normalize(normalMat * s_Data.VertexNormal[i]);
+            s_Data.CubeVertexBufferPtr->Color = meshRenderer.Color;
+            s_Data.CubeVertexBufferPtr->TexCoord = s_Data.VertexUV[i];
+            s_Data.CubeVertexBufferPtr->TexIndex = textureIndex;
+            s_Data.CubeVertexBufferPtr->TilingFactor = meshRenderer.TilingFactor;
+            s_Data.CubeVertexBufferPtr->EntityID = entityID;
+
+            s_Data.CubeVertexBufferPtr++;
+        }
+
+        s_Data.CubeIndexCount += 36;
+        // s_Data.Stats.CubeCount++;
+    }
+
     void Renderer3D::BeginShadowPass(const glm::vec3& lightDirection, const glm::vec3& focusPosition)
     {
         CreateShadowResources();

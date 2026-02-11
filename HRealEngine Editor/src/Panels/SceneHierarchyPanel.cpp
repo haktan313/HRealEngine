@@ -233,6 +233,7 @@ namespace HRealEngine
             ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
             ShowAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
+            ShowAddComponentEntry<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer");
             ShowAddComponentEntry<BehaviorTreeComponent>("Behavior Tree Component");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -769,24 +770,6 @@ namespace HRealEngine
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
-                    /*const wchar_t* path = (const wchar_t*)payload->Data;
-                    std::filesystem::path droppedPath = path;
-        
-                    if (droppedPath.extension() == ".hmesh")
-                    {
-                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
-        
-                        component.Mesh = ObjLoader::GetOrLoad(droppedPath, "assets", shader);
-                        component.MeshAssetPath = droppedPath;
-                        if (component.Mesh)
-                        {
-                            const size_t slotCount = component.Mesh->MaterialPaths.size();
-                            component.MaterialOverrides.clear();
-                            component.MaterialOverrides.resize(slotCount);
-                            LOG_CORE_INFO("Mesh material slots: {}", slotCount);
-                        }
-                        LOG_CORE_INFO("Assigned mesh: {}", droppedPath.string());
-                    }*/
                     AssetHandle handle = *(AssetHandle*)payload->Data;
                     if (AssetManager::GetAssetType(handle) == AssetType::Mesh)
                     {
@@ -799,10 +782,7 @@ namespace HRealEngine
                         auto meshGPU = MeshLoader::GetOrLoad(droppedPath, "assets", shader);
                         if (meshGPU)
                         {
-                            //const size_t slotCount = meshGPU->MaterialPaths.size();
                             const size_t slotCount = meshGPU->MaterialHandles.size();
-                            /*component.MaterialOverrides.clear();
-                            component.MaterialOverrides.resize(slotCount);*/
                             component.MaterialHandleOverrides.clear();
                             component.MaterialHandleOverrides.resize(slotCount);
                             LOG_CORE_INFO("Mesh material slots: {}", slotCount);
@@ -815,7 +795,6 @@ namespace HRealEngine
                                 meshGPUAsset->Shader = shader;
                                 meshGPUAsset->VAO = meshGPU->VAO;
                                 meshGPUAsset->IndexCount = meshGPU->IndexCount;
-                                //meshGPUAsset->MaterialPaths = meshGPU->MaterialPaths;
                                 meshGPUAsset->MaterialHandles = meshGPU->MaterialHandles;
                                 meshGPUAsset->Submeshes = meshGPU->Submeshes;
                             }
@@ -835,12 +814,6 @@ namespace HRealEngine
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                 {
-                    /*const wchar_t* path = (const wchar_t*)payload->Data;
-                    //std::filesystem::path fullPath = std::filesystem::path(g_AssetsDirectory) / path;
-                    std::filesystem::path fullPath(path);
-                    Ref<Texture2D> texture = Texture2D::Create(fullPath.string());
-                    if (texture->IsLoaded())
-                        component.Texture = texture;*/
                     AssetHandle handle = *(AssetHandle*)payload->Data;
                     if (AssetManager::GetAssetType(handle) == AssetType::Texture)
                     {
@@ -873,20 +846,15 @@ namespace HRealEngine
                 {
                     ImGui::Separator();
                     ImGui::Text("Materials");           
-
-                    /*if (component.MaterialOverrides.size() != slotCount)
-                        component.MaterialOverrides.resize(slotCount);*/
+                    
                     if (component.MaterialHandleOverrides.size() != slotCount)
                         component.MaterialHandleOverrides.resize(slotCount, 0);
 
                     for (size_t i = 0; i < slotCount; i++)
                     {
                         ImGui::PushID((int)i);          
-                        /*const std::string& defaultPath = meshGPU->MaterialPaths[i];          
-                        const std::string& overridePath = component.MaterialOverrides[i];*/
                         AssetHandle defaultHandle  = (i < meshGPU->MaterialHandles.size()) ? meshGPU->MaterialHandles[i] : 0;
                         AssetHandle overrideHandle = (i < component.MaterialHandleOverrides.size()) ? component.MaterialHandleOverrides[i] : 0;
-                        //const bool hasOverride = !overridePath.empty();
                         const bool hasOverride = overrideHandle != 0;
 
                         ImGui::Text("Slot %d", (int)i);
@@ -899,13 +867,6 @@ namespace HRealEngine
                         {
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
                             {
-                                /*const wchar_t* path = (const wchar_t*)payload->Data;
-                                std::filesystem::path dropped = path;           
-                                if (dropped.extension() == ".hmat")
-                                {
-                                    component.MaterialOverrides[i] = dropped.generic_string();
-                                    LOG_CORE_INFO("Material override set: slot={} -> {}", i, component.MaterialOverrides[i]);
-                                }*/
                                 AssetHandle h = *(AssetHandle*)payload->Data;
                                 if (AssetManager::GetAssetType(h) == AssetType::Material)
                                 {
@@ -913,9 +874,6 @@ namespace HRealEngine
                                         component.MaterialHandleOverrides.resize(slotCount, 0);
                                 
                                     component.MaterialHandleOverrides[i] = h;
-                                
-                                    /*const auto& md = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(h);
-                                    component.MaterialOverrides[i] = md.FilePath.generic_string();*/
                                 }
                                 else
                                 {
@@ -928,20 +886,237 @@ namespace HRealEngine
                         ImGui::SameLine();
                         if (ImGui::SmallButton("Clear"))
                         {
-                            /*component.MaterialHandleOverrides[i] = 0;
-                            component.MaterialOverrides[i].clear();
-                            //component.MaterialOverrides[i].clear();*/
                             component.MaterialHandleOverrides[i] = 0;
 
                         }
+                        
+                        AssetHandle activeMatHandle = (overrideHandle != 0) ? overrideHandle : defaultHandle;
 
-                        /*ImGui::TextDisabled("Default: %s", defaultPath.empty() ? "(empty)" : defaultPath.c_str());
+                        if (activeMatHandle != 0 && AssetManager::IsAssetHandleValid(activeMatHandle))
+                        {
+                            Ref<HMaterial> mat = AssetManager::GetAsset<HMaterial>(activeMatHandle);
+                            if (mat)
+                            {
+                                if (ImGui::TreeNodeEx("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
+                                {
+                                    ImGui::ColorEdit4("Base Color", glm::value_ptr(mat->Color));
+                                    ImGui::SliderFloat("Shininess", &mat->Shininess, 1.0f, 256.0f);
+
+                                    auto TextureDropButton = [&](const char* label, AssetHandle& texHandle)
+                                    {
+                                        ImGui::Text("%s: %llu", label, (uint64_t)texHandle);
+                                        ImGui::SameLine();
+                                        ImGui::Button(("Drop " + std::string(label)).c_str(), ImVec2(160, 0));
+
+                                        if (ImGui::BeginDragDropTarget())
+                                        {
+                                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                                            {
+                                                AssetHandle h = *(AssetHandle*)payload->Data;
+                                                if (AssetManager::GetAssetType(h) == AssetType::Texture)
+                                                {
+                                                    texHandle = h;
+                                                    
+                                                    if (std::string(label) == "Albedo")
+                                                        mat->AlbedoTextureCache = nullptr;
+                                                    if (std::string(label) == "Specular")
+                                                        mat->SpecularTextureCache = nullptr;
+                                                    if (std::string(label) == "Normal")
+                                                        mat->NormalTextureCache = nullptr;
+                                                       
+                                                } 
+                                                else
+                                                {
+                                                    LOG_CORE_WARN("Dropped asset is not a texture.");
+                                                }
+                                            }
+                                            ImGui::EndDragDropTarget();
+                                        }
+
+                                        ImGui::SameLine();
+                                        if (ImGui::SmallButton(("Clear##" + std::string(label)).c_str()))
+                                        {
+                                            texHandle = 0;
+                                            if (std::string(label) == "Albedo")
+                                                mat->AlbedoTextureCache = nullptr;
+                                            if (std::string(label) == "Specular")
+                                                mat->SpecularTextureCache = nullptr;
+                                            if (std::string(label) == "Normal")
+                                                mat->NormalTextureCache = nullptr;
+                                        }
+                                    };
+
+                                    TextureDropButton("Albedo",   mat->AlbedoTextureHandle);
+                                    TextureDropButton("Specular", mat->SpecularTextureHandle);
+                                    TextureDropButton("Normal",   mat->NormalTextureHandle);
+
+                                    ImGui::TreePop();
+                                }
+                            }
+                        }
+
+                        auto GetLabel = [](AssetHandle h) -> std::string
+                        {
+                            if (h == 0)
+                                return "(none)";
+                            if (!AssetManager::IsAssetHandleValid(h))
+                                return "(invalid)";
+                            auto& md = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(h);
+                            return md.FilePath.filename().string();
+                        };
+                        
+                        std::string defaultLabel  = GetLabel(defaultHandle);
+                        std::string overrideLabel = GetLabel(overrideHandle);
+                        
+                        ImGui::TextDisabled("Default: %s", defaultLabel.c_str());
                         if (hasOverride)
-                            ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Using Override: %s", overridePath.c_str());
+                            ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Using Override: %s", overrideLabel.c_str());
                         else
-                            ImGui::TextDisabled("Using Default");           
+                            ImGui::TextDisabled("Using Default");
                         ImGui::Separator();
-                        ImGui::PopID();*/
+                        ImGui::PopID();
+                    }
+                }
+                else
+                    ImGui::TextDisabled("No material slots found in this mesh.");
+            }
+            else
+                ImGui::TextDisabled("Assign a .hmesh to see material slots.");
+        });
+        DrawComponent<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", entity, [](auto& component)
+        {
+            ImGui::Text("Skeleton");
+            ImGui::Button("Drop .hskeleton here", ImVec2(200, 0));
+
+            ImGui::Separator();
+            
+            ImGui::Text("Mesh");
+            ImGui::Button("Drop .hmesh here", ImVec2(200, 0));
+        
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Mesh)
+                    {
+                        component.Mesh = handle;
+                        auto shader = Shader::Create("assets/shaders/StaticMesh.glsl");
+                        auto& metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(handle);
+                        std::filesystem::path droppedPath = metaData.FilePath;
+                        component.MeshAssetPath = droppedPath;
+                        
+                        auto meshGPU = MeshLoader::GetOrLoad(droppedPath, "assets", shader);
+                        if (meshGPU)
+                        {
+                            const size_t slotCount = meshGPU->MaterialHandles.size();
+                            component.MaterialHandleOverrides.clear();
+                            component.MaterialHandleOverrides.resize(slotCount);
+                            LOG_CORE_INFO("Mesh material slots: {}", slotCount);
+                            for (size_t i = 0; i < slotCount; i++)
+                                component.MaterialHandleOverrides[i] = meshGPU->MaterialHandles[i];
+
+                            auto meshGPUAsset = AssetManager::GetAsset<MeshGPU>(handle);
+                            if (meshGPUAsset)
+                            {
+                                meshGPUAsset->Shader = shader;
+                                meshGPUAsset->VAO = meshGPU->VAO;
+                                meshGPUAsset->IndexCount = meshGPU->IndexCount;
+                                meshGPUAsset->MaterialHandles = meshGPU->MaterialHandles;
+                                meshGPUAsset->Submeshes = meshGPU->Submeshes;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a mesh.");
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+            
+            ImGui::Button("Texture");
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Texture)
+                    {
+                        component.Texture = handle;
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a texture.");
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            if (component.Texture)
+            {
+                ImGui::SameLine();
+                ImGui::Text("Loaded");
+            }
+            ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+
+            if (component.Mesh)
+            {
+                auto meshGPU = AssetManager::GetAsset<MeshGPU>(component.Mesh);
+                if (!meshGPU)
+                {
+                    LOG_CORE_WARN("MeshRendererComponent: Mesh asset is invalid.");
+                    return;
+                }
+                const size_t slotCount = meshGPU->MaterialHandles.size();
+                if (slotCount > 0)
+                {
+                    ImGui::Separator();
+                    ImGui::Text("Materials");           
+                    
+                    if (component.MaterialHandleOverrides.size() != slotCount)
+                        component.MaterialHandleOverrides.resize(slotCount, 0);
+
+                    for (size_t i = 0; i < slotCount; i++)
+                    {
+                        ImGui::PushID((int)i);          
+                        AssetHandle defaultHandle  = (i < meshGPU->MaterialHandles.size()) ? meshGPU->MaterialHandles[i] : 0;
+                        AssetHandle overrideHandle = (i < component.MaterialHandleOverrides.size()) ? component.MaterialHandleOverrides[i] : 0;
+                        const bool hasOverride = overrideHandle != 0;
+
+                        ImGui::Text("Slot %d", (int)i);
+                        ImGui::SameLine();          
+
+                        std::string buttonLabel = hasOverride ? "Override (.hmat)" : "Drop .hmat";
+                        ImGui::Button(buttonLabel.c_str(), ImVec2(200, 0));         
+
+                        if (ImGui::BeginDragDropTarget())
+                        {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                            {
+                                AssetHandle h = *(AssetHandle*)payload->Data;
+                                if (AssetManager::GetAssetType(h) == AssetType::Material)
+                                {
+                                    if (component.MaterialHandleOverrides.size() != slotCount)
+                                        component.MaterialHandleOverrides.resize(slotCount, 0);
+                                
+                                    component.MaterialHandleOverrides[i] = h;
+                                }
+                                else
+                                {
+                                    LOG_CORE_WARN("Dropped asset is not a material.");
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
+                        }           
+
+                        ImGui::SameLine();
+                        if (ImGui::SmallButton("Clear"))
+                        {
+                            component.MaterialHandleOverrides[i] = 0;
+
+                        }
+                        
                         AssetHandle activeMatHandle = (overrideHandle != 0) ? overrideHandle : defaultHandle;
 
                         if (activeMatHandle != 0 && AssetManager::IsAssetHandleValid(activeMatHandle))

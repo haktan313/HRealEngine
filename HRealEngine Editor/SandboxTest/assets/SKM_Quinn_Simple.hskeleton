@@ -1,0 +1,5 @@
+Type: Skeleton
+Source: Imported/SKM_Quinn_Simple/Source/SKM_Quinn_Simple.FBX
+Cooked: cache/SKM_Quinn_Simple.hskeletonbin
+BoneCount: 70
+RootBone: pelvis

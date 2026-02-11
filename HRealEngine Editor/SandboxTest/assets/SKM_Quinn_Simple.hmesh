@@ -1,0 +1,14 @@
+Type: StaticMesh
+Source: Imported/SKM_Quinn_Simple/Source/SKM_Quinn_Simple.FBX
+Cooked: cache/SKM_Quinn_Simple.hmeshbin
+BoundsMin: [-51.9372, -25.4515, -0.031184]
+BoundsMax: [51.9372, 11.193, 180.284]
+Import:
+  Triangulate: true
+  GenSmoothNormals: true
+  CalcTangents: true
+  FlipUVs: false
+  Scale: 1.0
+MaterialHandles:
+  - 13888261421355053897
+  - 4695004667395968772

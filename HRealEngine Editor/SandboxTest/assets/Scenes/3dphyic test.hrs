@@ -90,3 +90,18 @@ Entities:
     BoxCollider3DComponent:
       Offset: [0, 0, 0]
       Size: [0.5, 0.5, 0.5]
+  - Entity: 15242012555503263854
+    TagComponent:
+      Tag: SkeletonCharacter
+    TransformComponent:
+      Position: [0, 1.6030658, 0]
+      Rotation: [4.712389, 0, 0]
+      Scale: [0.05, 0.05, 0.05]
+    SkeletalMeshRendererComponent:
+      MeshHandle: 9392886156800445406
+      SkeletonHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      MaterialHandleOverrides:
+        - 13888261421355053897
+        - 4695004667395968772

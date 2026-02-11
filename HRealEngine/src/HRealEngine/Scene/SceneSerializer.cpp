@@ -241,6 +241,37 @@ namespace HRealEngine
             
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<SkeletalMeshRendererComponent>())
+        {
+            auto& skMesh = entity.GetComponent<SkeletalMeshRendererComponent>();
+            out << YAML::Key << "SkeletalMeshRendererComponent";
+            out << YAML::BeginMap;
+            
+            /*if (skMesh.MeshAssetPath.empty() == false)
+                out << YAML::Key << "MeshPath" << YAML::Value << skMesh.MeshAssetPath.string();*/
+            out << YAML::Key << "MeshHandle" << YAML::Value << skMesh.Mesh;
+            out << YAML::Key << "SkeletonHandle" << YAML::Value << skMesh.Skeleton;
+            
+            out << YAML::Key << "Color" << YAML::Value << skMesh.Color;
+            /*if (skMesh.Texture)
+                out << YAML::Key << "TexturePath" << YAML::Value << skMesh.Texture->GetPath();*/
+            out << YAML::Key << "TextureHandle" << YAML::Value << skMesh.Texture;
+
+            out << YAML::Key << "MaterialHandleOverrides";
+            out << YAML::Value << YAML::BeginSeq;
+            for (AssetHandle h : skMesh.MaterialHandleOverrides)
+            {
+                out << h;
+                if (h == 0 || !AssetManager::IsAssetHandleValid(h))
+                    continue;
+                auto material = AssetManager::GetAsset<HMaterial>(h);
+                if (material)
+                    material->SaveToFile();
+            }
+            out << YAML::EndSeq;
+            
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<BehaviorTreeComponent>())
         {
             out << YAML::Key << "BehaviorTreeComponent";
@@ -606,6 +637,29 @@ namespace HRealEngine
                                 }
                             }
                         }
+                    }
+                }
+                if (auto skeletalMeshRendererComponent = entity["SkeletalMeshRendererComponent"])
+                {
+                    auto& skMesh = deserializedEntity.AddComponent<SkeletalMeshRendererComponent>();
+
+                    skMesh.Color = skeletalMeshRendererComponent["Color"].as<glm::vec4>();
+                
+                    if (skeletalMeshRendererComponent["TextureHandle"])
+                        skMesh.Texture = skeletalMeshRendererComponent["TextureHandle"].as<AssetHandle>();
+                    
+                    if (skeletalMeshRendererComponent["SkeletonHandle"])
+                        skMesh.Skeleton = skeletalMeshRendererComponent["SkeletonHandle"].as<AssetHandle>();
+                    
+                    if (skeletalMeshRendererComponent["MeshHandle"])
+                        skMesh.Mesh = skeletalMeshRendererComponent["MeshHandle"].as<AssetHandle>();
+
+                    skMesh.MaterialHandleOverrides.clear();
+                
+                    if (skeletalMeshRendererComponent["MaterialHandleOverrides"] && skeletalMeshRendererComponent["MaterialHandleOverrides"].IsSequence())
+                    {
+                        for (auto n : skeletalMeshRendererComponent["MaterialHandleOverrides"])
+                            skMesh.MaterialHandleOverrides.push_back(n.as<AssetHandle>());
                     }
                 }
                 if (auto btComponent = entity["BehaviorTreeComponent"])

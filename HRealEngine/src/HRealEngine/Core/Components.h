@@ -95,6 +95,10 @@ namespace HRealEngine
         AssetHandle Mesh = 0;
         std::filesystem::path MeshAssetPath;
         std::vector<AssetHandle> MaterialHandleOverrides;
+
+        AssetHandle Texture = 0;
+        glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
+        float TilingFactor = 1.0f;
         
         SkeletalMeshRendererComponent() = default;
         SkeletalMeshRendererComponent(const SkeletalMeshRendererComponent&) = default;

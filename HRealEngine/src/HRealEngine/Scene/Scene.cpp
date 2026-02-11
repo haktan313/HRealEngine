@@ -325,11 +325,21 @@ namespace HRealEngine
         
         Renderer3D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
-            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
-            for (auto entity : view)
             {
-                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                    Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                }
+            }
+            {
+                auto view = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                    Renderer3D::DrawMesh(transform.GetTransform(), skeletalMeshRenderer, (int)entity);
+                }
             }
         }
         Renderer3D::EndScene();
@@ -488,11 +498,21 @@ namespace HRealEngine
         LightningAndShadowSetup(camera.GetPosition());
         Renderer3D::BeginScene(camera);
         {
-            auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
-            for (auto entity : view)
             {
-                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                    Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                }
+            }
+            {
+                auto view = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                    Renderer3D::DrawMesh(transform.GetTransform(), skeletalMeshRenderer, (int)entity);
+                }
             }
         }
         Renderer3D::EndScene();
@@ -664,6 +684,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<SkeletalMeshRendererComponent>(Entity entity, SkeletalMeshRendererComponent& component)
     {
     }
     template<>
