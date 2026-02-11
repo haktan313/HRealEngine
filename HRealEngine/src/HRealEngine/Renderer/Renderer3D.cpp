@@ -1002,8 +1002,111 @@ namespace HRealEngine
 
         s_Data.CubeIndexCount += 36;
     }
+    void Renderer3D::DrawMeshShadow(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer)
+    {
+        if (!s_Data.ShadowValid)
+            return;
+        
+        if (meshRenderer.Mesh)
+        {
+            auto meshGPU = AssetManager::GetAsset<MeshGPU>(meshRenderer.Mesh);
+            if (!meshGPU || !meshGPU->VAO)
+                return;
+
+            s_Data.ShadowDepthShader->Bind();
+            s_Data.ShadowDepthShader->SetMat4("u_Transform", transform);
+
+            if (!meshGPU->Submeshes.empty())
+                for (const auto& sm : meshGPU->Submeshes)
+                {
+                    if (sm.IndexCount == 0)
+                        continue;
+                    RenderCommand::DrawIndexed(meshGPU->VAO, sm.IndexCount, sm.IndexOffset);
+                }
+            else
+                RenderCommand::DrawIndexed(meshGPU->VAO, meshGPU->IndexCount);
+            return;
+        }
+        
+        /*if (s_Data.CubeIndexCount >= s_Data.MaxIndices)*/if (s_Data.TextureSlotIndex >= s_Data.MaxTextureSlots)
+        {
+            Flush();
+            StartBatch();
+        }
+        
+        float textureIndex = 0.0f;
+        
+        for (size_t i = 0; i < 24; i++)
+        {
+            glm::vec4 worldPos4 = transform * s_Data.VertexPos[i];
+            
+            s_Data.CubeVertexBufferPtr->Position = glm::vec3(worldPos4);
+            
+            glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(transform)));
+            s_Data.CubeVertexBufferPtr->Normal = glm::normalize(normalMat * s_Data.VertexNormal[i]);
+
+            s_Data.CubeVertexBufferPtr->Color = meshRenderer.Color;
+            s_Data.CubeVertexBufferPtr->TexCoord = s_Data.VertexUV[i];
+            s_Data.CubeVertexBufferPtr->TexIndex = textureIndex;
+            s_Data.CubeVertexBufferPtr->TilingFactor = meshRenderer.TilingFactor;
+            s_Data.CubeVertexBufferPtr->EntityID = -1;
+
+            s_Data.CubeVertexBufferPtr++;
+        }
+
+        s_Data.CubeIndexCount += 36;
+    }
     
     void Renderer3D::DrawMeshPointShadow(const glm::mat4& transform, MeshRendererComponent& meshRenderer)
+    {
+        if (!s_Data.PointShadowValid)
+            return;
+
+        s_Data.PointShadowDepthShader->Bind();
+        s_Data.PointShadowDepthShader->SetMat4("u_Model", transform); 
+        
+        if (meshRenderer.Mesh)
+        {
+            auto meshGPU = AssetManager::GetAsset<MeshGPU>(meshRenderer.Mesh);
+            if (!meshGPU || !meshGPU->VAO)
+                return;
+
+            if (!meshGPU->Submeshes.empty())
+            {
+                for (const auto& sm : meshGPU->Submeshes)
+                {
+                    if (sm.IndexCount == 0) continue;
+                    RenderCommand::DrawIndexed(meshGPU->VAO, sm.IndexCount, sm.IndexOffset);
+                }
+            }
+            else
+            {
+                RenderCommand::DrawIndexed(meshGPU->VAO, meshGPU->IndexCount);
+            }
+            return; 
+        }
+        
+        CubeVertex* ptr = s_Data.CubeVertexBufferBase;
+        for (size_t i = 0; i < 24; i++)
+        {
+            glm::vec4 wp = transform * s_Data.VertexPos[i];
+            ptr->Position = glm::vec3(wp);
+
+            ptr->Normal = glm::vec3(0.0f); 
+            ptr->Color = glm::vec4(0.0f);
+            ptr->TexCoord = glm::vec2(0.0f);
+            ptr->TexIndex = 0.0f;
+            ptr->TilingFactor = 1.0f;
+            ptr->EntityID = -1;
+
+            ptr++;
+        }
+
+        s_Data.CubeVertexBuffer->SetData(s_Data.CubeVertexBufferBase, 24 * sizeof(CubeVertex));
+
+        RenderCommand::DrawIndexed(s_Data.CubeVertexArray, 36);
+    }
+    void Renderer3D::DrawMeshPointShadow(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer)
     {
         if (!s_Data.PointShadowValid)
             return;

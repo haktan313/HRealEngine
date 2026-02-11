@@ -45,9 +45,10 @@ namespace HRealEngine
         static void BeginShadowPass(const glm::vec3& lightDirection, const glm::vec3& focusPosition);
         static void EndShadowPass();
         static void DrawMeshShadow(const glm::mat4& transform, MeshRendererComponent& meshRenderer);
+        static void DrawMeshShadow(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer);
         
-        // Renderer3D.h
         static void DrawMeshPointShadow(const glm::mat4& transform, MeshRendererComponent& meshRenderer);
+        static void DrawMeshPointShadow(const glm::mat4& transform, SkeletalMeshRendererComponent& meshRenderer);
         static void BeginPointShadowAtlas();
         static void BeginPointShadowCaster(uint32_t casterIndex, int lightIndex, const glm::vec3& lightPosition, float farPlane);
 

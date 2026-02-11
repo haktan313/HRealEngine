@@ -803,6 +803,17 @@ namespace HRealEngine
                 }
                 else
                     Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+
+                if (selectedEntity.HasComponent<SkeletalMeshRendererComponent>())
+                {
+                    auto& meshComp = selectedEntity.GetComponent<SkeletalMeshRendererComponent>();
+                    auto meshAsset = AssetManager::GetAsset<MeshGPU>(meshComp.Mesh);
+
+                    if (meshAsset)
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(), meshAsset->BoundsMin, meshAsset->BoundsMax, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                    else
+                        Renderer3D::DrawSelectionBounds(tc.GetTransform(), glm::vec3(-0.5f), glm::vec3(0.5f), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+                }
             }
         }
         Renderer2D::EndScene();

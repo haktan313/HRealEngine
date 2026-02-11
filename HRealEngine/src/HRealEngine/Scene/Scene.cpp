@@ -97,6 +97,7 @@ namespace HRealEngine
         CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<MeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<SkeletalMeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BehaviorTreeComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
@@ -339,15 +340,6 @@ namespace HRealEngine
                 {
                     auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
                     Renderer3D::DrawMesh(transform.GetTransform(), skeletalMeshRenderer, (int)entity);
-                    
-                    if (skeletalMeshRenderer.ShowSkeletonDebug && skeletalMeshRenderer.Skeleton)
-                    {
-                        Ref<Skeleton> skel = AssetManager::GetAsset<Skeleton>(skeletalMeshRenderer.Skeleton);
-                        if (skel)
-                        {
-                            Renderer3D::DrawSkeletonDebug(skel, transform.GetTransform(), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-                        }
-                    }
                 }
             }
         }
@@ -355,12 +347,31 @@ namespace HRealEngine
         
         Renderer2D::BeginScene(mainCamera->GetProjectionMatrix(), cameraTransform);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-            RecalculateRenderListSprite();
-            for (auto entity : m_RenderList)
             {
-                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                auto view = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                    
+                    if (skeletalMeshRenderer.ShowSkeletonDebug && skeletalMeshRenderer.Skeleton)
+                    {
+                        Ref<Skeleton> skel = AssetManager::GetAsset<Skeleton>(skeletalMeshRenderer.Skeleton);
+                        if (skel)
+                        {
+                            Renderer3D::DrawSkeletonDebug(skel, transform.GetTransform(), 
+                                glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+                        }
+                    }
+                }
+            }
+            {
+                auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+                RecalculateRenderListSprite();
+                for (auto entity : m_RenderList)
+                {
+                    auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                    Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                }
             }
         }
         {
@@ -620,11 +631,21 @@ namespace HRealEngine
         if (doDirShadows/*doShadows*/)
         {
             Renderer3D::BeginShadowPass(/*shadowDir*/dirShadowDir, cameraPosition);
-            auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
-            for (auto entity : viewShadow)
             {
-                auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMeshShadow(transform.GetTransform(), meshRenderer);
+                auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
+                for (auto entity : viewShadow)
+                {
+                    auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
+                    Renderer3D::DrawMeshShadow(transform.GetTransform(), meshRenderer);
+                }
+            }
+            {
+                auto viewShadow = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+                for (auto entity : viewShadow)
+                {
+                    auto [transform, skeletalMeshRenderer] = viewShadow.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                    Renderer3D::DrawMeshShadow(transform.GetTransform(), skeletalMeshRenderer);
+                }   
             }
             Renderer3D::EndShadowPass();
         }
@@ -633,21 +654,41 @@ namespace HRealEngine
         {
             Renderer3D::BeginPointShadowAtlas();
 
-            auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
-
-            for (uint32_t casterIndex = 0; casterIndex < pointShadowCasters.size() && casterIndex < 8; casterIndex++)
             {
-                auto [lightIndex, pos, farPlane] = pointShadowCasters[casterIndex];
+                auto viewShadow = m_Registry.view<TransformComponent, MeshRendererComponent>();
 
-                Renderer3D::BeginPointShadowCaster(casterIndex, lightIndex, pos, farPlane);
-
-                for (auto entity : viewShadow)
+                for (uint32_t casterIndex = 0; casterIndex < pointShadowCasters.size() && casterIndex < 8; casterIndex++)
                 {
-                    auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
-                    Renderer3D::DrawMeshPointShadow(transform.GetTransform(), meshRenderer);
-                }
+                    auto [lightIndex, pos, farPlane] = pointShadowCasters[casterIndex];
 
-                Renderer3D::EndPointShadowCaster();
+                    Renderer3D::BeginPointShadowCaster(casterIndex, lightIndex, pos, farPlane);
+
+                    for (auto entity : viewShadow)
+                    {
+                        auto [transform, meshRenderer] = viewShadow.get<TransformComponent, MeshRendererComponent>(entity);
+                        Renderer3D::DrawMeshPointShadow(transform.GetTransform(), meshRenderer);
+                    }
+
+                    Renderer3D::EndPointShadowCaster();
+                }
+            }
+            {
+                auto viewShadow = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+
+                for (uint32_t casterIndex = 0; casterIndex < pointShadowCasters.size() && casterIndex < 8; casterIndex++)
+                {
+                    auto [lightIndex, pos, farPlane] = pointShadowCasters[casterIndex];
+
+                    Renderer3D::BeginPointShadowCaster(casterIndex, lightIndex, pos, farPlane);
+
+                    for (auto entity : viewShadow)
+                    {
+                        auto [transform, skeletalMeshRenderer] = viewShadow.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                        Renderer3D::DrawMeshPointShadow(transform.GetTransform(), skeletalMeshRenderer);
+                    }
+
+                    Renderer3D::EndPointShadowCaster();
+                }
             }
 
             Renderer3D::EndPointShadowAtlas();
