@@ -988,6 +988,42 @@ namespace HRealEngine
             ImGui::Text("Skeleton");
             ImGui::Button("Drop .hskeleton here", ImVec2(200, 0));
 
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+                {
+                    AssetHandle handle = *(AssetHandle*)payload->Data;
+                    if (AssetManager::GetAssetType(handle) == AssetType::Skeleton)
+                    {
+                        component.Skeleton = handle;
+                    }
+                    else
+                    {
+                        LOG_CORE_WARN("Dropped asset is not a skeleton.");
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            if (component.Skeleton)
+            {
+                ImGui::Checkbox("Show Skeleton Debug", &component.ShowSkeletonDebug);
+        
+                if (ImGui::TreeNode("Skeleton Bones"))
+                {
+                    auto skel = AssetManager::GetAsset<Skeleton>(component.Skeleton);
+                    if (skel)
+                    {
+                        for (size_t i = 0; i < skel->Bones.size(); ++i)
+                        {
+                            const Bone& bone = skel->Bones[i];
+                            ImGui::Text("[%d] %s (Parent: %d)", (int)i, bone.Name.c_str(), bone.ParentIndex);
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+            }
+
             ImGui::Separator();
             
             ImGui::Text("Mesh");

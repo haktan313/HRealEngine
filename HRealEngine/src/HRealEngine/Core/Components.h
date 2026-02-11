@@ -99,6 +99,7 @@ namespace HRealEngine
         AssetHandle Texture = 0;
         glm::vec4 Color {1.0f, 1.0f, 1.0f, 1.0f};
         float TilingFactor = 1.0f;
+        bool ShowSkeletonDebug = true;
         
         SkeletalMeshRendererComponent() = default;
         SkeletalMeshRendererComponent(const SkeletalMeshRendererComponent&) = default;

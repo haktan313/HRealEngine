@@ -1,0 +1,45 @@
+Scene: Untitled
+Entities:
+  - Entity: 13232510857691529022
+    TagComponent:
+      Tag: player
+    TransformComponent:
+      Position: [0, 1.06369, -1.6838776e-07]
+      Rotation: [-1.5707964, 0, 0]
+      Scale: [0.05, 0.04999983, 0.04999983]
+    SkeletalMeshRendererComponent:
+      MeshHandle: 9392886156800445406
+      SkeletonHandle: 13217237012644540067
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      MaterialHandleOverrides:
+        - 13888261421355053897
+        - 4695004667395968772
+  - Entity: 14705521409848809500
+    TagComponent:
+      Tag: ground
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [18.462149, 1, 24.774855]
+    MeshRendererComponent:
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 10200236731944327064
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [0, 10.605629, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 1.6
+      Radius: 26
+      CastShadows: true

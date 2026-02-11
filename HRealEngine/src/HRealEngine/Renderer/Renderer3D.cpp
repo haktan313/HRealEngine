@@ -841,6 +841,57 @@ namespace HRealEngine
         // s_Data.Stats.CubeCount++;
     }
 
+    void Renderer3D::DrawSkeletonDebug(const Ref<Skeleton>& skeleton, const glm::mat4& rootTransform, const glm::vec4& boneColor)
+    {
+        if (!skeleton || skeleton->Bones.empty())
+            return;
+
+        std::vector<glm::mat4> boneWorldMatrices(skeleton->Bones.size());
+        
+        for (size_t i = 0; i < skeleton->Bones.size(); ++i)
+        {
+            const Bone& bone = skeleton->Bones[i];
+            
+            glm::mat4 localTransform = glm::translate(glm::mat4(1.0f), bone.LocalT);
+            localTransform *= glm::toMat4(bone.LocalR);
+            localTransform *= glm::scale(glm::mat4(1.0f), bone.LocalS);
+            
+            if (bone.ParentIndex >= 0)
+                boneWorldMatrices[i] = boneWorldMatrices[bone.ParentIndex] * localTransform;
+            else
+                boneWorldMatrices[i] = rootTransform * localTransform;
+        }
+
+        for (size_t i = 0; i < skeleton->Bones.size(); ++i)
+        {
+            const Bone& bone = skeleton->Bones[i];
+            
+            if (bone.ParentIndex >= 0)
+            {
+                glm::vec3 childPos = glm::vec3(boneWorldMatrices[i][3]);
+                glm::vec3 parentPos = glm::vec3(boneWorldMatrices[bone.ParentIndex][3]);
+                
+                Renderer2D::DrawLine(parentPos, childPos, boneColor);
+            }
+        }
+
+        for (size_t i = 0; i < skeleton->Bones.size(); ++i)
+        {
+            const Bone& bone = skeleton->Bones[i];
+            glm::vec3 bonePos = glm::vec3(boneWorldMatrices[i][3]);
+            
+            float jointSize = (bone.ParentIndex < 0) ? 0.03f : 0.015f;
+            glm::vec4 jointColor = (bone.ParentIndex < 0) 
+                ? glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)
+                : glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);
+            
+            glm::mat4 jointTransform = glm::translate(glm::mat4(1.0f), bonePos);
+            jointTransform = glm::scale(jointTransform, glm::vec3(jointSize));
+            
+            Renderer2D::DrawCircle(jointTransform, jointColor, 1.0f, 0.005f, -1);
+        }
+    }
+
     void Renderer3D::BeginShadowPass(const glm::vec3& lightDirection, const glm::vec3& focusPosition)
     {
         CreateShadowResources();

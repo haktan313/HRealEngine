@@ -339,6 +339,15 @@ namespace HRealEngine
                 {
                     auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
                     Renderer3D::DrawMesh(transform.GetTransform(), skeletalMeshRenderer, (int)entity);
+                    
+                    if (skeletalMeshRenderer.ShowSkeletonDebug && skeletalMeshRenderer.Skeleton)
+                    {
+                        Ref<Skeleton> skel = AssetManager::GetAsset<Skeleton>(skeletalMeshRenderer.Skeleton);
+                        if (skel)
+                        {
+                            Renderer3D::DrawSkeletonDebug(skel, transform.GetTransform(), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+                        }
+                    }
                 }
             }
         }
@@ -496,6 +505,7 @@ namespace HRealEngine
     void Scene::RenderScene(EditorCamera& camera)
     {
         LightningAndShadowSetup(camera.GetPosition());
+
         Renderer3D::BeginScene(camera);
         {
             {
@@ -519,21 +529,39 @@ namespace HRealEngine
         
         Renderer2D::BeginScene(camera);
         {
-            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-            RecalculateRenderListSprite();
-            for (auto entity : m_RenderList)
             {
-                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                //Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-                Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                auto view = m_Registry.view<TransformComponent, SkeletalMeshRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, skeletalMeshRenderer] = view.get<TransformComponent, SkeletalMeshRendererComponent>(entity);
+                    
+                    if (skeletalMeshRenderer.ShowSkeletonDebug && skeletalMeshRenderer.Skeleton)
+                    {
+                        Ref<Skeleton> skel = AssetManager::GetAsset<Skeleton>(skeletalMeshRenderer.Skeleton);
+                        if (skel)
+                        {
+                            Renderer3D::DrawSkeletonDebug(skel, transform.GetTransform(), 
+                                glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+                        }
+                    }
+                }
             }
-        }
-        {
-            auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-            for (auto entity : view)
             {
-                auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
-                Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+                auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+                RecalculateRenderListSprite();
+                for (auto entity : m_RenderList)
+                {
+                    auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                    Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+                }
+            }
+            {
+                auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+                for (auto entity : view)
+                {
+                    auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+                    Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+                }
             }
         }
         Renderer2D::EndScene();
