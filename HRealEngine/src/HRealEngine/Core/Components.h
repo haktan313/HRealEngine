@@ -172,6 +172,8 @@ namespace HRealEngine
 
         void* RuntimeBody = nullptr;
 
+        bool bIsTrigger = false;
+
         BoxCollider3DComponent() = default;
         BoxCollider3DComponent(const BoxCollider3DComponent&) = default;
     };

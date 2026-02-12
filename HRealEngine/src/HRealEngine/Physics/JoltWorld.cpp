@@ -101,6 +101,8 @@ namespace HRealEngine
                 bodySettings.mAllowSleeping = bAllowSleep; 
                 JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
                 body->SetUserData(entity.GetUUID());
+                if (boxCollider.bIsTrigger)
+                    body->SetIsSensor(true);
                 auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
                 body_interface->AddBody(body->GetID(), activation);
 
@@ -416,7 +418,7 @@ namespace HRealEngine
 
     void JoltWorld::UpdateRuntime3D()
     {
-        if (!m_CollisionBeginEvents.empty())
+        /*if (!m_CollisionBeginEvents.empty())
         {
             for (const auto& collisionEvent : m_CollisionBeginEvents)
             {
@@ -477,6 +479,65 @@ namespace HRealEngine
                 }
             }
             m_CollisionEndEvents.clear();
+        }*/
+        std::vector<CollisionEvent> beginEvents, endEvents;
+        {
+            std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+            beginEvents = std::move(m_CollisionBeginEvents);
+            endEvents = std::move(m_CollisionEndEvents);
+        
+            m_CollisionBeginEvents.clear();
+            m_CollisionEndEvents.clear();
+        }
+        
+        for (const auto& ev : beginEvents)
+        {
+            Entity a = m_Scene->GetEntityByUUID(ev.EntityA);
+            Entity b = m_Scene->GetEntityByUUID(ev.EntityB);
+
+            if (a && b)
+            {
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(a))
+                    ScriptEngine::OnCollisionBegin(a, b);
+            
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(b))
+                    ScriptEngine::OnCollisionBegin(b, a);
+                
+                if (a.HasComponent<NativeScriptComponent>())
+                {
+                    auto& nsc = a.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(b);
+                }
+                if (b.HasComponent<NativeScriptComponent>())
+                    {
+                    auto& nsc = b.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(a);
+                }
+            }
+        }
+        for (const auto& ev : endEvents)
+        {
+            Entity a = m_Scene->GetEntityByUUID(ev.EntityA);
+            Entity b = m_Scene->GetEntityByUUID(ev.EntityB);
+            if (a && b)
+            {
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(a))
+                    ScriptEngine::OnCollisionEnd(a, b);
+            
+                if (m_Scene->GetRegistry().any_of<ScriptComponent>(b))
+                    ScriptEngine::OnCollisionEnd(b, a);
+
+                if (a.HasComponent<NativeScriptComponent>())
+                    {
+                    auto& nsc = a.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(b);
+                }
+                if (b.HasComponent<NativeScriptComponent>())
+                    {
+                    auto& nsc = b.GetComponent<NativeScriptComponent>();
+                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(a);
+                }
+            }
         }
     }
 }

@@ -1126,6 +1126,7 @@ namespace HRealEngine
         {
             ImGui::DragFloat3("Offset", glm::value_ptr(component.Offset));
             ImGui::DragFloat3("Size", glm::value_ptr(component.Size));
+            ImGui::Checkbox("Is Trigger", &component.bIsTrigger);
         });
         DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
         {

@@ -364,6 +364,7 @@ namespace HRealEngine
             auto& bc3d = entity.GetComponent<BoxCollider3DComponent>();
             out << YAML::Key << "Offset" << YAML::Value << bc3d.Offset;
             out << YAML::Key << "Size" << YAML::Value << bc3d.Size;
+            out << YAML::Key << "IsTrigger" << YAML::Value << bc3d.bIsTrigger;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<BoxCollider2DComponent>())
@@ -642,6 +643,7 @@ namespace HRealEngine
                     auto& bc3d = deserializedEntity.AddComponent<BoxCollider3DComponent>();
                     bc3d.Offset = boxCollider3DComponent["Offset"].as<glm::vec3>();
                     bc3d.Size = boxCollider3DComponent["Size"].as<glm::vec3>();
+                    bc3d.bIsTrigger = boxCollider3DComponent["IsTrigger"].as<bool>();
                 }
                 if (auto boxCollider2DComponent = entity["BoxCollider2DComponent"])
                 {
