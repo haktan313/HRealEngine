@@ -19,6 +19,18 @@ namespace HRealEngine
                 InternalCalls.TransformComponent_SetTranslation(entity.EntityID, ref value);
             }
         }
+        public Vector3 Rotation
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetRotation(entity.EntityID, out Vector3 r); 
+                return r;
+            }
+            set
+            {
+                InternalCalls.TransformComponent_SetRotation(entity.EntityID, ref value);
+            }
+        }
     }
     public class Rigidbody2DComponent : Component
     {

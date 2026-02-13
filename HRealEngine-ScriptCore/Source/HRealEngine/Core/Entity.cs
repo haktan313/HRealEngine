@@ -23,6 +23,18 @@ namespace HRealEngine
                 InternalCalls.TransformComponent_SetTranslation(EntityID, ref value);
             }
         }
+        public Vector3 Rotation
+        {
+            get
+            {
+                InternalCalls.TransformComponent_GetRotation(EntityID, out Vector3 r); 
+                return r;
+            }
+            set
+            {
+                InternalCalls.TransformComponent_SetRotation(EntityID, ref value);
+            }
+        }
         
         public bool HasComponent<T>() where T : Component, new()
         {
@@ -53,6 +65,11 @@ namespace HRealEngine
         public void Destroy(ulong entityID)
         {
             InternalCalls.DestroyEntity(entityID);
+        }
+        
+        public void OpenScene(string scenePath)
+        {
+            InternalCalls.OpenScene(scenePath);
         }
     }
 }

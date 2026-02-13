@@ -83,6 +83,14 @@ namespace HRealEngine
         return entity.GetUUID();
     }
 
+    static void OpenScene(MonoString* scenePath)
+    {
+        char* pathCStr = mono_string_to_utf8(scenePath);
+        std::string pathStr(pathCStr);
+        mono_free(pathCStr);
+        ScriptEngine::OpenScene(pathStr);
+    }
+
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -95,6 +103,20 @@ namespace HRealEngine
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
         entity.GetComponent<TransformComponent>().Position = *position;
+    }
+
+    static void TransformComponent_GetRotation(UUID entityID, glm::vec3* outRotation)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->GetEntityByUUID(entityID);
+        *outRotation = entity.GetComponent<TransformComponent>().Rotation;
+    }
+
+    static void TransformComponent_SetRotation(UUID entityID, glm::vec3* rotation)
+    {
+        Scene* scene = ScriptEngine::GetSceneContext();
+        Entity entity = scene->GetEntityByUUID(entityID);
+        entity.GetComponent<TransformComponent>().Rotation = *rotation;
     }
 
     static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
@@ -170,9 +192,12 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(GetScriptInstance);
         HRE_ADD_INTERNAL_CALL(DestroyEntity);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+        HRE_ADD_INTERNAL_CALL(OpenScene);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+        HRE_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
+        HRE_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
         HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyLinearImpulseToCenter);

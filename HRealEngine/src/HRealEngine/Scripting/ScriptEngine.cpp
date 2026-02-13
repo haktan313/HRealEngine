@@ -426,6 +426,19 @@ namespace HRealEngine
             instanceB->InvokeOnCollisionExit2D(idA);
     }
 
+    void ScriptEngine::OpenScene(const std::string& path)
+    {
+        LOG_CORE_INFO("Opening scene {0} from script", path);
+        auto editorAssetManager = Project::GetActive()->GetEditorAssetManager();
+        AssetHandle sceneHandle = editorAssetManager->GetHandleFromPath(path);
+        LOG_CORE_INFO("Got scene handle {0} from path {1}", static_cast<uint64_t>(sceneHandle), path);
+        if (sceneHandle)
+        {
+            SceneChangeEvent event(static_cast<uint64_t>(sceneHandle));
+            Application::Get().OnEvent(event);
+        }
+    }
+
     Scene* ScriptEngine::GetSceneContext()
     {
         return s_Data->SceneContext;

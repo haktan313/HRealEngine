@@ -209,6 +209,7 @@ namespace HRealEngine
         static void OnUpdateEntity(Entity entity, Timestep ts);
         static void OnCollisionBegin(Entity entityA, Entity entityB);
         static void OnCollisionEnd(Entity entityA, Entity entityB);
+        static void OpenScene(const std::string& path);
 
         static Scene* GetSceneContext();
         static JPH::BodyInterface* GetBodyInterface();

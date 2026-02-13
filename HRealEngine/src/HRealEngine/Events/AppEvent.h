@@ -8,6 +8,22 @@
 
 namespace HRealEngine
 {
+	class HREALENGINE_API SceneChangeEvent : public EventBase
+	{
+	public:
+		SceneChangeEvent(uint64_t sceneHandle) : m_SceneHandle(sceneHandle) {}
+		uint64_t GetSceneHandle() const { return m_SceneHandle; }
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "SceneChangeEvent: " << m_SceneHandle;
+			return ss.str();
+		}
+		EVENT_CLASS_TYPE(SceneChange)
+		EVENT_CLASS_CATEGORY(AppRuntimeEvents)
+	private:
+		uint64_t m_SceneHandle;
+	};
 	class HREALENGINE_API WindowResizeEvent : public EventBase
 	{
 	public:

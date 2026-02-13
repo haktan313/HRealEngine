@@ -13,7 +13,8 @@ namespace HRealEngine
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved, WindowDrop,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		SceneChange
 	};
 	enum EventCategory
 	{
@@ -22,7 +23,8 @@ namespace HRealEngine
 		InputEvents = BIT(1),
 		KeyboardEvents = BIT(2),
 		MouseEvents = BIT(3),
-		MouseButtonEvents = BIT(4)
+		MouseButtonEvents = BIT(4),
+		AppRuntimeEvents = BIT(5)
 	};
 
 #define EVENT_CLASS_TYPE(type) static EventTypes GetEventStaticType() { return EventTypes::type; } \

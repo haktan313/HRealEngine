@@ -30,6 +30,8 @@ namespace HRealEngine
         bool OnKeyPressed(KeyPressedEvent& event);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& event);
         bool OnWindowDrop(WindowDropEvent& event);
+        bool OnSceneChange(SceneChangeEvent& event);
+        AssetHandle m_PendingSceneHandle = 0;
 
         void OnOverlayRender();
         

@@ -189,6 +189,29 @@ namespace HRealEngine
     {
         if (m_bShowProjectBrowser)
             return;
+        if (m_PendingSceneHandle != 0)
+        {
+            AssetHandle handle = m_PendingSceneHandle;
+            m_PendingSceneHandle = 0;
+            if (m_SceneState == SceneState::Runtime)
+            {
+                m_ActiveScene->OnRuntimeStop();
+                
+                Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);
+                if (nextSceneAsset)
+                {
+                    m_ActiveScene = Scene::Copy(nextSceneAsset);
+                    m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+                    m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
+                    m_ActiveScene->CreatePhysicsWorld();
+                    m_ActiveScene->OnRuntimeStart();
+                    LOG_CORE_INFO("Runtime scene transitioned to new instance.");
+                }
+            }
+            else
+                OpenScene(handle);
+            return;
+        }
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
             m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
@@ -641,6 +664,7 @@ namespace HRealEngine
         dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
         dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
         dispatcher.Dispatch<WindowDropEvent>(BIND_EVENT_FN(EditorLayer::OnWindowDrop));
+        dispatcher.Dispatch<SceneChangeEvent>(BIND_EVENT_FN(EditorLayer::OnSceneChange));
     }
 
     bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
@@ -724,6 +748,15 @@ namespace HRealEngine
         }
         if (!paths.empty())
             m_ContentBrowserPanel->RefreshAssetTree();
+        return true;
+    }
+
+    bool EditorLayer::OnSceneChange(SceneChangeEvent& event)
+    {
+        auto handle = event.GetSceneHandle();
+        LOG_CORE_INFO("Scene change event received. New scene handle: {0}", handle);
+        m_PendingSceneHandle = handle;
+        //OpenScene(handle);
         return true;
     }
 
@@ -963,12 +996,12 @@ namespace HRealEngine
 
         m_EditorScenePath = std::filesystem::path();
     }
-
+ 
     void EditorLayer::OpenScene()
     {
         /*std::string filePath = FileDialogs::OpenFile("HRE Scene (*.hrs)\0*.hrs\0");
         if (!filePath.empty())
-            OpenScene(filePath);*/
+            OpenScene(filePath);*/ 
     }
 
     void EditorLayer::OpenScene(AssetHandle assetHandle/*const std::filesystem::path& path*/)
@@ -1001,11 +1034,16 @@ namespace HRealEngine
         /*m_EditorScene = newScene;
         m_SceneHierarchyPanel.SetContext(m_EditorScene);
         m_ActiveScene = m_EditorScene;*/
+        if (m_SceneState == SceneState::Editor)
+        {
+            m_EditorScene = scene;
+            m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(assetHandle).FilePath;
+        }
         m_ActiveScene = scene;
-        m_EditorScene = scene;
+        //m_EditorScene = scene;
         m_SceneHierarchyPanel.SetContext(scene);
         //m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(assetHandle);
-        m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(assetHandle).FilePath;
+        //m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(assetHandle).FilePath;
     }
 
     void EditorLayer::SaveSceneAs()
