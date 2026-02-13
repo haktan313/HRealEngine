@@ -21,6 +21,7 @@
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
+#include "HRealEngine/Renderer/Font.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
@@ -63,9 +64,11 @@ namespace HRealEngine
     {
         return (idx == 1) ? GL_NEAREST : GL_LINEAR;
     }
+
+    static Ref<Font> s_Font;
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
     {
-        
+        s_Font = Font::GetDefault();
     }
 
     void EditorLayer::RegisterBehaviorTreeStufs()
@@ -535,6 +538,7 @@ namespace HRealEngine
         
         Renderer::SetDebugView(debugView);
 
+        ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512,512 }, {0, 1}, {1, 0});
         
         ImGui::End();
 

@@ -92,6 +92,7 @@ namespace HRealEngine
         }
 
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<TextComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<LightComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<ScriptComponent>(dstRegistry, srcRegistry, entityMap);
@@ -352,6 +353,19 @@ namespace HRealEngine
                 Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
             }
         }
+        {
+            auto view = m_Registry.view<TransformComponent, TextComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+        
+                if (!text.TextString.empty())
+                {
+                    LOG_CORE_TRACE("Rendering text: '{}' at pos ({}, {}, {})", text.TextString, transform.Position.x, transform.Position.y, transform.Position.z);
+                    Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+                }
+            }
+        }
         Renderer2D::EndScene();
 
         Root::RootTick();
@@ -516,6 +530,15 @@ namespace HRealEngine
                 Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
             }
         }
+
+        {
+            auto view = m_Registry.view<TransformComponent, TextComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+                Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+            }
+        }
         Renderer2D::EndScene();
     }
 
@@ -634,6 +657,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<LightComponent>(Entity entity, LightComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<TextComponent>(Entity entity, TextComponent& component)
     {
     }
     template<>

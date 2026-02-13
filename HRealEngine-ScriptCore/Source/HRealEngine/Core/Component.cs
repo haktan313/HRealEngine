@@ -50,4 +50,41 @@ namespace HRealEngine
             InternalCalls.Rigidbody3DComponent_ApplyLinearImpulseToCenter(entity.EntityID, ref impulse);
         } 
     }
+    
+    public class TextComponent : Component
+    {
+
+        public string Text
+        {
+            get => InternalCalls.TextComponent_GetText(entity.EntityID);
+            set => InternalCalls.TextComponent_SetText(entity.EntityID, value);
+        }
+
+        public Vector4 Color
+        {
+            get
+            {
+                InternalCalls.TextComponent_GetColor(entity.EntityID, out Vector4 color);
+                return color;
+            }
+
+            set
+            {
+                InternalCalls.TextComponent_SetColor(entity.EntityID, ref value);
+            }
+        }
+
+        public float Kerning
+        {
+            get => InternalCalls.TextComponent_GetKerning(entity.EntityID);
+            set => InternalCalls.TextComponent_SetKerning(entity.EntityID, value);
+        }
+
+        public float LineSpacing
+        {
+            get => InternalCalls.TextComponent_GetLineSpacing(entity.EntityID);
+            set => InternalCalls.TextComponent_SetLineSpacing(entity.EntityID, value);
+        }
+
+    }
 }

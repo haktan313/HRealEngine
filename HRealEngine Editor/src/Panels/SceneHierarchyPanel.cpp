@@ -1,8 +1,10 @@
 
 #include "SceneHierarchyPanel.h"
-#include <imgui/imgui_internal.h>
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Core/Logger.h"
@@ -229,6 +231,8 @@ namespace HRealEngine
         if (ImGui::BeginPopup("AddComponent"))
         {
             ShowAddComponentEntry<LightComponent>("Light Component");
+            ShowAddComponentEntry<TextComponent>("Text Component");
+            ShowAddComponentEntry<TransformComponent>("Transform Component");
             ShowAddComponentEntry<CameraComponent>("Camera Component");
             ShowAddComponentEntry<ScriptComponent>("Script Component");
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
@@ -270,6 +274,13 @@ namespace HRealEngine
                 ImGui::DragFloat("Radius", &component.Radius, 0.1f, 0.0f, 1000.0f);
 
             ImGui::Checkbox("Cast Shadows", &component.CastShadows);
+        });
+        DrawComponent<TextComponent>("Text Component", entity, [](auto& component)
+        {
+            ImGui::InputTextMultiline("Text String", &component.TextString);
+            ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+            ImGui::DragFloat("Kerning", &component.Kerning, 0.1f, -50.0f, 50.0f);
+            ImGui::DragFloat("Line Spacing", &component.LineSpacing, 0.1f, -50.0f, 50.0f);
         });
         DrawComponent<CameraComponent>("Camera",entity, [](auto& component)
         {

@@ -26,3 +26,6 @@
 [submodule "HRealEngine/vendor/assimp"]
     path = HRealEngine/vendor/assimp
     url = https://github.com/haktan313/assimp.git
+[submodule "HRealEngine/vendor/msdf-atlas-gen"]
+	path = HRealEngine/vendor/msdf-atlas-gen
+	url = https://github.com/TheCherno/msdf-atlas-gen.git

@@ -17,7 +17,8 @@ IncludeDir["JoltPhysics"] = "%{wks.location}/HRealEngine/vendor/JoltPhysics"
 IncludeDir["Jolt"] = "%{wks.location}/HRealEngine/vendor/JoltPhysics/Jolt"
 IncludeDir["assimp"] = "%{wks.location}/HRealEngine/vendor/assimp/include"
 IncludeDir["BehaviorTreeLibrary"] = "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src"
-
+IncludeDir["msdfgen"] = "%{wks.location}/HRealEngine/vendor/msdf-atlas-gen/msdfgen"
+IncludeDir["msdf_atlas_gen"] = "%{wks.location}/HRealEngine/vendor/msdf-atlas-gen/msdf-atlas-gen"
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/HRealEngine/vendor/mono/lib/%{cfg.buildcfg}"

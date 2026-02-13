@@ -32,6 +32,23 @@ namespace HRealEngine
         internal extern static void TransformComponent_SetRotation(ulong entityID, ref Vector3 value);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static string TextComponent_GetText(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void TextComponent_SetText(ulong entityID, string text);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void TextComponent_GetColor(ulong entityID, out Vector4 color);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void TextComponent_SetColor(ulong entityID, ref Vector4 color);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static float TextComponent_GetKerning(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void TextComponent_SetKerning(ulong entityID, float kerning);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static float TextComponent_GetLineSpacing(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void TextComponent_SetLineSpacing(ulong entityID, float lineSpacing);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Rigidbody2DComponent_ApplyLinearImpulse(ulong entityID, ref Vector2 impulse, ref Vector2 point, bool wake);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(ulong entityID, ref Vector2 impulse, bool wake);

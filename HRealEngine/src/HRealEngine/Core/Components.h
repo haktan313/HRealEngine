@@ -11,6 +11,8 @@
 #include <filesystem>
 #include <glm/gtx/quaternion.hpp>
 
+#include "HRealEngine/Renderer/Font.h"
+
 
 namespace HRealEngine
 {
@@ -52,6 +54,14 @@ namespace HRealEngine
 
         LightComponent() = default;
         LightComponent(const LightComponent&) = default;
+    };
+    struct TextComponent
+    {
+        std::string TextString;
+        Ref<Font> FontAsset = Font::GetDefault();
+        glm::vec4 Color{ 1.0f };
+        float Kerning = 0.0f;
+        float LineSpacing = 0.0f;
     };
 
     struct SpriteRendererComponent
@@ -230,6 +240,7 @@ namespace HRealEngine
         TransformComponent,
         TagComponent,
         LightComponent,
+        TextComponent,
         CameraComponent,
         SpriteRendererComponent,
         MeshRendererComponent,

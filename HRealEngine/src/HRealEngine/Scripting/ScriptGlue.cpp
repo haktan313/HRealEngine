@@ -119,6 +119,109 @@ namespace HRealEngine
         entity.GetComponent<TransformComponent>().Rotation = *rotation;
     }
 
+	static MonoString* TextComponent_GetText(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		return ScriptEngine::CreateString(tc.TextString.c_str());
+	}
+
+	std::string MonoStringToString(MonoString* string)
+    {
+    	char* cStr = mono_string_to_utf8(string);
+    	std::string str(cStr);
+    	mono_free(cStr);
+    	return str;
+    }
+	static void TextComponent_SetText(UUID entityID, MonoString* textString)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.TextString = MonoStringToString(textString);
+	}
+
+	static void TextComponent_GetColor(UUID entityID, glm::vec4* color)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		*color = tc.Color;
+	}
+
+	static void TextComponent_SetColor(UUID entityID, glm::vec4* color)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.Color = *color;
+	}
+
+	static float TextComponent_GetKerning(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		return tc.Kerning;
+	}
+
+	static void TextComponent_SetKerning(UUID entityID, float kerning)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.Kerning = kerning;
+	}
+
+	static float TextComponent_GetLineSpacing(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		return tc.LineSpacing;
+	}
+
+	static void TextComponent_SetLineSpacing(UUID entityID, float lineSpacing)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HREALENGINE_CORE_DEBUGBREAK(scene);
+		Entity entity = scene->GetEntityByUUID(entityID);
+		HREALENGINE_CORE_DEBUGBREAK(entity);
+		HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TextComponent>());
+
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.LineSpacing = lineSpacing;
+	}
+
     static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -198,6 +301,16 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
+
+        HRE_ADD_INTERNAL_CALL(TextComponent_GetText);
+        HRE_ADD_INTERNAL_CALL(TextComponent_SetText);
+        HRE_ADD_INTERNAL_CALL(TextComponent_GetColor);
+        HRE_ADD_INTERNAL_CALL(TextComponent_SetColor);
+        HRE_ADD_INTERNAL_CALL(TextComponent_GetKerning);
+        HRE_ADD_INTERNAL_CALL(TextComponent_SetKerning);
+        HRE_ADD_INTERNAL_CALL(TextComponent_GetLineSpacing);
+        HRE_ADD_INTERNAL_CALL(TextComponent_SetLineSpacing);
+        
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
         HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyLinearImpulseToCenter);

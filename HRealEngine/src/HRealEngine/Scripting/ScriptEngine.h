@@ -18,6 +18,7 @@ extern "C"
     typedef struct _MonoAssembly MonoAssembly;
     typedef struct _MonoImage MonoImage;
     typedef struct _MonoClassField MonoClassField;
+    typedef struct _MonoString MonoString;
 }
 
 namespace HRealEngine
@@ -210,6 +211,7 @@ namespace HRealEngine
         static void OnCollisionBegin(Entity entityA, Entity entityB);
         static void OnCollisionEnd(Entity entityA, Entity entityB);
         static void OpenScene(const std::string& path);
+        static MonoString* CreateString(const char* string);
 
         static Scene* GetSceneContext();
         static JPH::BodyInterface* GetBodyInterface();

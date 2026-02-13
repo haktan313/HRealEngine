@@ -197,6 +197,19 @@ namespace HRealEngine
             out << YAML::Key << "CastShadows" << YAML::Value << light.CastShadows;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<TextComponent>())
+        {
+            out << YAML::Key << "TextComponent";
+            out << YAML::BeginMap;
+
+            auto& textComponent = entity.GetComponent<TextComponent>();
+            out << YAML::Key << "TextString" << YAML::Value << textComponent.TextString;
+            out << YAML::Key << "Color" << YAML::Value << textComponent.Color;
+            out << YAML::Key << "Kerning" << YAML::Value << textComponent.Kerning;
+            out << YAML::Key << "LineSpacing" << YAML::Value << textComponent.LineSpacing;
+
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<SpriteRendererComponent>())
         {
             auto& sprite = entity.GetComponent<SpriteRendererComponent>();
@@ -478,6 +491,14 @@ namespace HRealEngine
                     light.Intensity = lightComponent["Intensity"].as<float>();
                     light.Radius = lightComponent["Radius"].as<float>();
                     light.CastShadows = lightComponent["CastShadows"].as<bool>();
+                }
+                if (auto textComponent = entity["TextComponent"])
+                {
+                    auto& text = deserializedEntity.AddComponent<TextComponent>();
+                    text.TextString = textComponent["TextString"].as<std::string>();
+                    text.Color = textComponent["Color"].as<glm::vec4>();
+                    text.Kerning = textComponent["Kerning"].as<float>();
+                    text.LineSpacing = textComponent["LineSpacing"].as<float>();
                 }
                 if (auto cameraComponent = entity["CameraComponent"])
                 {
