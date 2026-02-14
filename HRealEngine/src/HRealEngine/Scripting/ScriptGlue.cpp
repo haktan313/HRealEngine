@@ -83,6 +83,22 @@ namespace HRealEngine
         return entity.GetUUID();
     }
 
+	static uint64_t Entity_GetHoveredEntity()
+    {
+    	Entity* hoveredEntity = Input::GetHoveredEntity();
+    	if (!hoveredEntity)
+    		return 0;
+
+    	if (!*hoveredEntity)
+    		return 0;
+    	
+    	if (!hoveredEntity->HasComponent<EntityIDComponent>())
+    		return 0;
+
+    	return hoveredEntity->GetUUID();
+    }
+
+
     static void OpenScene(MonoString* scenePath)
     {
         char* pathCStr = mono_string_to_utf8(scenePath);
@@ -255,6 +271,11 @@ namespace HRealEngine
         return Input::IsKeyPressed(keycode);
     }
 
+	static void Input_GetMousePosition(glm::vec2* outResult)
+    {
+    	*outResult = Input::GetViewportMousePos();
+    }
+
     template<typename... Component>
     static void RegisterComponent()
     {
@@ -295,6 +316,7 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(GetScriptInstance);
         HRE_ADD_INTERNAL_CALL(DestroyEntity);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+    	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
@@ -314,6 +336,8 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
         HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyLinearImpulseToCenter);
+    	
         HRE_ADD_INTERNAL_CALL(Input_IsKeyDown);
+    	HRE_ADD_INTERNAL_CALL(Input_GetMousePosition);
     }
 }

@@ -56,6 +56,14 @@ namespace HRealEngine
                 return null;
             return new Entity(entityID);
         }
+        
+        public Entity GetHoveredEntity()
+        {
+            ulong entityID = InternalCalls.Entity_GetHoveredEntity();
+            if (entityID == 0)
+                return null;
+            return new Entity(entityID);
+        }
         public T As<T>() where T : Entity, new()
         {
             object instance = InternalCalls.GetScriptInstance(EntityID);

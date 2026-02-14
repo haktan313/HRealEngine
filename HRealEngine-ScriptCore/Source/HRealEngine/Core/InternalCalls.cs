@@ -11,6 +11,9 @@ namespace HRealEngine
         internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong Entity_FindEntityByName(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_GetHoveredEntity();
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void OpenScene(string scenePath);
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -20,6 +23,8 @@ namespace HRealEngine
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCodes keyCode);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Input_GetMousePosition(out Vector2 result);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 result);

@@ -4,10 +4,13 @@
 
 #include <GLFW/glfw3.h>
 #include "HRealEngine/Core/Application.h"
+#include "imgui.h"
 
 namespace HRealEngine
 {
 	Input* Input::s_InstanceOfInput = new WindowsInput();
+	glm::vec2 Input::s_ViewportMousePos = { 0.f, 0.f };
+	Entity* Input::s_HoveredEntity = nullptr;
 
 	bool WindowsInput::IsKeyPressedImpl(int keyCode)
 	{
@@ -28,6 +31,7 @@ namespace HRealEngine
 		glfwGetCursorPos(window, &xPos, &yPos);
 		return { (float)xPos, (float)yPos };
 	}
+
 	float WindowsInput::GetMouseXImpl()
 	{
 		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

@@ -8,5 +8,9 @@ namespace HRealEngine
         {
             return InternalCalls.Input_IsKeyDown(keycode);
         }
+        public static void GetMousePosition(out Vector2 result)
+        {
+            InternalCalls.Input_GetMousePosition(out result);
+        }
     }
 }
