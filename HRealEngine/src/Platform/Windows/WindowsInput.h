@@ -11,6 +11,7 @@ namespace HRealEngine
 		bool IsKeyPressedImpl(int keyCode) override;
 		bool IsMouseButtonPressedImpl(int button) override;
 		std::pair<float, float> GetMousePositionImpl() override;
+		void SetCursorModeImpl(CursorMode mode) override;
 		float GetMouseXImpl() override;
 		float GetMouseYImpl() override;
 	};

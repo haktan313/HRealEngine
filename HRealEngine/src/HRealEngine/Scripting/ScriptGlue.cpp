@@ -276,6 +276,16 @@ namespace HRealEngine
     	*outResult = Input::GetViewportMousePos();
     }
 
+	static void Input_SetCursorMode(CursorMode mode)
+	{
+		Input::SetCursorMode(mode);
+	}
+
+	static CursorMode Input_GetCursorMode()
+	{
+    	return Input::GetCursorMode();
+	}
+
     template<typename... Component>
     static void RegisterComponent()
     {
@@ -339,5 +349,7 @@ namespace HRealEngine
     	
         HRE_ADD_INTERNAL_CALL(Input_IsKeyDown);
     	HRE_ADD_INTERNAL_CALL(Input_GetMousePosition);
+    	HRE_ADD_INTERNAL_CALL(Input_SetCursorMode);
+		HRE_ADD_INTERNAL_CALL(Input_GetCursorMode);
     }
 }

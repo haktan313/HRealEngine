@@ -6,6 +6,12 @@
 
 namespace HRealEngine
 {
+	enum class CursorMode
+	{
+		Normal,
+		Hidden,
+		Locked
+	};
 	class HREALENGINE_API Input
 	{
 	public:
@@ -22,15 +28,20 @@ namespace HRealEngine
 		static void SetHoveredEntity(Entity* entity) { s_HoveredEntity = entity; }
 		static Entity* GetHoveredEntity() { return s_HoveredEntity; }
 
+		static void SetCursorMode(CursorMode mode) { s_CursorMode = mode; s_InstanceOfInput->SetCursorModeImpl(mode); }
+		static CursorMode GetCursorMode() { return s_CursorMode; }
+
 	protected:
 		virtual bool IsKeyPressedImpl(int keyCode) = 0;
 		virtual bool IsMouseButtonPressedImpl(int button) = 0;
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
+		virtual void SetCursorModeImpl(CursorMode mode) = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 	private:
 		static Input* s_InstanceOfInput;
 		static glm::vec2 s_ViewportMousePos;
 		static Entity* s_HoveredEntity;
+		static CursorMode s_CursorMode;
 	};
 }

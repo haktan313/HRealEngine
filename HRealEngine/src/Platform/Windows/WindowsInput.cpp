@@ -11,6 +11,7 @@ namespace HRealEngine
 	Input* Input::s_InstanceOfInput = new WindowsInput();
 	glm::vec2 Input::s_ViewportMousePos = { 0.f, 0.f };
 	Entity* Input::s_HoveredEntity = nullptr;
+	CursorMode Input::s_CursorMode = CursorMode::Normal;
 
 	bool WindowsInput::IsKeyPressedImpl(int keyCode)
 	{
@@ -30,6 +31,31 @@ namespace HRealEngine
 		double xPos, yPos;
 		glfwGetCursorPos(window, &xPos, &yPos);
 		return { (float)xPos, (float)yPos };
+	}
+
+	void WindowsInput::SetCursorModeImpl(CursorMode mode)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		if (!window)
+		{
+			LOG_CORE_ERROR("No window found when trying to set cursor mode!");
+			return;
+		}
+		switch (mode)
+		{
+		case CursorMode::Normal:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			LOG_CORE_INFO("Cursor mode set to Normal");
+			break;
+		case CursorMode::Hidden:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			LOG_CORE_INFO("Cursor mode set to Hidden");
+			break;
+		case CursorMode::Locked:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			LOG_CORE_INFO("Cursor mode set to Locked");
+			break;
+		}
 	}
 
 	float WindowsInput::GetMouseXImpl()

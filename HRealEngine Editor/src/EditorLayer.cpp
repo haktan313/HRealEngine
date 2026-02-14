@@ -14,6 +14,7 @@
 #include "BehaviorTreeThings/Editor/EditorRoot.h"
 #include "BehaviorTreeThings/Editor/NodeEditorApp.h"
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "HRealEngine/Asset/AssetImporter.h"
 #include "HRealEngine/Asset/AssetManager.h"
 #include "HRealEngine/Asset/SceneImporter.h"
@@ -306,6 +307,15 @@ namespace HRealEngine
 
         OnOverlayRender();
         m_Framebuffer->Unbind();
+
+        auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+        int cur = glfwGetInputMode(window, GLFW_CURSOR);
+        if (cur == GLFW_CURSOR_NORMAL)
+            LOG_CORE_INFO("GLFW_CURSOR mode now = Normal");
+        else if (cur == GLFW_CURSOR_HIDDEN)
+            LOG_CORE_INFO("GLFW_CURSOR mode now = Hidden");
+        else if (cur == GLFW_CURSOR_DISABLED)
+            LOG_CORE_INFO("GLFW_CURSOR mode now = Locked");
     }
 
     void EditorLayer::OnImGuiRender()
@@ -721,7 +731,12 @@ namespace HRealEngine
                 if (!ImGuizmo::IsUsing())
                     m_GizmoType = ImGuizmo::OPERATION::SCALE;
             break;
-
+        case HR_KEY_F8:
+            if (Input::GetCursorMode() == CursorMode::Normal)
+                Input::SetCursorMode(CursorMode::Locked);
+            else
+                Input::SetCursorMode(CursorMode::Normal);
+             break;
         }
         return false;
     }
@@ -1149,6 +1164,8 @@ namespace HRealEngine
 
         if (EditorRoot::HasNodeEditorApp())
             EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
+
+        Input::SetCursorMode(CursorMode::Locked);
     }
 
     void EditorLayer::OnSceneSimulate()
@@ -1188,6 +1205,7 @@ namespace HRealEngine
                 EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().BuildNodes();
             }
         }
+        Input::SetCursorMode(CursorMode::Normal);
     }
 
     void EditorLayer::OnScenePause()
@@ -1195,6 +1213,7 @@ namespace HRealEngine
         if (m_SceneState == SceneState::Editor)
             return;
         m_ActiveScene->SetPaused(true);
+        Input::SetCursorMode(CursorMode::Normal);
     }
 
     void EditorLayer::OnDuplicateEntity()
