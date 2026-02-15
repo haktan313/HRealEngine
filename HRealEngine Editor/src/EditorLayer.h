@@ -41,6 +41,7 @@ namespace HRealEngine
         bool OpenProject();
         void OpenProject(const std::filesystem::path& path);
         void SaveProject();
+        void BuildProject();
 
         void NewScene();
         void OpenScene();

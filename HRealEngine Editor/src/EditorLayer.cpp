@@ -459,7 +459,12 @@ namespace HRealEngine
                     LoadBehaviorTreeAsAnAsset();
                 ImGui::EndMenu();
             }
-    
+            if (ImGui::BeginMenu("Build"))
+            {
+                if (ImGui::MenuItem("Build Project"))
+                    BuildProject();
+                ImGui::EndMenu();
+            }
             ImGui::EndMenuBar();
         }
 
@@ -1019,6 +1024,79 @@ namespace HRealEngine
         
     }
 
+    void EditorLayer::BuildProject()
+    {
+        auto activeProject = Project::GetActive();
+        if (!activeProject)
+            return;
+        
+        std::string projectName = activeProject->GetConfig().Name;
+        
+        std::string buildPathStr = FileDialogs::SaveFile((projectName + " Build\0*.exe\0").c_str());
+        if (buildPathStr.empty())
+            return;
+        
+        std::filesystem::path buildDir = std::filesystem::path(buildPathStr).parent_path() / (projectName + "_Build");
+        std::filesystem::create_directories(buildDir);
+
+        LOG_CORE_INFO("[Build] Starting build for project '{0}' to: {1}", projectName, buildDir.string());
+
+        try
+        {
+            std::filesystem::path rootDir = std::filesystem::current_path().parent_path(); 
+            std::filesystem::path runtimeSrcDir = rootDir / "bin" / "Release-windows-x86_64" / "HRealEngine Runtime";
+
+            if (!std::filesystem::exists(runtimeSrcDir))
+            {
+                LOG_CORE_ERROR("[Build] Runtime source not found at: {0}", runtimeSrcDir.string());
+                return;
+            }
+            
+            for (const auto& entry : std::filesystem::directory_iterator(runtimeSrcDir))
+            {
+                const auto& path = entry.path();
+                std::string filename = path.filename().string();
+                std::filesystem::path destPath = buildDir / filename;
+
+                if (entry.is_directory())
+                {
+                    std::filesystem::copy(path, destPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+                }
+                else
+                {
+                    if (filename == "HRealEngine Runtime.exe")
+                        destPath = buildDir / (projectName + ".exe");
+                    else if (filename == "HRealEngine Runtime.pdb")
+                        destPath = buildDir / (projectName + ".pdb");
+
+                    std::filesystem::copy_file(path, destPath, std::filesystem::copy_options::overwrite_existing);
+                }
+            }
+
+            auto& config = activeProject->GetConfig();
+            std::filesystem::path projectRootDir = Project::GetProjectDirectory();
+
+            std::filesystem::copy(projectRootDir / config.AssetDirectory, buildDir / config.AssetDirectory, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+
+            std::filesystem::path scriptDest = buildDir / config.ScriptModulePath;
+            std::filesystem::create_directories(scriptDest.parent_path());
+            if (std::filesystem::exists(projectRootDir / config.ScriptModulePath))
+                std::filesystem::copy_file(projectRootDir / config.ScriptModulePath, scriptDest, std::filesystem::copy_options::overwrite_existing);
+
+            std::filesystem::path projectDestPath = buildDir / (projectName + ".hrpj");
+            Project::SaveActive(projectDestPath);
+
+            LOG_CORE_INFO("[Build] Build Successful! Game Executable: {0}.exe", projectName);
+
+            std::string command = "explorer " + buildDir.string();
+            system(command.c_str());
+        }
+        catch (const std::exception& e)
+        {
+            LOG_CORE_ERROR("[Build] Critical Error: {0}", e.what());
+        }
+    }
+    
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();

@@ -3,10 +3,14 @@
 #pragma once
 #include <entt.hpp>
 
-#include "BehaviorTreeThings/Core/Nodes.h"
 #include "HRealEngine/Asset/Asset.h"
 #include "HRealEngine/Camera/EditorCamera.h"
 #include "HRealEngine/Core/Timestep.h"
+
+namespace YAML
+{
+    class Node;
+}
 
 class BehaviorTree;
 

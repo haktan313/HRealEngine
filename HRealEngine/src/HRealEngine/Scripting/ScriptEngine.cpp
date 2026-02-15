@@ -11,6 +11,7 @@
 #include "HRealEngine/Core/Entity.h"
 
 #include "FileWatch.hpp"
+#include "imgui_internal.h"
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/Buffer.h"
 #include "HRealEngine/Core/FileSystem.h"

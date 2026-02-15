@@ -27,6 +27,7 @@ workspace "HRealEngine"
     group ""
     include "HRealEngine"
     include "HRealEngine Editor"
+    include "HRealEngine Runtime"
     include "HRealEngine-ScriptCore"
     
     
