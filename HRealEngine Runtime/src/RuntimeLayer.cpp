@@ -8,7 +8,6 @@
 #include "HRealEngine/Events/KeyEvent.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
-#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -26,12 +25,13 @@ namespace HRealEngine
         fbSpec.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpec);
 
-        m_ProjectLoaded = LoadProjectFromCommandLine();
-        if (!m_ProjectLoaded)
+        if (!Project::GetActive())
         {
             LOG_CORE_ERROR("[Runtime] No project loaded. Pass a .hrpj as argv[1].");
+            m_ProjectLoaded = false;
             return;
         }
+        m_ProjectLoaded = true;
 
         AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
         if (!startScene)
@@ -199,36 +199,6 @@ namespace HRealEngine
             ImGui::DockBuilderFinish(dockspaceID);
         }
         ImGui::End();
-    }
-    
-    bool RuntimeLayer::LoadProjectFromCommandLine()
-    {
-        auto& app = Application::Get();
-        auto args = app.GetSpecification().CommandLineArgs;
-        std::filesystem::path projectPath;
-
-        if (args.Count > 1)
-        {
-            projectPath = args[1];
-        } 
-        else
-        {
-            projectPath = R"(C:\Users\Haktan\Desktop\PlatformerGame\PlatformerGame.hrpj)";
-            LOG_CORE_WARN("[Runtime] No command line arg given, using hardcoded project path: {}",
-            projectPath.string());
-        }
-
-        if (projectPath.empty() || !std::filesystem::exists(projectPath))
-        {
-            LOG_CORE_ERROR("[Runtime] No .hrpj file found in directory!");
-            return false;
-        }
-
-        if (!Project::Load(projectPath))
-            return false;
-
-        ScriptEngine::Init();
-        return Project::GetActive() != nullptr;
     }
     
     bool RuntimeLayer::OnSceneChange(SceneChangeEvent& event)

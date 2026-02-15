@@ -1028,7 +1028,10 @@ namespace HRealEngine
     {
         auto activeProject = Project::GetActive();
         if (!activeProject)
+        {
+            LOG_CORE_ERROR("[Build] No active project!");
             return;
+        }
         
         std::string projectName = activeProject->GetConfig().Name;
         
@@ -1037,12 +1040,12 @@ namespace HRealEngine
             return;
         
         std::filesystem::path buildDir = std::filesystem::path(buildPathStr).parent_path() / (projectName + "_Build");
-        std::filesystem::create_directories(buildDir);
-
-        LOG_CORE_INFO("[Build] Starting build for project '{0}' to: {1}", projectName, buildDir.string());
-
+        
         try
         {
+            std::filesystem::create_directories(buildDir);
+            LOG_CORE_INFO("[Build] Starting build for project '{0}' to: {1}", projectName, buildDir.string());
+            
             std::filesystem::path rootDir = std::filesystem::current_path().parent_path(); 
             std::filesystem::path runtimeSrcDir = rootDir / "bin" / "Release-windows-x86_64" / "HRealEngine Runtime";
 
@@ -1052,6 +1055,7 @@ namespace HRealEngine
                 return;
             }
             
+            LOG_CORE_INFO("[Build] Copying runtime files...");
             for (const auto& entry : std::filesystem::directory_iterator(runtimeSrcDir))
             {
                 const auto& path = entry.path();
@@ -1060,7 +1064,9 @@ namespace HRealEngine
 
                 if (entry.is_directory())
                 {
-                    std::filesystem::copy(path, destPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+                    std::filesystem::copy(path, destPath, 
+                        std::filesystem::copy_options::recursive | 
+                        std::filesystem::copy_options::overwrite_existing);
                 }
                 else
                 {
@@ -1069,27 +1075,46 @@ namespace HRealEngine
                     else if (filename == "HRealEngine Runtime.pdb")
                         destPath = buildDir / (projectName + ".pdb");
 
-                    std::filesystem::copy_file(path, destPath, std::filesystem::copy_options::overwrite_existing);
+                    std::filesystem::copy_file(path, destPath, 
+                        std::filesystem::copy_options::overwrite_existing);
                 }
             }
-
+            
             auto& config = activeProject->GetConfig();
             std::filesystem::path projectRootDir = Project::GetProjectDirectory();
-
-            std::filesystem::copy(projectRootDir / config.AssetDirectory, buildDir / config.AssetDirectory, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
-
+            
+            LOG_CORE_INFO("[Build] Copying assets...");
+            std::filesystem::path assetsSrc = projectRootDir / config.AssetDirectory;
+            std::filesystem::path assetsDest = buildDir / config.AssetDirectory;
+            
+            if (std::filesystem::exists(assetsSrc))
+                std::filesystem::copy(assetsSrc, assetsDest, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+            
+            LOG_CORE_INFO("[Build] Copying scripts...");
+            std::filesystem::path scriptSrc = projectRootDir / config.ScriptModulePath;
             std::filesystem::path scriptDest = buildDir / config.ScriptModulePath;
-            std::filesystem::create_directories(scriptDest.parent_path());
-            if (std::filesystem::exists(projectRootDir / config.ScriptModulePath))
-                std::filesystem::copy_file(projectRootDir / config.ScriptModulePath, scriptDest, std::filesystem::copy_options::overwrite_existing);
-
+            if (std::filesystem::exists(scriptSrc))
+            {
+                std::filesystem::create_directories(scriptDest.parent_path());
+                std::filesystem::copy_file(scriptSrc, scriptDest, std::filesystem::copy_options::overwrite_existing);
+            }
+            
+            LOG_CORE_INFO("[Build] Saving project configuration...");
             std::filesystem::path projectDestPath = buildDir / (projectName + ".hrpj");
             Project::SaveActive(projectDestPath);
+            
+            if (!config.StartScene)
+                LOG_CORE_WARN("[Build] Warning: No start scene is set in the project configuration!");
 
-            LOG_CORE_INFO("[Build] Build Successful! Game Executable: {0}.exe", projectName);
+            LOG_CORE_INFO("[Build] ============================================");
+            LOG_CORE_INFO("[Build] Build Successful!");
+            LOG_CORE_INFO("[Build] Executable: {0}", (buildDir / (projectName + ".exe")).string());
+            LOG_CORE_INFO("[Build] ============================================");
 
-            std::string command = "explorer " + buildDir.string();
-            system(command.c_str());
+            #ifdef _WIN32
+                std::string command = "explorer \"" + buildDir.string() + "\"";
+                system(command.c_str());
+            #endif
         }
         catch (const std::exception& e)
         {

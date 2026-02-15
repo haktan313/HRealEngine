@@ -1,30 +1,12 @@
 Scene: Untitled
 Entities:
-  - Entity: 13228748078512122506
+  - Entity: 7485391268872159674
     TagComponent:
-      Tag: camera
+      Tag: floor
     TransformComponent:
-      Position: [-6.0504127, 4.0472794, 11.533431]
-      Rotation: [-0.091245264, -0.26525092, 0.023982065]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      PrimaryCamera: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 1.3962634
-        PerspectiveNear: 0.01
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
-  - Entity: 10090947251999055734
-    TagComponent:
-      Tag: ground
-    TransformComponent:
-      Position: [0, -1.2385433, -8.711866]
+      Position: [1.2382158, 3.181654, -9.480915]
       Rotation: [0, 0, 0]
-      Scale: [31.506945, 1, 25.655624]
+      Scale: [6.010399, 1, 7.009605]
     MeshRendererComponent:
       MeshHandle: 0
       Color: [1, 1, 1, 1]
@@ -32,23 +14,13 @@ Entities:
       TilingFactor: 1
       MaterialHandleOverrides:
         []
+    Rigidbody3DComponent:
+      BodyType: Kinematic
+      FixedRotation: false
     BoxCollider3DComponent:
       Offset: [0, 0, 0]
       Size: [0.5, 0.5, 0.5]
-  - Entity: 6193716271100103742
-    TagComponent:
-      Tag: light
-    TransformComponent:
-      Position: [0, 6.6645174, -0.25528467]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [1, 1, 1]
-      Direction: [0, -1, 0]
-      Intensity: 1
-      Radius: 26.9
-      CastShadows: true
+      IsTrigger: false
   - Entity: 533702191247743140
     TagComponent:
       Tag: player
@@ -70,13 +42,28 @@ Entities:
     BoxCollider3DComponent:
       Offset: [0, 38, 0]
       Size: [25, 40, 20]
-  - Entity: 7485391268872159674
+      IsTrigger: false
+  - Entity: 6193716271100103742
     TagComponent:
-      Tag: floor
+      Tag: light
     TransformComponent:
-      Position: [1.2382158, 3.181654, -9.480915]
+      Position: [0, 6.6645174, -0.25528467]
       Rotation: [0, 0, 0]
-      Scale: [6.010399, 1, 7.009605]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 1
+      Radius: 26.9
+      CastShadows: true
+  - Entity: 10090947251999055734
+    TagComponent:
+      Tag: ground
+    TransformComponent:
+      Position: [0, -1.2385433, -8.711866]
+      Rotation: [0, 0, 0]
+      Scale: [31.506945, 1, 25.655624]
     MeshRendererComponent:
       MeshHandle: 0
       Color: [1, 1, 1, 1]
@@ -84,9 +71,25 @@ Entities:
       TilingFactor: 1
       MaterialHandleOverrides:
         []
-    Rigidbody3DComponent:
-      BodyType: Kinematic
-      FixedRotation: false
     BoxCollider3DComponent:
       Offset: [0, 0, 0]
       Size: [0.5, 0.5, 0.5]
+      IsTrigger: false
+  - Entity: 13228748078512122506
+    TagComponent:
+      Tag: camera
+    TransformComponent:
+      Position: [-6.0504127, 4.0472794, 11.533431]
+      Rotation: [-0.091245264, -0.26525092, 0.023982065]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.3962634
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1

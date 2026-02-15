@@ -20,7 +20,6 @@ namespace HRealEngine
         void OnImGuiRender() override;
         void OnEvent(EventBase& eventRef) override;
         void Dockspace();
-        bool LoadProjectFromCommandLine();
 
         bool OnSceneChange(SceneChangeEvent& event);
 
