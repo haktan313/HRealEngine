@@ -55,6 +55,10 @@ namespace HRealEngine
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			LOG_CORE_INFO("Cursor mode set to Locked");
 			break;
+		case CursorMode::InGame:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			LOG_CORE_INFO("Cursor mode set to InGame");
+			break;
 		}
 	}
 

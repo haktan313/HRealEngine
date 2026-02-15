@@ -308,14 +308,11 @@ namespace HRealEngine
         OnOverlayRender();
         m_Framebuffer->Unbind();
 
-        auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-        int cur = glfwGetInputMode(window, GLFW_CURSOR);
-        if (cur == GLFW_CURSOR_NORMAL)
-            LOG_CORE_INFO("GLFW_CURSOR mode now = Normal");
-        else if (cur == GLFW_CURSOR_HIDDEN)
-            LOG_CORE_INFO("GLFW_CURSOR mode now = Hidden");
-        else if (cur == GLFW_CURSOR_DISABLED)
-            LOG_CORE_INFO("GLFW_CURSOR mode now = Locked");
+        auto viewportHovered = m_ViewportHovered;
+        auto viewportFocused = m_ViewportFocused;
+        auto wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+        auto curserMode = Input::GetCursorMode();
+        LOG_CORE_INFO("Viewport hovered = {0}, Viewport focused = {1}, Want capture mouse = {2}, Cursor mode = {3}", viewportHovered, viewportFocused, wantCaptureMouse, (int)curserMode);
     }
 
     void EditorLayer::OnImGuiRender()
@@ -564,7 +561,15 @@ namespace HRealEngine
         
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->SetBlockEvents(/*!m_ViewportFocused && */!m_ViewportHovered);
+        //Application::Get().GetImGuiLayer()->SetBlockEvents(/*!m_ViewportFocused && */!m_ViewportHovered);
+        bool isCursorLocked = Input::GetCursorMode() == CursorMode::Locked;
+        bool shouldBlock = true;
+        if (isCursorLocked)
+            shouldBlock = false;
+        else
+            shouldBlock = !m_ViewportHovered;
+        Application::Get().GetImGuiLayer()->SetBlockEvents(shouldBlock);
+
         
         ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
         if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize) && viewportPanelSize.x > 0 && viewportPanelSize.y > 0)
@@ -733,9 +738,15 @@ namespace HRealEngine
             break;
         case HR_KEY_F8:
             if (Input::GetCursorMode() == CursorMode::Normal)
+            {
+                ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
                 Input::SetCursorMode(CursorMode::Locked);
+            }
             else
+            {
+                ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
                 Input::SetCursorMode(CursorMode::Normal);
+            }
              break;
         }
         return false;
@@ -743,8 +754,10 @@ namespace HRealEngine
 
     bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& event)
     {
+        if (m_SceneState != SceneState::Editor && (Input::GetCursorMode() == CursorMode::Locked || Input::GetCursorMode() == CursorMode::Hidden || Input::GetCursorMode() == CursorMode::InGame))
+            return false;
         if (event.GetMouseButton() == HR_MOUSE_BUTTON_LEFT)
-            if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(HR_KEY_LEFT_ALT))
+            if (m_ViewportHovered && m_ViewportFocused && !ImGuizmo::IsOver() && !Input::IsKeyPressed(HR_KEY_LEFT_ALT))
                 m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
         return false;
     }

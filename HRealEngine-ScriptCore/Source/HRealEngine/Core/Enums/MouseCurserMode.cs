@@ -4,6 +4,7 @@ namespace HRealEngine
     {
         Normal,
         Hidden,
-        Locked
+        Locked,
+        InGame
     }
 }

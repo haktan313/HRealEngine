@@ -10,7 +10,8 @@ namespace HRealEngine
 	{
 		Normal,
 		Hidden,
-		Locked
+		Locked,
+		InGame
 	};
 	class HREALENGINE_API Input
 	{

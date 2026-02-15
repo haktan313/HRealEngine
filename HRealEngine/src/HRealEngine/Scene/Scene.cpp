@@ -360,10 +360,7 @@ namespace HRealEngine
                 auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
         
                 if (!text.TextString.empty())
-                {
-                    LOG_CORE_TRACE("Rendering text: '{}' at pos ({}, {}, {})", text.TextString, transform.Position.x, transform.Position.y, transform.Position.z);
                     Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
-                }
             }
         }
         Renderer2D::EndScene();
