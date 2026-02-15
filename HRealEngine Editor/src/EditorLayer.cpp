@@ -307,12 +307,6 @@ namespace HRealEngine
 
         OnOverlayRender();
         m_Framebuffer->Unbind();
-
-        auto viewportHovered = m_ViewportHovered;
-        auto viewportFocused = m_ViewportFocused;
-        auto wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
-        auto curserMode = Input::GetCursorMode();
-        LOG_CORE_INFO("Viewport hovered = {0}, Viewport focused = {1}, Want capture mouse = {2}, Cursor mode = {3}", viewportHovered, viewportFocused, wantCaptureMouse, (int)curserMode);
     }
 
     void EditorLayer::OnImGuiRender()
@@ -1270,9 +1264,15 @@ namespace HRealEngine
                 && bToolbarEnabled)
             {
                 if (m_SceneState == SceneState::Editor)
+                {
+                    Application::Get().CreateGameModeData();
                     OnScenePlay();
+                }
                 else if (m_SceneState == SceneState::Runtime)
+                {
+                    Application::Get().DestroyGameModeData();
                     OnSceneStop();
+                }
             }
         }
 

@@ -10,6 +10,7 @@
 #include <mono/metadata/reflection.h>
 
 #include "box2d/b2_body.h"
+#include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
 #include "Physics/Body/Body.h"
 #include "Physics/Body/BodyInterface.h"
@@ -303,6 +304,100 @@ namespace HRealEngine
 		}
 	}
 
+	static void GameModeData_SetStringData(MonoString* key, MonoString* value)
+	{
+    	std::string keyStr = MonoStringToString(key);
+		std::string valueStr = MonoStringToString(value);
+		Application::Get().GetGameModeData().SetString(keyStr, valueStr);
+	}
+	static std::string GameModeData_GetStringData(MonoString* key)
+	{
+    	std::string keyStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetString(keyStr);
+	}
+	static void GameModeData_SetFloatData(MonoString* key, float value)
+	{
+		std::string keyStr = MonoStringToString(key);
+    	std::string valueStr = MonoStringToString(key);
+		Application::Get().GetGameModeData().SetFloat(keyStr, value);
+	}
+	static float GameModeData_GetFloatData(MonoString* key)
+	{
+    	std::string keyStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetFloat(keyStr);
+	}
+	static void GameModeData_SetIntData(MonoString* key, int value)
+    {
+	    std::string keyStr = MonoStringToString(key);
+    	std::string valueStr = MonoStringToString(key);
+    }
+	static int GameModeData_GetIntData(MonoString* key)
+	{
+		std::string keyStr = MonoStringToString(key);
+    	std::string valueStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetInt(keyStr);
+	}
+	static void GameModeData_SetVector2Data(MonoString* key, glm::vec2* value)
+	{
+		std::string keyStr = MonoStringToString(key);
+		std::string valueStr = MonoStringToString(key);
+    	Application::Get().GetGameModeData().SetVec2(keyStr, *value);
+	}
+	static glm::vec2 GameModeData_GetVector2Data(MonoString* key)
+    {
+	    std::string keyStr = MonoStringToString(key);
+    	std::string valueStr = MonoStringToString(key);
+    	return Application::Get().GetGameModeData().GetVec2(keyStr);
+    }
+	static void GameModeData_SetVector3Data(MonoString* key, glm::vec3* value)
+    {
+	    std::string keyStr = MonoStringToString(key);
+    	std::string valueStr = MonoStringToString(key);
+    	Application::Get().GetGameModeData().SetVec3(keyStr, *value);
+    }
+	static glm::vec3 GameModeData_GetVector3Data(MonoString* key)
+	{
+	    std::string keyStr = MonoStringToString(key);
+		std::string valueStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetVec3(keyStr);
+	}
+	static void GameModeData_SetVector4Data(MonoString* key, glm::vec4* value)
+	{
+	    std::string keyStr = MonoStringToString(key);
+		std::string valueStr = MonoStringToString(key);
+		Application::Get().GetGameModeData().SetVec4(keyStr, *value);
+	}
+	static glm::vec4 GameModeData_GetVector4Data(MonoString* key)
+	{	    std::string keyStr = MonoStringToString(key);
+		std::string valueStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetVec4(keyStr);
+	}
+	static void GameModeData_SetEntityData(MonoString* key, uint64_t entityID)
+	{
+	    std::string keyStr = MonoStringToString(key);
+		Application::Get().GetGameModeData().SetEntity(keyStr, entityID);
+	}
+	static uint64_t GameModeData_GetEntityData(MonoString* key)
+	{
+    	std::string keyStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().GetEntity(keyStr);
+	}
+	
+	static bool GameModeData_HasData(MonoString* key)
+	{	    std::string keyStr = MonoStringToString(key);
+		return Application::Get().GetGameModeData().HasString(keyStr) || Application::Get().GetGameModeData().HasInt(keyStr) || Application::Get().GetGameModeData().HasFloat(keyStr) || Application::Get().GetGameModeData().HasBool(keyStr) || Application::Get().GetGameModeData().HasVec2(keyStr) || Application::Get().GetGameModeData().HasVec3(keyStr) || Application::Get().GetGameModeData().HasVec4(keyStr) || Application::Get().GetGameModeData().HasEntity(keyStr);
+	}
+	static void GameModeData_RemoveData(MonoString* key)
+	{
+    	std::string keyStr = MonoStringToString(key);
+		Application::Get().GetGameModeData().RemoveData(keyStr);
+	}
+	static void GameModeData_ClearAllData()
+	{
+    	Application::Get().GetGameModeData().ClearAllData();
+	}
+	
+
     template<typename... Component>
     static void RegisterComponent()
     {
@@ -369,5 +464,23 @@ namespace HRealEngine
     	HRE_ADD_INTERNAL_CALL(Input_SetCursorMode);
 		HRE_ADD_INTERNAL_CALL(Input_GetCursorMode);
     	HRE_ADD_INTERNAL_CALL(Input_IsMousePressed);
+
+    	HRE_ADD_INTERNAL_CALL(GameModeData_SetStringData);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_GetStringData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_SetFloatData);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_GetFloatData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_SetIntData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_GetIntData);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_SetVector2Data);
+		HRE_ADD_INTERNAL_CALL(GameModeData_GetVector2Data);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_SetVector3Data);
+		HRE_ADD_INTERNAL_CALL(GameModeData_GetVector3Data);
+		HRE_ADD_INTERNAL_CALL(GameModeData_SetVector4Data);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_GetVector4Data);
+		HRE_ADD_INTERNAL_CALL(GameModeData_SetEntityData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_GetEntityData);
+    	HRE_ADD_INTERNAL_CALL(GameModeData_HasData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_RemoveData);
+		HRE_ADD_INTERNAL_CALL(GameModeData_ClearAllData);
     }
 }

@@ -435,6 +435,7 @@ namespace HRealEngine
         LOG_CORE_INFO("Got scene handle {0} from path {1}", static_cast<uint64_t>(sceneHandle), path);
         if (sceneHandle)
         {
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
             Input::SetCursorMode(CursorMode::Locked);
             SceneChangeEvent event(static_cast<uint64_t>(sceneHandle));
             Application::Get().OnEvent(event);

@@ -13,7 +13,7 @@
 
 namespace HRealEngine
 {
-    class EditorLayer : public HRealEngine::Layer
+    class EditorLayer : public Layer
     {
     public:
         EditorLayer();

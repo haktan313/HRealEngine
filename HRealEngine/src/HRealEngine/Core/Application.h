@@ -11,6 +11,8 @@
 #include <functional>
 #include <mutex>
 
+#include "GameModeData.h"
+
 
 namespace HRealEngine
 {
@@ -44,6 +46,10 @@ namespace HRealEngine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		void CreateGameModeData() { if (!m_GameModeData) m_GameModeData = CreateScope<GameModeData>(); }
+		void DestroyGameModeData() { if (m_GameModeData) m_GameModeData.reset(); }
+		GameModeData& GetGameModeData() { HREALENGINE_CORE_DEBUGBREAK(m_GameModeData); return *m_GameModeData; }
+
 		void Close() { m_bRunning = false; }
 
 		Window& GetWindow() { return *m_Window; }
@@ -67,6 +73,7 @@ namespace HRealEngine
 		static Application* s_InstanceOfApp;
 
 		Scope<Window> m_Window;
+		Scope<GameModeData> m_GameModeData;
 		
 		bool m_bRunning = true;
 		bool m_bMinimized = false;
