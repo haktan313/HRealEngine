@@ -84,6 +84,11 @@ namespace HRealEngine
         
         m_LoadedAssets.erase(handle);
         Ref<Asset> reloaded = GetAsset(handle);
+        if (!reloaded)
+        {
+            LOG_CORE_ERROR("Failed to reload asset with handle: {}", (uint64_t)handle);
+            return nullptr;
+        }
         return reloaded;
     }
 

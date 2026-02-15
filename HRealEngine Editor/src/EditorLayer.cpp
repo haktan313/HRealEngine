@@ -1179,25 +1179,51 @@ namespace HRealEngine
         //m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetFilePath(assetHandle);
         //m_EditorScenePath = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(assetHandle).FilePath;
     }
-
+    
     void EditorLayer::SaveSceneAs()
     {
         std::string filePath = FileDialogs::SaveFile("HRE Scene (*.hrs)\0*.hrs\0");
         if (!filePath.empty())
         {
-            SerializeScene(m_ActiveScene, filePath);
-            m_EditorScenePath = filePath;
-            Project::GetActive()->GetEditorAssetManager()->ImportAsset(filePath);
+            std::filesystem::path absPath = std::filesystem::absolute(filePath);
+            std::filesystem::path assetDir = Project::GetAssetDirectory();
+            std::filesystem::path relativePath;
+        
+            try
+            {
+                relativePath = std::filesystem::relative(absPath, assetDir);
+            }
+            catch (...)
+            {
+                LOG_CORE_ERROR("Failed to create relative path for scene: {}", absPath.string());
+                return;
+            }
+            
+            SerializeScene(m_ActiveScene, relativePath);
+            m_EditorScenePath = relativePath;
+
+            Project::GetActive()->GetEditorAssetManager()->ImportAsset(absPath);
+
+            AssetHandle newHandle = Project::GetActive()->GetEditorAssetManager()->GetHandleFromPath(relativePath);
+            if (newHandle != 0)
+            {
+                m_ActiveScene->Handle = newHandle;
+                LOG_CORE_INFO("Scene saved and registered with handle: {}", (uint64_t)newHandle);
+            }
+        
             m_ContentBrowserPanel->RefreshAssetTree();
         }
     }
 
     void EditorLayer::SaveScene()
     {
-        if (!m_EditorScenePath.empty())
-            SerializeScene(m_ActiveScene, m_EditorScenePath);
-        else
+        if (m_EditorScenePath.empty() || m_ActiveScene->Handle == 0)
+        {
             SaveSceneAs();
+            return;
+        }
+
+        SerializeScene(m_ActiveScene, m_EditorScenePath);
     }
 
     void EditorLayer::LoadSceneFromFile()
@@ -1246,17 +1272,25 @@ namespace HRealEngine
 
     void EditorLayer::SerializeScene(Ref<Scene> sceneRef, const std::filesystem::path& path)
     {
-        /*SceneSerializer serializer(sceneRef);
-        serializer.Serialize(path.string());*/
         SceneImporter::SaveScene(sceneRef, path);
-        AssetHandle sceneHandle = m_ActiveScene->Handle;
-
-        auto eam = Project::GetActive()->GetEditorAssetManager();
-        eam->ReloadAsset(sceneHandle);
         
-        m_ActiveScene = AssetManager::GetAsset<Scene>(sceneHandle);
-        m_EditorScene = m_ActiveScene;
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        AssetHandle sceneHandle = sceneRef->Handle;
+
+        if (sceneHandle != 0)
+        {
+            auto eam = Project::GetActive()->GetEditorAssetManager();
+            
+            if (eam->IsAssetHandleValid(sceneHandle))
+            {
+                eam->ReloadAsset(sceneHandle);
+            
+                m_ActiveScene = AssetManager::GetAsset<Scene>(sceneHandle);
+                m_EditorScene = m_ActiveScene;
+                m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+            }
+            else
+                LOG_CORE_WARN("Scene handle {} is not valid in asset registry", (uint64_t)sceneHandle);
+        }
     }
 
     void EditorLayer::OnScenePlay()

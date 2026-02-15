@@ -109,7 +109,7 @@ namespace HRealEngine
                 unsigned long long glyphSeed = (LCG_MULTIPLIER * (coloringSeed ^ i) + LCG_INCREMENT) * !!coloringSeed;
                 glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
                 return true;
-                }, m_Data->Glyphs.size()).finish(THREAD_COUNT);
+                }, static_cast<int>(m_Data->Glyphs.size())).finish(THREAD_COUNT);
         }
         else {
             unsigned long long glyphSeed = coloringSeed;
