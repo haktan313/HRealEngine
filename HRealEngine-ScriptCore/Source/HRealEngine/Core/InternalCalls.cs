@@ -29,6 +29,8 @@ namespace HRealEngine
         internal extern static void Input_SetCursorMode(MouseCurserMode mode);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static MouseCurserMode Input_GetCursorMode();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool Input_IsMousePressed(MouseButton button);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void TransformComponent_GetTranslation(ulong entityID, out Vector3 result);

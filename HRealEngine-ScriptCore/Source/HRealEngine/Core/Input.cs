@@ -21,5 +21,10 @@ namespace HRealEngine
         {
             return InternalCalls.Input_GetCursorMode();
         }
+        
+        public static bool IsMousePressed(MouseButton button)
+        {
+            return InternalCalls.Input_IsMousePressed(button);
+        }
     }
 }

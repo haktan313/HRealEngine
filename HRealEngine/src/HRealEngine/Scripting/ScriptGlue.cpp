@@ -10,6 +10,7 @@
 #include <mono/metadata/reflection.h>
 
 #include "box2d/b2_body.h"
+#include "HRealEngine/Core/MouseButtonCodes.h"
 #include "Physics/Body/Body.h"
 #include "Physics/Body/BodyInterface.h"
 
@@ -286,6 +287,22 @@ namespace HRealEngine
     	return Input::GetCursorMode();
 	}
 
+	static bool Input_IsMousePressed(int button)
+	{
+    	switch (button)
+		{
+			case 0:
+    			return Input::IsMouseButtonPressed(HR_MOUSE_BUTTON_LEFT);
+			case 1:
+    			return Input::IsMouseButtonPressed(HR_MOUSE_BUTTON_RIGHT);
+			case 2:
+    			return Input::IsMouseButtonPressed(HR_MOUSE_BUTTON_MIDDLE);
+			default:
+				LOG_CORE_ERROR("Input_IsMousePressed: Invalid mouse button index: {}", button);
+				return false;
+		}
+	}
+
     template<typename... Component>
     static void RegisterComponent()
     {
@@ -351,5 +368,6 @@ namespace HRealEngine
     	HRE_ADD_INTERNAL_CALL(Input_GetMousePosition);
     	HRE_ADD_INTERNAL_CALL(Input_SetCursorMode);
 		HRE_ADD_INTERNAL_CALL(Input_GetCursorMode);
+    	HRE_ADD_INTERNAL_CALL(Input_IsMousePressed);
     }
 }

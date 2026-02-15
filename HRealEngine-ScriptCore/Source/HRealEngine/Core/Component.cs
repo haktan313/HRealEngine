@@ -85,6 +85,5 @@ namespace HRealEngine
             get => InternalCalls.TextComponent_GetLineSpacing(entity.EntityID);
             set => InternalCalls.TextComponent_SetLineSpacing(entity.EntityID, value);
         }
-
     }
 }
