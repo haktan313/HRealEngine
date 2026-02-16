@@ -7,6 +7,7 @@
 #include <mono/metadata/tabledefs.h>
 
 #include "ScriptGlue.h"
+#include "ScriptBehaviorTreeNodes.h"
 #include "HRealEngine/Core/Components.h"
 #include "HRealEngine/Core/Entity.h"
 
@@ -268,6 +269,48 @@ namespace HRealEngine
         return true;
     }
 
+    static void RegisterBehaviorTreeScriptTypes()
+    {
+        MonoClass* actionBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "BTAction");
+        MonoClass* conditionBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "BTCondition");
+        MonoClass* decoratorBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "BTDecorator");
+        MonoClass* blackboardBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine", "BTBlackboard");
+
+        if (!actionBase || !conditionBase || !decoratorBase || !blackboardBase)
+            return;
+
+        const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppImage, MONO_TABLE_TYPEDEF);
+        int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+
+        for (int32_t i = 0; i < numTypes; i++)
+        {
+            uint32_t cols[MONO_TYPEDEF_SIZE];
+            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+            const char* nameSpace = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAMESPACE]);
+            const char* className = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAME]);
+            MonoClass* monoClass = mono_class_from_name(s_Data->AppImage, nameSpace, className);
+            if (!monoClass)
+                continue;
+
+            std::string fullName;
+            if (strlen(nameSpace) != 0)
+                fullName = fmt::format("{}.{}", nameSpace, className);
+            else
+                fullName = className;
+
+            const std::string displayName = className;
+            if (mono_class_is_subclass_of(monoClass, actionBase, false))
+                RegisterScriptBehaviorTreeAction(displayName, fullName);
+            if (mono_class_is_subclass_of(monoClass, conditionBase, false))
+                RegisterScriptBehaviorTreeCondition(displayName, fullName);
+            if (mono_class_is_subclass_of(monoClass, decoratorBase, false))
+                RegisterScriptBehaviorTreeDecorator(displayName, fullName);
+            if (mono_class_is_subclass_of(monoClass, blackboardBase, false))
+                RegisterScriptBehaviorTreeBlackboard(displayName, fullName);
+        }
+    }
+
     void ScriptEngine::LoadAssemblyClasses()
     {
         s_Data->EntityClasses.clear();
@@ -316,6 +359,8 @@ namespace HRealEngine
                 }
             }
         }
+        RegisterBehaviorTreeScriptTypes();
+
         auto& entityClasses = s_Data->EntityClasses;
     }
 
@@ -333,7 +378,8 @@ namespace HRealEngine
         LoadAppAssembly(s_Data->AppAssemblyFilePath);
         LoadAssemblyClasses();
         ScriptGlue::RegisterComponents();
-        
+        ScriptGlue::RegisterFunctions();
+
         s_Data->EntityClass = ScriptClass("HRealEngine", "Entity", true);
     }
 
@@ -479,6 +525,11 @@ namespace HRealEngine
     MonoImage* ScriptEngine::GetCoreAssemblyImage()
     {
         return s_Data->CoreImage;
+    }
+
+    MonoImage* ScriptEngine::GetAppAssemblyImage()
+    {
+        return s_Data->AppImage;
     }
 
     Ref<ScriptInstance> ScriptEngine::GetEntitySriptInstance(UUID entityID)

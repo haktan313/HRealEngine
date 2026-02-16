@@ -6,6 +6,23 @@
 class NodeRegistry
 {
 public:
+    static void AddActionNodeInfo(const std::string& name, ActionClassInfo actionInfo)
+    {
+        s_ActionClassInfoMap[name] = std::move(actionInfo);
+    }
+    static void AddDecoratorNodeInfo(const std::string& name, DecoratorClassInfo decoratorInfo)
+    {
+        s_DecoratorClassInfoMap[name] = std::move(decoratorInfo);
+    }
+    static void AddConditionNodeInfo(const std::string& name, ConditionClassInfo conditionInfo)
+    {
+        s_ConditionClassInfoMap[name] = std::move(conditionInfo);
+    }
+    static void AddBlackboardInfo(const std::string& name, BlackboardClassInfo blackboardInfo)
+    {
+        s_BlackboardClassInfoMap[name] = std::move(blackboardInfo);
+    }
+
     template<typename ActionClass, typename ParamsStruct>
     static void AddActionNodeToBuilder(const std::string& name = "")
     {

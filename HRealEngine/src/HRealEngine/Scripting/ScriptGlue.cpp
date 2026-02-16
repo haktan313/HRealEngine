@@ -1,6 +1,7 @@
 #include "HRpch.h"
 #include "ScriptGlue.h"
 #include "ScriptEngine.h"
+#include "ScriptBehaviorTreeNodes.h"
 
 #include "HRealEngine/Core/KeyCodes.h"
 #include "HRealEngine/Core/Input.h"
@@ -19,6 +20,8 @@ namespace HRealEngine
 {
     static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFunctions;
 #define HRE_ADD_INTERNAL_CALL(Name) mono_add_internal_call("HRealEngine.InternalCalls::" #Name, Name)
+
+    static std::string MonoStringToString(MonoString* string);
     
     static void PrintLog(MonoString* string, int number)
     {
@@ -109,6 +112,51 @@ namespace HRealEngine
         ScriptEngine::OpenScene(pathStr);
     }
 
+    static void BehaviorTree_RegisterAction(MonoString* displayName, MonoString* managedTypeName)
+    {
+        RegisterScriptBehaviorTreeAction(MonoStringToString(displayName), MonoStringToString(managedTypeName));
+    }
+
+    static void BehaviorTree_RegisterCondition(MonoString* displayName, MonoString* managedTypeName)
+    {
+        RegisterScriptBehaviorTreeCondition(MonoStringToString(displayName), MonoStringToString(managedTypeName));
+    }
+
+    static void BehaviorTree_RegisterDecorator(MonoString* displayName, MonoString* managedTypeName)
+    {
+        RegisterScriptBehaviorTreeDecorator(MonoStringToString(displayName), MonoStringToString(managedTypeName));
+    }
+
+    static void BehaviorTree_RegisterBlackboard(MonoString* displayName, MonoString* managedTypeName)
+    {
+        RegisterScriptBehaviorTreeBlackboard(MonoStringToString(displayName), MonoStringToString(managedTypeName));
+    }
+
+    static bool BehaviorTree_BlackboardCreateBool(MonoString* key, bool value)
+    {
+        return CreateScriptBlackboardBool(MonoStringToString(key), value);
+    }
+
+    static bool BehaviorTree_BlackboardCreateInt(MonoString* key, int value)
+    {
+        return CreateScriptBlackboardInt(MonoStringToString(key), value);
+    }
+
+    static bool BehaviorTree_BlackboardCreateFloat(MonoString* key, float value)
+    {
+        return CreateScriptBlackboardFloat(MonoStringToString(key), value);
+    }
+
+    static bool BehaviorTree_BlackboardCreateString(MonoString* key, MonoString* value)
+    {
+        return CreateScriptBlackboardString(MonoStringToString(key), MonoStringToString(value));
+    }
+
+    static uint64_t BehaviorTree_GetCurrentOwnerEntity()
+    {
+        return GetCurrentBehaviorTreeOwnerEntityID();
+    }
+
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
@@ -149,7 +197,7 @@ namespace HRealEngine
 		return ScriptEngine::CreateString(tc.TextString.c_str());
 	}
 
-	std::string MonoStringToString(MonoString* string)
+	static std::string MonoStringToString(MonoString* string)
     {
     	char* cStr = mono_string_to_utf8(string);
     	std::string str(cStr);
@@ -441,6 +489,16 @@ namespace HRealEngine
     	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);
+
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_RegisterAction);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_RegisterCondition);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_RegisterDecorator);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_RegisterBlackboard);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_BlackboardCreateBool);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_BlackboardCreateInt);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_BlackboardCreateFloat);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_BlackboardCreateString);
+        HRE_ADD_INTERNAL_CALL(BehaviorTree_GetCurrentOwnerEntity);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
         HRE_ADD_INTERNAL_CALL(TransformComponent_GetRotation);

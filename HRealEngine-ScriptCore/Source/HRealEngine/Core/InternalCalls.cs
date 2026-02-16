@@ -22,6 +22,25 @@ namespace HRealEngine
         internal extern static void DestroyEntity(ulong entityID);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BehaviorTree_RegisterAction(string displayName, string managedTypeName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BehaviorTree_RegisterCondition(string displayName, string managedTypeName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BehaviorTree_RegisterDecorator(string displayName, string managedTypeName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BehaviorTree_RegisterBlackboard(string displayName, string managedTypeName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool BehaviorTree_BlackboardCreateBool(string key, bool value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool BehaviorTree_BlackboardCreateInt(string key, int value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool BehaviorTree_BlackboardCreateFloat(string key, float value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool BehaviorTree_BlackboardCreateString(string key, string value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong BehaviorTree_GetCurrentOwnerEntity();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCodes keyCode);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Input_GetMousePosition(out Vector2 result);

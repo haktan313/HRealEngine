@@ -219,6 +219,7 @@ namespace HRealEngine
         static ScriptFieldMap& GetScriptFieldMap(Entity entity);
         static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
         static MonoImage* GetCoreAssemblyImage();
+        static MonoImage* GetAppAssemblyImage();
         static Ref<ScriptInstance> GetEntitySriptInstance(UUID entityID);
         static MonoObject* GetManagedInstance(UUID entityID);
     private:
