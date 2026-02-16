@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "Tree.h"
-#include "../Editor/NodeEditorStructsAndEnums.h"
+#include "NodeRegistryTypes.h"
 
 class NodeRegistry
 {

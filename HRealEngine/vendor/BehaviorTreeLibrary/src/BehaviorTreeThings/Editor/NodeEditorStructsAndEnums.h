@@ -2,6 +2,7 @@
 #include <functional>
 #include <imgui_node_editor_internal.h>
 #include "BehaviorTreeThings/Core/Nodes.h"
+#include "BehaviorTreeThings/Core/NodeRegistryTypes.h"
 
 namespace nodeEditor = ax::NodeEditor;
 
@@ -29,32 +30,6 @@ struct BuildOp
 {
     BuildOpType Type;
     Node* EditorNode;
-};
-struct ActionClassInfo
-{
-    std::string Name;
-    std::function<void(BehaviorTreeBuilder&, Node*, ParamsForAction&)> BuildFn;
-    std::function<std::unique_ptr<ParamsForAction>()> CreateParamsFn;
-    std::function<void(BehaviorTreeBuilder&, const std::string&, const YAML::Node&)> BuildFromYAML;
-};
-struct DecoratorClassInfo
-{
-    std::string Name;
-    std::function<void(BehaviorTreeBuilder&, ParamsForDecorator&)> BuildFn;
-    std::function<std::unique_ptr<ParamsForDecorator>()> CreateParamsFn;
-    std::function<void(BehaviorTreeBuilder&, const std::string&, const YAML::Node&)> BuildFromYAML;
-};
-struct ConditionClassInfo
-{
-    std::string Name;
-    std::function<void(BehaviorTreeBuilder&, ParamsForCondition&)> BuildFn;
-    std::function<std::unique_ptr<ParamsForCondition>()> CreateParamsFn;
-    std::function<void(BehaviorTreeBuilder&, const std::string&, const YAML::Node&, PriorityType)> BuildFromYAML;
-};
-struct BlackboardClassInfo
-{
-    std::string Name;
-    std::function<std::unique_ptr<HBlackboard>()> CreateBlackboardFn;
 };
 struct EditorDecorator
 {
