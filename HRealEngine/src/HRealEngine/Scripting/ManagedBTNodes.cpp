@@ -182,6 +182,22 @@ namespace HRealEngine
         HActionNode::OnAbort();
     }
 
+    void ManagedBTAction::SetParametersInstance(void* p)
+    {
+        m_ParamsInstance = static_cast<MonoObject*>(p);
+        
+        if (m_ManagedInstance && m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+    }
+
     void ManagedBTAction::InitializeManagedNode()
     {
         if (!GetTree())
@@ -198,6 +214,13 @@ namespace HRealEngine
         if (!ownerUUID)
             return;
         
+        Scene* scene = ScriptEngine::GetSceneContext();
+        if (!scene)
+        {
+            LOG_CORE_ERROR("InitializeManagedNode: Scene context is null! Make sure ScriptEngine::OnRuntimeStart() was called.");
+            return;
+        }
+        
         MonoObject* managedBlackboard = nullptr;
         auto* rawBlackboard = tree->GetBlackboardRaw();
         
@@ -207,6 +230,17 @@ namespace HRealEngine
         }
 
         ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
+        
+        if (m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
     }
 
     //---------------------BTCondition---------------------
@@ -254,6 +288,22 @@ namespace HRealEngine
     {
         if (m_ManagedInstance)
             ScriptEngine::CallBTNodeOnAbort(m_ManagedInstance);
+    }
+
+    void ManagedBTCondition::SetParametersInstance(void* p)
+    {
+        m_ParamsInstance = static_cast<MonoObject*>(p);
+        
+        if (m_ManagedInstance && m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
     }
 
     void ManagedBTCondition::InitializeManagedNode()
@@ -334,6 +384,22 @@ namespace HRealEngine
     {
         if (m_ManagedInstance)
             ScriptEngine::CallBTNodeOnAbort(m_ManagedInstance);
+    }
+
+    void ManagedBTDecorator::SetParametersInstance(void* p)
+    {
+        m_ParamsInstance = static_cast<MonoObject*>(p);
+        
+        if (m_ManagedInstance && m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
     }
 
     void ManagedBTDecorator::InitializeManagedNode()

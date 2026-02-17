@@ -35,7 +35,7 @@ namespace HRealEngine
         MonoObject* GetManagedInstance() const { return m_ManagedInstance; }
         MonoObject* GetParametersInstance() const { return m_ParamsInstance; }
 
-        void SetParametersInstance(void* p) { m_ParamsInstance = static_cast<MonoObject*>(p); }
+        void SetParametersInstance(void* p);
     private:
         void InitializeManagedNode();
 
@@ -57,7 +57,7 @@ namespace HRealEngine
         MonoObject* GetManagedInstance() const { return m_ManagedInstance; }
         MonoObject* GetParametersInstance() const { return m_ParamsInstance; }
 
-        void SetParametersInstance(void* p) { m_ParamsInstance = static_cast<MonoObject*>(p); }
+        void SetParametersInstance(void* p);
     private:
         void InitializeManagedNode();
 
@@ -80,7 +80,7 @@ namespace HRealEngine
         MonoObject* GetManagedInstance() const { return m_ManagedInstance; }
         MonoObject* GetParametersInstance() const { return m_ParamsInstance; }
 
-        void SetParametersInstance(void* p) { m_ParamsInstance = static_cast<MonoObject*>(p); }
+        void SetParametersInstance(void* p);
     private:
         void InitializeManagedNode();
 

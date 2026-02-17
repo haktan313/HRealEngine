@@ -18,12 +18,26 @@ namespace HRealEngine.BehaviorTree
     public abstract class BTNode
     {
         protected BTBlackboard blackboard;
-        protected Entity owner;
+        protected ulong ownerEntityID;
         
-        public virtual void Initialize(BTBlackboard bb, Entity ownerEntity)
+        private Entity cachedOwner;
+        
+        protected Entity owner
+        {
+            get
+            {
+                if (cachedOwner == null || cachedOwner.EntityID != ownerEntityID)
+                {
+                    cachedOwner = new Entity(ownerEntityID);
+                }
+                return cachedOwner;
+            }
+        }
+        
+        public virtual void Initialize(BTBlackboard bb, ulong entityID)
         {
             blackboard = bb;
-            owner = ownerEntity;
+            ownerEntityID = entityID;
             OnInitialize();
         }
 

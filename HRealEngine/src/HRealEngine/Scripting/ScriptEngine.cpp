@@ -49,6 +49,31 @@ namespace HRealEngine
         { "HRealEngine.Entity",   ScriptFieldType::Entity },
         { "System.String",    ScriptFieldType::String } 
     };
+
+    static MonoClassField* FindFieldInHierarchy(MonoClass* klass, const char* fieldName)
+    {
+        MonoClass* current = klass;
+        while (current != nullptr)
+        {
+            MonoClassField* field = mono_class_get_field_from_name(current, fieldName);
+            if (field)
+                return field;
+            current = mono_class_get_parent(current);
+        }
+        return nullptr;
+    }
+    static MonoMethod* FindMethodInHierarchy(MonoClass* klass, const char* methodName, int paramCount)
+    {
+        MonoClass* current = klass;
+        while (current != nullptr)
+        {
+            MonoMethod* method = mono_class_get_method_from_name(current, methodName, paramCount);
+            if (method)
+                return method;
+            current = mono_class_get_parent(current);
+        }
+        return nullptr;
+    }
     
     /*static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
     {
@@ -807,16 +832,43 @@ namespace HRealEngine
             return;
 
         MonoClass* klass = mono_object_get_class(nodeInstance);
-        MonoMethod* initMethod = mono_class_get_method_from_name(klass, "Initialize", 2);
-        
+        //MonoMethod* initMethod = mono_class_get_method_from_name(klass, "Initialize", 2);
+        MonoMethod* initMethod = FindMethodInHierarchy(klass, "Initialize", 2);
         if (initMethod)
         {
+            Scene* scene = ScriptEngine::GetSceneContext();
+            if (!scene)
+            {
+                LOG_CORE_ERROR("InitializeBTNode: Scene context is null!");
+                return;
+            }
+        
+            Entity verifyEntity = scene->GetEntityByUUID(entityID);
+            if (!verifyEntity)
+            {
+                LOG_CORE_ERROR("InitializeBTNode: Invalid entity UUID: {}", (uint64_t)entityID);
+                return;
+            }
+            
             void* args[2];
             args[0] = blackboardInstance;
             args[1] = &entityID;
-            
-            mono_runtime_invoke(initMethod, nodeInstance, args, nullptr);
+        
+            LOG_CORE_INFO("Calling Initialize method with blackboard: {}, entityID: {}", (void*)blackboardInstance, (uint64_t)entityID);
+        
+            MonoObject* exception = nullptr;
+            mono_runtime_invoke(initMethod, nodeInstance, args, &exception);
+        
+            if (exception)
+            {
+                MonoString* exMsg = mono_object_to_string(exception, nullptr);
+                char* exChars = mono_string_to_utf8(exMsg);
+                LOG_CORE_ERROR("Exception in Initialize: {}", exChars);
+                mono_free(exChars);
+            }
         }
+        else
+            LOG_CORE_ERROR("Initialize(BTBlackboard, Entity) method not found in class hierarchy!");
     }
 
     void ScriptEngine::CallBTNodeOnStart(MonoObject* nodeInstance)
@@ -1018,32 +1070,7 @@ namespace HRealEngine
             }
         }
     }
-
-
-    static MonoClassField* FindFieldInHierarchy(MonoClass* klass, const char* fieldName)
-    {
-        MonoClass* current = klass;
-        while (current != nullptr)
-        {
-            MonoClassField* field = mono_class_get_field_from_name(current, fieldName);
-            if (field)
-                return field;
-            current = mono_class_get_parent(current);
-        }
-        return nullptr;
-    }
-    static MonoMethod* FindMethodInHierarchy(MonoClass* klass, const char* methodName, int paramCount)
-    {
-        MonoClass* current = klass;
-        while (current != nullptr)
-        {
-            MonoMethod* method = mono_class_get_method_from_name(current, methodName, paramCount);
-            if (method)
-                return method;
-            current = mono_class_get_parent(current);
-        }
-        return nullptr;
-    }
+    
     ScriptEngine::BTParameterInfo ScriptEngine::GetBTParameterInfo(const std::string& nodeClassName)
     {
         if (s_BTParameterCache.find(nodeClassName) != s_BTParameterCache.end())
