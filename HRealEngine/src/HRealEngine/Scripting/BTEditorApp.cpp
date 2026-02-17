@@ -145,4 +145,52 @@ namespace HRealEngine
             }
         }
     }
+
+    void BTEditorApp::DeserializeManagedActionParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode)
+    {
+        if (!ScriptEngine::IsInitialized())
+            return;
+        if (ScriptEngine::s_BTActionClasses.find(className) == ScriptEngine::s_BTActionClasses.end())
+            return;
+
+        MonoObject* paramsInstance = ScriptEngine::CreateBTParameterInstance(className);
+        if (!paramsInstance)
+            return;
+
+        ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
+        m_NodeToManagedActionParams[nodeKey] = paramsInstance;
+        m_NodeToActionClassId[nodeKey] = className;
+    }
+
+    void BTEditorApp::DeserializeManagedDecoratorParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode)
+    {
+        if (!ScriptEngine::IsInitialized())
+            return;
+        if (ScriptEngine::s_BTDecoratorClasses.find(className) == ScriptEngine::s_BTDecoratorClasses.end())
+            return;
+
+        MonoObject* paramsInstance = ScriptEngine::CreateBTParameterInstance(className);
+        if (!paramsInstance)
+            return;
+
+        ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
+        m_NodeToManagedDecoratorParams[nodeKey] = paramsInstance;
+        m_NodeToDecoratorClassId[nodeKey] = className;
+    }
+
+    void BTEditorApp::DeserializeManagedConditionParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode)
+    {
+        if (!ScriptEngine::IsInitialized())
+            return;
+        if (ScriptEngine::s_BTConditionClasses.find(className) == ScriptEngine::s_BTConditionClasses.end())
+            return;
+
+        MonoObject* paramsInstance = ScriptEngine::CreateBTParameterInstance(className);
+        if (!paramsInstance)
+            return;
+
+        ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
+        m_NodeToManagedConditionParams[nodeKey] = paramsInstance;
+        m_NodeToConditionClassId[nodeKey] = className;
+    }
 }

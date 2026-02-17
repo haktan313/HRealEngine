@@ -11,6 +11,17 @@ public:
     void ClearNodeMappings() { m_NodeToEditorIdMap.clear(); }
     void ClearDatas();
     
+    using RuntimeNodeSyncer = std::function<void(HNode*, void*)>;
+    static void SetRuntimeNodeSyncer(RuntimeNodeSyncer fn)
+    {
+        s_RuntimeNodeSyncer = fn;
+    }
+    virtual void DeserializeManagedActionParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode) {}
+    virtual void DeserializeManagedDecoratorParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode) {}
+    virtual void DeserializeManagedConditionParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode) {}
+private:
+    static RuntimeNodeSyncer s_RuntimeNodeSyncer;
+public:
     NodeEditorApp();
     virtual ~NodeEditorApp();
     void SetEmbeddedMode(bool enabled) { m_bIsEmbedded = enabled; }
@@ -30,6 +41,10 @@ public:
     NodeEditorHelper& GetNodeEditorHelper() { return *m_NodeEditor; }
     HBlackboard& GetBlackboard() { return *m_Blackboard; }
     bool IsRuntimeMode() const { return m_bIsRuntimeMode; }
+
+    virtual void* GetManagedActionParams(int nodeKey) const { return nullptr; }
+    virtual void* GetManagedDecoratorParams(int nodeKey) const { return nullptr; }
+    virtual void* GetManagedConditionParams(int nodeKey) const { return nullptr; }
     
     void DecoratorNodeSelected(EditorDecorator& decorator);
     void ConditionNodeSelected(EditorCondition& condition);
@@ -38,8 +53,13 @@ public:
 protected:
     std::unique_ptr<HBlackboard> m_Blackboard;
 
+    std::unordered_map<int, std::string> m_NodeToActionClassId;
     std::unordered_map<int, std::unique_ptr<ParamsForAction>> m_NodeToParams;
+    
+    std::unordered_map<int, std::string> m_NodeToDecoratorClassId;
     std::unordered_map<int, std::unique_ptr<ParamsForDecorator>> m_NodeToDecoratorParams;
+
+    std::unordered_map<int, std::string> m_NodeToConditionClassId;
     std::unordered_map<int, std::unique_ptr<ParamsForCondition>> m_NodeToConditionParams;
 private:
     
@@ -92,15 +112,15 @@ private:
     std::unordered_map<const HNode*, nodeEditor::NodeId> m_NodeToEditorIdMap;
     std::unordered_map<uintptr_t, const HNode*> m_EditorIdToNodeMap;
 
-    std::unordered_map<int, std::string> m_NodeToActionClassId;
+    //std::unordered_map<int, std::string> m_NodeToActionClassId;
     //std::unordered_map<int, std::unique_ptr<ParamsForAction>> m_NodeToParams;
     std::string m_SelectedActionClassName;
 
-    std::unordered_map<int, std::string> m_NodeToDecoratorClassId;
+    //std::unordered_map<int, std::string> m_NodeToDecoratorClassId;
     //std::unordered_map<int, std::unique_ptr<ParamsForDecorator>> m_NodeToDecoratorParams;
     std::string m_SelectedDecoratorClassName;
 
-    std::unordered_map<int, std::string> m_NodeToConditionClassId;
+    //std::unordered_map<int, std::string> m_NodeToConditionClassId;
     //std::unordered_map<int, std::unique_ptr<ParamsForCondition>> m_NodeToConditionParams;
     std::string m_SelectedConditionClassName;
 

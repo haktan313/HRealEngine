@@ -9,6 +9,8 @@
 
 
 BTSerializer::EditorAppProvider BTSerializer::s_EditorAppProvider = nullptr;
+BTSerializer::ParamsSerializer BTSerializer::s_ParamsSerializer = nullptr;
+BTSerializer::ManagedParamsSerializer BTSerializer::s_ManagedParamsSerializer = nullptr;
 
 BTSerializer::BTSerializer()
 {
@@ -51,6 +53,8 @@ void BTSerializer::Serialize(const std::string& filepath)
 {
     auto rootNode = m_Tree->GetRootNode();
 
+    SyncEditorParamsToRuntime();
+    
     YAML::Emitter out;
     out << YAML::BeginMap;
 
@@ -75,6 +79,36 @@ void BTSerializer::Serialize(const std::string& filepath)
 
     std::ofstream fout(filepath);
     fout << out.c_str();
+}
+
+void BTSerializer::SyncEditorParamsToRuntime()
+{
+    NodeEditorApp* editorApp = nullptr;
+    if (s_EditorAppProvider)
+        editorApp = s_EditorAppProvider();
+    if (!editorApp || !NodeEditorApp::s_RuntimeNodeSyncer)
+        return;
+
+    auto& helper = editorApp->GetNodeEditorHelper();
+    for (const auto& node : helper.GetNodes())
+    {
+        int nodeKey = (int)node.ID.Get();
+        auto* runtimeNodeConst = editorApp->GetRuntimeNodeFor(node.ID);
+        if (!runtimeNodeConst)
+            continue;
+        HNode* runtimeNode = const_cast<HNode*>(runtimeNodeConst);
+        
+        void* managedParams = editorApp->GetManagedActionParams(nodeKey);
+        if (managedParams)
+            NodeEditorApp::s_RuntimeNodeSyncer(runtimeNode, managedParams);
+        
+        void* managedDecoParams = editorApp->GetManagedDecoratorParams(nodeKey);
+        if (managedDecoParams)
+        {
+            for (auto* child : runtimeNode->GetChildrensRaw())
+                NodeEditorApp::s_RuntimeNodeSyncer(child, managedDecoParams);
+        }
+    }
 }
 
 bool BTSerializer::Deserialize(const std::string& filepath)
@@ -218,6 +252,7 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
                             edeco.ClassName = className;
                             edeco.Params = editorApp->m_NodeToDecoratorParams[nodeKey].get();
                             newNode->Decorators.push_back(edeco);
+                            editorApp->DeserializeManagedDecoratorParams(nodeKey, className, d["Params"]);
                         }
                     }
                 if (n["Conditions"])
@@ -249,6 +284,7 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
                             econd.ClassName = className;
                             econd.Params = editorApp->m_NodeToConditionParams[nodeKey].get();
                             newNode->Conditions.push_back(econd);
+                            editorApp->DeserializeManagedConditionParams(nodeKey, className, c["Params"]);
                         }
                     }
                 
@@ -261,6 +297,7 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
                         editorApp->m_NodeToActionClassId[nodeKey] = actionClassName;
                         editorApp->m_NodeToParams[nodeKey] = actionMap[actionClassName].CreateParamsFn();
                         editorApp->m_NodeToParams[nodeKey]->Deserialize(n["Params"]);
+                        editorApp->DeserializeManagedActionParams(nodeKey, actionClassName, n["Params"]);
                     }
                 }
             }
@@ -373,7 +410,15 @@ bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditor
                     std::string className = d["ClassName"].as<std::string>();
                     auto& decoMap = NodeRegistry::GetDecoratorClassInfoMap();
                     if (!decoMap.count(className))
+                    {
+                        editorApp->DeserializeManagedDecoratorParams(nodeKey, className, d["Params"]);
+    
+                        EditorDecorator edeco(d["Name"].as<std::string>());
+                        edeco.ClassName = className;
+                        edeco.Params = nullptr;
+                        newNode->Decorators.push_back(edeco);
                         continue;
+                    }
 
                     editorApp->m_NodeToDecoratorClassId[nodeKey] = className;
                     editorApp->m_NodeToDecoratorParams[nodeKey] = decoMap[className].CreateParamsFn();
@@ -390,7 +435,15 @@ bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditor
                     std::string className = c["ClassName"].as<std::string>();
                     auto& condMap = NodeRegistry::GetConditionClassInfoMap();
                     if (!condMap.count(className))
+                    {
+                        editorApp->DeserializeManagedConditionParams(nodeKey, className, c["Params"]);
+    
+                        EditorCondition econd(c["Name"].as<std::string>());
+                        econd.ClassName = className;
+                        econd.Params = nullptr;
+                        newNode->Conditions.push_back(econd);
                         continue;
+                    }
 
                     editorApp->m_NodeToConditionClassId[nodeKey] = className;
                     editorApp->m_NodeToConditionParams[nodeKey] = condMap[className].CreateParamsFn();
@@ -423,7 +476,8 @@ bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditor
                     editorApp->m_NodeToActionClassId[nodeKey] = actionClassName;
                     editorApp->m_NodeToParams[nodeKey] = actionMap[actionClassName].CreateParamsFn();
                     editorApp->m_NodeToParams[nodeKey]->Deserialize(node["Params"]);
-                }
+                }else
+                    editorApp->DeserializeManagedActionParams(nodeKey, actionClassName, node["Params"]);
             }
         }
     }
@@ -733,8 +787,23 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
             out << YAML::Key << "Name" << YAML::Value << deco.Name;
             out << YAML::Key << "ClassName" << YAML::Value << deco.ClassName;
             out << YAML::Key << "Params" << YAML::Value << YAML::BeginMap;
-            if (deco.Params)
-                deco.Params->Serialize(out);
+            /*if (deco.Params)
+                deco.Params->Serialize(out);*/
+            /*bool serialized = false;
+            if (s_ParamsSerializer && runtimeNode)
+                serialized = s_ParamsSerializer(runtimeNode, out);
+            if (!serialized && deco.Params)
+                deco.Params->Serialize(out);*/
+            {
+                int nodeKey = (int)node.ID.Get();
+                void* managedParams = editorApp->GetManagedDecoratorParams(nodeKey);
+                bool serialized = false;
+                if (managedParams && s_ManagedParamsSerializer)
+                    serialized = s_ManagedParamsSerializer(managedParams, out);
+                if (!serialized && deco.Params)
+                    deco.Params->Serialize(out);
+            }
+
             out << YAML::EndMap;
             out << YAML::EndMap;
         }
@@ -747,9 +816,31 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
             out << YAML::Key << "Name" << YAML::Value << cond.Name;
             out << YAML::Key << "ClassName" << YAML::Value << cond.ClassName;
             out << YAML::Key << "Params" << YAML::Value << YAML::BeginMap;
-            out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond.Params->Priority);
+            //out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond.Params->Priority);
+            out << YAML::Key << "Priority" << YAML::Value;
             if (cond.Params)
-                cond.Params->Serialize(out);
+                out << YAML::Value << PriorityToString(cond.Params->Priority);
+            else
+                out << YAML::Value << "None";
+            /*if (cond.Params)
+                cond.Params->Serialize(out);*/
+            /*bool serialized = false;
+            if (s_ParamsSerializer && runtimeNode)
+                serialized = s_ParamsSerializer(runtimeNode, out);
+            if (!serialized && cond.Params)
+                cond.Params->Serialize(out);*/
+            {
+                int nodeKey = (int)node.ID.Get();
+                void* managedParams = editorApp->GetManagedConditionParams(nodeKey);
+                bool serialized = false;
+                if (managedParams && s_ManagedParamsSerializer)
+                    serialized = s_ManagedParamsSerializer(managedParams, out);
+                if (!serialized && cond.Params)
+                {
+                    out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond.Params->Priority);
+                    cond.Params->Serialize(out);
+                }
+            }
             out << YAML::EndMap;
             out << YAML::EndMap;
         }
@@ -757,8 +848,22 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
         
         out << YAML::Key << "Params" << YAML::Value;
         out << YAML::BeginMap;
-        if (runtimeNode)
-            runtimeNode->GetParams().Serialize(out);
+        /*if (runtimeNode)
+            runtimeNode->GetParams().Serialize(out);*/
+        /*bool serialized = false;
+        if (s_ParamsSerializer)
+            serialized = s_ParamsSerializer(runtimeNode, out);
+        if (!serialized)
+            runtimeNode->GetParams().Serialize(out);*/
+        {
+            int nodeKey = (int)node.ID.Get();
+            void* managedParams = editorApp->GetManagedActionParams(nodeKey);
+            bool serialized = false;
+            if (managedParams && s_ManagedParamsSerializer)
+                serialized = s_ManagedParamsSerializer(managedParams, out);
+            if (!serialized && runtimeNode)
+                runtimeNode->GetParams().Serialize(out);
+        }
         out << YAML::EndMap;
 
         out << YAML::EndMap;
@@ -847,7 +952,12 @@ void BTSerializer::SerializeNode(YAML::Emitter& out, const HNode* node)
 
     out << YAML::Key << "Params" << YAML::Value;
     out << YAML::BeginMap;
-    node->GetParams().Serialize(out);
+    //node->GetParams().Serialize(out);
+    bool serialized = false;
+    if (s_ParamsSerializer)
+        serialized = s_ParamsSerializer(node, out);
+    if (!serialized)
+        node->GetParams().Serialize(out);
     out << YAML::EndMap;
 
     out << YAML::EndMap;

@@ -11,6 +11,8 @@
 
 #include "imgui.h"
 
+NodeEditorApp::RuntimeNodeSyncer NodeEditorApp::s_RuntimeNodeSyncer = nullptr;
+
 void NodeEditorApp::ClearDatas()
 {
     m_bIsRuntimeMode = false;

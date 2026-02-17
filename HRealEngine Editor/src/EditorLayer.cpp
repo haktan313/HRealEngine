@@ -120,6 +120,64 @@ namespace HRealEngine
                 LOG_CORE_INFO("Registered managed BT Blackboard in editor: {}", className);
             }
         }
+
+        BTSerializer::SetParamsSerializer([](const HNode* node, YAML::Emitter& out) -> bool
+        {
+            using namespace HRealEngine;
+    
+            auto* managedAction = dynamic_cast<const ManagedBTAction*>(node);
+            if (managedAction && managedAction->GetParametersInstance())
+            {
+                ScriptEngine::SerializeBTParameters(
+                    managedAction->GetParametersInstance(), out);
+                return true;
+            }
+            auto* managedCond = dynamic_cast<const ManagedBTCondition*>(node);
+            if (managedCond && managedCond->GetParametersInstance())
+            {
+                ScriptEngine::SerializeBTParameters(
+                    managedCond->GetParametersInstance(), out);
+                return true;
+            }
+            auto* managedDeco = dynamic_cast<const ManagedBTDecorator*>(node);
+            if (managedDeco && managedDeco->GetParametersInstance())
+            {
+                ScriptEngine::SerializeBTParameters(
+                    managedDeco->GetParametersInstance(), out);
+                return true;
+            }
+            return false;
+        });
+        BTSerializer::SetManagedParamsSerializer([](void* paramsPtr, YAML::Emitter& out) -> bool
+        {
+            if (!paramsPtr)
+                return false;
+            MonoObject* paramsInstance = static_cast<MonoObject*>(paramsPtr);
+            HRealEngine::ScriptEngine::SerializeBTParameters(paramsInstance, out);
+            return true;
+        });
+        NodeEditorApp::SetRuntimeNodeSyncer([](HNode* runtimeNode, void* paramsPtr) {
+        using namespace HRealEngine;
+        
+        auto* managedAction = dynamic_cast<ManagedBTAction*>(runtimeNode);
+        if (managedAction)
+        {
+            managedAction->SetParametersInstance(paramsPtr);
+            return;
+        }
+        auto* managedCond = dynamic_cast<ManagedBTCondition*>(runtimeNode);
+        if (managedCond)
+        {
+            managedCond->SetParametersInstance(paramsPtr);
+            return;
+        }
+        auto* managedDeco = dynamic_cast<ManagedBTDecorator*>(runtimeNode);
+        if (managedDeco)
+        {
+            managedDeco->SetParametersInstance(paramsPtr);
+            return;
+        }
+    });
     }
 
     void EditorLayer::OnAttach()

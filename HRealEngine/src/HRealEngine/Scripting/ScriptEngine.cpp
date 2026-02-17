@@ -828,7 +828,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         MonoMethod* method = nullptr;
         if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
@@ -851,7 +856,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         MonoMethod* method = nullptr;
         if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
@@ -875,7 +885,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         MonoMethod* method = nullptr;
         if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
@@ -898,7 +913,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         MonoMethod* method = nullptr;
         if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
@@ -921,7 +941,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         if (s_BTConditionClasses.find(fullName) != s_BTConditionClasses.end())
         {
@@ -945,7 +970,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
         {
@@ -969,7 +999,12 @@ namespace HRealEngine
         const char* className = mono_class_get_name(klass);
         const char* nameSpace = mono_class_get_namespace(klass);
         
-        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        //std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        std::string fullName;
+        if (nameSpace && strlen(nameSpace) != 0)
+            fullName = fmt::format("{}.{}", nameSpace, className);
+        else
+            fullName = className;
         
         if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
         {
@@ -1338,12 +1373,19 @@ namespace HRealEngine
 
         MonoClass* paramsClass = mono_object_get_class(paramsInstance);
         const char* paramsClassName = mono_class_get_name(paramsClass);
+        const char* paramsNamespace = mono_class_get_namespace(paramsClass);
+        
+        std::string fullParamsName;
+        if (paramsNamespace && strlen(paramsNamespace) != 0)
+            fullParamsName = fmt::format("{}.{}", paramsNamespace, paramsClassName);
+        else
+            fullParamsName = paramsClassName;
         
         BTParameterInfo info;
         bool found = false;
         
         for (const auto& [nodeName, cachedInfo] : s_BTParameterCache)
-            if (cachedInfo.ClassName == paramsClassName)
+            /*if (cachedInfo.ClassName == paramsClassName)*/if (cachedInfo.ClassName == fullParamsName)
             {
                 info = cachedInfo;
                 found = true;
@@ -1399,12 +1441,19 @@ namespace HRealEngine
 
         MonoClass* paramsClass = mono_object_get_class(paramsInstance);
         const char* paramsClassName = mono_class_get_name(paramsClass);
-
+        const char* paramsNamespace = mono_class_get_namespace(paramsClass);
+        
+        std::string fullParamsName;
+        if (paramsNamespace && strlen(paramsNamespace) != 0)
+            fullParamsName = fmt::format("{}.{}", paramsNamespace, paramsClassName);
+        else
+            fullParamsName = paramsClassName;
+        
         BTParameterInfo info;
         bool found = false;
         
         for (const auto& [nodeName, cachedInfo] : s_BTParameterCache)
-            if (cachedInfo.ClassName == paramsClassName)
+            /*if (cachedInfo.ClassName == paramsClassName)*/if (cachedInfo.ClassName == fullParamsName)
             {
                 info = cachedInfo;
                 found = true;

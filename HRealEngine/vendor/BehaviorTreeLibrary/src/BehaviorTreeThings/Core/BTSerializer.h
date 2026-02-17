@@ -12,6 +12,16 @@ public:
     {
         s_EditorAppProvider = provider;
     }
+    using ParamsSerializer = std::function<bool(const HNode*, YAML::Emitter&)>;
+    static void SetParamsSerializer(ParamsSerializer fn) 
+    { 
+        s_ParamsSerializer = fn; 
+    }
+    using ManagedParamsSerializer = std::function<bool(void*, YAML::Emitter&)>;
+    static void SetManagedParamsSerializer(ManagedParamsSerializer fn) 
+    { 
+        s_ManagedParamsSerializer = fn; 
+    }
     
     BTSerializer();
     BTSerializer(BehaviorTree*& tree);
@@ -19,7 +29,8 @@ public:
 
     void CreateBehaviorTreeFile(const std::string& filepath);
     void Serialize(const std::string& filepath);
-    
+    void SyncEditorParamsToRuntime();
+
     bool Deserialize(const std::string& filepath);
     bool Deserialize(const std::string& filepath, NodeEditorApp* editorAppFromEditor);
     bool Deserialize(const YAML::Node& data);
@@ -48,4 +59,6 @@ private:
     BehaviorTree* m_Tree = nullptr;
 
     static EditorAppProvider s_EditorAppProvider;
+    static ParamsSerializer s_ParamsSerializer;
+    static ManagedParamsSerializer s_ManagedParamsSerializer;
 };
