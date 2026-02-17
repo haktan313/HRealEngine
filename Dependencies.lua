@@ -19,6 +19,7 @@ IncludeDir["assimp"] = "%{wks.location}/HRealEngine/vendor/assimp/include"
 IncludeDir["BehaviorTreeLibrary"] = "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/src"
 IncludeDir["msdfgen"] = "%{wks.location}/HRealEngine/vendor/msdf-atlas-gen/msdfgen"
 IncludeDir["msdf_atlas_gen"] = "%{wks.location}/HRealEngine/vendor/msdf-atlas-gen/msdf-atlas-gen"
+IncludeDir["ImGuiNodeEditor"] = "%{wks.location}/HRealEngine/vendor/BehaviorTreeLibrary/libs/imgui-node-editor"
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/HRealEngine/vendor/mono/lib/%{cfg.buildcfg}"

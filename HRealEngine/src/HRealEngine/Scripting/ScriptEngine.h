@@ -3,6 +3,7 @@
 #include <mono/metadata/class.h>
 #include <mono/metadata/object-forward.h>
 
+#include "ManagedBTNodes.h"
 #include "HRealEngine/Scene/Scene.h"
 
 namespace JPH
@@ -228,6 +229,76 @@ namespace HRealEngine
         static MonoObject* InstantiateClass(MonoClass* monoClass);
         friend class ScriptClass;
         friend class ScriptGlue;
+
+    public:
+        static MonoObject* CreateBTActionInstance(const std::string& className);
+        static MonoObject* CreateBTConditionInstance(const std::string& className);
+        static MonoObject* CreateBTDecoratorInstance(const std::string& className);
+        static MonoObject* CreateBTBlackboardInstance(const std::string& className);
+        
+        static void CallBTNodeOnStart(MonoObject* nodeInstance);
+        static int CallBTNodeUpdate(MonoObject* nodeInstance);
+        static void CallBTNodeOnFinished(MonoObject* nodeInstance);
+        static void CallBTNodeOnAbort(MonoObject* nodeInstance);
+        
+        static bool CallBTConditionCheck(MonoObject* conditionInstance);
+        static bool CallBTDecoratorCanExecute(MonoObject* decoratorInstance);
+        static void CallBTDecoratorOnFinishedResult(MonoObject* decoratorInstance, NodeStatus& status);
+        
+        static void InitializeBTNode(MonoObject* nodeInstance, MonoObject* blackboardInstance, UUID entityID);
+
+        struct BTParameterField
+        {
+            std::string Name;
+            std::string DisplayName;
+            ScriptFieldType Type;
+            MonoClassField* Field;
+            bool IsBlackboardKey;
+            int BlackboardKeyType; // 0=Float, 1=Int, 2=Bool, 3=String
+        };
+
+        struct BTParameterInfo
+        {
+            std::string ClassName;
+            MonoClass* MonoClass;
+            std::vector<BTParameterField> Fields;
+        };
+
+        struct BTClassInfo
+        {
+            std::string ClassName;
+            MonoClass* MonoClass;
+            MonoMethod* OnStartMethod;
+            MonoMethod* UpdateMethod;
+            MonoMethod* OnFinishedMethod;
+            MonoMethod* OnAbortMethod;
+            MonoMethod* InitializeMethod;
+            MonoMethod* GetParametersMethod;
+            MonoMethod* SetParametersMethod;
+            
+            // Condition specific
+            MonoMethod* CheckConditionMethod;
+            
+            // Decorator specific
+            MonoMethod* CanExecuteMethod;
+            MonoMethod* OnFinishedResultMethod;
+        };
+
+        static BTParameterInfo GetBTParameterInfo(const std::string& nodeClassName);
+        static MonoObject* CreateBTParameterInstance(const std::string& nodeClassName);
+        static void SerializeBTParameters(MonoObject* paramsInstance, YAML::Emitter& out);
+        static void DeserializeBTParameters(MonoObject* paramsInstance, const YAML::Node& node);
+        static void DrawBTParametersImGui(MonoObject* paramsInstance, HBlackboard* blackboard);
+
+        static std::unordered_map<std::string, Ref<ScriptClass>> GetBTActionClasses();
+        static std::unordered_map<std::string, Ref<ScriptClass>> GetBTConditionClasses();
+        static std::unordered_map<std::string, Ref<ScriptClass>> GetBTDecoratorClasses();
+        static std::unordered_map<std::string, Ref<ScriptClass>> GetBTBlackboardClasses();
+
+        static std::unordered_map<std::string, BTClassInfo> s_BTActionClasses;
+        static std::unordered_map<std::string, BTClassInfo> s_BTConditionClasses;
+        static std::unordered_map<std::string, BTClassInfo> s_BTDecoratorClasses;
+        static std::unordered_map<std::string, BTClassInfo> s_BTBlackboardClasses;
+        static std::unordered_map<std::string, BTParameterInfo> s_BTParameterCache;
     };
-    
 }

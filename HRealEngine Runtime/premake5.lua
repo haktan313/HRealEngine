@@ -20,6 +20,10 @@ project "HRealEngine Runtime"
         "%{IncludeDir.Glad}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.JoltPhysics}",
+        "%{IncludeDir.BehaviorTreeLibrary}",
+        "%{IncludeDir.ImGuiNodeEditor}",
+        "%{IncludeDir['yaml-cpp']}",
+        "%{IncludeDir.ImGui}"
     }
 
     buildoptions { "/utf-8" }
@@ -31,6 +35,10 @@ project "HRealEngine Runtime"
         "%{Library.WinMM}",
         "%{Library.WinVersion}",
         "%{Library.Bcrypt}"
+    }
+
+    defines{
+        "YAML_CPP_STATIC_DEFINE"
     }
 
     postbuildcommands{

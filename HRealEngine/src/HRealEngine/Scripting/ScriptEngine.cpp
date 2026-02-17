@@ -268,6 +268,13 @@ namespace HRealEngine
         return true;
     }
 
+    // Static member definitions
+    std::unordered_map<std::string, ScriptEngine::BTClassInfo> ScriptEngine::s_BTActionClasses;
+    std::unordered_map<std::string, ScriptEngine::BTClassInfo> ScriptEngine::s_BTConditionClasses;
+    std::unordered_map<std::string, ScriptEngine::BTClassInfo> ScriptEngine::s_BTDecoratorClasses;
+    std::unordered_map<std::string, ScriptEngine::BTClassInfo> ScriptEngine::s_BTBlackboardClasses;
+    std::unordered_map<std::string, ScriptEngine::BTParameterInfo> ScriptEngine::s_BTParameterCache;
+    
     void ScriptEngine::LoadAssemblyClasses()
     {
         s_Data->EntityClasses.clear();
@@ -317,6 +324,107 @@ namespace HRealEngine
             }
         }
         auto& entityClasses = s_Data->EntityClasses;
+
+        // Clear BT class maps
+        s_BTActionClasses.clear();
+        s_BTConditionClasses.clear();
+        s_BTDecoratorClasses.clear();
+        s_BTBlackboardClasses.clear();
+        s_BTParameterCache.clear();
+
+        // Get base classes
+        MonoClass* btActionBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine.BehaviorTree", "BTActionNode");
+        MonoClass* btConditionBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine.BehaviorTree", "BTCondition");
+        MonoClass* btDecoratorBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine.BehaviorTree", "BTDecorator");
+        MonoClass* btBlackboardBase = mono_class_from_name(s_Data->CoreImage, "HRealEngine.BehaviorTree", "BTBlackboard");
+        
+        for (int32_t i = 0; i < numTypes; i++)
+        {
+            uint32_t cols[MONO_TYPEDEF_SIZE];
+            mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+            const char* nameSpace = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAMESPACE]);
+            const char* className = mono_metadata_string_heap(s_Data->AppImage, cols[MONO_TYPEDEF_NAME]);
+            
+            std::string fullName;
+            if (strlen(nameSpace) != 0)
+                fullName = fmt::format("{}.{}", nameSpace, className);
+            else
+                fullName = className;
+
+            MonoClass* monoClass = mono_class_from_name(s_Data->AppImage, nameSpace, className);
+
+            // Skip abstract classes using flags
+            uint32_t classFlags = mono_class_get_flags(monoClass);
+            if (classFlags & TYPE_ATTRIBUTE_ABSTRACT)
+                continue;
+
+            // Check for BT Action
+        if (btActionBase && mono_class_is_subclass_of(monoClass, btActionBase, false) && monoClass != btActionBase)
+        {
+            BTClassInfo info;
+            info.ClassName = fullName;
+            info.MonoClass = monoClass;
+            info.OnStartMethod = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+            info.UpdateMethod = mono_class_get_method_from_name(monoClass, "Update", 0);
+            info.OnFinishedMethod = mono_class_get_method_from_name(monoClass, "OnFinished", 0);
+            info.OnAbortMethod = mono_class_get_method_from_name(monoClass, "OnAbort", 0);
+            info.InitializeMethod = mono_class_get_method_from_name(monoClass, "Initialize", 2);
+            info.GetParametersMethod = mono_class_get_method_from_name(monoClass, "GetParameters", 0);
+            info.SetParametersMethod = mono_class_get_method_from_name(monoClass, "SetParameters", 1);
+            
+            s_BTActionClasses[fullName] = info;
+            LOG_CORE_INFO("Registered BT Action: {}", fullName);
+        }
+        
+        // Check for BT Condition
+        if (btConditionBase && mono_class_is_subclass_of(monoClass, btConditionBase, false) && monoClass != btConditionBase)
+        {
+            BTClassInfo info;
+            info.ClassName = fullName;
+            info.MonoClass = monoClass;
+            info.OnStartMethod = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+            info.CheckConditionMethod = mono_class_get_method_from_name(monoClass, "CheckCondition", 0);
+            info.OnFinishedMethod = mono_class_get_method_from_name(monoClass, "OnFinished", 0);
+            info.OnAbortMethod = mono_class_get_method_from_name(monoClass, "OnAbort", 0);
+            info.InitializeMethod = mono_class_get_method_from_name(monoClass, "Initialize", 2);
+            info.GetParametersMethod = mono_class_get_method_from_name(monoClass, "GetParameters", 0);
+            info.SetParametersMethod = mono_class_get_method_from_name(monoClass, "SetParameters", 1);
+            
+            s_BTConditionClasses[fullName] = info;
+            LOG_CORE_INFO("Registered BT Condition: {}", fullName);
+        }
+        
+        // Check for BT Decorator
+        if (btDecoratorBase && mono_class_is_subclass_of(monoClass, btDecoratorBase, false) && monoClass != btDecoratorBase)
+        {
+            BTClassInfo info;
+            info.ClassName = fullName;
+            info.MonoClass = monoClass;
+            info.OnStartMethod = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+            info.CanExecuteMethod = mono_class_get_method_from_name(monoClass, "CanExecute", 0);
+            info.OnFinishedResultMethod = mono_class_get_method_from_name(monoClass, "OnFinishedResult", 1);
+            info.OnFinishedMethod = mono_class_get_method_from_name(monoClass, "OnFinished", 0);
+            info.OnAbortMethod = mono_class_get_method_from_name(monoClass, "OnAbort", 0);
+            info.InitializeMethod = mono_class_get_method_from_name(monoClass, "Initialize", 2);
+            info.GetParametersMethod = mono_class_get_method_from_name(monoClass, "GetParameters", 0);
+            info.SetParametersMethod = mono_class_get_method_from_name(monoClass, "SetParameters", 1);
+            
+            s_BTDecoratorClasses[fullName] = info;
+            LOG_CORE_INFO("Registered BT Decorator: {}", fullName);
+        }
+        
+        // Check for BT Blackboard
+        if (btBlackboardBase && mono_class_is_subclass_of(monoClass, btBlackboardBase, false) && monoClass != btBlackboardBase)
+        {
+            BTClassInfo info;
+            info.ClassName = fullName;
+            info.MonoClass = monoClass;
+            
+            s_BTBlackboardClasses[fullName] = info;
+            LOG_CORE_INFO("Registered BT Blackboard: {}", fullName);
+        }
+        }
     }
 
     void ScriptEngine::InitCSharpProject()
@@ -531,6 +639,15 @@ namespace HRealEngine
     MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
     {
         MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
+        MonoObject* exception = nullptr;
+        mono_runtime_invoke(mono_class_get_method_from_name(monoClass, ".ctor", 0), instance, nullptr, &exception);
+        if (exception)
+        {
+            MonoString* exceptionMessage = mono_object_to_string(exception, nullptr);
+            char* exceptionChars = mono_string_to_utf8(exceptionMessage);
+            LOG_CORE_ERROR("Failed to instantiate class: {0}", exceptionChars);
+            mono_free(exceptionChars);
+        }
         mono_runtime_object_init(instance);
         return instance;
     }
@@ -636,5 +753,729 @@ namespace HRealEngine
         const ScriptField& field = it->second;
         mono_field_set_value(m_Instance, field.ClassField, (void*)value);
         return true;
+    }
+
+
+
+    MonoObject* ScriptEngine::CreateBTActionInstance(const std::string& className)
+    {
+        if (s_BTActionClasses.find(className) == s_BTActionClasses.end())
+        {
+            LOG_CORE_ERROR("BT Action class not found: {}", className);
+            return nullptr;
+        }
+        
+        return InstantiateClass(s_BTActionClasses[className].MonoClass);
+    }
+
+    MonoObject* ScriptEngine::CreateBTConditionInstance(const std::string& className)
+    {
+        if (s_BTConditionClasses.find(className) == s_BTConditionClasses.end())
+        {
+            LOG_CORE_ERROR("BT Condition class not found: {}", className);
+            return nullptr;
+        }
+        
+        return InstantiateClass(s_BTConditionClasses[className].MonoClass);
+    }
+
+    MonoObject* ScriptEngine::CreateBTDecoratorInstance(const std::string& className)
+    {
+        if (s_BTDecoratorClasses.find(className) == s_BTDecoratorClasses.end())
+        {
+            LOG_CORE_ERROR("BT Decorator class not found: {}", className);
+            return nullptr;
+        }
+        
+        return InstantiateClass(s_BTDecoratorClasses[className].MonoClass);
+    }
+
+    MonoObject* ScriptEngine::CreateBTBlackboardInstance(const std::string& className)
+    {
+        if (s_BTBlackboardClasses.find(className) == s_BTBlackboardClasses.end())
+        {
+            LOG_CORE_ERROR("BT Blackboard class not found: {}", className);
+            return nullptr;
+        }
+        
+        return InstantiateClass(s_BTBlackboardClasses[className].MonoClass);
+    }
+
+    void ScriptEngine::InitializeBTNode(MonoObject* nodeInstance, MonoObject* blackboardInstance, UUID entityID)
+    {
+        if (!nodeInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(nodeInstance);
+        MonoMethod* initMethod = mono_class_get_method_from_name(klass, "Initialize", 2);
+        
+        if (initMethod)
+        {
+            void* args[2];
+            args[0] = blackboardInstance;
+            args[1] = &entityID;
+            
+            mono_runtime_invoke(initMethod, nodeInstance, args, nullptr);
+        }
+    }
+
+    void ScriptEngine::CallBTNodeOnStart(MonoObject* nodeInstance)
+    {
+        if (!nodeInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(nodeInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        MonoMethod* method = nullptr;
+        if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
+            method = s_BTActionClasses[fullName].OnStartMethod;
+        else if (s_BTConditionClasses.find(fullName) != s_BTConditionClasses.end())
+            method = s_BTConditionClasses[fullName].OnStartMethod;
+        else if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
+            method = s_BTDecoratorClasses[fullName].OnStartMethod;
+            
+        if (method)
+            mono_runtime_invoke(method, nodeInstance, nullptr, nullptr);
+    }
+
+    int ScriptEngine::CallBTNodeUpdate(MonoObject* nodeInstance)
+    {
+        if (!nodeInstance)
+            return 1; // Failure
+
+        MonoClass* klass = mono_object_get_class(nodeInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        MonoMethod* method = nullptr;
+        if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
+            method = s_BTActionClasses[fullName].UpdateMethod;
+            
+        if (method)
+        {
+            MonoObject* result = mono_runtime_invoke(method, nodeInstance, nullptr, nullptr);
+            return *(int*)mono_object_unbox(result);
+        }
+        
+        return 1; // Failure
+    }
+
+    void ScriptEngine::CallBTNodeOnFinished(MonoObject* nodeInstance)
+    {
+        if (!nodeInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(nodeInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        MonoMethod* method = nullptr;
+        if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
+            method = s_BTActionClasses[fullName].OnFinishedMethod;
+        else if (s_BTConditionClasses.find(fullName) != s_BTConditionClasses.end())
+            method = s_BTConditionClasses[fullName].OnFinishedMethod;
+        else if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
+            method = s_BTDecoratorClasses[fullName].OnFinishedMethod;
+            
+        if (method)
+            mono_runtime_invoke(method, nodeInstance, nullptr, nullptr);
+    }
+
+    void ScriptEngine::CallBTNodeOnAbort(MonoObject* nodeInstance)
+    {
+        if (!nodeInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(nodeInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        MonoMethod* method = nullptr;
+        if (s_BTActionClasses.find(fullName) != s_BTActionClasses.end())
+            method = s_BTActionClasses[fullName].OnAbortMethod;
+        else if (s_BTConditionClasses.find(fullName) != s_BTConditionClasses.end())
+            method = s_BTConditionClasses[fullName].OnAbortMethod;
+        else if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
+            method = s_BTDecoratorClasses[fullName].OnAbortMethod;
+            
+        if (method)
+            mono_runtime_invoke(method, nodeInstance, nullptr, nullptr);
+    }
+
+    bool ScriptEngine::CallBTConditionCheck(MonoObject* conditionInstance)
+    {
+        if (!conditionInstance)
+            return false;
+
+        MonoClass* klass = mono_object_get_class(conditionInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        if (s_BTConditionClasses.find(fullName) != s_BTConditionClasses.end())
+        {
+            MonoMethod* method = s_BTConditionClasses[fullName].CheckConditionMethod;
+            if (method)
+            {
+                MonoObject* result = mono_runtime_invoke(method, conditionInstance, nullptr, nullptr);
+                return *(bool*)mono_object_unbox(result);
+            }
+        }
+        
+        return false;
+    }
+
+    bool ScriptEngine::CallBTDecoratorCanExecute(MonoObject* decoratorInstance)
+    {
+        if (!decoratorInstance)
+            return true;
+
+        MonoClass* klass = mono_object_get_class(decoratorInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
+        {
+            MonoMethod* method = s_BTDecoratorClasses[fullName].CanExecuteMethod;
+            if (method)
+            {
+                MonoObject* result = mono_runtime_invoke(method, decoratorInstance, nullptr, nullptr);
+                return *(bool*)mono_object_unbox(result);
+            }
+        }
+        
+        return true;
+    }
+
+    void ScriptEngine::CallBTDecoratorOnFinishedResult(MonoObject* decoratorInstance, NodeStatus& status)
+    {
+        if (!decoratorInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(decoratorInstance);
+        const char* className = mono_class_get_name(klass);
+        const char* nameSpace = mono_class_get_namespace(klass);
+        
+        std::string fullName = fmt::format("{}.{}", nameSpace, className);
+        
+        if (s_BTDecoratorClasses.find(fullName) != s_BTDecoratorClasses.end())
+        {
+            MonoMethod* method = s_BTDecoratorClasses[fullName].OnFinishedResultMethod;
+            if (method)
+            {
+                int statusInt = (int)status;
+                void* params[1] = { &statusInt };
+                mono_runtime_invoke(method, decoratorInstance, params, nullptr);
+                status = (NodeStatus)statusInt;
+            }
+        }
+    }
+
+
+    static MonoClassField* FindFieldInHierarchy(MonoClass* klass, const char* fieldName)
+    {
+        MonoClass* current = klass;
+        while (current != nullptr)
+        {
+            MonoClassField* field = mono_class_get_field_from_name(current, fieldName);
+            if (field)
+                return field;
+            current = mono_class_get_parent(current);
+        }
+        return nullptr;
+    }
+    static MonoMethod* FindMethodInHierarchy(MonoClass* klass, const char* methodName, int paramCount)
+    {
+        MonoClass* current = klass;
+        while (current != nullptr)
+        {
+            MonoMethod* method = mono_class_get_method_from_name(current, methodName, paramCount);
+            if (method)
+                return method;
+            current = mono_class_get_parent(current);
+        }
+        return nullptr;
+    }
+    ScriptEngine::BTParameterInfo ScriptEngine::GetBTParameterInfo(const std::string& nodeClassName)
+    {
+        if (s_BTParameterCache.find(nodeClassName) != s_BTParameterCache.end())
+            return s_BTParameterCache[nodeClassName];
+
+        BTParameterInfo info;
+        
+        MonoClass* nodeClass = nullptr;
+        if (s_BTActionClasses.find(nodeClassName) != s_BTActionClasses.end())
+            nodeClass = s_BTActionClasses[nodeClassName].MonoClass;
+        else if (s_BTConditionClasses.find(nodeClassName) != s_BTConditionClasses.end())
+            nodeClass = s_BTConditionClasses[nodeClassName].MonoClass;
+        else if (s_BTDecoratorClasses.find(nodeClassName) != s_BTDecoratorClasses.end())
+            nodeClass = s_BTDecoratorClasses[nodeClassName].MonoClass;
+
+        if (!nodeClass)
+        {
+            LOG_CORE_ERROR("Node class not found: {}", nodeClassName);
+            return info;
+        }
+        
+        MonoObject* nodeInstance = InstantiateClass(nodeClass);
+        if (!nodeInstance)
+        {
+            LOG_CORE_ERROR("Failed to instantiate node class: {}", nodeClassName);
+            return info;
+        }
+        
+        //MonoClassField* parametersField = mono_class_get_field_from_name(nodeClass, "parameters");
+        MonoClassField* parametersField = FindFieldInHierarchy(nodeClass, "parameters");
+        
+        /*MonoObject* paramsInstance = nullptr;
+        if (parametersField)
+        {
+            mono_field_get_value(nodeInstance, parametersField, &paramsInstance);
+        }*/
+        MonoObject* paramsInstance = nullptr;
+        if (parametersField)
+        {
+            mono_field_get_value(nodeInstance, parametersField, &paramsInstance);
+            if (!paramsInstance)
+            {
+                LOG_CORE_ERROR("Failed to get parameters instance from field for {}", nodeClassName);
+            }
+        }
+        
+        if (!paramsInstance)
+        {
+            LOG_CORE_ERROR("Parameters field is null for {}", nodeClassName);
+            return info;
+        }
+
+        MonoClass* paramsClass = mono_object_get_class(paramsInstance);
+        info.MonoClass = paramsClass;
+        //info.ClassName = mono_class_get_name(paramsClass);
+        const char* paramsNs = mono_class_get_namespace(paramsClass);
+        const char* paramsName = mono_class_get_name(paramsClass);
+        if (paramsNs && strlen(paramsNs) > 0)
+            info.ClassName = fmt::format("{}.{}", paramsNs, paramsName);
+        else
+            info.ClassName = paramsName;
+        
+        //MonoMethod* getFieldInfosMethod = mono_class_get_method_from_name(paramsClass, "GetFieldInfos", 0);
+        MonoMethod* getFieldInfosMethod = FindMethodInHierarchy(paramsClass, "GetFieldInfos", 0);
+        if (!getFieldInfosMethod)
+        {
+            LOG_CORE_ERROR("GetFieldInfos method not found on {}", info.ClassName);
+            return info;
+        }
+
+        MonoArray* fieldInfoArray = (MonoArray*)mono_runtime_invoke(getFieldInfosMethod, paramsInstance, nullptr, nullptr);
+        
+        if (fieldInfoArray)
+        {
+            int length = mono_array_length(fieldInfoArray);
+            LOG_CORE_INFO("Found {} parameter fields for {}", length, nodeClassName);
+            
+            for (int i = 0; i < length; i++)
+            {
+                MonoObject* fieldInfoObj = mono_array_get(fieldInfoArray, MonoObject*, i);
+                MonoClass* fieldInfoClass = mono_object_get_class(fieldInfoObj);
+                
+                BTParameterField paramField;
+                
+                MonoClassField* nameField = mono_class_get_field_from_name(fieldInfoClass, "Name");
+                if (nameField)
+                {
+                    MonoString* nameStr;
+                    mono_field_get_value(fieldInfoObj, nameField, &nameStr);
+                    char* name = mono_string_to_utf8(nameStr);
+                    paramField.Name = name ? name : "";
+                    if (name) mono_free(name);
+                }
+                
+                MonoClassField* displayNameField = mono_class_get_field_from_name(fieldInfoClass, "DisplayName");
+                if (displayNameField)
+                {
+                    MonoString* displayNameStr;
+                    mono_field_get_value(fieldInfoObj, displayNameField, &displayNameStr);
+                    char* displayName = mono_string_to_utf8(displayNameStr);
+                    paramField.DisplayName = displayName ? displayName : "";
+                    if (displayName) mono_free(displayName);
+                }
+                
+                MonoClassField* isKeyField = mono_class_get_field_from_name(fieldInfoClass, "IsBlackboardKey");
+                if (isKeyField)
+                    mono_field_get_value(fieldInfoObj, isKeyField, &paramField.IsBlackboardKey);
+                
+                MonoClassField* keyTypeField = mono_class_get_field_from_name(fieldInfoClass, "BlackboardKeyType");
+                if (keyTypeField)
+                    mono_field_get_value(fieldInfoObj, keyTypeField, &paramField.BlackboardKeyType);
+                
+                paramField.Field = mono_class_get_field_from_name(paramsClass, paramField.Name.c_str());
+                
+                if (paramField.Field)
+                {
+                    MonoType* fieldType = mono_field_get_type(paramField.Field);
+                    paramField.Type = MonoTypeToScriptFieldType(fieldType);
+                    info.Fields.push_back(paramField);
+                    
+                    LOG_CORE_INFO("  Field: {} ({}) - IsKey: {}", paramField.DisplayName, ScriptFieldTypeToString(paramField.Type), paramField.IsBlackboardKey);
+                }
+            }
+        }
+
+        s_BTParameterCache[nodeClassName] = info;
+        LOG_CORE_INFO("Cached parameter info for {} with {} fields", nodeClassName, info.Fields.size());
+        return info;
+    }
+
+    MonoObject* ScriptEngine::CreateBTParameterInstance(const std::string& nodeClassName)
+    {
+        BTParameterInfo info = GetBTParameterInfo(nodeClassName);
+    
+        if (!info.MonoClass)
+        {
+            LOG_CORE_ERROR("Failed to get parameter info for {}", nodeClassName);
+            return nullptr;
+        }
+
+        MonoObject* paramsInstance = InstantiateClass(info.MonoClass);
+        if (!paramsInstance)
+        {
+            LOG_CORE_ERROR("Failed to instantiate parameter class for {}", nodeClassName);
+            return nullptr;
+        }
+
+        LOG_CORE_INFO("Created parameter instance for {}", nodeClassName);
+        return paramsInstance;
+    }
+
+    void ScriptEngine::DrawBTParametersImGui(MonoObject* paramsInstance, HBlackboard* blackboard)
+    {
+        if (!paramsInstance)
+            return;
+
+        MonoClass* paramsClass = mono_object_get_class(paramsInstance);
+        const char* paramsClassName = mono_class_get_name(paramsClass);
+        const char* paramsNamespace = mono_class_get_namespace(paramsClass);
+        
+        //std::string fullParamsName = fmt::format("{}.{}", paramsNamespace, paramsClassName);
+        std::string fullParamsName;
+        if (paramsNamespace && strlen(paramsNamespace) > 0)
+            fullParamsName = fmt::format("{}.{}", paramsNamespace, paramsClassName);
+        else
+            fullParamsName = paramsClassName;
+        
+        BTParameterInfo info;
+        bool found = false;
+        
+        for (const auto& [nodeName, cachedInfo] : s_BTParameterCache)
+        
+            if (cachedInfo.ClassName == fullParamsName)
+            {
+                info = cachedInfo;
+                found = true;
+                break;
+            }
+
+        
+        if (!found)
+            return;
+
+        for (auto& field : info.Fields)
+        {
+            std::string label = field.DisplayName.empty() ? field.Name : field.DisplayName;
+
+            if (field.IsBlackboardKey)
+            {
+                MonoString* keyValueStr;
+                mono_field_get_value(paramsInstance, field.Field, &keyValueStr);
+                
+                char* keyValue = keyValueStr ? mono_string_to_utf8(keyValueStr) : nullptr;
+                std::string currentKey = keyValue ? keyValue : "";
+                if (keyValue)
+                    mono_free(keyValue);
+
+                const char* preview = currentKey.empty() ? "Select key..." : currentKey.c_str();
+
+                if (ImGui::BeginCombo(label.c_str(), preview))
+                {
+                    if (blackboard)
+                    {
+                        switch (field.BlackboardKeyType)
+                        {
+                            case 0: // Float
+                            {
+                                for (const auto& [key, value] : blackboard->GetFloatValues())
+                                {
+                                    bool isSelected = (currentKey == key);
+                                    if (ImGui::Selectable(key.c_str(), isSelected))
+                                    {
+                                        MonoString* monoKey = mono_string_new(s_Data->AppDomain, key.c_str());
+                                        mono_field_set_value(paramsInstance, field.Field, monoKey);
+                                    }
+                                    if (isSelected)
+                                        ImGui::SetItemDefaultFocus();
+                                }
+                                break;
+                            }
+                            case 1: // Int
+                            {
+                                for (const auto& [key, value] : blackboard->GetIntValues())
+                                {
+                                    bool isSelected = (currentKey == key);
+                                    if (ImGui::Selectable(key.c_str(), isSelected))
+                                    {
+                                        MonoString* monoKey = mono_string_new(s_Data->AppDomain, key.c_str());
+                                        mono_field_set_value(paramsInstance, field.Field, monoKey);
+                                    }
+                                    if (isSelected)
+                                        ImGui::SetItemDefaultFocus();
+                                }
+                                break;
+                            }
+                            case 2: // Bool
+                            {
+                                for (const auto& [key, value] : blackboard->GetBoolValues())
+                                {
+                                    bool isSelected = (currentKey == key);
+                                    if (ImGui::Selectable(key.c_str(), isSelected))
+                                    {
+                                        MonoString* monoKey = mono_string_new(s_Data->AppDomain, key.c_str());
+                                        mono_field_set_value(paramsInstance, field.Field, monoKey);
+                                    }
+                                    if (isSelected)
+                                        ImGui::SetItemDefaultFocus();
+                                }
+                                break;
+                            }
+                            case 3: // String
+                            {
+                                for (const auto& [key, value] : blackboard->GetStringValues())
+                                {
+                                    bool isSelected = (currentKey == key);
+                                    if (ImGui::Selectable(key.c_str(), isSelected))
+                                    {
+                                        MonoString* monoKey = mono_string_new(s_Data->AppDomain, key.c_str());
+                                        mono_field_set_value(paramsInstance, field.Field, monoKey);
+                                    }
+                                    if (isSelected)
+                                        ImGui::SetItemDefaultFocus();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+            else
+            {
+                switch (field.Type)
+                {
+                    case ScriptFieldType::Float:
+                    {
+                        float value;
+                        mono_field_get_value(paramsInstance, field.Field, &value);
+                        if (ImGui::InputFloat(label.c_str(), &value))
+                            mono_field_set_value(paramsInstance, field.Field, &value);
+                        break;
+                    }
+                    case ScriptFieldType::Int:
+                    {
+                        int value;
+                        mono_field_get_value(paramsInstance, field.Field, &value);
+                        if (ImGui::InputInt(label.c_str(), &value))
+                            mono_field_set_value(paramsInstance, field.Field, &value);
+                        break;
+                    }
+                    case ScriptFieldType::Bool:
+                    {
+                        bool value;
+                        mono_field_get_value(paramsInstance, field.Field, &value);
+                        if (ImGui::Checkbox(label.c_str(), &value))
+                            mono_field_set_value(paramsInstance, field.Field, &value);
+                        break;
+                    }
+                    case ScriptFieldType::String:
+                    {
+                        MonoString* monoStr;
+                        mono_field_get_value(paramsInstance, field.Field, &monoStr);
+                        char* str = monoStr ? mono_string_to_utf8(monoStr) : nullptr;
+                        
+                        char buffer[256];
+                        strncpy_s(buffer, str ? str : "", sizeof(buffer));
+                        
+                        if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
+                        {
+                            MonoString* newStr = mono_string_new(s_Data->AppDomain, buffer);
+                            mono_field_set_value(paramsInstance, field.Field, newStr);
+                        }
+                        
+                        if (str)
+                            mono_free(str);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    void ScriptEngine::SerializeBTParameters(MonoObject* paramsInstance, YAML::Emitter& out)
+    {
+        if (!paramsInstance)
+            return;
+
+        MonoClass* paramsClass = mono_object_get_class(paramsInstance);
+        const char* paramsClassName = mono_class_get_name(paramsClass);
+        
+        BTParameterInfo info;
+        bool found = false;
+        
+        for (const auto& [nodeName, cachedInfo] : s_BTParameterCache)
+            if (cachedInfo.ClassName == paramsClassName)
+            {
+                info = cachedInfo;
+                found = true;
+                break;
+            }
+
+        if (!found)
+            return;
+
+        for (auto& field : info.Fields)
+        {
+            switch (field.Type)
+            {
+                case ScriptFieldType::Float:
+                {
+                    float value;
+                    mono_field_get_value(paramsInstance, field.Field, &value);
+                    out << YAML::Key << field.Name << YAML::Value << value;
+                    break;
+                }
+                case ScriptFieldType::Int:
+                {
+                    int value;
+                    mono_field_get_value(paramsInstance, field.Field, &value);
+                    out << YAML::Key << field.Name << YAML::Value << value;
+                    break;
+                }
+                case ScriptFieldType::Bool:
+                {
+                    bool value;
+                    mono_field_get_value(paramsInstance, field.Field, &value);
+                    out << YAML::Key << field.Name << YAML::Value << value;
+                    break;
+                }
+                case ScriptFieldType::String:
+                {
+                    MonoString* monoStr;
+                    mono_field_get_value(paramsInstance, field.Field, &monoStr);
+                    char* str = monoStr ? mono_string_to_utf8(monoStr) : nullptr;
+                    out << YAML::Key << field.Name << YAML::Value << (str ? str : "");
+                    if (str)
+                        mono_free(str);
+                    break;
+                }
+            }
+        }
+    }
+
+    void ScriptEngine::DeserializeBTParameters(MonoObject* paramsInstance, const YAML::Node& node)
+    {
+        if (!paramsInstance)
+            return;
+
+        MonoClass* paramsClass = mono_object_get_class(paramsInstance);
+        const char* paramsClassName = mono_class_get_name(paramsClass);
+
+        BTParameterInfo info;
+        bool found = false;
+        
+        for (const auto& [nodeName, cachedInfo] : s_BTParameterCache)
+            if (cachedInfo.ClassName == paramsClassName)
+            {
+                info = cachedInfo;
+                found = true;
+                break;
+            }
+
+        if (!found)
+            return;
+
+        for (auto& field : info.Fields)
+        {
+            if (!node[field.Name])
+                continue;
+
+            switch (field.Type)
+            {
+                case ScriptFieldType::Float:
+                {
+                    float value = node[field.Name].as<float>();
+                    mono_field_set_value(paramsInstance, field.Field, &value);
+                    break;
+                }
+                case ScriptFieldType::Int:
+                {
+                    int value = node[field.Name].as<int>();
+                    mono_field_set_value(paramsInstance, field.Field, &value);
+                    break;
+                }
+                case ScriptFieldType::Bool:
+                {
+                    bool value = node[field.Name].as<bool>();
+                    mono_field_set_value(paramsInstance, field.Field, &value);
+                    break;
+                }
+                case ScriptFieldType::String:
+                {
+                    std::string value = node[field.Name].as<std::string>();
+                    MonoString* monoStr = mono_string_new(s_Data->AppDomain, value.c_str());
+                    mono_field_set_value(paramsInstance, field.Field, monoStr);
+                    break;
+                }
+            }
+        }
+    }
+
+    std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetBTActionClasses()
+    {
+        std::unordered_map<std::string, Ref<ScriptClass>> result;
+        for (const auto& [className, info] : s_BTActionClasses)
+        {
+            // Convert to ScriptClass format if needed
+            // For now, return empty map or implement conversion
+        }
+        return result;
+    }
+
+    std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetBTConditionClasses()
+    {
+        std::unordered_map<std::string, Ref<ScriptClass>> result;
+        return result;
+    }
+
+    std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetBTDecoratorClasses()
+    {
+        std::unordered_map<std::string, Ref<ScriptClass>> result;
+        return result;
+    }
+
+    std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetBTBlackboardClasses()
+    {
+        std::unordered_map<std::string, Ref<ScriptClass>> result;
+        return result;
     }
 }

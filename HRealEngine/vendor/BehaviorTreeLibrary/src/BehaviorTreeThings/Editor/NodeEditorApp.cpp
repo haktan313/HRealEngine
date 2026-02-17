@@ -305,15 +305,7 @@ void NodeEditorApp::ShowActionNodeInBlackboard()
         ImGui::EndCombo();
     }
 
-    ImGui::Text("Parameters");
-    ImGui::Separator();
-
-    if (!currentIdString.empty())
-    {
-        auto parameter = m_NodeToParams.find(nodeKey);
-        if (parameter != m_NodeToParams.end() && parameter->second)
-            parameter->second->DrawImGui(m_Blackboard.get());
-    }
+    DrawActionNodeParameters(nodeKey, currentIdString);
 }
 
 void NodeEditorApp::ShowDecoratorNodeInBlackboard()
@@ -354,15 +346,7 @@ void NodeEditorApp::ShowDecoratorNodeInBlackboard()
         }
         ImGui::EndCombo();
     }
-    ImGui::Text("Parameters");
-    ImGui::Separator();
-
-    if (!currentIdString.empty())
-    {
-        auto parameter = m_NodeToDecoratorParams.find(nodeKey);
-        if (parameter != m_NodeToDecoratorParams.end() && parameter->second)
-            parameter->second->DrawImGui(m_Blackboard.get());
-    }
+    DrawDecoratorNodeParameters(nodeKey, currentIdString);
 }
 
 void NodeEditorApp::ShowConditionNodeInBlackboard()
@@ -403,25 +387,8 @@ void NodeEditorApp::ShowConditionNodeInBlackboard()
             }
             ImGui::EndCombo();
         }
-        ImGui::Text("Parameters");
-        ImGui::Separator();
 
-        if (!currentIdString.empty())
-        {
-            auto parameter = m_NodeToConditionParams.find(nodeKey);
-            if (parameter != m_NodeToConditionParams.end() && parameter->second)
-            {
-                ImGui::Text("Priority Type");
-                ImGui::Separator();
-                const char* priorityTypes[] = { "None", "Self", "Lower Priority", "Both" };
-                int currentPriority = static_cast<int>(parameter->second->Priority);
-                if (ImGui::Combo("##PriorityTypeCombo", &currentPriority, priorityTypes, IM_ARRAYSIZE(priorityTypes)))
-                {
-                    parameter->second->Priority = static_cast<PriorityType>(currentPriority);
-                }
-                parameter->second->DrawImGui(m_Blackboard.get());
-            }
-        }
+    DrawConditionNodeParameters(nodeKey, currentIdString);
 }
 
 void NodeEditorApp::ShowBlackboardDetails()
@@ -461,6 +428,45 @@ HBlackboard& NodeEditorApp::SetBlackboardForEditor(const std::string& id, const 
     m_Blackboard = info.CreateBlackboardFn();
     m_CopyBlackboard = m_Blackboard.get();
     return *m_Blackboard;
+}
+
+void NodeEditorApp::DrawActionNodeParameters(int nodeKey, const std::string& classId)
+{
+    ImGui::Text("Parameters");
+    ImGui::Separator();
+
+    if (!classId.empty())
+    {
+        auto parameter = m_NodeToParams.find(nodeKey);
+        if (parameter != m_NodeToParams.end() && parameter->second)
+            parameter->second->DrawImGui(m_Blackboard.get());
+    }
+}
+
+void NodeEditorApp::DrawDecoratorNodeParameters(int nodeKey, const std::string& classId)
+{
+    ImGui::Text("Parameters");
+    ImGui::Separator();
+
+    if (!classId.empty())
+    {
+        auto parameter = m_NodeToDecoratorParams.find(nodeKey);
+        if (parameter != m_NodeToDecoratorParams.end() && parameter->second)
+            parameter->second->DrawImGui(m_Blackboard.get());
+    }
+}
+
+void NodeEditorApp::DrawConditionNodeParameters(int nodeKey, const std::string& classId)
+{
+    ImGui::Text("Parameters");
+    ImGui::Separator();
+
+    if (!classId.empty())
+    {
+        auto parameter = m_NodeToConditionParams.find(nodeKey);
+        if (parameter != m_NodeToConditionParams.end() && parameter->second)
+            parameter->second->DrawImGui(m_Blackboard.get());
+    }
 }
 
 BehaviorTree* NodeEditorApp::BuildBehaviorTree()
