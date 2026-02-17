@@ -188,12 +188,15 @@ namespace HRealEngine
             return;
 
         auto* tree = GetTree();
-        Entity* owner = tree->GetOwner<Entity>();
+        /*Entity* owner = tree->GetOwner<Entity>();
         
         if (!owner)
             return;
 
-        UUID entityID = owner->GetUUID();
+        UUID entityID = owner->GetUUID();*/
+        UUID* ownerUUID = tree->GetOwner<UUID>();
+        if (!ownerUUID)
+            return;
         
         MonoObject* managedBlackboard = nullptr;
         auto* rawBlackboard = tree->GetBlackboardRaw();
@@ -203,7 +206,7 @@ namespace HRealEngine
             managedBlackboard = managedBB->GetManagedInstance();
         }
 
-        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, entityID);
+        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
     }
 
     //---------------------BTCondition---------------------
@@ -259,12 +262,15 @@ namespace HRealEngine
             return;
 
         auto* tree = GetTree();
-        Entity* owner = tree->GetOwner<Entity>();
+        /*Entity* owner = tree->GetOwner<Entity>();
         
         if (!owner)
             return;
 
-        UUID entityID = owner->GetUUID();
+        UUID entityID = owner->GetUUID();*/
+        UUID* ownerUUID = tree->GetOwner<UUID>();
+        if (!ownerUUID)
+            return;
         
         MonoObject* managedBlackboard = nullptr;
         auto* rawBlackboard = tree->GetBlackboardRaw();
@@ -274,7 +280,7 @@ namespace HRealEngine
             managedBlackboard = managedBB->GetManagedInstance();
         }
 
-        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, entityID);
+        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
     }
 
     //---------------------BTDecorator---------------------
@@ -336,12 +342,15 @@ namespace HRealEngine
             return;
 
         auto* tree = GetTree();
-        Entity* owner = tree->GetOwner<Entity>();
+        /*Entity* owner = tree->GetOwner<Entity>();
         
         if (!owner)
             return;
 
-        UUID entityID = owner->GetUUID();
+        UUID entityID = owner->GetUUID();*/
+        UUID* ownerUUID = tree->GetOwner<UUID>();
+        if (!ownerUUID)
+            return;
         
         MonoObject* managedBlackboard = nullptr;
         auto* rawBlackboard = tree->GetBlackboardRaw();
@@ -351,6 +360,6 @@ namespace HRealEngine
             managedBlackboard = managedBB->GetManagedInstance();
         }
 
-        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, entityID);
+        ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
     }
 }

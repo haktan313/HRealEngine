@@ -1083,7 +1083,7 @@ namespace HRealEngine
         
         if (fieldInfoArray)
         {
-            int length = mono_array_length(fieldInfoArray);
+            int length = static_cast<int>(mono_array_length(fieldInfoArray));
             LOG_CORE_INFO("Found {} parameter fields for {}", length, nodeClassName);
             
             for (int i = 0; i < length; i++)

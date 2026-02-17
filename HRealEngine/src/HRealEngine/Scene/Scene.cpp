@@ -225,7 +225,11 @@ namespace HRealEngine
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
                     m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
-                    bt->SetOwner<Entity>(&entity);
+                    /*bt->SetOwner<Entity>(&entity);
+                    bt->StartTree();*/
+                    UUID ownerUUID = entity.GetUUID();
+                    m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
+                    bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);
                     bt->StartTree();
                 }
                 else
@@ -238,7 +242,11 @@ namespace HRealEngine
                     BehaviorTree* bt = Root::CreateBehaviorTree(name, path.string());
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
-                    bt->SetOwner<Entity>(&entity);
+                    /*bt->SetOwner<Entity>(&entity);
+                    bt->StartTree();*/
+                    UUID ownerUUID = entity.GetUUID();
+                    m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
+                    bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);
                     bt->StartTree();
                 }
             }
@@ -249,6 +257,7 @@ namespace HRealEngine
     {
         Root::RootClear();
         m_BehaviorTreeCache.clear();
+        m_BTOwnerUUIDs.clear();
     }
 
     void Scene::OnUpdateSimulation(Timestep deltaTime, EditorCamera& camera)

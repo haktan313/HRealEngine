@@ -10,11 +10,13 @@ BehaviorTree* BehaviorTreeBuilder::build() const
 BehaviorTree::~BehaviorTree()
 {
     m_Blackboard = nullptr;
+    std::cout << "Destroying Tree: " << GetName() << std::endl;
 }
 
 void BehaviorTree::StartTree()
 {
     m_bIsRunning = true;
+    std::cout << "Starting Tree: " << GetName() << std::endl;
 }
 
 void BehaviorTree::TickTree()
@@ -23,6 +25,7 @@ void BehaviorTree::TickTree()
     {
         m_RootNode->Tick();
         m_Blackboard->ClearValuesChangedFlag();
+        std::cout << "Ticking Tree: " << GetName() << std::endl;
     }
 }
 
@@ -33,6 +36,7 @@ void BehaviorTree::StopTree()
     m_bIsRunning = false;
     if (m_RootNode)
         m_RootNode->OnAbort();
+    std::cout << "Stopping Tree: " << GetName() << std::endl;
 }
 
 // BehaviorTreeBuilder methods

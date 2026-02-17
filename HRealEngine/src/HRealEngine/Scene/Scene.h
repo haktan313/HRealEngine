@@ -80,6 +80,7 @@ namespace HRealEngine
         std::unordered_map<UUID, entt::entity> m_EntityMap;
 
         std::unordered_map<AssetHandle, YAML::Node> m_BehaviorTreeCache;
+        std::unordered_map<AssetHandle, UUID> m_BTOwnerUUIDs;
         
         entt::registry m_Registry;
         uint32_t viewportWidth = 0, viewportHeight = 0;

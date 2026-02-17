@@ -1,10 +1,18 @@
 #pragma once
+#include <functional>
+
 #include "Tree.h"
 #include "yaml-cpp/emitter.h"
 
 class BTSerializer
 {
 public:
+    using EditorAppProvider = std::function<NodeEditorApp*()>;
+    static void SetEditorAppProvider(EditorAppProvider provider)
+    {
+        s_EditorAppProvider = provider;
+    }
+    
     BTSerializer();
     BTSerializer(BehaviorTree*& tree);
     ~BTSerializer() = default;
@@ -38,4 +46,6 @@ private:
     static void DeserializeCondition(const YAML::Node& condData, BehaviorTreeBuilder& builder);
 
     BehaviorTree* m_Tree = nullptr;
+
+    static EditorAppProvider s_EditorAppProvider;
 };

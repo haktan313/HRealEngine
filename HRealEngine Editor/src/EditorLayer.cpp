@@ -77,7 +77,7 @@ namespace HRealEngine
 
     void EditorLayer::RegisterBehaviorTreeStufs()
     {
-        NodeRegistry::AddBlackBoardToEditor<MeleeEnemyBlackboard>("Melee Enemy Blackboard");
+        /*NodeRegistry::AddBlackBoardToEditor<MeleeEnemyBlackboard>("Melee Enemy Blackboard");
         NodeRegistry::AddBlackBoardToEditor<RangedEnemyBlackboard>("Ranged Enemy Blackboard");
     
         NodeRegistry::AddActionNodeToBuilder<MoveToAction, MoveToParameters>("Move To Action");
@@ -88,7 +88,7 @@ namespace HRealEngine
         NodeRegistry::AddConditionNodeToBuilder<CanAttackCondition, CanAttackParameters>("Can Attack Condition");
     
         NodeRegistry::AddDecoratorNodeToBuilder<ChangeResultOfTheNodeDecorator, ChangeResultOfTheNodeParameters>("Change Result Of The Node Decorator");
-        NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");
+        NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");*/
         
         if (ScriptEngine::IsInitialized())
         {
@@ -642,6 +642,9 @@ namespace HRealEngine
             {
                 BTEditorRoot::Start();
                 BTEditorRoot::GetEditorApp()->SetEmbeddedMode(true);
+                BTSerializer::SetEditorAppProvider([]() -> NodeEditorApp* {
+                    return BTEditorRoot::GetEditorApp();
+                });
             }
             
             if (ImGui::BeginTable("BT_Table", 2, ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable))

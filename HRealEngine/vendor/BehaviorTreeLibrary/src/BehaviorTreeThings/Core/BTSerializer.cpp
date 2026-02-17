@@ -7,7 +7,10 @@
 #include "Editor/EditorRoot.h"
 #include "Editor/NodeEditorApp.h"
 
-BTSerializer::BTSerializer() : m_Tree(nullptr)
+
+BTSerializer::EditorAppProvider BTSerializer::s_EditorAppProvider = nullptr;
+
+BTSerializer::BTSerializer()
 {
     
 }
@@ -689,7 +692,12 @@ void BTSerializer::DeserializeBlackboard(const YAML::Node& blackboardNode, HBlac
 
 void BTSerializer::SerializeEditorData(YAML::Emitter& out)
 {
-    auto editorApp = EditorRoot::GetNodeEditorApp();
+    /*auto editorApp = EditorRoot::GetNodeEditorApp();
+    if (!editorApp)
+        return;*/
+    NodeEditorApp* editorApp = nullptr;
+    if (s_EditorAppProvider)
+        editorApp = s_EditorAppProvider();
     if (!editorApp)
         return;
 
