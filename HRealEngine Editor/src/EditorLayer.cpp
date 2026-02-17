@@ -11,8 +11,10 @@
 #include "BehaviorTreeThings/CustomThings/CustomBlackboards.h"
 #include "BehaviorTreeThings/CustomThings/CustomConditions.h"
 #include "BehaviorTreeThings/CustomThings/CustomDecorators.h"
-#include "BehaviorTreeThings/Editor/EditorRoot.h"
-#include "BehaviorTreeThings/Editor/NodeEditorApp.h"
+//#include "BehaviorTreeThings/Editor/EditorRoot.h"
+//#include "BehaviorTreeThings/Editor/NodeEditorApp.h"
+#include "HRealEngine/Scripting/BTEditorRoot.h"
+#include "HRealEngine/Scripting/BTEditorApp.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "HRealEngine/Asset/AssetImporter.h"
@@ -27,6 +29,7 @@
 #include "HRealEngine/Renderer/Renderer2D.h"
 #include "HRealEngine/Renderer/Renderer3D.h"
 #include "HRealEngine/Scene/SceneSerializer.h"
+#include "HRealEngine/Scripting/CSharpNodeRegistry.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
 #include "HRealEngine/Utils/PlatformUtils.h"
 #include "imgui/imgui.h"
@@ -86,6 +89,37 @@ namespace HRealEngine
     
         NodeRegistry::AddDecoratorNodeToBuilder<ChangeResultOfTheNodeDecorator, ChangeResultOfTheNodeParameters>("Change Result Of The Node Decorator");
         NodeRegistry::AddDecoratorNodeToBuilder<CooldownDecorator, CooldownDecoratorParameters>("Cooldown Decorator");
+        
+        if (ScriptEngine::IsInitialized())
+        {
+            auto& btActionClasses = ScriptEngine::s_BTActionClasses;
+            for (const auto& [className, info] : btActionClasses)
+            {
+                CSharpNodeRegistry::AddManagedActionNode(className);
+                LOG_CORE_INFO("Registered managed BT Action in editor: {}", className);
+            }
+        
+            auto& btConditionClasses = ScriptEngine::s_BTConditionClasses;
+            for (const auto& [className, info] : btConditionClasses)
+            {
+                CSharpNodeRegistry::AddManagedConditionNode(className);
+                LOG_CORE_INFO("Registered managed BT Condition in editor: {}", className);
+            }
+        
+            auto& btDecoratorClasses = ScriptEngine::s_BTDecoratorClasses;
+            for (const auto& [className, info] : btDecoratorClasses)
+            {
+                CSharpNodeRegistry::AddManagedDecoratorNode(className);
+                LOG_CORE_INFO("Registered managed BT Decorator in editor: {}", className);
+            }
+        
+            auto& btBlackboardClasses = ScriptEngine::s_BTBlackboardClasses;
+            for (const auto& [className, info] : btBlackboardClasses)
+            {
+                CSharpNodeRegistry::AddManagedBlackboard(className);
+                LOG_CORE_INFO("Registered managed BT Blackboard in editor: {}", className);
+            }
+        }
     }
 
     void EditorLayer::OnAttach()
@@ -181,10 +215,15 @@ namespace HRealEngine
 
     void EditorLayer::OnDetach()
     {
-        if (EditorRoot::HasNodeEditorApp())
+        /*if (EditorRoot::HasNodeEditorApp())
         {
             EditorRoot::GetNodeEditorApp()->ClearDatas();
             EditorRoot::EditorRootStop();
+        }*/
+        if (BTEditorRoot::HasEditorApp())
+        {
+            BTEditorRoot::GetEditorApp()->ClearDatas();
+            BTEditorRoot::Stop();
         }
         Root::RootClear();
     }
@@ -594,17 +633,23 @@ namespace HRealEngine
         if (m_bShowBehaviorTreeEditor)
         {
             ImGui::Begin("Behavior Tree Editor", &m_bShowBehaviorTreeEditor);
-            if (!EditorRoot::HasNodeEditorApp())
+            /*if (!EditorRoot::HasNodeEditorApp())
             {
                 EditorRoot::EditorRootStart();
                 EditorRoot::GetNodeEditorApp()->SetEmbeddedMode(true);
+            }*/
+            if (!BTEditorRoot::HasEditorApp())
+            {
+                BTEditorRoot::Start();
+                BTEditorRoot::GetEditorApp()->SetEmbeddedMode(true);
             }
             
             if (ImGui::BeginTable("BT_Table", 2, ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable))
             {
                 ImGui::TableNextColumn();
         
-                auto* app = EditorRoot::GetNodeEditorApp();
+                //auto* app = EditorRoot::GetNodeEditorApp();
+                auto* app = BTEditorRoot::GetEditorApp();
                 if (app)
                 {
                     app->DrawToolbar();
@@ -1306,8 +1351,10 @@ namespace HRealEngine
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-        if (EditorRoot::HasNodeEditorApp())
-            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
+        /*if (EditorRoot::HasNodeEditorApp())
+            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);*/
+        if (BTEditorRoot::HasEditorApp())
+            BTEditorRoot::GetEditorApp()->SetRuntimeMode(true);
 
         Input::SetCursorMode(CursorMode::Locked);
     }
@@ -1324,8 +1371,10 @@ namespace HRealEngine
         m_ActiveScene->OnSimulationStart();
 
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        if (EditorRoot::HasNodeEditorApp())
-            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);
+        /*if (EditorRoot::HasNodeEditorApp())
+            EditorRoot::GetNodeEditorApp()->SetRuntimeMode(true);*/
+        if (BTEditorRoot::HasEditorApp())
+            BTEditorRoot::GetEditorApp()->SetRuntimeMode(true);
     }
 
     void EditorLayer::OnSceneStop() 
@@ -1340,13 +1389,22 @@ namespace HRealEngine
         m_ActiveScene = m_EditorScene;
         
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        if (EditorRoot::HasNodeEditorApp())
+        /*if (EditorRoot::HasNodeEditorApp())
         {
             EditorRoot::GetNodeEditorApp()->ClearDatas();
             if (EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().GetNodes().empty())
             {
                 EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().SpawnRootNode();
                 EditorRoot::GetNodeEditorApp()->GetNodeEditorHelper().BuildNodes();
+            }
+        }*/
+        if (BTEditorRoot::HasEditorApp())
+        {
+            BTEditorRoot::GetEditorApp()->ClearDatas();
+            if (BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().GetNodes().empty())
+            {
+                BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().SpawnRootNode();
+                BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().BuildNodes();
             }
         }
         Input::SetCursorMode(CursorMode::Normal);

@@ -53,7 +53,8 @@ project "HRealEngine"
         "%{IncludeDir.Jolt}",
         "%{IncludeDir.JoltPhysics}",
         "%{IncludeDir.assimp}",
-        "%{IncludeDir.BehaviorTreeLibrary}"
+        "%{IncludeDir.BehaviorTreeLibrary}",
+        "%{IncludeDir.ImGuiNodeEditor}"
     }
 
     links

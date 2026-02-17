@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "Tree.h"
-#include "Editor/NodeEditorStructsAndEnums.h"
+#include "BehaviorTreeThings/Editor/NodeEditorStructsAndEnums.h" 
 
 class NodeRegistry
 {
@@ -89,7 +89,7 @@ public:
     static std::unordered_map<std::string, DecoratorClassInfo>& GetDecoratorClassInfoMap() { return s_DecoratorClassInfoMap; }
     static std::unordered_map<std::string, ConditionClassInfo>& GetConditionClassInfoMap() { return s_ConditionClassInfoMap; }
     static std::unordered_map<std::string, BlackboardClassInfo>& GetBlackboardClassInfoMap() { return s_BlackboardClassInfoMap; }
-private:
+protected:
     static std::unordered_map<std::string, ActionClassInfo> s_ActionClassInfoMap;
     static std::unordered_map<std::string, DecoratorClassInfo> s_DecoratorClassInfoMap;
     static std::unordered_map<std::string, ConditionClassInfo> s_ConditionClassInfoMap;

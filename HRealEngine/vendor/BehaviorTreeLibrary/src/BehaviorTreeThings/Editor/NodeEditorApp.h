@@ -12,7 +12,7 @@ public:
     void ClearDatas();
     
     NodeEditorApp();
-    ~NodeEditorApp();
+    virtual ~NodeEditorApp();
     void SetEmbeddedMode(bool enabled) { m_bIsEmbedded = enabled; }
     void SetRuntimeMode(bool enabled) { m_bIsRuntimeMode = enabled; }
     void DrawToolbar();
@@ -35,6 +35,12 @@ public:
     void ConditionNodeSelected(EditorCondition& condition);
     void DecoratorNodeUnSelected();
     void ConditionNodeUnSelected();
+protected:
+    std::unique_ptr<HBlackboard> m_Blackboard;
+
+    std::unordered_map<int, std::unique_ptr<ParamsForAction>> m_NodeToParams;
+    std::unordered_map<int, std::unique_ptr<ParamsForDecorator>> m_NodeToDecoratorParams;
+    std::unordered_map<int, std::unique_ptr<ParamsForCondition>> m_NodeToConditionParams;
 private:
     
     void MouseInputHandling();
@@ -49,6 +55,11 @@ private:
     void ShowBlackboardDetails();
     HBlackboard& SetBlackboardForEditor(const std::string& id, const BlackboardClassInfo& info);
     std::unique_ptr<HBlackboard> GetUniqueBlackboard() { return std::move(m_Blackboard); }
+
+    //For c# scripted nodes, we need to draw parameters in a different way, so we have separate functions for them
+    virtual void DrawActionNodeParameters(int nodeKey, const std::string& classId);
+    virtual void DrawDecoratorNodeParameters(int nodeKey, const std::string& classId);
+    virtual void DrawConditionNodeParameters(int nodeKey, const std::string& classId);
     
     BehaviorTree* BuildBehaviorTree();
     void BuildSequence(Node* node, BehaviorTreeBuilder& btBuilder);
@@ -77,21 +88,20 @@ private:
     BehaviorTree* m_BehaviorTree = nullptr;
     HBlackboard* m_CopyBlackboard = nullptr;
     std::unique_ptr<NodeEditorHelper> m_NodeEditor;
-    std::unique_ptr<HBlackboard> m_Blackboard;
     
     std::unordered_map<const HNode*, nodeEditor::NodeId> m_NodeToEditorIdMap;
     std::unordered_map<uintptr_t, const HNode*> m_EditorIdToNodeMap;
 
     std::unordered_map<int, std::string> m_NodeToActionClassId;
-    std::unordered_map<int, std::unique_ptr<ParamsForAction>> m_NodeToParams;
+    //std::unordered_map<int, std::unique_ptr<ParamsForAction>> m_NodeToParams;
     std::string m_SelectedActionClassName;
 
     std::unordered_map<int, std::string> m_NodeToDecoratorClassId;
-    std::unordered_map<int, std::unique_ptr<ParamsForDecorator>> m_NodeToDecoratorParams;
+    //std::unordered_map<int, std::unique_ptr<ParamsForDecorator>> m_NodeToDecoratorParams;
     std::string m_SelectedDecoratorClassName;
 
     std::unordered_map<int, std::string> m_NodeToConditionClassId;
-    std::unordered_map<int, std::unique_ptr<ParamsForCondition>> m_NodeToConditionParams;
+    //std::unordered_map<int, std::unique_ptr<ParamsForCondition>> m_NodeToConditionParams;
     std::string m_SelectedConditionClassName;
 
     std::string m_SelectedBlackboardClassName;
