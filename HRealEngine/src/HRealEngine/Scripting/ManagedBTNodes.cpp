@@ -15,6 +15,7 @@ namespace HRealEngine
         if (m_ManagedInstance)
         {
             SyncFromManagedBlackboard();
+            SetOnValuesChangedCallback([this](HBlackboard* bb) { SyncToManagedBlackboard(); });
         }
     }
 
@@ -119,6 +120,83 @@ namespace HRealEngine
         }
 
         LOG_CORE_INFO("ManagedBTBlackboard synced: {} bools, {} ints, {} floats, {} strings", GetBoolValues().size(), GetIntValues().size(), GetFloatValues().size(), GetStringValues().size());
+    }
+
+    void ManagedBTBlackboard::SyncToManagedBlackboard()
+    {
+        if (!m_ManagedInstance)
+            return;
+
+        MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+        MonoDomain* domain = mono_object_get_domain(m_ManagedInstance);
+        
+        auto findMethod = [](MonoClass* k, const char* name, int paramCount) -> MonoMethod*
+        {
+            MonoClass* current = k;
+            while (current != nullptr)
+            {
+                MonoMethod* method = mono_class_get_method_from_name(current, name, paramCount);
+                if (method)
+                    return method;
+                current = mono_class_get_parent(current);
+            }
+            return nullptr;
+        };
+
+        // Bool values
+        MonoMethod* setBoolMethod = findMethod(klass, "SetBool", 2);
+        if (setBoolMethod)
+        {
+            for (const auto& [key, value] : GetBoolValues())
+            {
+                MonoString* keyStr = mono_string_new(domain, key.c_str());
+                MonoBoolean monoValue = value ? 1 : 0;
+                void* args[2] = { keyStr, &monoValue };
+                mono_runtime_invoke(setBoolMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+
+        // Int values
+        MonoMethod* setIntMethod = findMethod(klass, "SetInt", 2);
+        if (setIntMethod)
+        {
+            for (const auto& [key, value] : GetIntValues())
+            {
+                MonoString* keyStr = mono_string_new(domain, key.c_str());
+                int monoValue = value;
+                void* args[2] = { keyStr, &monoValue };
+                mono_runtime_invoke(setIntMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+
+        // Float values
+        MonoMethod* setFloatMethod = findMethod(klass, "SetFloat", 2);
+        if (setFloatMethod)
+        {
+            for (const auto& [key, value] : GetFloatValues())
+            {
+                MonoString* keyStr = mono_string_new(domain, key.c_str());
+                float monoValue = value;
+                void* args[2] = { keyStr, &monoValue };
+                mono_runtime_invoke(setFloatMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+
+        // String values
+        MonoMethod* setStringMethod = findMethod(klass, "SetString", 2);
+        if (setStringMethod)
+        {
+            for (const auto& [key, value] : GetStringValues())
+            {
+                MonoString* keyStr = mono_string_new(domain, key.c_str());
+                MonoString* valueStr = mono_string_new(domain, value.c_str());
+                void* args[2] = { keyStr, valueStr };
+                mono_runtime_invoke(setStringMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+
+        LOG_CORE_INFO("Synced {} bools, {} ints, {} floats, {} strings TO C# blackboard", 
+                      GetBoolValues().size(), GetIntValues().size(), GetFloatValues().size(), GetStringValues().size());
     }
 
     //---------------------BTAction---------------------

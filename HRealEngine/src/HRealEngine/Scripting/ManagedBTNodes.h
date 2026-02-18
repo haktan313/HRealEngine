@@ -14,6 +14,7 @@ namespace HRealEngine
         ManagedBTBlackboard(const std::string& name, const std::string& managedClassName);
         ~ManagedBTBlackboard();
         void SyncFromManagedBlackboard();
+        void SyncToManagedBlackboard();
         MonoObject* GetManagedInstance() const { return m_ManagedInstance; }
 
     private:

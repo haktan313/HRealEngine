@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -37,13 +38,22 @@ public:
     bool HasFloatValue(const std::string& key) const { return m_FloatValues.find(key) != m_FloatValues.end(); }
     bool HasStringValue(const std::string& key) const { return m_StringValues.find(key) != m_StringValues.end(); }
     
-    void DrawImGui();
+    virtual void DrawImGui();
+
+    using OnValuesChangedCallback = std::function<void(HBlackboard*)>;
+    void SetOnValuesChangedCallback(OnValuesChangedCallback callback) { m_OnValuesChangedCallback = callback; }
 protected:
     void CreateBoolValue(const std::string& key, bool value);
     void CreateIntValue(const std::string& key, int value);
     void CreateFloatValue(const std::string& key, float value);
     void CreateStringValue(const std::string& key, const std::string& value);
 
+    void NotifyValuesChanged() 
+    { 
+        m_bValuesChanged = true; 
+        if (m_OnValuesChangedCallback)
+            m_OnValuesChangedCallback(this);
+    }
 private:
     std::unordered_map<std::string, bool> m_BoolValues;
     std::unordered_map<std::string, int> m_IntValues;
@@ -53,6 +63,8 @@ private:
     bool m_bValuesChanged = false;
 
     std::string m_BlackboardName;
+
+    OnValuesChangedCallback m_OnValuesChangedCallback;
 
     friend class BTSerializer;
 };
