@@ -20,6 +20,10 @@ namespace HRealEngine
         internal extern static object GetScriptInstance(ulong entityID);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void DestroyEntity(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong SpawnEntity(string name, string tag, ref Vector3 translation, ref Vector3 rotation, ref Vector3 scale);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_AddComponent(ulong entityID, Type componentType);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCodes keyCode);
@@ -66,6 +70,39 @@ namespace HRealEngine
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Rigidbody3DComponent_ApplyLinearImpulseToCenter(ulong entityID, ref Vector3 impulse);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_GetLinearVelocity(ulong entityID, out Vector3 velocity);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_SetLinearVelocity(ulong entityID, ref Vector3 velocity);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_SetRotationDegrees(ulong entityID, ref Vector3 eulerDeg);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_GetRotationDegrees(ulong entityID, out Vector3 result);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_SetBodyType(ulong entityID, RigidBodyType bodyType);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Rigidbody3DComponent_GetBodyType(ulong entityID, out RigidBodyType bodyType);
+
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void MeshRendererComponent_SetMesh(ulong entityID, string meshPath);
+        
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BoxCollider3DComponent_SetSize(ulong entityID, ref Vector3 size);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static Vector3 BoxCollider3DComponent_GetSize(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BoxCollider3DComponent_SetOffset(ulong entityID, ref Vector3 offset);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static Vector3 BoxCollider3DComponent_GetOffset(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void BoxCollider3DComponent_SetIsTrigger(ulong entityID, bool isTrigger);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool BoxCollider3DComponent_GetIsTrigger(ulong entityID);
+        
+
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void GameModeData_SetStringData(string dataName, string value);

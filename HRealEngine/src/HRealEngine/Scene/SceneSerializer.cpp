@@ -368,6 +368,9 @@ namespace HRealEngine
             }
             out << YAML::Key << "BodyType" << YAML::Value << bodyType;
             out << YAML::Key << "FixedRotation" << YAML::Value << rb3d.FixedRotation;
+            out << YAML::Key << "Friction" << YAML::Value << rb3d.Friction;
+            out << YAML::Key << "Restitution" << YAML::Value << rb3d.Restitution;
+            out << YAML::Key << "Convex Radius" << YAML::Value << rb3d.ConvexRadius;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<BoxCollider3DComponent>())
@@ -658,6 +661,9 @@ namespace HRealEngine
                     else if (bodyType == "Kinematic")rb3d.Type = Rigidbody3DComponent::BodyType::Kinematic;
 
                     rb3d.FixedRotation = rb3dComponent["FixedRotation"].as<bool>();
+                    rb3d.Friction = rb3dComponent["Friction"].as<float>();
+                    rb3d.Restitution = rb3dComponent["Restitution"].as<float>();
+                    rb3d.ConvexRadius = rb3dComponent["Convex Radius"].as<float>();
                 }
                 if (auto boxCollider3DComponent = entity["BoxCollider3DComponent"])
                 {

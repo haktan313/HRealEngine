@@ -40,6 +40,12 @@ namespace HRealEngine
         {
             return InternalCalls.Entity_HasComponent(EntityID, typeof(T));
         }
+        public void AddComponent<T>() where T : Component, new()
+        {
+            if (HasComponent<T>())
+                return;
+            InternalCalls.Entity_AddComponent(EntityID, typeof(T));
+        }
         public T GetComponent<T>() where T : Component, new()
         {
             if (!HasComponent<T>())
@@ -78,6 +84,13 @@ namespace HRealEngine
         public void OpenScene(string scenePath)
         {
             InternalCalls.OpenScene(scenePath);
+        }
+        public Entity SpawnEntity(string name, string tag, Vector3 translation, Vector3 rotation, Vector3 scale)
+        {
+            ulong entityID = InternalCalls.SpawnEntity(name, tag, ref translation, ref rotation, ref scale);
+            if (entityID == 0)
+                return null;
+            return new Entity(entityID);
         }
     }
 }

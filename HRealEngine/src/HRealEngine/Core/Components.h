@@ -169,6 +169,10 @@ namespace HRealEngine
         BodyType Type = BodyType::Static;
         bool FixedRotation = false;
 
+        float Friction = 0.05f;
+        float Restitution = 0.0f;
+        float ConvexRadius = 0.02f;
+
         // Runtime
         void* RuntimeBody = nullptr;
 

@@ -19,6 +19,10 @@ namespace HRealEngine
         void CreateBoxCollider();
         void CreateEmptyBody();
 
+        void CreateBodyForEntity(Entity entity);
+        void CreateBoxColliderForEntity(Entity entity);
+        void CreateEmptyBodyForEntity(Entity entity);
+
         void UpdateSimulation3DForKinematicBodies(Timestep deltaTime);
         void UpdateSimulation3D(Timestep deltaTime, int& stepFrames);
         void UpdateSimulation3DForNonKinematicBodies();
@@ -26,6 +30,7 @@ namespace HRealEngine
         void Step3DWorldForKinematicBodies(Timestep deltaTime);
         void Step3DWorld(Timestep deltaTime);
         void Step3DWorldForNonKinematicBodies();
+        void SetBodyTypeForEntity(Entity entity);
         void DestroyEntityPhysics(Entity entity);
         void Stop3DPhysics();
         

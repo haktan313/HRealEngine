@@ -12,6 +12,7 @@
 #include "box2d/b2_body.h"
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
+#include "HRealEngine/Physics/JoltWorld.h"
 #include "Physics/Body/Body.h"
 #include "Physics/Body/BodyInterface.h"
 
@@ -50,6 +51,77 @@ namespace HRealEngine
         if (!entity)
             return;
         scene->DestroyEntity(entity);
+    }
+
+	static uint64_t SpawnEntity(MonoString* name)
+    {
+    	auto nameCStr = mono_string_to_utf8(name);
+		Scene* scene = ScriptEngine::GetSceneContext();
+    	if (!scene)
+		{
+			LOG_CORE_ERROR("SpawnEntity: Scene context is null!");
+			mono_free(nameCStr);
+			return 0;
+		}
+		Entity entity = scene->CreateEntity(nameCStr);
+		mono_free(nameCStr);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("SpawnEntity: Failed to create entity!");
+			return 0;
+		}
+    	UUID entityID = entity.GetUUID();
+    	LOG_CORE_INFO("Spawned entity with name '{}' and ID {}", mono_string_to_utf8(name), (uint64_t)entityID);
+    	return entityID;
+    }
+
+	static std::array<std::string, 3> s_ComponentTypeNames = {
+		"HRealEngine.BoxCollider3DComponent",
+		"HRealEngine.MeshRendererComponent",
+		"HRealEngine.Rigidbody3DComponent"
+	};
+	static void Entity_AddComponent(UUID entityID, MonoReflectionType* componentType)
+    {
+		auto entity = ScriptEngine::GetSceneContext()->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("Entity_AddComponent: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+    	auto managedType = mono_reflection_type_get_type(componentType);
+    	LOG_CORE_INFO("Adding component of type {} to entity {}", mono_type_get_name(managedType), (uint64_t)entityID);
+    	auto it = s_EntityHasComponentFunctions.find(managedType);
+		if (it != s_EntityHasComponentFunctions.end())
+		{
+			std::string componentName = mono_type_get_name(managedType);
+			LOG_CORE_INFO("Component type {} is registered, checking if entity already has it", componentName);
+			if (it->second(entity))
+			{
+				LOG_CORE_WARN("Entity {} already has component of type {}, skipping AddComponent", (uint64_t)entityID, componentName);
+				return;
+			}
+			
+			if (componentName == s_ComponentTypeNames[0])
+			{
+				entity.AddComponent<BoxCollider3DComponent>();
+				Scene* scene = ScriptEngine::GetSceneContext();
+				JoltWorld* joltWorld = scene->GetJoltWorld();
+				if (joltWorld)
+					joltWorld->CreateBodyForEntity(entity);
+			}
+			else if (componentName == s_ComponentTypeNames[1])
+				entity.AddComponent<MeshRendererComponent>();
+			else if (componentName == s_ComponentTypeNames[2])
+			{
+				entity.AddComponent<Rigidbody3DComponent>();
+				Scene* scene = ScriptEngine::GetSceneContext();
+				JoltWorld* joltWorld = scene->GetJoltWorld();
+				if (joltWorld)
+					joltWorld->CreateBodyForEntity(entity);
+			}
+			else
+				LOG_CORE_ERROR("Entity_AddComponent: No matching component type found for {}", componentName);
+		}
     }
 
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
@@ -268,6 +340,109 @@ namespace HRealEngine
         bodyInterface->AddLinearVelocity(body->GetID(), JPH::Vec3(impulse->x, impulse->y, impulse->z));
     }
 
+	static void Rigidbody3DComponent_SetLinearVelocity(UUID entityID, glm::vec3* velocity)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
+		JPH::BodyInterface* bodyInterface = ScriptEngine::GetBodyInterface();
+		bodyInterface->SetLinearVelocity(body->GetID(), JPH::Vec3(velocity->x, velocity->y, velocity->z));
+	}
+
+	static void Rigidbody3DComponent_GetLinearVelocity(UUID entityID, glm::vec3* outVelocity)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
+		JPH::BodyInterface* bodyInterface = ScriptEngine::GetBodyInterface();
+		JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(body->GetID());
+		*outVelocity = glm::vec3(velocity.GetX(), velocity.GetY(), velocity.GetZ());
+	}
+	
+	static void Rigidbody3DComponent_SetRotationDegrees(UUID entityID, glm::vec3* eulerDeg)
+    {
+    	Scene* scene = ScriptEngine::GetSceneContext();
+    	Entity entity = scene->GetEntityByUUID(entityID);
+    	auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+    	JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
+    	JPH::BodyInterface* bi = ScriptEngine::GetBodyInterface();
+
+    	glm::vec3 eulerRad = glm::radians(*eulerDeg);
+    	glm::quat gq = glm::quat(eulerRad);
+    	JPH::Quat q(gq.x, gq.y, gq.z, gq.w);
+
+    	bi->SetRotation(body->GetID(), q, JPH::EActivation::Activate);
+    }
+	
+	static void Rigidbody3DComponent_GetRotationDegrees(UUID entityID, glm::vec3* outRotation)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
+		JPH::BodyInterface* bodyInterface = ScriptEngine::GetBodyInterface();
+		JPH::Quat rotation = bodyInterface->GetRotation(body->GetID());
+		glm::quat glmRotation(rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW());
+		glm::vec3 eulerDegrees = glm::degrees(glm::eulerAngles(glmRotation));
+		*outRotation = eulerDegrees;
+	}
+
+	static void Rigidbody3DComponent_SetBodyType(UUID entityID, int bodyType)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+		rb3d.Type = static_cast<Rigidbody3DComponent::BodyType>(bodyType);
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld)
+			joltWorld->SetBodyTypeForEntity(entity);
+	}
+
+	static int Rigidbody3DComponent_GetBodyType(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+		return static_cast<int>(rb3d.Type);
+	}
+
+	static void MeshRendererComponent_SetMesh(UUID entityID, MonoString* meshPath)
+    {
+	    
+    }
+
+	static void BoxCollider3DComponent_SetSize(UUID entityID, glm::vec3* size)
+	{
+
+	}
+
+	static glm::vec3 BoxCollider3DComponent_GetSize(UUID entityID)
+    {
+	    return glm::vec3(0.0f);
+    }
+
+	static void BoxCollider3DComponent_SetOffset(UUID entityID, glm::vec3* offset)
+	{
+	    
+	}
+
+	static glm::vec3 BoxCollider3DComponent_GetOffset(UUID entityID)
+	{
+	    return glm::vec3(0.0f);
+	}
+
+	static void BoxCollider3DComponent_SetIsTrigger(UUID entityID, bool isTrigger)
+    {
+    	
+    }
+
+	static bool BoxCollider3DComponent_GetIsTrigger(UUID entityID)
+	{
+		return false;
+	}
+
     static bool Input_IsKeyDown(KeyCodes keycode)
     {
         return Input::IsKeyPressed(keycode);
@@ -437,6 +612,8 @@ namespace HRealEngine
 
         HRE_ADD_INTERNAL_CALL(GetScriptInstance);
         HRE_ADD_INTERNAL_CALL(DestroyEntity);
+    	HRE_ADD_INTERNAL_CALL(SpawnEntity);
+    	HRE_ADD_INTERNAL_CALL(Entity_AddComponent);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
     	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);
@@ -458,6 +635,21 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
         HRE_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
         HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_ApplyLinearImpulseToCenter);
+    	HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_SetLinearVelocity);
+    	HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_GetLinearVelocity);
+    	HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_SetRotationDegrees);
+    	HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_GetRotationDegrees);
+		HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_SetBodyType);
+		HRE_ADD_INTERNAL_CALL(Rigidbody3DComponent_GetBodyType);
+
+    	HRE_ADD_INTERNAL_CALL(MeshRendererComponent_SetMesh);
+
+    	HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_SetSize);
+    	HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_GetSize);
+		HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_SetOffset);
+    	HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_GetOffset);
+    	HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_SetIsTrigger);
+		HRE_ADD_INTERNAL_CALL(BoxCollider3DComponent_GetIsTrigger);
     	
         HRE_ADD_INTERNAL_CALL(Input_IsKeyDown);
     	HRE_ADD_INTERNAL_CALL(Input_GetMousePosition);

@@ -636,6 +636,10 @@ namespace HRealEngine
         {
             m_ActiveScene->Set2DPhysicsEnabled(m_bSetPhysics2DEnabled);
         }
+        ImGui::Checkbox("Snap Transform", &m_bSnapTransform);
+        ImGui::DragFloat("Snap Translation", &m_SnapValueForTransform, 0.1f);
+        ImGui::DragFloat("Snap Rotation", &m_SnapValueForRotation, 1.0f);
+        ImGui::DragFloat("Snap Scale", &m_SnapValueForScale, 0.1f);
         
         static int debugView = 0;
         ImGui::RadioButton("None", &debugView, 0);
@@ -755,8 +759,20 @@ namespace HRealEngine
             auto& transformComponent = selectedEntity.GetComponent<TransformComponent>();
             glm::mat4 transform = transformComponent.GetTransform();
 
-            bool bSnap = Input::IsKeyPressed(HR_KEY_LEFT_CONTROL) || Input::IsKeyPressed(HR_KEY_RIGHT_CONTROL);
-            float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.f : 0.5f;
+            bool bSnap = (Input::IsKeyPressed(HR_KEY_LEFT_CONTROL) || Input::IsKeyPressed(HR_KEY_RIGHT_CONTROL) || m_bSnapTransform);
+            float snapValue = 0.f;
+            switch (m_GizmoType)
+            {
+                case ImGuizmo::OPERATION::SCALE:
+                    snapValue = m_SnapValueForScale;
+                    break;
+                case ImGuizmo::OPERATION::ROTATE:
+                    snapValue = m_SnapValueForRotation;
+                    break;
+                case ImGuizmo::OPERATION::TRANSLATE:
+                    snapValue = m_SnapValueForTransform;
+                    break;
+            }
 
             float snapValues[3] = { snapValue, snapValue, snapValue };
 
@@ -853,6 +869,9 @@ namespace HRealEngine
                 Input::SetCursorMode(CursorMode::Normal);
             }
              break;
+        case HR_KEY_DELETE:
+            OnDeleteEntity();
+            break;
         }
         return false;
     }
@@ -1485,6 +1504,13 @@ namespace HRealEngine
             return;
         if (m_SceneHierarchyPanel.GetSelectedEntity())
             m_ActiveScene->DuplicateEntity(m_SceneHierarchyPanel.GetSelectedEntity());
+    }
+
+    void EditorLayer::OnDeleteEntity()
+    {
+        if (m_SceneState != SceneState::Editor || !m_SceneHierarchyPanel.GetSelectedEntity())
+            return;
+        m_ActiveScene->DestroyEntity(m_SceneHierarchyPanel.GetSelectedEntity());
     }
 
     void EditorLayer::UIToolbar()

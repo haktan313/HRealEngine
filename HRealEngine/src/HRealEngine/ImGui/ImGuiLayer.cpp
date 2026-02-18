@@ -50,7 +50,7 @@ namespace HRealEngine
 	{
 		if (eventRef.GetType() == EventTypes::WindowDrop)
 			return;
-		if (!m_bBlockEvents || eventRef.IsInCategory(EventCategory::AppRuntimeEvents))
+		if (!m_bBlockEvents || eventRef.IsInCategory(EventCategory::AppRuntimeEvents) || eventRef.IsInCategory(EventCategory::KeyboardEvents))
 			return;
 		ImGuiIO& io = ImGui::GetIO();
 		eventRef.m_bHandled |= io.WantCaptureMouse;

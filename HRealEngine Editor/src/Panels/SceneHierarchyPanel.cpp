@@ -1113,7 +1113,6 @@ namespace HRealEngine
         DrawComponent<Rigidbody3DComponent>("Rigidbody 3D", entity, [](auto& component)
         {
             const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
-            const char* bodyShapeStrings[] = { "Box", "Sphere", "Capsule", "Cylinder", "Plane", "Triangle" };
             const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
             
             if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
@@ -1132,6 +1131,9 @@ namespace HRealEngine
                 ImGui::EndCombo();
             }
             ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+            ImGui::DragFloat("Friction", &component.Friction, 0.1f, 0.0f, 1.0f);
+            ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);
+            ImGui::DragFloat("Convex Radius", &component.ConvexRadius, 0.1f, 0.0f, 10.0f);
         });
         DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
         {

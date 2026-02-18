@@ -49,6 +49,32 @@ namespace HRealEngine
         {
             InternalCalls.Rigidbody3DComponent_ApplyLinearImpulseToCenter(entity.EntityID, ref impulse);
         } 
+        public Vector3 GetLinearVelocity()
+        {
+            InternalCalls.Rigidbody3DComponent_GetLinearVelocity(entity.EntityID, out Vector3 v);
+            return v;
+        }
+        public void SetLinearVelocity(Vector3 v)
+        {
+            InternalCalls.Rigidbody3DComponent_SetLinearVelocity(entity.EntityID, ref v);
+        }
+        public void SetRotationDegrees(Vector3 eulerDeg)
+        {
+            InternalCalls.Rigidbody3DComponent_SetRotationDegrees(entity.EntityID, ref eulerDeg);
+        }
+        public void GetRotationDegrees(out Vector3 rot)
+        {
+            InternalCalls.Rigidbody3DComponent_GetRotationDegrees(entity.EntityID, out rot);
+        }
+        public void SetBodyType(RigidBodyType bodyType)
+        {
+            InternalCalls.Rigidbody3DComponent_SetBodyType(entity.EntityID, bodyType);
+        }
+        public RigidBodyType GetBodyType()
+        {
+            InternalCalls.Rigidbody3DComponent_GetBodyType(entity.EntityID, out RigidBodyType bodyType);
+            return bodyType;
+        }
     }
     
     public class TextComponent : Component
@@ -84,6 +110,42 @@ namespace HRealEngine
         {
             get => InternalCalls.TextComponent_GetLineSpacing(entity.EntityID);
             set => InternalCalls.TextComponent_SetLineSpacing(entity.EntityID, value);
+        }
+    }
+    
+    public class MeshRendererComponent : Component
+    {
+        public void SetMesh(string meshPath)
+        {
+            InternalCalls.MeshRendererComponent_SetMesh(entity.EntityID, meshPath);
+        }
+    }
+    
+    public class BoxCollider3DComponent : Component
+    {
+        public void SetSize(Vector3 size)
+        {
+            InternalCalls.BoxCollider3DComponent_SetSize(entity.EntityID, ref size);
+        }
+        public Vector3 GetSize()
+        {
+            return InternalCalls.BoxCollider3DComponent_GetSize(entity.EntityID);
+        }
+        public void SetOffset(Vector3 offset)
+        {
+            InternalCalls.BoxCollider3DComponent_SetOffset(entity.EntityID, ref offset);
+        }
+        public Vector3 GetOffset()
+        {
+            return InternalCalls.BoxCollider3DComponent_GetOffset(entity.EntityID);
+        }
+        public void SetIsTrigger(bool isTrigger)
+        {
+            InternalCalls.BoxCollider3DComponent_SetIsTrigger(entity.EntityID, isTrigger);
+        }
+        public bool GetIsTrigger()
+        {
+            return InternalCalls.BoxCollider3DComponent_GetIsTrigger(entity.EntityID);
         }
     }
 }

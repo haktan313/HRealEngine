@@ -62,6 +62,7 @@ namespace HRealEngine
         void OnScenePause();
 
         void OnDuplicateEntity();
+        void OnDeleteEntity();
 
         void UIToolbar();
 
@@ -95,7 +96,11 @@ namespace HRealEngine
         bool m_bShowBehaviorTreeEditor = false;
         bool m_bShowProjectBrowser = false;
 
-
+        bool m_bSnapTransform = false;
+        float m_SnapValueForTransform = 0.5f;
+        float m_SnapValueForRotation = 45.0f;
+        float m_SnapValueForScale = 0.5f;
+        
         Ref<Texture2D> m_JoseMourinhoTexture;
         Ref<Texture2D> m_CheckBoardTexture;
         Ref<Texture2D> m_SpriteSheet;
