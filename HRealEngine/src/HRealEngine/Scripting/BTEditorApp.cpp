@@ -22,7 +22,29 @@ namespace HRealEngine
         if (isManagedAction)
         {
             auto it = m_NodeToManagedActionParams.find(nodeKey);
-            if (it == m_NodeToManagedActionParams.end())
+            bool needsNewInstance = (it == m_NodeToManagedActionParams.end());
+        
+            if (!needsNewInstance)
+            {
+                MonoObject* currentInstance = it->second;
+                if (currentInstance)
+                {
+                    MonoClass* klass = mono_object_get_class(currentInstance);
+                    const char* currentClassName = mono_class_get_name(klass);
+                    const char* nameSpace = mono_class_get_namespace(klass);
+                
+                    std::string fullCurrentName;
+                    if (nameSpace && strlen(nameSpace) > 0)
+                        fullCurrentName = fmt::format("{}.{}", nameSpace, currentClassName);
+                    else
+                        fullCurrentName = currentClassName;
+                    
+                    if (fullCurrentName != classId)
+                        needsNewInstance = true;
+                }
+            }
+        
+            if (needsNewInstance)
             {
                 MonoObject* paramsInstance = ScriptEngine::CreateBTParameterInstance(classId);
                 if (paramsInstance)
@@ -70,7 +92,26 @@ namespace HRealEngine
         if (isManagedDecorator)
         {
             auto it = m_NodeToManagedDecoratorParams.find(nodeKey);
-            if (it == m_NodeToManagedDecoratorParams.end())
+            
+            bool needsNewInstance = (it == m_NodeToManagedDecoratorParams.end());
+            
+            if (!needsNewInstance && it->second)
+            {
+                MonoClass* klass = mono_object_get_class(it->second);
+                const char* currentClassName = mono_class_get_name(klass);
+                const char* nameSpace = mono_class_get_namespace(klass);
+                
+                std::string fullCurrentName;
+                if (nameSpace && strlen(nameSpace) > 0)
+                    fullCurrentName = fmt::format("{}.{}", nameSpace, currentClassName);
+                else
+                    fullCurrentName = currentClassName;
+                
+                if (fullCurrentName != classId)
+                    needsNewInstance = true;
+            }
+            
+            if (needsNewInstance)
             {
                 m_NodeToManagedDecoratorParams[nodeKey] = ScriptEngine::CreateBTParameterInstance(classId);
                 it = m_NodeToManagedDecoratorParams.find(nodeKey);
@@ -106,7 +147,26 @@ namespace HRealEngine
         if (isManagedCondition)
         {
             auto it = m_NodeToManagedConditionParams.find(nodeKey);
-            if (it == m_NodeToManagedConditionParams.end())
+            
+            bool needsNewInstance = (it == m_NodeToManagedConditionParams.end());
+            
+            if (!needsNewInstance && it->second)
+            {
+                MonoClass* klass = mono_object_get_class(it->second);
+                const char* currentClassName = mono_class_get_name(klass);
+                const char* nameSpace = mono_class_get_namespace(klass);
+                
+                std::string fullCurrentName;
+                if (nameSpace && strlen(nameSpace) > 0)
+                    fullCurrentName = fmt::format("{}.{}", nameSpace, currentClassName);
+                else
+                    fullCurrentName = currentClassName;
+                
+                if (fullCurrentName != classId)
+                    needsNewInstance = true;
+            }
+            
+            if (needsNewInstance)
             {
                 m_NodeToManagedConditionParams[nodeKey] = ScriptEngine::CreateBTParameterInstance(classId);
                 it = m_NodeToManagedConditionParams.find(nodeKey);
