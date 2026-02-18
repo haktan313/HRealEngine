@@ -37,5 +37,9 @@ namespace HRealEngine
         std::unordered_map<int, MonoObject*> m_NodeToManagedActionParams;
         std::unordered_map<int, MonoObject*> m_NodeToManagedConditionParams;
         std::unordered_map<int, MonoObject*> m_NodeToManagedDecoratorParams;
+
+        std::unordered_map<int, std::string> m_NodeToManagedActionClassName;
+        std::unordered_map<int, std::string> m_NodeToManagedDecoratorClassName;
+        std::unordered_map<int, std::string> m_NodeToManagedConditionClassName;
     };
 }
