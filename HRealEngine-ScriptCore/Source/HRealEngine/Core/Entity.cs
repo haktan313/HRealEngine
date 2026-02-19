@@ -46,6 +46,24 @@ namespace HRealEngine
                 return;
             InternalCalls.Entity_AddComponent(EntityID, typeof(T));
         }
+        public void AddRigidbody3DComponent(RigidBodyType bodyType, bool fixedRotation, float friction, float restitution, float convexRadius)
+        {
+            if (HasComponent<Rigidbody3DComponent>())
+                return;
+            InternalCalls.Entity_AddRigidbody3DComponent(EntityID, bodyType, fixedRotation, friction, restitution, convexRadius);
+        }
+        public void AddBoxCollider3DComponent(bool isTrigger, Vector3 size, Vector3 offset)
+        {
+            if (HasComponent<BoxCollider3DComponent>())
+                return;
+            InternalCalls.Entity_AddBoxCollider3DComponent(EntityID, isTrigger, ref size, ref offset);
+        }
+        public void AddMeshRendererComponent(string meshPath)
+        {
+            if (HasComponent<MeshRendererComponent>())
+                return;
+            InternalCalls.Entity_AddMeshRendererComponent(EntityID, meshPath);
+        }
         public T GetComponent<T>() where T : Component, new()
         {
             if (!HasComponent<T>())

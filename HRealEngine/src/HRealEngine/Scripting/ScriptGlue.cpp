@@ -13,6 +13,7 @@
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
 #include "HRealEngine/Physics/JoltWorld.h"
+#include "HRealEngine/Project/Project.h"
 #include "Physics/Body/Body.h"
 #include "Physics/Body/BodyInterface.h"
 
@@ -124,6 +125,76 @@ namespace HRealEngine
 		}
     }
 
+	static void Entity_AddRigidbody3DComponent(UUID entityID, Rigidbody3DComponent::BodyType bodyType, bool fixedRotation, float friction, float restitution, float convexRadius)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Entity_AddRigidbody3DComponent: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("Entity_AddRigidbody3DComponent: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		entity.AddComponent<Rigidbody3DComponent>(bodyType, fixedRotation, friction, restitution, convexRadius);
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld)
+			joltWorld->CreateBodyForEntity(entity);
+		else
+			LOG_CORE_ERROR("Entity_AddRigidbody3DComponent: Jolt physics world is null, cannot create body for entity {}", (uint64_t)entityID);
+	}
+
+	static void Entity_AddBoxCollider3DComponent(UUID entityID, bool isTrigger, glm::vec3* size, glm::vec3* offset)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Entity_AddBoxCollider3DComponent: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("Entity_AddBoxCollider3DComponent: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		entity.AddComponent<BoxCollider3DComponent>(isTrigger, *offset, *size);
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld)
+			joltWorld->CreateBodyForEntity(entity);
+		else
+			LOG_CORE_ERROR("Entity_AddBoxCollider3DComponent: Jolt physics world is null, cannot create body for entity {}", (uint64_t)entityID);
+	}
+
+	static void Entity_AddMeshRendererComponent(UUID entityID, MonoString* meshPath)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Entity_AddMeshRendererComponent: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("Entity_AddMeshRendererComponent: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		auto meshPathCStr = mono_string_to_utf8(meshPath);
+		auto meshHandle = Project::GetActive()->GetEditorAssetManager()->GetHandleFromPath(meshPathCStr);
+		mono_free(meshPathCStr);
+		if (meshHandle == 0)
+		{
+			LOG_CORE_ERROR("Entity_AddMeshRendererComponent: Invalid mesh path: {}", meshPathCStr);
+			entity.AddComponent<MeshRendererComponent>();
+			return;
+		}
+		entity.AddComponent<MeshRendererComponent>(meshHandle);
+	}
+	
     static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
     {
         /*Scene* scene = ScriptEngine::GetSceneContext();
@@ -410,37 +481,154 @@ namespace HRealEngine
 
 	static void MeshRendererComponent_SetMesh(UUID entityID, MonoString* meshPath)
     {
-	    
+	    Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetMesh: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetMesh: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		if (!entity.HasComponent<MeshRendererComponent>())
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetMesh: Entity {} does not have MeshRendererComponent!", (uint64_t)entityID);
+			return;
+		}
+		auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+		char* meshPathCStr = mono_string_to_utf8(meshPath);
+		meshRenderer.MeshAssetPath = meshPathCStr;
+		mono_free(meshPathCStr);
     }
 
 	static void BoxCollider3DComponent_SetSize(UUID entityID, glm::vec3* size)
 	{
-
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return;
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		boxCollider.Size = *size;
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld) 
+			joltWorld->SetBoxColliderSizeForEntity(entity, *size);
 	}
 
 	static glm::vec3 BoxCollider3DComponent_GetSize(UUID entityID)
     {
-	    return glm::vec3(0.0f);
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity)
+	    {
+		    LOG_CORE_ERROR("BoxCollider3DComponent_GetSize: Invalid entity ID: {}", (uint64_t)entityID);
+	    	return glm::vec3(0.0f);
+	    }
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetSize: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return glm::vec3(0.0f);
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		return boxCollider.Size;
     }
 
 	static void BoxCollider3DComponent_SetOffset(UUID entityID, glm::vec3* offset)
 	{
-	    
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity)
+	    {
+		    LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: Invalid entity ID: {}", (uint64_t)entityID);
+	    	return;
+	    }
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return;
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		boxCollider.Offset = *offset;
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld) 
+			joltWorld->SetBoxColliderOffsetForEntity(entity, *offset);
 	}
 
 	static glm::vec3 BoxCollider3DComponent_GetOffset(UUID entityID)
 	{
-	    return glm::vec3(0.0f);
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity)
+	    {
+		    LOG_CORE_ERROR("BoxCollider3DComponent_GetOffset: Invalid entity ID: {}", (uint64_t)entityID);
+	    	return glm::vec3(0.0f);
+	    }
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetOffset: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return glm::vec3(0.0f);
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		return boxCollider.Offset;
 	}
 
 	static void BoxCollider3DComponent_SetIsTrigger(UUID entityID, bool isTrigger)
     {
-    	
+    	Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetIsTrigger: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetIsTrigger: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetIsTrigger: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return;
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		boxCollider.bIsTrigger = isTrigger;
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (joltWorld)
+			joltWorld->SetIsTriggerForEntity(entity, isTrigger);
     }
 
 	static bool BoxCollider3DComponent_GetIsTrigger(UUID entityID)
 	{
-		return false;
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetIsTrigger: Scene context is null!");
+			return false;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetIsTrigger: Invalid entity ID: {}", (uint64_t)entityID);
+			return false;
+		}
+		if (!entity.HasComponent<BoxCollider3DComponent>())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetIsTrigger: Entity {} does not have BoxCollider3DComponent!", (uint64_t)entityID);
+			return false;
+		}
+		auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+		return boxCollider.bIsTrigger;
 	}
 
     static bool Input_IsKeyDown(KeyCodes keycode)
@@ -614,6 +802,9 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(DestroyEntity);
     	HRE_ADD_INTERNAL_CALL(SpawnEntity);
     	HRE_ADD_INTERNAL_CALL(Entity_AddComponent);
+		HRE_ADD_INTERNAL_CALL(Entity_AddRigidbody3DComponent);
+		HRE_ADD_INTERNAL_CALL(Entity_AddBoxCollider3DComponent);
+		HRE_ADD_INTERNAL_CALL(Entity_AddMeshRendererComponent);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
     	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);

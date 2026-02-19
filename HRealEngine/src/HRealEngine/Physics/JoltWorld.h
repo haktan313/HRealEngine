@@ -20,6 +20,10 @@ namespace HRealEngine
         void CreateEmptyBody();
 
         void CreateBodyForEntity(Entity entity);
+        void SetBodyTypeForEntity(Entity entity);
+        void SetIsTriggerForEntity(Entity entity, bool isTrigger);
+        void SetBoxColliderOffsetForEntity(Entity entity, const glm::vec3& offset);
+        void SetBoxColliderSizeForEntity(Entity entity, const glm::vec3& size);
 
         void UpdateSimulation3DForKinematicBodies(Timestep deltaTime);
         void UpdateSimulation3D(Timestep deltaTime, int& stepFrames);
@@ -28,7 +32,6 @@ namespace HRealEngine
         void Step3DWorldForKinematicBodies(Timestep deltaTime);
         void Step3DWorld(Timestep deltaTime);
         void Step3DWorldForNonKinematicBodies();
-        void SetBodyTypeForEntity(Entity entity);
         void DestroyEntityPhysics(Entity entity);
         void Stop3DPhysics();
         

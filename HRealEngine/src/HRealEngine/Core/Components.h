@@ -95,6 +95,8 @@ namespace HRealEngine
         MeshRendererComponent() = default;
         MeshRendererComponent(const MeshRendererComponent&) = default;
         MeshRendererComponent(const glm::vec4& color) : Color(color) {}
+        MeshRendererComponent(AssetHandle meshHandle) : Mesh(meshHandle) {}
+        MeshRendererComponent(std::filesystem::path meshPath) : MeshAssetPath(meshPath) {}
 
         operator glm::vec4& () { return Color; }
         operator const glm::vec4& () const { return Color; }
@@ -181,13 +183,13 @@ namespace HRealEngine
     };
     struct BoxCollider3DComponent
     {
+        bool bIsTrigger = false;
+        
         glm::vec3 Offset = {0.0f, 0.0f, 0.0f};
         glm::vec3 Size = {0.5f, 0.5f, 0.5f};
-
+        
         void* RuntimeBody = nullptr;
-
-        bool bIsTrigger = false;
-
+        
         BoxCollider3DComponent() = default;
         BoxCollider3DComponent(const BoxCollider3DComponent&) = default;
     };

@@ -24,6 +24,12 @@ namespace HRealEngine
         internal extern static ulong SpawnEntity(string name, string tag, ref Vector3 translation, ref Vector3 rotation, ref Vector3 scale);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static void Entity_AddComponent(ulong entityID, Type componentType);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_AddRigidbody3DComponent(ulong entityID, RigidBodyType bodyType, bool fixedRotation, float friction, float restitution, float convexRadius);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_AddBoxCollider3DComponent(ulong entityID, bool isTrigger, ref Vector3 size, ref Vector3 offset);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_AddMeshRendererComponent(ulong entityID, string meshPath);
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCodes keyCode);

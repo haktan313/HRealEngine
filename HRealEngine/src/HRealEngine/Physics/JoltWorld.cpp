@@ -379,6 +379,107 @@ namespace HRealEngine
         }
     }
 
+    void JoltWorld::SetBodyTypeForEntity(Entity entity)
+    {
+        if (!entity.HasComponent<Rigidbody3DComponent>())
+            return;
+        auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+        if (!rb.RuntimeBody)
+        {
+            LOG_CORE_ERROR("SetBodyTypeForEntity: RuntimeBody is null for entity with UUID {}", (uint32_t)entity.GetUUID());
+            return;
+        }
+        auto body = (JPH::Body*)rb.RuntimeBody;
+        if (!body)
+        {
+            LOG_CORE_ERROR("SetBodyTypeForEntity: Body is null for entity with UUID {}", (uint32_t)entity.GetUUID());
+            return;
+        }
+        switch (rb.Type)
+        {
+        case Rigidbody3DComponent::BodyType::Static:
+            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Static, JPH::EActivation::DontActivate);
+            body_interface->SetObjectLayer(body->GetID(), Layers::NON_MOVING);
+            break;
+        case Rigidbody3DComponent::BodyType::Dynamic:
+            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Dynamic, JPH::EActivation::Activate);
+            body_interface->SetObjectLayer(body->GetID(), Layers::MOVING);
+            break;
+        case Rigidbody3DComponent::BodyType::Kinematic:
+            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Kinematic, JPH::EActivation::Activate);
+            body_interface->SetObjectLayer(body->GetID(), Layers::MOVING);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void JoltWorld::SetIsTriggerForEntity(Entity entity, bool isTrigger)
+    {
+        auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+        if (boxCollider.RuntimeBody)
+        {
+            auto body = (JPH::Body*)boxCollider.RuntimeBody;
+            body->SetIsSensor(isTrigger);
+        }
+    }
+
+    void JoltWorld::SetBoxColliderSizeForEntity(Entity entity, const glm::vec3& size)
+    {
+        if (!entity.HasComponent<BoxCollider3DComponent>())
+            return;
+        
+        auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+        boxCollider.Size = size;
+        
+        void* runtimeBody = entity.HasComponent<Rigidbody3DComponent>() ? entity.GetComponent<Rigidbody3DComponent>().RuntimeBody : boxCollider.RuntimeBody;
+        
+        if (!runtimeBody)
+            return;
+        
+        auto& transform = entity.GetComponent<TransformComponent>();
+        glm::vec3 halfExtents = glm::abs(transform.Scale) * size;
+        
+        JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
+        boxShapeSettings.SetEmbedded();
+        
+        glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
+        JPH::ShapeRefC newShape = boxShapeSettings.Create().Get();
+        if (glm::length(localOffset) > 0.0001f)
+            newShape = new JPH::RotatedTranslatedShape(JPH::Vec3(localOffset.x, localOffset.y, localOffset.z), JPH::Quat::sIdentity(), newShape);
+        
+        JPH::Body* body = (JPH::Body*)runtimeBody;
+        body_interface->SetShape(body->GetID(), newShape, true, JPH::EActivation::Activate);
+    }
+
+    void JoltWorld::SetBoxColliderOffsetForEntity(Entity entity, const glm::vec3& offset)
+    {
+        if (!entity.HasComponent<BoxCollider3DComponent>())
+            return;
+        
+        auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+        boxCollider.Offset = offset;
+        
+        void* runtimeBody = entity.HasComponent<Rigidbody3DComponent>() ? entity.GetComponent<Rigidbody3DComponent>().RuntimeBody : boxCollider.RuntimeBody;
+        
+        if (!runtimeBody)
+            return;
+        
+        auto& transform = entity.GetComponent<TransformComponent>();
+        glm::vec3 halfExtents = glm::abs(transform.Scale) * boxCollider.Size;
+        
+        JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
+        boxShapeSettings.SetEmbedded();
+        
+        JPH::ShapeRefC newShape = boxShapeSettings.Create().Get();
+        glm::vec3 localOffset = glm::abs(transform.Scale) * offset;
+        if (glm::length(localOffset) > 0.0001f)
+            newShape = new JPH::RotatedTranslatedShape(JPH::Vec3(localOffset.x, localOffset.y, localOffset.z), JPH::Quat::sIdentity(), newShape);
+        
+        JPH::Body* body = (JPH::Body*)runtimeBody;
+        body_interface->SetShape(body->GetID(), newShape, true, JPH::EActivation::Activate);
+    }
+
     void JoltWorld::DestroyEntityPhysics(Entity entity)
     {
         if (entity.HasComponent<Rigidbody3DComponent>())
@@ -493,41 +594,6 @@ namespace HRealEngine
                     transform.Rotation = euler;
                 }
             }
-        }
-    }
-
-    void JoltWorld::SetBodyTypeForEntity(Entity entity)
-    {
-        if (!entity.HasComponent<Rigidbody3DComponent>())
-            return;
-        auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-        if (!rb.RuntimeBody)
-        {
-            LOG_CORE_ERROR("SetBodyTypeForEntity: RuntimeBody is null for entity with UUID {}", (uint32_t)entity.GetUUID());
-            return;
-        }
-        auto body = (JPH::Body*)rb.RuntimeBody;
-        if (!body)
-        {
-            LOG_CORE_ERROR("SetBodyTypeForEntity: Body is null for entity with UUID {}", (uint32_t)entity.GetUUID());
-            return;
-        }
-        switch (rb.Type)
-        {
-        case Rigidbody3DComponent::BodyType::Static:
-            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Static, JPH::EActivation::DontActivate);
-            body_interface->SetObjectLayer(body->GetID(), Layers::NON_MOVING);
-            break;
-        case Rigidbody3DComponent::BodyType::Dynamic:
-            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Dynamic, JPH::EActivation::Activate);
-            body_interface->SetObjectLayer(body->GetID(), Layers::MOVING);
-            break;
-        case Rigidbody3DComponent::BodyType::Kinematic:
-            body_interface->SetMotionType(body->GetID(), JPH::EMotionType::Kinematic, JPH::EActivation::Activate);
-            body_interface->SetObjectLayer(body->GetID(), Layers::MOVING);
-            break;
-        default:
-            break;
         }
     }
 
