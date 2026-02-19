@@ -34,6 +34,40 @@ namespace HRealEngine.BehaviorTree
             }
         }
         
+        public Entity FindEntityByName(string name)
+        {
+            ulong entityID = InternalCalls.FindEntityByName(name);
+            if (entityID == 0)
+                return null;
+            return new Entity(entityID);
+        }
+        public void Destroy(ulong entityID)
+        {
+            InternalCalls.DestroyEntity(entityID);
+        }
+        public void OpenScene(string scenePath)
+        {
+            InternalCalls.OpenScene(scenePath);
+        }
+        public Entity SpawnEntity(string name, string tag, Vector3 translation, Vector3 rotation, Vector3 scale)
+        {
+            ulong entityID = InternalCalls.SpawnEntity(name, tag, ref translation, ref rotation, ref scale);
+            if (entityID == 0)
+                return null;
+            return new Entity(entityID);
+        }
+        public Entity GetHoveredEntity()
+        {
+            ulong entityID = InternalCalls.Entity_GetHoveredEntity();
+            if (entityID == 0)
+                return null;
+            return new Entity(entityID);
+        }
+        public float GetDeltaTime()
+        {
+            return InternalCalls.Time_GetDeltaTime();
+        }
+        
         public virtual void Initialize(BTBlackboard bb, ulong entityID)
         {
             blackboard = bb;

@@ -50,6 +50,7 @@ namespace HRealEngine
 			float time = Time::GetTime();
 			Timestep timeStep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
+			Time::SetDeltaTime(timeStep);
 
 			ExecuteMainThreadQueue();
 

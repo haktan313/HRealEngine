@@ -11,6 +11,7 @@
 
 namespace HRealEngine
 {
+    float Time::s_DeltaTime = 0.f;
     float Time::GetTime()
     {
         return (float)glfwGetTime();

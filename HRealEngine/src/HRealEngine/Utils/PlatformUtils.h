@@ -13,5 +13,9 @@ namespace HRealEngine
     {
     public:
         static float GetTime();
+        static float GetDeltaTime() { return s_DeltaTime; }
+        static void SetDeltaTime(float delta) { s_DeltaTime = delta; }
+    private:
+        static float s_DeltaTime;
     };
 }

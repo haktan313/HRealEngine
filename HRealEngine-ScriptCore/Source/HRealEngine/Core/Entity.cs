@@ -110,5 +110,10 @@ namespace HRealEngine
                 return null;
             return new Entity(entityID);
         }
+        
+        public float GetDeltaTime()
+        {
+            return InternalCalls.Time_GetDeltaTime();
+        }
     }
 }

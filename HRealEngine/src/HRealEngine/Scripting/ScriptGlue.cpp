@@ -14,6 +14,7 @@
 #include "HRealEngine/Core/MouseButtonCodes.h"
 #include "HRealEngine/Physics/JoltWorld.h"
 #include "HRealEngine/Project/Project.h"
+#include "HRealEngine/Utils/PlatformUtils.h"
 #include "Physics/Body/Body.h"
 #include "Physics/Body/BodyInterface.h"
 
@@ -38,6 +39,11 @@ namespace HRealEngine
     static float PrintLog_VectorDot(glm::vec3* parameter)
     {
         return glm::dot(*parameter, *parameter);
+    }
+
+	static float Time_GetDeltaTime()
+    {
+	    return Time::GetDeltaTime();
     }
 
     static MonoObject* GetScriptInstance(UUID entityID)
@@ -227,6 +233,17 @@ namespace HRealEngine
             return 0;
         return entity.GetUUID();
     }
+
+	static uint64_t FindEntityByName(MonoString* name)
+	{
+		char* tagCStr = mono_string_to_utf8(name);
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->FindEntityByName(tagCStr);
+		mono_free(tagCStr);
+		if (!entity)
+			return 0;
+		return entity.GetUUID();
+	}
 
 	static uint64_t Entity_GetHoveredEntity()
     {
@@ -798,6 +815,7 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL(PrintLog_Vector);
         HRE_ADD_INTERNAL_CALL(PrintLog_VectorDot);
 
+		HRE_ADD_INTERNAL_CALL(Time_GetDeltaTime);
         HRE_ADD_INTERNAL_CALL(GetScriptInstance);
         HRE_ADD_INTERNAL_CALL(DestroyEntity);
     	HRE_ADD_INTERNAL_CALL(SpawnEntity);
@@ -806,6 +824,7 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL(Entity_AddBoxCollider3DComponent);
 		HRE_ADD_INTERNAL_CALL(Entity_AddMeshRendererComponent);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		HRE_ADD_INTERNAL_CALL(FindEntityByName);
     	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);

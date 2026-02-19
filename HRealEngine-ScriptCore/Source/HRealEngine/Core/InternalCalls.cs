@@ -8,9 +8,13 @@ namespace HRealEngine
     public static class InternalCalls
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static float Time_GetDeltaTime();
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong Entity_FindEntityByName(string name);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong FindEntityByName(string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong Entity_GetHoveredEntity();
