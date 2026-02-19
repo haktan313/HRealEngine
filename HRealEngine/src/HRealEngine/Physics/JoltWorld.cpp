@@ -139,7 +139,7 @@ namespace HRealEngine
                 bodySettings.mAllowSleeping = bAllowSleep;
                 bodySettings.mFriction = 0.05f;
                 bodySettings.mRestitution = 0.0f;
-                
+                bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
                 JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
                 body->SetUserData(entity.GetUUID());
                 
@@ -197,7 +197,7 @@ namespace HRealEngine
             JPH::BodyCreationSettings bodySettings(emptyShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
                 joltRot, motionType, layer);            
             bodySettings.mAllowSleeping = bAllowSleep;
-            
+            bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
             JPH::Body* body = body_interface->CreateBody(bodySettings);
             body->SetUserData(entity.GetUUID());
             auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
@@ -210,63 +210,140 @@ namespace HRealEngine
     {
         if (entity.HasComponent<BoxCollider3DComponent>())
         {
-            auto& bc = entity.GetComponent<BoxCollider3DComponent>();
+            auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+            auto& transform = entity.GetComponent<TransformComponent>();
             
             if (entity.HasComponent<Rigidbody3DComponent>())
             {
-                auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-                if (rb.RuntimeBody)
-                    return;
-                
-                if (bc.RuntimeBody)
+                auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+                JPH::Vec3 savedVelocity = JPH::Vec3::sZero();
+                if (rb3d.RuntimeBody)
                 {
-                    JPH::Body* oldBody = (JPH::Body*)bc.RuntimeBody;
+                    JPH::Body* oldBody = (JPH::Body*)rb3d.RuntimeBody;
+                    savedVelocity = oldBody->GetLinearVelocity();
                     oldBody->SetUserData(0);
                     body_interface->RemoveBody(oldBody->GetID());
                     body_interface->DestroyBody(oldBody->GetID());
-                    bc.RuntimeBody = nullptr;
+                    rb3d.RuntimeBody = nullptr;
                 }
-                CreateBoxColliderForEntity(entity);
+                if (boxCollider.RuntimeBody)
+                {
+                    JPH::Body* oldBody = (JPH::Body*)boxCollider.RuntimeBody;
+                    oldBody->SetUserData(0);
+                    body_interface->RemoveBody(oldBody->GetID());
+                    body_interface->DestroyBody(oldBody->GetID());
+                    boxCollider.RuntimeBody = nullptr;
+                }
+                
+                glm::vec3 halfExtents = glm::abs(transform.Scale) * boxCollider.Size;
+                JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
+                boxShapeSettings.mConvexRadius = rb3d.ConvexRadius;
+                boxShapeSettings.SetEmbedded(); // A ref counted object on the stack (base class RefTarget) should be marked as such to prevent it from being freed when its reference count goes to 0.
+
+                JPH::ShapeSettings::ShapeResult boxShapeResult = boxShapeSettings.Create();
+                JPH::ShapeRefC boxShape = boxShapeResult.Get(); // We don't expect an error here, but you can check boxShapeResult for HasError() / GetError()
+                glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
+                if (glm::length(localOffset) > 0.0001f)
+                    boxShape = new JPH::RotatedTranslatedShape(JPH::Vec3(localOffset.x, localOffset.y, localOffset.z), JPH::Quat::sIdentity(), boxShape);
+                
+                JPH::EMotionType motionType = JPH::EMotionType::Static;
+                auto layer = Layers::NON_MOVING;
+                bool bAllowSleep = false;
+                switch (rb3d.Type)
+                {
+                case Rigidbody3DComponent::BodyType::Static:
+                    motionType = JPH::EMotionType::Static;
+                    layer = Layers::NON_MOVING;
+                    bAllowSleep = true;
+                    break;
+                case Rigidbody3DComponent::BodyType::Dynamic:
+                    motionType = JPH::EMotionType::Dynamic;
+                    layer = Layers::MOVING;
+                    bAllowSleep = false;
+                    break;
+                case Rigidbody3DComponent::BodyType::Kinematic:
+                    motionType = JPH::EMotionType::Kinematic;
+                    layer = Layers::MOVING;
+                    bAllowSleep = false;
+                    break;
+                }
+                glm::quat q = glm::quat(transform.Rotation); // (pitch/yaw/roll) rad
+                JPH::Quat joltRot(q.x, q.y, q.z, q.w);
+
+                JPH::BodyCreationSettings bodySettings(boxShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
+                    joltRot, motionType, layer);
+
+                bodySettings.mAllowSleeping = bAllowSleep;
+                bodySettings.mFriction = rb3d.Friction;
+                bodySettings.mRestitution = rb3d.Restitution;
+                bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
+                JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
+                body->SetUserData(entity.GetUUID());
+                if (boxCollider.bIsTrigger)
+                    body->SetIsSensor(true);
+                auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
+                body_interface->AddBody(body->GetID(), activation);
+                
+                if (savedVelocity.LengthSq() > 0.0f)
+                    body_interface->SetLinearVelocity(body->GetID(), savedVelocity);
+                
+                rb3d.RuntimeBody = body;
+                boxCollider.RuntimeBody = body;
             }
             else
             {
-                if (bc.RuntimeBody)
+                if (boxCollider.RuntimeBody)
                     return;
-                CreateBoxColliderForEntity(entity);
+
+                glm::vec3 halfExtents = glm::abs(transform.Scale) * boxCollider.Size;
+                JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
+                //boxShapeSettings.mConvexRadius = 0.0f;
+                boxShapeSettings.SetEmbedded(); // A ref counted object on the stack (base class RefTarget) should be marked as such to prevent it from being freed when its reference count goes to 0.
+                
+                JPH::ShapeSettings::ShapeResult boxShapeResult = boxShapeSettings.Create();
+                JPH::ShapeRefC boxShape = boxShapeResult.Get(); // We don't expect an error here, but you can check boxShapeResult for HasError() / GetError()
+                
+                glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
+                if (glm::length(localOffset) > 0.0001f)
+                    boxShape = new JPH::RotatedTranslatedShape(JPH::Vec3(localOffset.x, localOffset.y, localOffset.z), JPH::Quat::sIdentity(), boxShape);
+                
+                JPH::EMotionType motionType = JPH::EMotionType::Static;
+                auto layer = Layers::NON_MOVING;
+                bool bAllowSleep = true;
+                
+                glm::quat q = glm::quat(transform.Rotation); // (pitch/yaw/roll) rad
+                JPH::Quat joltRot(q.x, q.y, q.z, q.w);
+                
+                JPH::BodyCreationSettings bodySettings(boxShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
+                    joltRot, motionType, layer);
+                
+                bodySettings.mAllowSleeping = bAllowSleep;
+                bodySettings.mFriction = 0.05f;
+                bodySettings.mRestitution = 0.0f;
+                bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
+                JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
+                body->SetUserData(entity.GetUUID());
+                
+                auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
+                body_interface->AddBody(body->GetID(), activation);     
+                
+                boxCollider.RuntimeBody = body;
             }
         }
         else if (entity.HasComponent<Rigidbody3DComponent>())
         {
-            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-            if (rb.RuntimeBody)
-                return;
-            CreateEmptyBodyForEntity(entity);
-        }
-    }
-    
-    void JoltWorld::CreateBoxColliderForEntity(Entity entity)
-    {
-        auto& transform = entity.GetComponent<TransformComponent>();
-        auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
-
-        if (entity.HasComponent<Rigidbody3DComponent>())
-        {
             auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-
-            glm::vec3 halfExtents = glm::abs(transform.Scale) * boxCollider.Size;
-            JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
-            boxShapeSettings.mConvexRadius = rb3d.ConvexRadius;
-            boxShapeSettings.SetEmbedded();
-
-            JPH::ShapeRefC boxShape = boxShapeSettings.Create().Get();
-            glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
-            if (glm::length(localOffset) > 0.0001f)
-                boxShape = new JPH::RotatedTranslatedShape(
-                    JPH::Vec3(localOffset.x, localOffset.y, localOffset.z),
-                    JPH::Quat::sIdentity(), boxShape);
-
-            JPH::EMotionType motionType = JPH::EMotionType::Dynamic;
-            JPH::ObjectLayer layer = Layers::MOVING;
+            auto& transform = entity.GetComponent<TransformComponent>();
+            if (rb3d.RuntimeBody)
+                return;
+            JPH::EmptyShapeSettings emptyShapeSettings;
+            emptyShapeSettings.SetEmbedded();
+            JPH::ShapeSettings::ShapeResult emptyShapeResult = emptyShapeSettings.Create();
+            JPH::ShapeRefC emptyShape = emptyShapeResult.Get();
+            LOG_CORE_WARN("Rigidbody3D without collider, emptyShapeBody created: Entity UUID {}", (uint32_t)entity.GetUUID());
+            
+            JPH::EMotionType motionType = JPH::EMotionType::Static;
+            auto layer = Layers::NON_MOVING;
             bool bAllowSleep = false;
             switch (rb3d.Type)
             {
@@ -275,108 +352,31 @@ namespace HRealEngine
                 layer = Layers::NON_MOVING;
                 bAllowSleep = true;
                 break;
+            case Rigidbody3DComponent::BodyType::Dynamic:
+                motionType = JPH::EMotionType::Dynamic;
+                layer = Layers::MOVING;
+                bAllowSleep = false;
+                break;
             case Rigidbody3DComponent::BodyType::Kinematic:
                 motionType = JPH::EMotionType::Kinematic;
+                layer = Layers::MOVING;
+                bAllowSleep = false;
                 break;
-            default: break;
             }
-
+            
             glm::quat q = glm::quat(transform.Rotation);
-            JPH::BodyCreationSettings bodySettings(
-                boxShape,
-                JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
-                JPH::Quat(q.x, q.y, q.z, q.w), motionType, layer);
-
+            JPH::Quat joltRot(q.x, q.y, q.z, q.w);
+            
+            JPH::BodyCreationSettings bodySettings(emptyShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
+                joltRot, motionType, layer);            
             bodySettings.mAllowSleeping = bAllowSleep;
-            bodySettings.mFriction = rb3d.Friction;
-            bodySettings.mRestitution = rb3d.Restitution;
-
+            bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
             JPH::Body* body = body_interface->CreateBody(bodySettings);
-            if (!body)
-            {
-                LOG_CORE_ERROR("CreateBoxColliderForEntity: Failed to create body!");
-                return;
-            }
             body->SetUserData(entity.GetUUID());
-            if (boxCollider.bIsTrigger)
-                body->SetIsSensor(true);
-
-            auto activation = (motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic)
-                ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
-            body_interface->AddBody(body->GetID(), activation);
-
+            auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
+            body_interface->AddBody(body->GetID(), activation);         
             rb3d.RuntimeBody = body;
-            boxCollider.RuntimeBody = body;
         }
-        else
-        {
-            glm::vec3 halfExtents = glm::abs(transform.Scale) * boxCollider.Size;
-            JPH::BoxShapeSettings boxShapeSettings({ halfExtents.x, halfExtents.y, halfExtents.z });
-            boxShapeSettings.SetEmbedded();
-
-            JPH::ShapeRefC boxShape = boxShapeSettings.Create().Get();
-            glm::vec3 localOffset = glm::abs(transform.Scale) * boxCollider.Offset;
-            if (glm::length(localOffset) > 0.0001f)
-                boxShape = new JPH::RotatedTranslatedShape(
-                    JPH::Vec3(localOffset.x, localOffset.y, localOffset.z),
-                    JPH::Quat::sIdentity(), boxShape);
-
-            glm::quat q = glm::quat(transform.Rotation);
-            JPH::BodyCreationSettings bodySettings(
-                boxShape,
-                JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
-                JPH::Quat(q.x, q.y, q.z, q.w),
-                JPH::EMotionType::Static, Layers::NON_MOVING);
-
-            bodySettings.mAllowSleeping = true;
-            bodySettings.mFriction = 0.05f;
-            bodySettings.mRestitution = 0.0f;
-
-            JPH::Body* body = body_interface->CreateBody(bodySettings);
-            if (!body)
-                return;
-            body->SetUserData(entity.GetUUID());
-            body_interface->AddBody(body->GetID(), JPH::EActivation::DontActivate);
-            boxCollider.RuntimeBody = body;
-        }
-    }
-
-    void JoltWorld::CreateEmptyBodyForEntity(Entity entity)
-    {
-        auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-        auto& transform = entity.GetComponent<TransformComponent>();
-
-        JPH::EmptyShapeSettings emptyShapeSettings;
-        emptyShapeSettings.SetEmbedded();
-        JPH::ShapeRefC emptyShape = emptyShapeSettings.Create().Get();
-
-        JPH::EMotionType motionType = JPH::EMotionType::Dynamic;
-        JPH::ObjectLayer layer = Layers::MOVING;
-        switch (rb3d.Type)
-        {
-        case Rigidbody3DComponent::BodyType::Static:
-            motionType = JPH::EMotionType::Static; layer = Layers::NON_MOVING; break;
-        case Rigidbody3DComponent::BodyType::Kinematic:
-            motionType = JPH::EMotionType::Kinematic; break;
-        default: break;
-        }
-
-        glm::quat q = glm::quat(transform.Rotation);
-        JPH::BodyCreationSettings bodySettings(emptyShape,
-            JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
-            JPH::Quat(q.x, q.y, q.z, q.w), motionType, layer);
-
-        bodySettings.mAllowDynamicOrKinematic = true;
-
-        JPH::Body* body = body_interface->CreateBody(bodySettings);
-        if (!body)
-        {
-            LOG_CORE_ERROR("CreateEmptyBodyForEntity: Failed to create body!");
-            return;
-        }
-        body->SetUserData(entity.GetUUID());
-        body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
-        rb3d.RuntimeBody = body;
     }
 
     void JoltWorld::DestroyEntityPhysics(Entity entity)
@@ -502,8 +502,16 @@ namespace HRealEngine
             return;
         auto& rb = entity.GetComponent<Rigidbody3DComponent>();
         if (!rb.RuntimeBody)
+        {
+            LOG_CORE_ERROR("SetBodyTypeForEntity: RuntimeBody is null for entity with UUID {}", (uint32_t)entity.GetUUID());
             return;
+        }
         auto body = (JPH::Body*)rb.RuntimeBody;
+        if (!body)
+        {
+            LOG_CORE_ERROR("SetBodyTypeForEntity: Body is null for entity with UUID {}", (uint32_t)entity.GetUUID());
+            return;
+        }
         switch (rb.Type)
         {
         case Rigidbody3DComponent::BodyType::Static:
