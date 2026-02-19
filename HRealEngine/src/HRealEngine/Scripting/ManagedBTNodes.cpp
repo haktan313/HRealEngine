@@ -409,6 +409,17 @@ namespace HRealEngine
         }
 
         ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
+
+        if (m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
     }
 
     //---------------------BTDecorator---------------------
@@ -505,5 +516,16 @@ namespace HRealEngine
         }
 
         ScriptEngine::InitializeBTNode(m_ManagedInstance, managedBlackboard, *ownerUUID);
+
+        if (m_ParamsInstance)
+        {
+            MonoClass* klass = mono_object_get_class(m_ManagedInstance);
+            MonoMethod* setParamsMethod = mono_class_get_method_from_name(klass, "SetParameters", 1);
+            if (setParamsMethod)
+            {
+                void* args[1] = { m_ParamsInstance };
+                mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
     }
 }

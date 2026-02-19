@@ -296,6 +296,15 @@ namespace HRealEngine
             m_PendingSceneHandle = 0;
             if (m_SceneState == SceneState::Runtime)
             {
+                if (BTEditorRoot::HasEditorApp())
+                {
+                    BTEditorRoot::GetEditorApp()->ClearDatas();
+                    if (BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().GetNodes().empty())
+                    {
+                        BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().SpawnRootNode();
+                        BTEditorRoot::GetEditorApp()->GetNodeEditorHelper().BuildNodes();
+                    }
+                }
                 m_ActiveScene->OnRuntimeStop();
                 
                 Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);

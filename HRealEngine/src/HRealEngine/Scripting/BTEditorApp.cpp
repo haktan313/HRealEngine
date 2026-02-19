@@ -186,6 +186,7 @@ namespace HRealEngine
         ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
         m_NodeToManagedActionParams[nodeKey] = paramsInstance;
         m_NodeToActionClassId[nodeKey] = className;
+        m_NodeToManagedActionClassName[nodeKey] = className;
     }
 
     void BTEditorApp::DeserializeManagedDecoratorParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode)
@@ -202,6 +203,7 @@ namespace HRealEngine
         ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
         m_NodeToManagedDecoratorParams[nodeKey] = paramsInstance;
         m_NodeToDecoratorClassId[nodeKey] = className;
+        m_NodeToManagedDecoratorClassName[nodeKey] = className;
     }
 
     void BTEditorApp::DeserializeManagedConditionParams(int nodeKey, const std::string& className, const YAML::Node& paramsNode)
@@ -218,5 +220,6 @@ namespace HRealEngine
         ScriptEngine::DeserializeBTParameters(paramsInstance, paramsNode);
         m_NodeToManagedConditionParams[nodeKey] = paramsInstance;
         m_NodeToConditionClassId[nodeKey] = className;
+        m_NodeToManagedConditionClassName[nodeKey] = className;
     }
 }
