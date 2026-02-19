@@ -1508,9 +1508,19 @@ namespace HRealEngine
 
     void EditorLayer::OnDeleteEntity()
     {
-        if (m_SceneState != SceneState::Editor || !m_SceneHierarchyPanel.GetSelectedEntity())
+        if (m_SceneState != SceneState::Editor)
             return;
+
+        Entity selected = m_SceneHierarchyPanel.GetSelectedEntity();
+        if (!selected)
+            return;
+        
         m_ActiveScene->DestroyEntity(m_SceneHierarchyPanel.GetSelectedEntity());
+        
+        m_SceneHierarchyPanel.SetSelectedEntity({});
+        m_HoveredEntity = {};
+        m_GizmoType = -1;
+        
     }
 
     void EditorLayer::UIToolbar()
