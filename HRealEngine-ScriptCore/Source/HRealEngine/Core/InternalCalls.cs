@@ -12,6 +12,12 @@ namespace HRealEngine
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
         [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool HasTag(ulong entityID, string tag);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static string Entity_GetName(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]  
+        internal extern static void Entity_SetEntityName(ulong entityID, string name);
+        [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong Entity_FindEntityByName(string name);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong FindEntityByName(string name);

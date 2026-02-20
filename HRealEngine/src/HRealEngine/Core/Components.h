@@ -110,13 +110,22 @@ namespace HRealEngine
         BehaviorTreeComponent(const BehaviorTreeComponent&) = default;
     };
 
+    struct EntityNameComponent
+    {
+        std::string Name;
+
+        EntityNameComponent() = default;
+        EntityNameComponent(const EntityNameComponent&) = default;
+        EntityNameComponent(const std::string& name) : Name(name) {}
+    };
+
     struct TagComponent
     {
-        std::string Tag;
+        std::vector<std::string> Tags;
 
         TagComponent() = default;
         TagComponent(const TagComponent&) = default;
-        TagComponent(const std::string& tag) : Tag(tag) {}
+        TagComponent(const std::vector<std::string>& tags) : Tags(tags) {}
     };
 
     struct CameraComponent
@@ -244,6 +253,7 @@ namespace HRealEngine
     {};
     using AllComponents = ComponentGroup<
         TransformComponent,
+        EntityNameComponent,
         TagComponent,
         LightComponent,
         TextComponent,

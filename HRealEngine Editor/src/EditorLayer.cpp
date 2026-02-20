@@ -583,8 +583,8 @@ namespace HRealEngine
         {
             if (m_ActiveScene->GetRegistry().valid((entt::entity)m_HoveredEntity))
             {
-                if(m_HoveredEntity.HasComponent<TagComponent>())
-                    name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+                if(m_HoveredEntity.HasComponent<EntityNameComponent>())
+                    name = m_HoveredEntity.GetComponent<EntityNameComponent>().Name;
             }
             else
             {

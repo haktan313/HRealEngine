@@ -10,6 +10,14 @@ namespace HRealEngine
             EntityID = entityID;
         }
         public readonly ulong EntityID;
+        
+        public static Entity FromID(ulong entityID)
+        {
+            if (entityID == 0)
+                return null;
+
+            return new Entity(entityID);
+        }
 
         public Vector3 Translation
         {
@@ -36,6 +44,21 @@ namespace HRealEngine
             }
         }
         
+        public string Name
+        {
+            get
+            {
+                return InternalCalls.Entity_GetName(EntityID);
+            }
+            set
+            {
+                InternalCalls.Entity_SetEntityName(EntityID, value);
+            }
+        }
+        public bool HasTag(string tag)
+        {
+            return InternalCalls.HasTag(EntityID, tag);
+        }
         public bool HasComponent<T>() where T : Component, new()
         {
             return InternalCalls.Entity_HasComponent(EntityID, typeof(T));

@@ -34,6 +34,17 @@ namespace HRealEngine.BehaviorTree
             }
         }
         
+        public static Entity FromID(ulong entityID)
+        {
+            if (entityID == 0)
+                return null;
+
+            return new Entity(entityID);
+        }
+        public bool HasTag(string tag)
+        {
+            return InternalCalls.HasTag(ownerEntityID, tag);
+        }
         public Entity FindEntityByName(string name)
         {
             ulong entityID = InternalCalls.FindEntityByName(name);

@@ -32,7 +32,7 @@ namespace HRealEngine
         ImGui::Begin("Scene Hierarchy");
 
         auto& registry = m_Context->GetRegistry();
-        auto view = registry.view<TransformComponent, TagComponent>();
+        auto view = registry.view<TransformComponent, EntityNameComponent>();
         for (auto entity : view)
             DrawEntityNode(Entity{entity, m_Context.get()});
 
@@ -68,7 +68,7 @@ namespace HRealEngine
 
     void SceneHierarchyPanel::DrawEntityNode(Entity entity)
     {
-        auto& Tag = entity.GetComponent<TagComponent>().Tag;
+        auto& Tag = entity.GetComponent<EntityNameComponent>().Name;
         
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         bool bOpened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, Tag.c_str());
@@ -211,9 +211,9 @@ namespace HRealEngine
 
     void SceneHierarchyPanel::DrawComponents(Entity entity)
     {
-        if (entity.HasComponent<TagComponent>())
+        if (entity.HasComponent<EntityNameComponent>())
         {
-            auto& tag = entity.GetComponent<TagComponent>().Tag;
+            auto& tag = entity.GetComponent<EntityNameComponent>().Name;
 
             char extraSpace[256];
             memset(extraSpace, 0, sizeof(extraSpace));
@@ -230,6 +230,7 @@ namespace HRealEngine
             ImGui::OpenPopup("AddComponent");
         if (ImGui::BeginPopup("AddComponent"))
         {
+            ShowAddComponentEntry<TagComponent>("Tag Component");
             ShowAddComponentEntry<LightComponent>("Light Component");
             ShowAddComponentEntry<TextComponent>("Text Component");
             ShowAddComponentEntry<TransformComponent>("Transform Component");
@@ -248,7 +249,51 @@ namespace HRealEngine
         }
 
         ImGui::PopItemWidth();
-        
+
+        DrawComponent<TagComponent>("Tag", entity, [](auto& component)
+        {
+            ImGui::Text("Tags");
+            ImGui::Separator();
+
+            for (int i = 0; i < (int)component.Tags.size(); i++)
+            {
+                ImGui::PushID(i);
+
+                ImGui::TextUnformatted(component.Tags[i].c_str());
+                ImGui::SameLine();
+
+                if (ImGui::SmallButton("X"))
+                {
+                    component.Tags.erase(component.Tags.begin() + i);
+                    ImGui::PopID();
+                    break;
+                }
+
+                ImGui::PopID();
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            static std::unordered_map<uint64_t, std::string> s_NewTagBuffers;
+            uint64_t key = (uint64_t)(uintptr_t)&component;
+            std::string& newTag = s_NewTagBuffers[key];
+
+            ImGui::InputText("##NewTag", &newTag);
+            ImGui::SameLine();
+
+            if (ImGui::Button("Add"))
+            {
+                if (!newTag.empty())
+                {
+                    bool exists = std::find(component.Tags.begin(), component.Tags.end(), newTag) != component.Tags.end();
+                    if (!exists)
+                        component.Tags.push_back(newTag);
+
+                    newTag.clear();
+                }
+            }
+        });
         DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
         {
             DrawVec3Control("Position", component.Position);

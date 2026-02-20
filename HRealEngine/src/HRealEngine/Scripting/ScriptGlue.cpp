@@ -223,6 +223,26 @@ namespace HRealEngine
         return it->second(entity);
     }
 
+	static bool HasTag(UUID entityID, MonoString* tag)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("HasTag: Scene context is null!");
+			return false;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("HasTag: Invalid entity ID: {}", (uint64_t)entityID);
+			return false;
+		}
+		auto tagCStr = mono_string_to_utf8(tag);
+		bool hasTag = entity.HasTag(tagCStr);
+		mono_free(tagCStr);
+		return hasTag;
+	}
+
     static uint64_t Entity_FindEntityByName(MonoString* name)
     {
         char* nameCStr = mono_string_to_utf8(name);
@@ -233,6 +253,26 @@ namespace HRealEngine
             return 0;
         return entity.GetUUID();
     }
+
+	static std::string Entity_GetName(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+			return {};
+		return entity.GetName();
+	}
+
+	static void Entity_SetName(UUID entityID, MonoString* name)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+			return;
+		char* nameCStr = mono_string_to_utf8(name);
+		entity.GetComponent<EntityNameComponent>().Name = nameCStr;
+		mono_free(nameCStr);
+	}
 
 	static uint64_t FindEntityByName(MonoString* name)
 	{
@@ -825,6 +865,9 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL(Entity_AddMeshRendererComponent);
         HRE_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 		HRE_ADD_INTERNAL_CALL(FindEntityByName);
+		HRE_ADD_INTERNAL_CALL(HasTag);
+		HRE_ADD_INTERNAL_CALL(Entity_GetName);
+		HRE_ADD_INTERNAL_CALL(Entity_SetName);
     	HRE_ADD_INTERNAL_CALL(Entity_GetHoveredEntity);
         HRE_ADD_INTERNAL_CALL(OpenScene);
         HRE_ADD_INTERNAL_CALL(Entity_HasComponent);

@@ -86,12 +86,13 @@ namespace HRealEngine
         for (auto e : idView)
         {
             UUID uuid = srcRegistry.get<EntityIDComponent>(e).ID;
-            const auto& name = srcRegistry.get<TagComponent>(e).Tag;
+            const auto& name = srcRegistry.get<EntityNameComponent>(e).Name;
             Entity newEntity = newScene->CreateEntityWithUUID(uuid, name);
             entityMap[uuid] = (entt::entity)newEntity;
         }
 
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<TagComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<TextComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<LightComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CameraComponent>(dstRegistry, srcRegistry, entityMap);
@@ -120,8 +121,8 @@ namespace HRealEngine
         Entity entity = {m_Registry.create(),this};
         entity.AddComponent<EntityIDComponent>(uuid);
         entity.AddComponent<TransformComponent>();
-        auto& tag = entity.AddComponent<TagComponent>();
-        tag.Tag = name.empty() ? "Entity" : name;
+        auto& tag = entity.AddComponent<EntityNameComponent>();
+        tag.Name = name.empty() ? "Entity" : name;
         m_EntityMap[uuid] = entity;
         return entity;
     }
@@ -416,11 +417,11 @@ namespace HRealEngine
 
     Entity Scene::FindEntityByName(std::string_view name)
     {
-        auto view = m_Registry.view<TagComponent>();
+        auto view = m_Registry.view<EntityNameComponent>();
         for (auto entity : view)
         {
-            const TagComponent& tagComponent = view.get<TagComponent>(entity);
-            if (tagComponent.Tag == name)
+            const EntityNameComponent& nameComponent = view.get<EntityNameComponent>(entity);
+            if (nameComponent.Name == name)
                 return Entity{entity, this};
         }
         return {};
@@ -685,6 +686,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<EntityNameComponent>(Entity entity, EntityNameComponent& component)
     {
     }
     template<>

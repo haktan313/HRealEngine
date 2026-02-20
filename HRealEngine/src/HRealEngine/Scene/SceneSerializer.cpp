@@ -154,17 +154,28 @@ namespace HRealEngine
 
     static void SerializeEntity(YAML::Emitter& out, Entity entity)
     {
-        HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<TagComponent>(), "Entity has no tag component");
+        HREALENGINE_CORE_DEBUGBREAK(entity.HasComponent<EntityNameComponent>(), "Entity has no tag component");
         
         out << YAML::BeginMap;
         out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();//todo entity ID
         
+        if (entity.HasComponent<EntityNameComponent>())
+        {
+            out << YAML::Key << "EntityNameComponent";
+            out << YAML::BeginMap;
+            auto& name = entity.GetComponent<EntityNameComponent>().Name;
+            out << YAML::Key << "Name" << YAML::Value << name;
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<TagComponent>())
         {
             out << YAML::Key << "TagComponent";
             out << YAML::BeginMap;
-            auto& tag = entity.GetComponent<TagComponent>().Tag;
-            out << YAML::Key << "Tag" << YAML::Value << tag;
+            auto& tags = entity.GetComponent<TagComponent>().Tags;
+            out << YAML::Key << "Tags" << YAML::Value << YAML::BeginSeq;
+            for (const std::string& tag : tags)
+                out << tag;
+            out << YAML::EndSeq;
             out << YAML::EndMap;
         }
         if (entity.HasComponent<TransformComponent>())
@@ -420,7 +431,7 @@ namespace HRealEngine
         out << YAML::BeginMap;
         out << YAML::Key << "Scene" << YAML::Value << "Untitled";
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-        sceneRef->GetRegistry().view<TagComponent>().each([&](auto entityHandle, auto& tagComponent)
+        sceneRef->GetRegistry().view<EntityNameComponent>().each([&](auto entityHandle, auto& nameComponent)
         {
             Entity entity{entityHandle, sceneRef.get()};
             if (!entity)
@@ -467,11 +478,18 @@ namespace HRealEngine
                 uint64_t uuid = entity["Entity"].as<uint64_t>();
                 
                 std::string name;
-                auto tagComponent = entity["TagComponent"];
-                if (tagComponent)
-                    name = tagComponent["Tag"].as<std::string>();
+                auto nameComponent = entity["EntityNameComponent"];
+                if (nameComponent)
+                    name = nameComponent["Name"].as<std::string>();
 
                 Entity deserializedEntity = sceneRef->CreateEntityWithUUID(uuid,name);
+                if (auto tagComponent = entity["TagComponent"])
+                {
+                    auto& tag = deserializedEntity.AddComponent<TagComponent>();
+                    auto tags = tagComponent["Tags"];
+                    for (auto tagNode : tags)
+                        tag.Tags.push_back(tagNode.as<std::string>());
+                }
                 if (auto transformComponent = entity["TransformComponent"])
                 {
                     auto& transform = deserializedEntity.GetComponent<TransformComponent>();
