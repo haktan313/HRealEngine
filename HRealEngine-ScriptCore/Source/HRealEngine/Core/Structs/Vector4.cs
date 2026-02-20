@@ -1,3 +1,5 @@
+
+using System;
 namespace HRealEngine
 {
     public struct Vector4
@@ -55,10 +57,49 @@ namespace HRealEngine
         {
             return new Vector4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
         }
-
+        public static Vector4 operator -(Vector4 a, Vector4 b)
+        {
+            return new Vector4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+        }
         public static Vector4 operator *(Vector4 vector, float scalar)
         {
             return new Vector4(vector.X * scalar, vector.Y * scalar, vector.Z * scalar, vector.W * scalar);
+        }
+        public static Vector4 operator /(Vector4 a, float scalar)
+        {
+            return new Vector4(a.X / scalar, a.Y / scalar, a.Z / scalar, a.W / scalar);
+        }
+
+        public float Length()
+        {
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
+        }
+
+        public float LengthSquared()
+        {
+            return X * X + Y * Y + Z * Z + W * W;
+        }
+
+        public Vector4 Normalized()
+        {
+            float len = Length();
+            return len > 0 ? this / len : Zero;
+        }
+
+        public void Normalize()
+        {
+            float len = Length();
+            if (len > 0) { X /= len; Y /= len; Z /= len; W /= len; }
+        }
+
+        public static float Dot(Vector4 a, Vector4 b)
+        {
+            return a.X * b.X + a.Y * b.Y + a.Z * b.Z + a.W * b.W;
+        }
+
+        public static float Distance(Vector4 a, Vector4 b)
+        {
+            return (a - b).Length();
         }
 
     }

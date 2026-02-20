@@ -1,5 +1,5 @@
 
-
+using System;
 namespace HRealEngine
 {
     public struct Vector3
@@ -41,5 +41,43 @@ namespace HRealEngine
         public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         public static Vector3 operator *(Vector3 a, float scalar) => new Vector3(a.X * scalar, a.Y * scalar, a.Z * scalar);
         public static Vector3 operator /(Vector3 a, float scalar) => new Vector3(a.X / scalar, a.Y / scalar, a.Z / scalar);
+
+        public float Length()
+        {
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        }
+
+        public float LengthSquared()
+        {
+            return X * X + Y * Y + Z * Z;
+        }
+
+        public Vector3 Normalized()
+        {
+            float len = Length();
+            return len > 0 ? this / len : Zero;
+        }
+
+        public void Normalize()
+        {
+            float len = Length();
+            if (len > 0) { X /= len; Y /= len; Z /= len; }
+        }
+
+        public static float Dot(Vector3 a, Vector3 b)
+        {
+            return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+        }
+
+        public static float Distance(Vector3 a, Vector3 b)
+        {
+            return (a - b).Length();
+        }
+
+        public static Vector3 Cross(Vector3 a, Vector3 b) => new Vector3(
+            a.Y * b.Z - a.Z * b.Y,
+            a.Z * b.X - a.X * b.Z,
+            a.X * b.Y - a.Y * b.X
+        );
     }
 }
