@@ -263,7 +263,7 @@ namespace HRealEngine
     void ManagedBTAction::SetParametersInstance(void* p)
     {
         m_ParamsInstance = static_cast<MonoObject*>(p);
-        
+        LOG_CORE_INFO("SetParametersInstance called on ManagedBTAction with new parameters instance.");
         if (m_ManagedInstance && m_ParamsInstance)
         {
             MonoClass* klass = mono_object_get_class(m_ManagedInstance);
@@ -272,6 +272,7 @@ namespace HRealEngine
             {
                 void* args[1] = { m_ParamsInstance };
                 mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+                LOG_CORE_INFO("Parameters instance set on managed action instance successfully.");
             }
         }
     }
@@ -371,7 +372,7 @@ namespace HRealEngine
     void ManagedBTCondition::SetParametersInstance(void* p)
     {
         m_ParamsInstance = static_cast<MonoObject*>(p);
-        
+        LOG_CORE_INFO("SetParametersInstance called on ManagedBTCondition with new parameters instance.");
         if (m_ManagedInstance && m_ParamsInstance)
         {
             MonoClass* klass = mono_object_get_class(m_ManagedInstance);
@@ -380,6 +381,7 @@ namespace HRealEngine
             {
                 void* args[1] = { m_ParamsInstance };
                 mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+                LOG_CORE_INFO("Parameters instance set on managed condition instance successfully.");
             }
         }
     }
@@ -478,7 +480,7 @@ namespace HRealEngine
     void ManagedBTDecorator::SetParametersInstance(void* p)
     {
         m_ParamsInstance = static_cast<MonoObject*>(p);
-        
+        LOG_CORE_INFO("SetParametersInstance called on ManagedBTDecorator with new parameters instance.");
         if (m_ManagedInstance && m_ParamsInstance)
         {
             MonoClass* klass = mono_object_get_class(m_ManagedInstance);
@@ -487,6 +489,7 @@ namespace HRealEngine
             {
                 void* args[1] = { m_ParamsInstance };
                 mono_runtime_invoke(setParamsMethod, m_ManagedInstance, args, nullptr);
+                LOG_CORE_INFO("Parameters instance set on managed decorator instance successfully.");
             }
         }
     }

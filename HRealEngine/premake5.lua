@@ -22,6 +22,8 @@ project "HRealEngine"
         
         "%{IncludeDir.ImGui}/backends/imgui_impl_glfw.cpp",
         "%{IncludeDir.ImGui}/backends/imgui_impl_opengl3.cpp",
+        "%{IncludeDir.ImGui}/misc/cpp/imgui_stdlib.cpp",
+        "%{IncludeDir.ImGui}/misc/cpp/imgui_stdlib.h",
         
         "vendor/glm/glm/**.hpp",
         "vendor/glm/glm/**.inl",

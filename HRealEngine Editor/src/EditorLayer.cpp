@@ -156,28 +156,27 @@ namespace HRealEngine
             HRealEngine::ScriptEngine::SerializeBTParameters(paramsInstance, out);
             return true;
         });
-        NodeEditorApp::SetRuntimeNodeSyncer([](HNode* runtimeNode, void* paramsPtr) {
-        using namespace HRealEngine;
-        
-        auto* managedAction = dynamic_cast<ManagedBTAction*>(runtimeNode);
-        if (managedAction)
+        NodeEditorApp::SetRuntimeNodeSyncer([](HNode* runtimeNode, void* paramsPtr)
         {
-            managedAction->SetParametersInstance(paramsPtr);
-            return;
-        }
-        auto* managedCond = dynamic_cast<ManagedBTCondition*>(runtimeNode);
-        if (managedCond)
-        {
-            managedCond->SetParametersInstance(paramsPtr);
-            return;
-        }
-        auto* managedDeco = dynamic_cast<ManagedBTDecorator*>(runtimeNode);
-        if (managedDeco)
-        {
-            managedDeco->SetParametersInstance(paramsPtr);
-            return;
-        }
-    });
+            auto* managedAction = dynamic_cast<ManagedBTAction*>(runtimeNode);
+            if (managedAction)
+            {
+                managedAction->SetParametersInstance(paramsPtr);
+                return;
+            }
+            auto* managedCond = dynamic_cast<ManagedBTCondition*>(runtimeNode);
+            if (managedCond)
+            {
+                managedCond->SetParametersInstance(paramsPtr);
+                return;
+            }
+            auto* managedDeco = dynamic_cast<ManagedBTDecorator*>(runtimeNode);
+            if (managedDeco)
+            {
+                managedDeco->SetParametersInstance(paramsPtr);
+                return;
+            }
+        });
     }
 
     void EditorLayer::OnAttach()

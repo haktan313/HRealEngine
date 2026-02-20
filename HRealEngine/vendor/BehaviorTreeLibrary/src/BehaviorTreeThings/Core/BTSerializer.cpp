@@ -105,8 +105,16 @@ void BTSerializer::SyncEditorParamsToRuntime()
         void* managedDecoParams = editorApp->GetManagedDecoratorParams(nodeKey);
         if (managedDecoParams)
         {
-            for (auto* child : runtimeNode->GetChildrensRaw())
-                NodeEditorApp::s_RuntimeNodeSyncer(child, managedDecoParams);
+            HNode* parent = runtimeNode->GetParent();
+            if (parent && dynamic_cast<HDecorator*>(parent))
+                NodeEditorApp::s_RuntimeNodeSyncer(parent, managedDecoParams);
+        }
+
+        void* managedCondParams = editorApp->GetManagedConditionParams(nodeKey);
+        if (managedCondParams)
+        {
+            for (auto* cond : runtimeNode->GetConditionNodesRaw())
+                NodeEditorApp::s_RuntimeNodeSyncer(cond, managedCondParams);
         }
     }
 }
