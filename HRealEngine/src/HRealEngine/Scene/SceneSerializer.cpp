@@ -378,6 +378,12 @@ namespace HRealEngine
                 case Rigidbody3DComponent::BodyType::Kinematic: bodyType = "Kinematic"; break;
             }
             out << YAML::Key << "BodyType" << YAML::Value << bodyType;
+            out << YAML::Key << "LockPositionX" << YAML::Value << rb3d.lockPositionX;
+            out << YAML::Key << "LockPositionY" << YAML::Value << rb3d.lockPositionY;
+            out << YAML::Key << "LockPositionZ" << YAML::Value << rb3d.lockPositionZ;
+            out << YAML::Key << "LockRotationX" << YAML::Value << rb3d.lockRotationX;
+            out << YAML::Key << "LockRotationY" << YAML::Value << rb3d.lockRotationY;
+            out << YAML::Key << "LockRotationZ" << YAML::Value << rb3d.lockRotationZ;
             out << YAML::Key << "FixedRotation" << YAML::Value << rb3d.FixedRotation;
             out << YAML::Key << "Friction" << YAML::Value << rb3d.Friction;
             out << YAML::Key << "Restitution" << YAML::Value << rb3d.Restitution;
@@ -678,6 +684,12 @@ namespace HRealEngine
                     else if (bodyType == "Dynamic")  rb3d.Type = Rigidbody3DComponent::BodyType::Dynamic;
                     else if (bodyType == "Kinematic")rb3d.Type = Rigidbody3DComponent::BodyType::Kinematic;
 
+                    rb3d.lockPositionX = rb3dComponent["LockPositionX"].as<bool>();
+                    rb3d.lockPositionY = rb3dComponent["LockPositionY"].as<bool>();
+                    rb3d.lockPositionZ = rb3dComponent["LockPositionZ"].as<bool>();
+                    rb3d.lockRotationX = rb3dComponent["LockRotationX"].as<bool>();
+                    rb3d.lockRotationY = rb3dComponent["LockRotationY"].as<bool>();
+                    rb3d.lockRotationZ = rb3dComponent["LockRotationZ"].as<bool>();
                     rb3d.FixedRotation = rb3dComponent["FixedRotation"].as<bool>();
                     rb3d.Friction = rb3dComponent["Friction"].as<float>();
                     rb3d.Restitution = rb3dComponent["Restitution"].as<float>();

@@ -25,6 +25,11 @@ namespace HRealEngine
         public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.X - b.X, a.Y - b.Y);
         public static Vector2 operator *(Vector2 a, float scalar) => new Vector2(a.X * scalar, a.Y * scalar);
         public static Vector2 operator /(Vector2 a, float scalar) => new Vector2(a.X / scalar, a.Y / scalar);
+        
+        public override int GetHashCode() => (X, Y).GetHashCode();
+        public override bool Equals(object obj) => obj is Vector2 v && X == v.X && Y == v.Y;
+        public static Vector2 operator ==(Vector2 a, Vector2 b) => new Vector2(a.X == b.X ? 1 : 0, a.Y == b.Y ? 1 : 0);
+        public static Vector2 operator !=(Vector2 a, Vector2 b) => new Vector2(a.X != b.X ? 1 : 0, a.Y != b.Y ? 1 : 0);
 
         public float Length()
         {

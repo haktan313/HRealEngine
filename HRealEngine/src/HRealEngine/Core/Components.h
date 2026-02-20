@@ -184,6 +184,14 @@ namespace HRealEngine
         float Restitution = 0.0f;
         float ConvexRadius = 0.02f;
 
+        bool lockPositionX = false;
+        bool lockPositionY = false;
+        bool lockPositionZ = false;
+        
+        bool lockRotationX = false;
+        bool lockRotationY = false;
+        bool lockRotationZ = false;
+
         // Runtime
         void* RuntimeBody = nullptr;
 

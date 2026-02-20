@@ -41,6 +41,11 @@ namespace HRealEngine
         public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         public static Vector3 operator *(Vector3 a, float scalar) => new Vector3(a.X * scalar, a.Y * scalar, a.Z * scalar);
         public static Vector3 operator /(Vector3 a, float scalar) => new Vector3(a.X / scalar, a.Y / scalar, a.Z / scalar);
+        
+        public override int GetHashCode() => (X, Y, Z).GetHashCode();
+        public override bool Equals(object obj) => obj is Vector3 v && X == v.X && Y == v.Y && Z == v.Z;
+        public static Vector3 operator ==(Vector3 a, Vector3 b) => new Vector3(a.X == b.X ? 1 : 0, a.Y == b.Y ? 1 : 0, a.Z == b.Z ? 1 : 0);
+        public static Vector3 operator !=(Vector3 a, Vector3 b) => new Vector3(a.X != b.X ? 1 : 0, a.Y != b.Y ? 1 : 0, a.Z != b.Z ? 1 : 0);
 
         public float Length()
         {

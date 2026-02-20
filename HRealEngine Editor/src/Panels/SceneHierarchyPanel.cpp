@@ -1175,6 +1175,23 @@ namespace HRealEngine
                 }
                 ImGui::EndCombo();
             }
+            ImGui::Separator();
+
+            if (ImGui::CollapsingHeader("Position", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Lock X##Pos", &component.lockPositionX);
+                ImGui::Checkbox("Lock Y##Pos", &component.lockPositionY);
+                ImGui::Checkbox("Lock Z##Pos", &component.lockPositionZ);
+            }
+
+            if (ImGui::CollapsingHeader("Rotation", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Lock X##Rot", &component.lockRotationX);
+                ImGui::Checkbox("Lock Y##Rot", &component.lockRotationY);
+                ImGui::Checkbox("Lock Z##Rot", &component.lockRotationZ);
+            }
+            ImGui::Separator();
+            
             ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
             ImGui::DragFloat("Friction", &component.Friction, 0.1f, 0.0f, 1.0f);
             ImGui::DragFloat("Restitution", &component.Restitution, 0.1f, 0.0f, 1.0f);

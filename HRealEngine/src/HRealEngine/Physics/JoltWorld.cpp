@@ -15,6 +15,26 @@
 
 namespace HRealEngine
 {
+    static JPH::EAllowedDOFs GetAllowedDOFs(const Rigidbody3DComponent& rb)
+    {
+        JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs(0);
+
+        if (!rb.lockPositionX) 
+            dofs |= JPH::EAllowedDOFs::TranslationX;
+        if (!rb.lockPositionY) 
+            dofs |= JPH::EAllowedDOFs::TranslationY;
+        if (!rb.lockPositionZ) 
+            dofs |= JPH::EAllowedDOFs::TranslationZ;
+        if (!rb.lockRotationX) 
+            dofs |= JPH::EAllowedDOFs::RotationX;
+        if (!rb.lockRotationY) 
+            dofs |= JPH::EAllowedDOFs::RotationY;
+        if (!rb.lockRotationZ) 
+            dofs |= JPH::EAllowedDOFs::RotationZ;
+
+        return dofs;
+    }
+    
     JoltWorld::JoltWorld(Scene* scene) : m_Scene(scene), m_ContactListener(scene, this)
     {
         m_JoltWorldHelper = CreateScope<JoltWorldHelper>(this);
@@ -97,6 +117,7 @@ namespace HRealEngine
 
                 JPH::BodyCreationSettings bodySettings(boxShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
                     joltRot, motionType, layer);
+                bodySettings.mAllowedDOFs = GetAllowedDOFs(rb3d);
 
                 bodySettings.mAllowSleeping = bAllowSleep;
                 bodySettings.mFriction = rb3d.Friction;
@@ -195,7 +216,8 @@ namespace HRealEngine
             JPH::Quat joltRot(q.x, q.y, q.z, q.w);
             
             JPH::BodyCreationSettings bodySettings(emptyShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
-                joltRot, motionType, layer);            
+                joltRot, motionType, layer);
+            bodySettings.mAllowedDOFs = GetAllowedDOFs(rb3d);
             bodySettings.mAllowSleeping = bAllowSleep;
             bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
             JPH::Body* body = body_interface->CreateBody(bodySettings);
@@ -272,6 +294,7 @@ namespace HRealEngine
 
                 JPH::BodyCreationSettings bodySettings(boxShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
                     joltRot, motionType, layer);
+                bodySettings.mAllowedDOFs = GetAllowedDOFs(rb3d);
 
                 bodySettings.mAllowSleeping = bAllowSleep;
                 bodySettings.mFriction = rb3d.Friction;
@@ -368,7 +391,8 @@ namespace HRealEngine
             JPH::Quat joltRot(q.x, q.y, q.z, q.w);
             
             JPH::BodyCreationSettings bodySettings(emptyShape, JPH::RVec3(transform.Position.x, transform.Position.y, transform.Position.z),
-                joltRot, motionType, layer);            
+                joltRot, motionType, layer);
+            bodySettings.mAllowedDOFs = GetAllowedDOFs(rb3d);
             bodySettings.mAllowSleeping = bAllowSleep;
             bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
             JPH::Body* body = body_interface->CreateBody(bodySettings);

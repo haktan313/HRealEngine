@@ -69,6 +69,17 @@ namespace HRealEngine
         {
             return new Vector4(a.X / scalar, a.Y / scalar, a.Z / scalar, a.W / scalar);
         }
+        
+        public override int GetHashCode() => (X, Y, Z, W).GetHashCode();
+        public override bool Equals(object obj) => obj is Vector4 v && X == v.X && Y == v.Y && Z == v.Z && W == v.W;
+        public static Vector4 operator ==(Vector4 a, Vector4 b)
+        {
+            return new Vector4(a.X == b.X ? 1 : 0, a.Y == b.Y ? 1 : 0, a.Z == b.Z ? 1 : 0, a.W == b.W ? 1 : 0);
+        }
+        public static Vector4 operator !=(Vector4 a, Vector4 b) 
+        {
+            return new Vector4(a.X != b.X ? 1 : 0, a.Y != b.Y ? 1 : 0, a.Z != b.Z ? 1 : 0, a.W != b.W ? 1 : 0);
+        }
 
         public float Length()
         {
