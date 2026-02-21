@@ -561,11 +561,15 @@ namespace HRealEngine
             auto meshGPU = AssetManager::GetAsset<MeshGPU>(meshRenderer.Mesh);
             if (!meshGPU)
                 return;
+
+            glm::mat4 pivotMat = glm::translate(glm::mat4(1.0f), -meshRenderer.PivotOffset);
+            glm::mat4 finalTransform = transform * pivotMat;
+            
             meshGPU->Shader->Bind();
             meshGPU->Shader->SetInt("u_EntityID", entityID);
             //meshRenderer.Mesh->Shader->SetFloat4("u_Color", meshRenderer.Color);
             meshGPU->Shader->SetMat4("u_ViewProjection", s_Data.CameraBuffer.ViewProjectionMatrix);
-            meshGPU->Shader->SetMat4("u_Transform", transform);
+            meshGPU->Shader->SetMat4("u_Transform", finalTransform);
             meshGPU->Shader->SetInt("u_DebugView", Renderer::GetDebugView());
             
             if (s_Data.LightsDirty)
@@ -677,10 +681,12 @@ namespace HRealEngine
             }
         }
         
-        const glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(transform)));
+        glm::mat4 pivotMat = glm::translate(glm::mat4(1.0f), -meshRenderer.PivotOffset);
+        glm::mat4 finalTransform = transform * pivotMat;
+        const glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(finalTransform)));
         for (size_t i = 0; i < 24; i++)
         {
-            const glm::vec4 worldPos4 = transform * s_Data.VertexPos[i];
+            const glm::vec4 worldPos4 = finalTransform * s_Data.VertexPos[i];
 
             s_Data.CubeVertexBufferPtr->Position = glm::vec3(worldPos4);
             s_Data.CubeVertexBufferPtr->Normal = glm::normalize(normalMat * s_Data.VertexNormal[i]);

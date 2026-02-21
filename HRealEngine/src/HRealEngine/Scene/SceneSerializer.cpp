@@ -239,7 +239,8 @@ namespace HRealEngine
             auto& mesh = entity.GetComponent<MeshRendererComponent>();
             out << YAML::Key << "MeshRendererComponent";
             out << YAML::BeginMap;
-            
+
+            out << YAML::Key << "PivotOffset" << YAML::Value << mesh.PivotOffset;
             /*if (mesh.MeshAssetPath.empty() == false)
                 out << YAML::Key << "MeshPath" << YAML::Value << mesh.MeshAssetPath.string();*/
             out << YAML::Key << "MeshHandle" << YAML::Value << mesh.Mesh;
@@ -616,6 +617,8 @@ namespace HRealEngine
                 {
                     auto& mesh = deserializedEntity.AddComponent<MeshRendererComponent>();
 
+                    mesh.PivotOffset = meshRendererComponent["PivotOffset"].as<glm::vec3>();
+                    
                     mesh.Color = meshRendererComponent["Color"].as<glm::vec4>();
                 
                     if (meshRendererComponent["TextureHandle"])

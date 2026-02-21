@@ -818,6 +818,8 @@ namespace HRealEngine
         });
         DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
         {
+            ImGui::DragFloat3("Pivot Offset", glm::value_ptr(component.PivotOffset), 0.1f);
+            ImGui::Spacing();
             ImGui::Text("Mesh");
             ImGui::Button("Drop .hmesh here", ImVec2(200, 0));
         
