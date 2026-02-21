@@ -33,52 +33,6 @@ namespace HRealEngine.BehaviorTree
                 return cachedOwner;
             }
         }
-        
-        public static Entity FromID(ulong entityID)
-        {
-            if (entityID == 0)
-                return null;
-
-            return new Entity(entityID);
-        }
-        public bool HasTag(string tag)
-        {
-            return InternalCalls.HasTag(ownerEntityID, tag);
-        }
-        public Entity FindEntityByName(string name)
-        {
-            ulong entityID = InternalCalls.FindEntityByName(name);
-            if (entityID == 0)
-                return null;
-            return new Entity(entityID);
-        }
-        public void Destroy(ulong entityID)
-        {
-            InternalCalls.DestroyEntity(entityID);
-        }
-        public void OpenScene(string scenePath)
-        {
-            InternalCalls.OpenScene(scenePath);
-        }
-        public Entity SpawnEntity(string name, string tag, Vector3 translation, Vector3 rotation, Vector3 scale)
-        {
-            ulong entityID = InternalCalls.SpawnEntity(name, tag, ref translation, ref rotation, ref scale);
-            if (entityID == 0)
-                return null;
-            return new Entity(entityID);
-        }
-        public Entity GetHoveredEntity()
-        {
-            ulong entityID = InternalCalls.Entity_GetHoveredEntity();
-            if (entityID == 0)
-                return null;
-            return new Entity(entityID);
-        }
-        public float GetDeltaTime()
-        {
-            return InternalCalls.Time_GetDeltaTime();
-        }
-        
         public virtual void Initialize(BTBlackboard bb, ulong entityID)
         {
             blackboard = bb;
@@ -92,5 +46,31 @@ namespace HRealEngine.BehaviorTree
         public abstract NodeStatus Update();
         public abstract void OnFinished();
         public abstract void OnAbort();
+        
+        
+        public Entity FromID(ulong entityID)
+        {
+            return GlobalFunctions.FromID(entityID);
+        }
+        public float GetDeltaTime()
+        {
+            return GlobalFunctions.GetDeltaTime();
+        }
+        public void OpenScene(string scenePath)
+        {
+            GlobalFunctions.OpenScene(scenePath);
+        }
+        public void Destroy(ulong entityID)
+        {
+            GlobalFunctions.Destroy(entityID);
+        }
+        public Entity SpawnEntity(string name, string tag, Vector3 translation, Vector3 rotation, Vector3 scale)
+        {
+            return GlobalFunctions.SpawnEntity(name, tag, translation, rotation, scale);
+        }
+        public Entity FindEntityByName(string name)
+        {
+            return GlobalFunctions.FindEntityByName(name);
+        }
     }
 }

@@ -1,5 +1,7 @@
 
 using System;
+using HRealEngine.Calls;
+
 namespace HRealEngine
 {
     public class Entity
@@ -11,81 +13,72 @@ namespace HRealEngine
         }
         public readonly ulong EntityID;
         
-        public static Entity FromID(ulong entityID)
-        {
-            if (entityID == 0)
-                return null;
-
-            return new Entity(entityID);
-        }
-
         public Vector3 Translation
         {
             get
             {
-                InternalCalls.TransformComponent_GetTranslation(EntityID, out Vector3 result);
+                InternalCalls_TransformComponent.TransformComponent_GetTranslation(EntityID, out Vector3 result);
                 return result;
             }
             set
             {
-                InternalCalls.TransformComponent_SetTranslation(EntityID, ref value);
+                InternalCalls_TransformComponent.TransformComponent_SetTranslation(EntityID, ref value);
             }
         }
         public Vector3 Rotation
         {
             get
             {
-                InternalCalls.TransformComponent_GetRotation(EntityID, out Vector3 r); 
+                InternalCalls_TransformComponent.TransformComponent_GetRotation(EntityID, out Vector3 r); 
                 return r;
             }
             set
             {
-                InternalCalls.TransformComponent_SetRotation(EntityID, ref value);
+                InternalCalls_TransformComponent.TransformComponent_SetRotation(EntityID, ref value);
             }
         }
-        
         public string Name
         {
             get
             {
-                return InternalCalls.Entity_GetName(EntityID);
+                return InternalCalls_Entity.Entity_GetName(EntityID);
             }
             set
             {
-                InternalCalls.Entity_SetEntityName(EntityID, value);
+                InternalCalls_Entity.Entity_SetName(EntityID, value);
             }
         }
         public bool HasTag(string tag)
         {
-            return InternalCalls.HasTag(EntityID, tag);
+            return InternalCalls_Entity.Entity_HasTag(EntityID, tag);
         }
         public bool HasComponent<T>() where T : Component, new()
         {
-            return InternalCalls.Entity_HasComponent(EntityID, typeof(T));
+            return InternalCalls_Entity.Entity_HasComponent(EntityID, typeof(T));
         }
         public void AddComponent<T>() where T : Component, new()
         {
             if (HasComponent<T>())
                 return;
-            InternalCalls.Entity_AddComponent(EntityID, typeof(T));
+            InternalCalls_Entity.Entity_AddComponent(EntityID, typeof(T));
         }
         public void AddRigidbody3DComponent(RigidBodyType bodyType, bool fixedRotation, float friction, float restitution, float convexRadius)
         {
             if (HasComponent<Rigidbody3DComponent>())
                 return;
-            InternalCalls.Entity_AddRigidbody3DComponent(EntityID, bodyType, fixedRotation, friction, restitution, convexRadius);
+            InternalCalls_Entity.Entity_AddRigidbody3DComponent(EntityID, bodyType, fixedRotation, friction, restitution, convexRadius);
         }
         public void AddBoxCollider3DComponent(bool isTrigger, Vector3 size, Vector3 offset)
         {
             if (HasComponent<BoxCollider3DComponent>())
                 return;
-            InternalCalls.Entity_AddBoxCollider3DComponent(EntityID, isTrigger, ref size, ref offset);
+            InternalCalls_Entity.Entity_AddBoxCollider3DComponent(EntityID, isTrigger, ref size, ref offset);
         }
         public void AddMeshRendererComponent(string meshPath)
         {
             if (HasComponent<MeshRendererComponent>())
                 return;
-            InternalCalls.Entity_AddMeshRendererComponent(EntityID, meshPath);
+            InternalCalls_Entity.Entity_AddMeshRendererComponent(EntityID, meshPath);
         }
         public T GetComponent<T>() where T : Component, new()
         {
@@ -95,48 +88,43 @@ namespace HRealEngine
             component.entity = this;
             return component;
         }
-
-        public Entity FindEntityByName(string name)
-        {
-            ulong entityID = InternalCalls.Entity_FindEntityByName(name);
-            if (entityID == 0)
-                return null;
-            return new Entity(entityID);
-        }
-        
         public Entity GetHoveredEntity()
         {
-            ulong entityID = InternalCalls.Entity_GetHoveredEntity();
+            ulong entityID = InternalCalls_Entity.Entity_GetHoveredEntity();
             if (entityID == 0)
                 return null;
             return new Entity(entityID);
         }
         public T As<T>() where T : Entity, new()
         {
-            object instance = InternalCalls.GetScriptInstance(EntityID);
+            object instance = InternalCalls_GlobalCalls.GetScriptInstance(EntityID);
             return instance as T;
         }
         
-        public void Destroy(ulong entityID)
+
+        public Entity FromID(ulong entityID)
         {
-            InternalCalls.DestroyEntity(entityID);
+            return GlobalFunctions.FromID(entityID);
         }
-        
+        public float GetDeltaTime()
+        {
+            return GlobalFunctions.GetDeltaTime();
+        }
         public void OpenScene(string scenePath)
         {
-            InternalCalls.OpenScene(scenePath);
+            GlobalFunctions.OpenScene(scenePath);
+        }
+        public void Destroy(ulong entityID)
+        {
+            GlobalFunctions.Destroy(entityID);
         }
         public Entity SpawnEntity(string name, string tag, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
-            ulong entityID = InternalCalls.SpawnEntity(name, tag, ref translation, ref rotation, ref scale);
-            if (entityID == 0)
-                return null;
-            return new Entity(entityID);
+            return GlobalFunctions.SpawnEntity(name, tag, translation, rotation, scale);
         }
-        
-        public float GetDeltaTime()
+        public Entity FindEntityByName(string name)
         {
-            return InternalCalls.Time_GetDeltaTime();
+            return GlobalFunctions.FindEntityByName(name);
         }
     }
 }

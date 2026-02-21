@@ -512,7 +512,7 @@ namespace HRealEngine
                         instance->SetFieldValueInternal(name, field.m_Buffer);
                 }
             }
-            instance->InvokeOnCreate();
+            instance->InvokeBeginPlay();
         }
     }
 
@@ -534,7 +534,7 @@ namespace HRealEngine
             return;
         }
         Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
-        instance->InvokeOnUpdate((float)ts);
+        instance->InvokeTick((float)ts);
     }
 
     void ScriptEngine::OnCollisionBegin(Entity entityA, Entity entityB)
@@ -543,10 +543,10 @@ namespace HRealEngine
         UUID idB = entityB.GetUUID();
         Ref<ScriptInstance> instanceA = s_Data->EntityInstances[idA];
         if (instanceA)
-            instanceA->InvokeOnCollisionEnter2D(idB);
+            instanceA->InvokeOnCollisionEnter(idB);
         Ref<ScriptInstance> instanceB = s_Data->EntityInstances[idB];
         if (instanceB)
-            instanceB->InvokeOnCollisionEnter2D(idA);
+            instanceB->InvokeOnCollisionEnter(idA);
     }
 
     void ScriptEngine::OnCollisionEnd(Entity entityA, Entity entityB)
@@ -555,10 +555,10 @@ namespace HRealEngine
         UUID idB = entityB.GetUUID();
         Ref<ScriptInstance> instanceA = s_Data->EntityInstances[idA];
         if (instanceA)
-            instanceA->InvokeOnCollisionExit2D(idB);
+            instanceA->InvokeOnCollisionExit(idB);
         Ref<ScriptInstance> instanceB = s_Data->EntityInstances[idB];
         if (instanceB)
-            instanceB->InvokeOnCollisionExit2D(idA);
+            instanceB->InvokeOnCollisionExit(idA);
     }
 
     void ScriptEngine::OpenScene(const std::string& path)
@@ -704,11 +704,11 @@ namespace HRealEngine
         m_Instance = scriptClass->Instantiate();
 
         m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
-        m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
-        m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+        m_BeginPlayMethod = scriptClass->GetMethod("BeginPlay", 0);
+        m_TickMethod = scriptClass->GetMethod("Tick", 1);
         
-        m_OnCollisionEnter2DMethod = scriptClass->GetMethod("OnCollisionEnter2D", 1);
-        m_OnCollisionExit2DMethod = scriptClass->GetMethod("OnCollisionExit2D", 1);
+        m_OnCollisionEnterMethod = scriptClass->GetMethod("OnCollisionEnter", 1);
+        m_OnCollisionExitMethod = scriptClass->GetMethod("OnCollisionExit", 1);
         m_OnDestroyMethod = scriptClass->GetMethod("OnDestroy", 0);
 
         {
@@ -718,10 +718,10 @@ namespace HRealEngine
         }
     }
 
-    void ScriptInstance::InvokeOnCreate()
+    void ScriptInstance::InvokeBeginPlay()
     {
-        if (m_OnCreateMethod)
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
+        if (m_BeginPlayMethod)
+            m_ScriptClass->InvokeMethod(m_Instance, m_BeginPlayMethod);
     }
 
     void ScriptInstance::InvokeOnDestroy()
@@ -730,31 +730,31 @@ namespace HRealEngine
             m_ScriptClass->InvokeMethod(m_Instance, m_OnDestroyMethod);
     }
 
-    void ScriptInstance::InvokeOnUpdate(Timestep ts)
+    void ScriptInstance::InvokeTick(Timestep ts)
     {
-        if (m_OnUpdateMethod)
+        if (m_TickMethod)
         {
             float time = (float)ts;
             void* param = &time;
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+            m_ScriptClass->InvokeMethod(m_Instance, m_TickMethod, &param);
         }
     }
 
-    void ScriptInstance::InvokeOnCollisionEnter2D(UUID otherID)
+    void ScriptInstance::InvokeOnCollisionEnter(UUID otherID)
     {
-        if (m_OnCollisionEnter2DMethod)
+        if (m_OnCollisionEnterMethod)
         {
             void* param = &otherID;
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnter2DMethod, &param);
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionEnterMethod, &param);
         }
     }
 
-    void ScriptInstance::InvokeOnCollisionExit2D(UUID otherID)
+    void ScriptInstance::InvokeOnCollisionExit(UUID otherID)
     {
-        if (m_OnCollisionExit2DMethod)
+        if (m_OnCollisionExitMethod)
         {
             void* param = &otherID;
-            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExit2DMethod, &param);
+            m_ScriptClass->InvokeMethod(m_Instance, m_OnCollisionExitMethod, &param);
         }
     }
 

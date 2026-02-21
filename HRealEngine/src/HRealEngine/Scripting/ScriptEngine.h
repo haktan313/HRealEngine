@@ -93,10 +93,10 @@ namespace HRealEngine
     public:
         ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity);
 
-        void InvokeOnCreate();
+        void InvokeBeginPlay();
         void InvokeOnDestroy();
-        void InvokeOnUpdate(Timestep ts);
-        void InvokeOnCollisionEnter2D(UUID otherID);
+        void InvokeTick(Timestep ts);
+        void InvokeOnCollisionEnter(UUID otherID);
 
         Ref<ScriptClass> GetScriptClass() const { return m_ScriptClass; }
 
@@ -117,18 +117,18 @@ namespace HRealEngine
 
         MonoObject* GetManagedObject() const { return m_Instance; }
     private:
-        void InvokeOnCollisionExit2D(UUID otherID);
+        void InvokeOnCollisionExit(UUID otherID);
         bool GetFieldValueInternal(const std::string& name, void* outValue);
         bool SetFieldValueInternal(const std::string& name, const void* value);
         
         Ref<ScriptClass> m_ScriptClass;
         MonoObject* m_Instance = nullptr;
         MonoMethod* m_Constructor = nullptr;
-        MonoMethod* m_OnCreateMethod = nullptr;
-        MonoMethod* m_OnUpdateMethod = nullptr;
+        MonoMethod* m_BeginPlayMethod = nullptr;
+        MonoMethod* m_TickMethod = nullptr;
         
-        MonoMethod* m_OnCollisionEnter2DMethod = nullptr;
-        MonoMethod* m_OnCollisionExit2DMethod = nullptr;
+        MonoMethod* m_OnCollisionEnterMethod = nullptr;
+        MonoMethod* m_OnCollisionExitMethod = nullptr;
         MonoMethod* m_OnDestroyMethod = nullptr;
 
         inline static char s_FieldValueBuffer[16];
