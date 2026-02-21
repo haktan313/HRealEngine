@@ -72,5 +72,13 @@ namespace HRealEngine.BehaviorTree
         {
             return GlobalFunctions.FindEntityByName(name);
         }
+        public bool Raycast3D(Vector3 origin, Vector3 direction, float maxDistance, out RaycastHit hit, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
+        {
+            return GlobalFunctions.Raycast3D(origin, direction, maxDistance, out hit, ignoreEntities, debugDraw, debugDrawDuration);
+        }
+        public RaycastHit[] Raycast3DAll(Vector3 origin, Vector3 direction, float maxDistance, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
+        {
+            return GlobalFunctions.Raycast3DAll(origin, direction, maxDistance, ignoreEntities, debugDraw, debugDrawDuration);
+        }
     }
 }

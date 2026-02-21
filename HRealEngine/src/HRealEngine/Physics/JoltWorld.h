@@ -7,6 +7,22 @@ namespace HRealEngine
 {
     class Scene;
     class Timestep;
+
+    struct RaycastHit3D
+    {
+        UUID HitEntityID = 0;
+        glm::vec3 HitPoint = glm::vec3(0.0f);
+        glm::vec3 HitNormal = glm::vec3(0.0f);
+        float Distance = 0.0f;
+        bool Hit = false;
+    };
+    struct DebugLine
+    {
+        glm::vec3 Start;
+        glm::vec3 End;
+        glm::vec4 Color;
+        float RemainingLifetime;
+    };
     
     class JoltWorld
     {
@@ -22,8 +38,8 @@ namespace HRealEngine
         void CreateBodyForEntity(Entity entity);
         void SetBodyTypeForEntity(Entity entity);
         void SetIsTriggerForEntity(Entity entity, bool isTrigger);
-        void SetBoxColliderOffsetForEntity(Entity entity, const glm::vec3& offset);
         void SetBoxColliderSizeForEntity(Entity entity, const glm::vec3& size);
+        void SetBoxColliderOffsetForEntity(Entity entity, const glm::vec3& offset);
 
         void UpdateSimulation3DForKinematicBodies(Timestep deltaTime);
         void UpdateSimulation3D(Timestep deltaTime, int& stepFrames);
@@ -35,7 +51,14 @@ namespace HRealEngine
         void DestroyEntityPhysics(Entity entity);
         void Stop3DPhysics();
         
+        RaycastHit3D Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, bool debugDraw = false, float debugLifetime = 0.0f, const std::vector<uint64_t>& ignoreEntities = {});
+        std::vector<RaycastHit3D> RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, bool debugDraw = false, float debugLifetime = 0.0f, const std::vector<uint64_t>& ignoreEntities = {});
+        
+        std::vector<DebugLine>& GetDebugLines() { return m_DebugLines; }
+        void UpdateDebugLines(float deltaTime);
     private:
+        std::vector<DebugLine> m_DebugLines;
+        
         struct CollisionEvent
         {
             /*entt::entity A;

@@ -1,5 +1,8 @@
 #include "HRpch.h"
 #include "ScriptGlue.h"
+
+#include <mono/metadata/appdomain.h>
+
 #include "ScriptEngine.h"
 
 #include "HRealEngine/Core/KeyCodes.h"
@@ -91,6 +94,104 @@ namespace HRealEngine
         return ScriptEngine::GetManagedInstance(entityID);
     }
 
+	static bool Raycast3D(glm::vec3* origin, glm::vec3* direction, float maxDistance, MonoArray* ignoreEntitiesIDs,
+		uint64_t* outEntityID, glm::vec3* outPoint, glm::vec3* outNormal, float* outDistance, bool debugDraw, float debugLifetime)
+	{
+		std::vector<uint64_t> ignoreList;
+		if (ignoreEntitiesIDs != nullptr)
+		{
+			uintptr_t length = mono_array_length(ignoreEntitiesIDs);
+			for (uintptr_t i = 0; i < length; i++)
+			{
+				ignoreList.push_back(mono_array_get(ignoreEntitiesIDs, uint64_t, i));
+			}
+		}
+		
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Raycast3D: Scene context is null!");
+			return false;
+		}
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (!joltWorld)
+		{
+			LOG_CORE_ERROR("Raycast3D: Jolt physics world is null!");
+			return false;
+		}
+
+		auto result = joltWorld->Raycast(*origin, *direction, maxDistance, debugDraw, debugLifetime, ignoreList);
+		if (result.Hit)
+		{
+			*outEntityID = result.HitEntityID;
+			*outPoint = result.HitPoint;
+			*outNormal = result.HitNormal;
+			*outDistance = result.Distance;
+		}
+		return result.Hit;
+	}
+
+	struct RaycastHitManaged
+	{
+		uint64_t EntityID;
+		glm::vec3 Point;
+		glm::vec3 Normal;
+		float Distance;
+	};
+	static MonoArray* Raycast3DArray(glm::vec3* origin, glm::vec3* direction, MonoArray* ignoreEntitiesIDs,
+		float maxDistance, bool debugDraw, float debugLifetime)
+	{
+		std::vector<uint64_t> ignoreList;
+		if (ignoreEntitiesIDs != nullptr)
+		{
+			uintptr_t length = mono_array_length(ignoreEntitiesIDs);
+			for (uintptr_t i = 0; i < length; i++)
+			{
+				ignoreList.push_back(mono_array_get(ignoreEntitiesIDs, uint64_t, i));
+			}
+		}
+		
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Raycast3DArray: Scene context is null!");
+			return nullptr;
+		}
+		JoltWorld* joltWorld = scene->GetJoltWorld();
+		if (!joltWorld)
+		{
+			LOG_CORE_ERROR("Raycast3DArray: Jolt physics world is null!");
+			return nullptr;
+		}
+
+		auto results = joltWorld->RaycastAll(*origin, *direction, maxDistance, debugDraw, debugLifetime, ignoreList);
+		if (results.empty())
+			return nullptr;
+		
+		MonoClass* hitClass = mono_class_from_name(ScriptEngine::GetCoreAssemblyImage(), "HRealEngine", "RaycastHit");
+    
+		if (!hitClass)
+		{
+			LOG_CORE_ERROR("Raycast3DArray: Could not find RaycastHit class!");
+			return nullptr;
+		}
+
+		MonoArray* array = mono_array_new(mono_domain_get(), hitClass, (uintptr_t)results.size());
+
+		for (size_t i = 0; i < results.size(); i++)
+		{
+			RaycastHitManaged hit;
+			hit.EntityID = results[i].HitEntityID;
+			hit.Point = results[i].HitPoint;
+			hit.Normal = results[i].HitNormal;
+			hit.Distance = results[i].Distance;
+			
+			char* elem = mono_array_addr_with_size(array, (int)sizeof(RaycastHitManaged), (int)i);
+			memcpy(elem, &hit, sizeof(RaycastHitManaged));
+		}
+		return array;
+	}
+	
 	
 	static std::array<std::string, 3> s_ComponentTypeNames = {
 		"HRealEngine.BoxCollider3DComponent",
@@ -367,14 +468,14 @@ namespace HRealEngine
 	}
 	
 
-    static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
+    static void TransformComponent_GetPosition(UUID entityID, glm::vec3* outPosition)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
         *outPosition = entity.GetComponent<TransformComponent>().Position;
     }
 
-    static void TransformComponent_SetTranslation(UUID entityID, glm::vec3* position)
+    static void TransformComponent_SetPosition(UUID entityID, glm::vec3* position)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
         Entity entity = scene->GetEntityByUUID(entityID);
@@ -962,6 +1063,8 @@ namespace HRealEngine
     	HRE_ADD_INTERNAL_CALL_GLOBAL(SpawnEntity);
 		HRE_ADD_INTERNAL_CALL_GLOBAL(FindEntityByName);
         HRE_ADD_INTERNAL_CALL_GLOBAL(GetScriptInstance);
+		HRE_ADD_INTERNAL_CALL_GLOBAL(Raycast3D);
+		HRE_ADD_INTERNAL_CALL_GLOBAL(Raycast3DArray);
 
     	HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddComponent);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddRigidbody3DComponent);
@@ -979,8 +1082,8 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddChild);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetChild);
 		
-        HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_GetTranslation);
-        HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_SetTranslation);
+        HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_GetPosition);
+        HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_SetPosition);
         HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_GetRotation);
         HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_SetRotation);
 

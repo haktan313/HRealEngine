@@ -20,5 +20,10 @@ namespace HRealEngine.Calls
         
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static object GetScriptInstance(ulong entityID);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool Raycast3D(ref Vector3 origin, ref Vector3 direction, ulong[] ignoreEntitiesIDs, float maxDistance, out ulong entityID, out Vector3 point, out Vector3 normal, out float distance, bool debugDraw, float debugDrawDuration);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static RaycastHit[] Raycast3DArray(ref Vector3 origin, ref Vector3 direction, ulong[] ignoreEntitiesIDs, float maxDistance, bool debugDraw, float debugDrawDuration);
     }
 }

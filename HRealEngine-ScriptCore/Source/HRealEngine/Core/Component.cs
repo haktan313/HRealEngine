@@ -9,16 +9,16 @@ namespace HRealEngine
 
     public class TransformComponent : Component
     {
-        public Vector3 Translation
+        public Vector3 Position
         {
             get
             {
-                InternalCalls_TransformComponent.TransformComponent_GetTranslation(entity.EntityID, out Vector3 result);
+                InternalCalls_TransformComponent.TransformComponent_GetPosition(entity.EntityID, out Vector3 result);
                 return result;
             }
             set
             {
-                InternalCalls_TransformComponent.TransformComponent_SetTranslation(entity.EntityID, ref value);
+                InternalCalls_TransformComponent.TransformComponent_SetPosition(entity.EntityID, ref value);
             }
         }
         public Vector3 Rotation

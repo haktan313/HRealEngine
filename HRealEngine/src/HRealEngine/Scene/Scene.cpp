@@ -322,7 +322,10 @@ namespace HRealEngine
                 if (m_b2PhysicsEnabled)
                     m_Box2DWorld->Step2DWorld(deltaTime);
                 else
+                {
                     m_JoltWorld->Step3DWorld(deltaTime);
+                    m_JoltWorld->UpdateDebugLines(deltaTime);
+                }
             }
         }
 

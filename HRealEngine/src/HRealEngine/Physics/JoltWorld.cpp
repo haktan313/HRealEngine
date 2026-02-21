@@ -9,6 +9,9 @@
 
 #include "Physics/PhysicsSystem.h"
 #include "Physics/Body/BodyCreationSettings.h"
+#include "Physics/Collision/CastResult.h"
+#include "Physics/Collision/CollisionCollectorImpl.h"
+#include "Physics/Collision/RayCast.h"
 #include "Physics/Collision/Shape/BoxShape.h"
 #include "Physics/Collision/Shape/EmptyShape.h"
 #include "Physics/Collision/Shape/RotatedTranslatedShape.h"
@@ -504,123 +507,6 @@ namespace HRealEngine
         body_interface->SetShape(body->GetID(), newShape, true, JPH::EActivation::Activate);
     }
 
-    void JoltWorld::DestroyEntityPhysics(Entity entity)
-    {
-        if (entity.HasComponent<Rigidbody3DComponent>())
-        {
-            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-            if (rb.RuntimeBody)
-            {
-                auto body = (JPH::Body*)rb.RuntimeBody;
-                body->SetUserData(0);
-                body_interface->RemoveBody(body->GetID());
-                body_interface->DestroyBody(body->GetID());
-                rb.RuntimeBody = nullptr;
-            }
-        }
-    }
-
-    void JoltWorld::Stop3DPhysics()
-    {
-        ScriptEngine::SetBodyInterface(nullptr);
-        m_JoltWorldHelper = nullptr;
-    }
-
-    void JoltWorld::Step3DWorldForKinematicBodies(Timestep deltaTime)
-    {
-        auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
-        for (auto e : view)
-        {
-            Entity entity{ e, m_Scene };
-            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
-            if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
-                continue;
-
-            JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
-            if (!body)
-                continue;
-
-            auto& tc = entity.GetComponent<TransformComponent>();
-                
-            glm::quat q = glm::quat(tc.Rotation);
-            JPH::Quat rot(q.x, q.y, q.z, q.w);
-            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
-
-            body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
-        }
-    }
-    
-    void JoltWorld::Step3DWorld(Timestep deltaTime)
-    {
-        Step3DWorldForKinematicBodies(deltaTime);
-        m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
-        Step3DWorldForNonKinematicBodies();
-    }
-
-    void JoltWorld::Step3DWorldForNonKinematicBodies()
-    {
-        {
-            auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
-            for (auto e : view)
-            {
-                Entity entity = { e, m_Scene };
-                auto& transform = entity.GetComponent<TransformComponent>();
-                auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
-                if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
-                    continue;
-
-                auto body = (JPH::Body*)rb3d.RuntimeBody;
-                JPH::RVec3 position;
-                JPH::Quat rotation;
-            
-                body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
-                transform.Position.x = position.GetX();
-                transform.Position.y = position.GetY();
-                transform.Position.z = position.GetZ();
-            
-                glm::quat q;
-                q.x = rotation.GetX();
-                q.y = rotation.GetY();
-                q.z = rotation.GetZ();
-                q.w = rotation.GetW();
-            
-                glm::vec3 euler = glm::eulerAngles(q);
-                transform.Rotation = euler;
-            }
-        }
-        {
-            auto view = m_Scene->GetRegistry().view<BoxCollider3DComponent, TransformComponent>();
-            for (auto e : view)
-            {
-                Entity entity = { e, m_Scene };
-                if (entity.HasComponent<Rigidbody3DComponent>())
-                    continue;
-                auto& transform = entity.GetComponent<TransformComponent>();
-                auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
-                if (boxCollider.RuntimeBody)
-                {
-                    JPH::Body* body = (JPH::Body*)boxCollider.RuntimeBody;
-                    JPH::RVec3 position;
-                    JPH::Quat rotation;
-
-                    body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
-                    transform.Position.x = position.GetX();
-                    transform.Position.y = position.GetY();
-                    transform.Position.z = position.GetZ();
-
-                    glm::quat q;
-                    q.x = rotation.GetX();
-                    q.y = rotation.GetY();
-                    q.z = rotation.GetZ();
-                    q.w = rotation.GetW();
-
-                    glm::vec3 euler = glm::eulerAngles(q);
-                    transform.Rotation = euler;
-                }
-            }
-        }
-    }
-
     void JoltWorld::UpdateSimulation3DForKinematicBodies(Timestep deltaTime)
     {
         auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
@@ -717,71 +603,9 @@ namespace HRealEngine
             }
         }
     }
-
+    
     void JoltWorld::UpdateRuntime3D()
     {
-        /*if (!m_CollisionBeginEvents.empty())
-        {
-            for (const auto& collisionEvent : m_CollisionBeginEvents)
-            {
-                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
-                {
-                    Entity entityA = {collisionEvent.A, m_Scene};
-                    ScriptEngine::OnCollisionBegin(entityA, Entity{collisionEvent.B, m_Scene});
-                }
-                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
-                {
-                    Entity entityB = {collisionEvent.B, m_Scene};
-                    ScriptEngine::OnCollisionBegin(entityB, Entity{collisionEvent.A, m_Scene});
-                }       
-                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
-                {
-                    Entity entityA = {collisionEvent.A, m_Scene};
-                    auto& nsc = entityA.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance)
-                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.B, m_Scene});
-                }
-                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
-                {
-                    Entity entityB = {collisionEvent.B, m_Scene};
-                    auto& nsc = entityB.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance)
-                        nsc.Instance->OnCollisionBegin(Entity{collisionEvent.A, m_Scene});
-                }
-            }
-            m_CollisionBeginEvents.clear();
-        }
-        if (!m_CollisionEndEvents.empty())
-        {
-            for (const auto& collisionEvent : m_CollisionEndEvents)
-            {
-                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.A))
-                {
-                    Entity entityA = {collisionEvent.A, m_Scene};
-                    ScriptEngine::OnCollisionEnd(entityA, Entity{collisionEvent.B, m_Scene});
-                }
-                if (m_Scene->GetRegistry().any_of<ScriptComponent>(collisionEvent.B))
-                {
-                    Entity entityB = {collisionEvent.B, m_Scene};
-                    ScriptEngine::OnCollisionEnd(entityB, Entity{collisionEvent.A, m_Scene});
-                }       
-                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.A))
-                {
-                    Entity entityA = {collisionEvent.A, m_Scene};
-                    auto& nsc = entityA.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance)
-                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.B, m_Scene});
-                }
-                if (m_Scene->GetRegistry().any_of<NativeScriptComponent>(collisionEvent.B))
-                {
-                    Entity entityB = {collisionEvent.B, m_Scene};
-                    auto& nsc = entityB.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance)
-                        nsc.Instance->OnCollisionEnd(Entity{collisionEvent.A, m_Scene});
-                }
-            }
-            m_CollisionEndEvents.clear();
-        }*/
         std::vector<CollisionEvent> beginEvents, endEvents;
         {
             std::lock_guard<std::mutex> lock(m_EventQueueMutex);
@@ -841,5 +665,275 @@ namespace HRealEngine
                 }
             }
         }
+    }
+    
+    void JoltWorld::Step3DWorldForKinematicBodies(Timestep deltaTime)
+    {
+        auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent, TransformComponent>();
+        for (auto e : view)
+        {
+            Entity entity{ e, m_Scene };
+            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+            if (rb.Type != Rigidbody3DComponent::BodyType::Kinematic)
+                continue;
+
+            JPH::Body* body = (JPH::Body*)rb.RuntimeBody;
+            if (!body)
+                continue;
+
+            auto& tc = entity.GetComponent<TransformComponent>();
+                
+            glm::quat q = glm::quat(tc.Rotation);
+            JPH::Quat rot(q.x, q.y, q.z, q.w);
+            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+
+            body_interface->MoveKinematic(body->GetID(), pos, rot, deltaTime.GetSeconds());
+        }
+    }
+    
+    void JoltWorld::Step3DWorld(Timestep deltaTime)
+    {
+        Step3DWorldForKinematicBodies(deltaTime);
+        m_JoltWorldHelper->StepWorld(deltaTime, physics_system);
+        Step3DWorldForNonKinematicBodies();
+    }
+
+    void JoltWorld::Step3DWorldForNonKinematicBodies()
+    {
+        {
+            auto view = m_Scene->GetRegistry().view<Rigidbody3DComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, m_Scene };
+                auto& transform = entity.GetComponent<TransformComponent>();
+                auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
+                if (rb3d.Type == Rigidbody3DComponent::BodyType::Kinematic)
+                    continue;
+
+                auto body = (JPH::Body*)rb3d.RuntimeBody;
+                JPH::RVec3 position;
+                JPH::Quat rotation;
+            
+                body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
+                transform.Position.x = position.GetX();
+                transform.Position.y = position.GetY();
+                transform.Position.z = position.GetZ();
+            
+                glm::quat q;
+                q.x = rotation.GetX();
+                q.y = rotation.GetY();
+                q.z = rotation.GetZ();
+                q.w = rotation.GetW();
+            
+                glm::vec3 euler = glm::eulerAngles(q);
+                transform.Rotation = euler;
+            }
+        }
+        {
+            auto view = m_Scene->GetRegistry().view<BoxCollider3DComponent, TransformComponent>();
+            for (auto e : view)
+            {
+                Entity entity = { e, m_Scene };
+                if (entity.HasComponent<Rigidbody3DComponent>())
+                    continue;
+                auto& transform = entity.GetComponent<TransformComponent>();
+                auto& boxCollider = entity.GetComponent<BoxCollider3DComponent>();
+                if (boxCollider.RuntimeBody)
+                {
+                    JPH::Body* body = (JPH::Body*)boxCollider.RuntimeBody;
+                    JPH::RVec3 position;
+                    JPH::Quat rotation;
+
+                    body_interface->GetPositionAndRotation(body->GetID(), position, rotation);
+                    transform.Position.x = position.GetX();
+                    transform.Position.y = position.GetY();
+                    transform.Position.z = position.GetZ();
+
+                    glm::quat q;
+                    q.x = rotation.GetX();
+                    q.y = rotation.GetY();
+                    q.z = rotation.GetZ();
+                    q.w = rotation.GetW();
+
+                    glm::vec3 euler = glm::eulerAngles(q);
+                    transform.Rotation = euler;
+                }
+            }
+        }
+    }
+
+    void JoltWorld::DestroyEntityPhysics(Entity entity)
+    {
+        if (entity.HasComponent<Rigidbody3DComponent>())
+        {
+            auto& rb = entity.GetComponent<Rigidbody3DComponent>();
+            if (rb.RuntimeBody)
+            {
+                auto body = (JPH::Body*)rb.RuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                rb.RuntimeBody = nullptr;
+            }
+        }
+    }
+
+    void JoltWorld::Stop3DPhysics()
+    {
+        ScriptEngine::SetBodyInterface(nullptr);
+        m_JoltWorldHelper = nullptr;
+    }
+
+    RaycastHit3D JoltWorld::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, bool debugDraw, float debugLifetime, const std::vector<uint64_t>& ignoreEntities)
+    {
+        RaycastHit3D result;
+        glm::vec3 dir = glm::normalize(direction);
+        
+        JPH::RRayCast ray;
+        ray.mOrigin = JPH::RVec3(origin.x, origin.y, origin.z);
+        ray.mDirection = JPH::Vec3(dir.x, dir.y, dir.z) * maxDistance;
+
+        if (ignoreEntities.empty())
+        {
+            JPH::RayCastResult hit;
+        
+            if (physics_system.GetNarrowPhaseQuery().CastRay(ray, hit))
+            {
+                result.Hit = true;
+                result.Distance = hit.mFraction * maxDistance;
+                result.HitPoint = origin + dir * result.Distance;
+            
+                JPH::BodyLockRead lock(physics_system.GetBodyLockInterface(), hit.mBodyID);
+                if (lock.Succeeded())
+                {
+                    const JPH::Body& body = lock.GetBody();
+                    result.HitEntityID = (UUID)body.GetUserData();
+
+                    JPH::Vec3 normal = body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2,ray.GetPointOnRay(hit.mFraction));
+                    result.HitNormal = glm::vec3(normal.GetX(), normal.GetY(), normal.GetZ());
+                }
+            }
+        }
+        else
+        {
+            JPH::AllHitCollisionCollector<JPH::CastRayCollector> collector;
+            JPH::RayCastSettings settings;
+            physics_system.GetNarrowPhaseQuery().CastRay(ray, settings, collector);
+            collector.Sort();
+
+            for (auto& hit : collector.mHits)
+            {
+                JPH::BodyLockRead lock(physics_system.GetBodyLockInterface(), hit.mBodyID);
+                if (!lock.Succeeded())
+                    continue;
+
+                const JPH::Body& body = lock.GetBody();
+                uint64_t entityID = body.GetUserData();
+                
+                bool shouldIgnore = false;
+                for (uint64_t ignoreID : ignoreEntities)
+                    if (entityID == ignoreID)
+                    {
+                        shouldIgnore = true;
+                        break;
+                    }
+                if (shouldIgnore)
+                    continue;
+
+                result.Hit = true;
+                result.Distance = hit.mFraction * maxDistance;
+                result.HitPoint = origin + dir * result.Distance;
+                result.HitEntityID = (UUID)entityID;
+                JPH::Vec3 normal = body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+                result.HitNormal = glm::vec3(normal.GetX(), normal.GetY(), normal.GetZ());
+                break;
+            }
+        }
+        
+        if (debugDraw)
+        {
+            glm::vec3 endPoint = origin + dir * maxDistance;
+            if (result.Hit)
+            {
+                m_DebugLines.push_back({ origin, result.HitPoint, {0, 1, 0, 1}, debugLifetime });
+                m_DebugLines.push_back({ result.HitPoint, endPoint, {1, 0, 0, 0.4f}, debugLifetime });
+                m_DebugLines.push_back({ result.HitPoint, result.HitPoint + result.HitNormal * 0.5f, {0, 0, 1, 1}, debugLifetime });
+            }
+            else
+            {
+                m_DebugLines.push_back({ origin, endPoint, {1, 0, 0, 1}, debugLifetime });
+            }
+        }
+        return result;
+    }
+
+    std::vector<RaycastHit3D> JoltWorld::RaycastAll(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, bool debugDraw, float debugLifetime, const std::vector<uint64_t>& ignoreEntities)
+    {
+        std::vector<RaycastHit3D> results;
+        glm::vec3 dir = glm::normalize(direction);
+
+        JPH::RRayCast ray;
+        ray.mOrigin = JPH::RVec3(origin.x, origin.y, origin.z);
+        ray.mDirection = JPH::Vec3(dir.x, dir.y, dir.z) * maxDistance;
+    
+        JPH::AllHitCollisionCollector<JPH::CastRayCollector> collector;
+        JPH::RayCastSettings settings;
+        physics_system.GetNarrowPhaseQuery().CastRay(ray, settings, collector);
+        collector.Sort();
+
+        for (auto& hit : collector.mHits)
+        {
+            JPH::BodyLockRead lock(physics_system.GetBodyLockInterface(), hit.mBodyID);
+            if (!lock.Succeeded())
+                continue;
+
+            const JPH::Body& body = lock.GetBody();
+            uint64_t entityID = body.GetUserData();
+            
+            bool shouldIgnore = false;
+            for (uint64_t ignoreID : ignoreEntities)
+                if (entityID == ignoreID)
+                {
+                    shouldIgnore = true;
+                    break;
+                }
+            if (shouldIgnore)
+                continue;
+
+            RaycastHit3D r;
+            r.Hit = true;
+            r.Distance = hit.mFraction * maxDistance;
+            r.HitPoint = origin + dir * r.Distance;
+            r.HitEntityID = (UUID)entityID;
+            JPH::Vec3 normal = body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+            r.HitNormal = glm::vec3(normal.GetX(), normal.GetY(), normal.GetZ());
+            results.push_back(r);
+        }
+
+        if (debugDraw)
+        {
+            if (results.empty())
+                m_DebugLines.push_back({ origin, origin + dir * maxDistance, {1, 0, 0, 1}, debugLifetime });
+            else
+            {
+                m_DebugLines.push_back({ origin, results.front().HitPoint, {0, 1, 0, 1}, debugLifetime });
+                for (auto& r : results)
+                    m_DebugLines.push_back({ r.HitPoint, r.HitPoint + r.HitNormal * 0.5f, {0, 0, 1, 1}, debugLifetime });
+                m_DebugLines.push_back({ results.back().HitPoint, origin + dir * maxDistance, {1, 0, 0, 0.4f}, debugLifetime });
+            }
+        }
+        return results;
+    }
+
+    void JoltWorld::UpdateDebugLines(float deltaTime)
+    {
+        for (auto& line : m_DebugLines)
+            line.RemainingLifetime -= deltaTime;
+
+        m_DebugLines.erase(
+            std::remove_if(m_DebugLines.begin(), m_DebugLines.end(),
+                [](const DebugLine& l) { return l.RemainingLifetime < 0.0f; }),
+            m_DebugLines.end()
+        );
     }
 }

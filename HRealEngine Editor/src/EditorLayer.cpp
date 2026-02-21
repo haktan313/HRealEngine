@@ -24,6 +24,7 @@
 #include "HRealEngine/Core/Application.h"
 #include "HRealEngine/Core/Input.h"
 #include "HRealEngine/Core/MouseButtonCodes.h"
+#include "HRealEngine/Physics/JoltWorld.h"
 #include "HRealEngine/Renderer/Font.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
 #include "HRealEngine/Renderer/Renderer2D.h"
@@ -1009,6 +1010,12 @@ namespace HRealEngine
                 else
                     Renderer2D::DrawRect(tc.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
             }
+        }
+        if (m_ActiveScene->GetJoltWorld())
+        {
+            auto& debugLines = m_ActiveScene->GetJoltWorld()->GetDebugLines();
+            for (const auto& line : debugLines)
+                Renderer2D::DrawLine(line.Start, line.End, line.Color);
         }
         Renderer2D::EndScene();
     }
