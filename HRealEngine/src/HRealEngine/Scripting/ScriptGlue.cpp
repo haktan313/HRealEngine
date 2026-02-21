@@ -298,7 +298,73 @@ namespace HRealEngine
 
     	return hoveredEntity->GetUUID();
     }
+	
+	static uint64_t Entity_GetParent(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+			return 0;
+		if (!entity.HasComponent<ChildrenManagerComponent>())
+			return 0;
+		return entity.GetComponent<ChildrenManagerComponent>().ParentHandle;
+	}
 
+	static void Entity_SetParent(UUID childID, UUID parentID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity child = scene->GetEntityByUUID(childID);
+		Entity parent = scene->GetEntityByUUID(parentID);
+		if (!child || !parent)
+		{
+			LOG_CORE_ERROR("Entity_SetParent: Invalid entity IDs: child={}, parent={}", (uint64_t)childID, (uint64_t)parentID);
+			return;
+		}
+		scene->SetParent(child, parent);
+	}
+
+	static void Entity_RemoveParent(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+			return;
+		scene->RemoveParent(entity);
+	}
+
+	static int Entity_GetChildCount(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<ChildrenManagerComponent>())
+			return 0;
+		return (int)entity.GetComponent<ChildrenManagerComponent>().Children.size();
+	}
+
+	static void Entity_AddChild(UUID parentID, UUID childID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity parent = scene->GetEntityByUUID(parentID);
+		Entity child = scene->GetEntityByUUID(childID);
+		if (!parent || !child)
+		{
+			LOG_CORE_ERROR("Entity_AddChild: Invalid entity IDs: parent={}, child={}", (uint64_t)parentID, (uint64_t)childID);
+			return;
+		}
+		scene->SetParent(child, parent);
+	}
+
+	static uint64_t Entity_GetChild(UUID entityID, int index)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<ChildrenManagerComponent>())
+			return 0;
+		auto& children = entity.GetComponent<ChildrenManagerComponent>().Children;
+		if (index < 0 || index >= (int)children.size())
+			return 0;
+		return children[index];
+	}
 	
 
     static void TransformComponent_GetTranslation(UUID entityID, glm::vec3* outPosition)
@@ -449,6 +515,52 @@ namespace HRealEngine
 		meshRenderer.MeshAssetPath = meshPathCStr;
 		mono_free(meshPathCStr);
     }
+
+	static void MeshRendererComponent_SetPivotOffset(UUID entityID, glm::vec3* pivotOffset)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetPivotOffset: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetPivotOffset: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		if (!entity.HasComponent<MeshRendererComponent>())
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_SetPivotOffset: Entity {} does not have MeshRendererComponent!", (uint64_t)entityID);
+			return;
+		}
+		auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+		meshRenderer.PivotOffset = *pivotOffset;
+	}
+
+	static glm::vec3 MeshRendererComponent_GetPivotOffset(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_GetPivotOffset: Scene context is null!");
+			return glm::vec3(0.0f);
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_GetPivotOffset: Invalid entity ID: {}", (uint64_t)entityID);
+			return glm::vec3(0.0f);
+		}
+		if (!entity.HasComponent<MeshRendererComponent>())
+		{
+			LOG_CORE_ERROR("MeshRendererComponent_GetPivotOffset: Entity {} does not have MeshRendererComponent!", (uint64_t)entityID);
+			return glm::vec3(0.0f);
+		}
+		auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+		return meshRenderer.PivotOffset;
+	}
 
 	static void BoxCollider3DComponent_SetSize(UUID entityID, glm::vec3* size)
 	{
@@ -860,6 +972,12 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL_ENTITY(Entity_HasComponent);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_HasTag);
     	HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetHoveredEntity);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetParent);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_SetParent);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_RemoveParent);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetChildCount);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddChild);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetChild);
 		
         HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_GetTranslation);
         HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(TransformComponent_SetTranslation);
@@ -877,6 +995,8 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL_RIGIDBODY(Rigidbody3DComponent_GetBodyType);
 		
     	HRE_ADD_INTERNAL_CALL_MESHRENDERER(MeshRendererComponent_SetMesh);
+		HRE_ADD_INTERNAL_CALL_MESHRENDERER(MeshRendererComponent_SetPivotOffset);
+		HRE_ADD_INTERNAL_CALL_MESHRENDERER(MeshRendererComponent_GetPivotOffset);
 
     	HRE_ADD_INTERNAL_CALL_BOXCOLLIDER(BoxCollider3DComponent_SetSize);
     	HRE_ADD_INTERNAL_CALL_BOXCOLLIDER(BoxCollider3DComponent_GetSize);

@@ -11,6 +11,7 @@ namespace HRealEngine
     {
     public:
         RuntimeLayer();
+        void RegisterBehaviorTreeStufs();
         virtual ~RuntimeLayer() = default;
 
         void OnAttach() override;

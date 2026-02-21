@@ -25,6 +25,11 @@ namespace HRealEngine
         EntityIDComponent() = default;
         EntityIDComponent(const EntityIDComponent&) = default;
     };
+    struct ChildrenManagerComponent
+    {
+        UUID ParentHandle = 0;
+        std::vector<UUID> Children{};
+    };
     struct TransformComponent
     {
         glm::vec3 Position {0.0f, 0.0f, 0.0f};
@@ -263,6 +268,7 @@ namespace HRealEngine
     using AllComponents = ComponentGroup<
         TransformComponent,
         EntityNameComponent,
+        ChildrenManagerComponent,
         TagComponent,
         LightComponent,
         TextComponent,

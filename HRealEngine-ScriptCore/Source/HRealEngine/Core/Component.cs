@@ -121,6 +121,14 @@ namespace HRealEngine
         {
             InternalCalls_MeshRenderer.MeshRendererComponent_SetMesh(entity.EntityID, meshPath);
         }
+        public void SetPivotOffset(Vector3 offset)
+        {
+            InternalCalls_MeshRenderer.MeshRendererComponent_SetPivotOffset(entity.EntityID, ref offset);
+        }
+        public Vector3 GetPivotOffset()
+        {           
+            return InternalCalls_MeshRenderer.MeshRendererComponent_GetPivotOffset(entity.EntityID);
+        }
     }
     
     public class BoxCollider3DComponent : Component

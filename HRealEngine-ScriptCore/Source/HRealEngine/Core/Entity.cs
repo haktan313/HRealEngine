@@ -13,6 +13,33 @@ namespace HRealEngine
         }
         public readonly ulong EntityID;
         
+        public Entity Parent
+        {
+            get
+            {
+                ulong parentID = InternalCalls_Entity.Entity_GetParent(EntityID);
+                return parentID == 0 ? null : new Entity(parentID);
+            }
+            set
+            {
+                if (value == null)
+                    InternalCalls_Entity.Entity_RemoveParent(EntityID);
+                else
+                    InternalCalls_Entity.Entity_SetParent(EntityID, value.EntityID);
+            }
+        }
+        public int ChildCount => InternalCalls_Entity.Entity_GetChildCount(EntityID);
+        public void AddChild(Entity child)
+        {
+            if (child != null)
+                InternalCalls_Entity.Entity_AddChild(EntityID, child.EntityID);
+        }
+        public Entity GetChild(int index)
+        {
+            ulong childID = InternalCalls_Entity.Entity_GetChild(EntityID, index);
+            return childID == 0 ? null : new Entity(childID);
+        }
+        
         public Vector3 Translation
         {
             get

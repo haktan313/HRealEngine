@@ -8,6 +8,8 @@
 #include "HRealEngine/Events/KeyEvent.h"
 #include "HRealEngine/Project/Project.h"
 #include "HRealEngine/Renderer/RenderCommand.h"
+#include "HRealEngine/Scripting/CSharpNodeRegistry.h"
+#include "HRealEngine/Scripting/ScriptEngine.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -16,7 +18,41 @@ namespace HRealEngine
     RuntimeLayer::RuntimeLayer() : Layer("RuntimeLayer")
     {
     }
-
+    
+    void RuntimeLayer::RegisterBehaviorTreeStufs()
+    {
+        if (ScriptEngine::IsInitialized())
+        {
+            auto& btActionClasses = ScriptEngine::s_BTActionClasses;
+            for (const auto& [className, info] : btActionClasses)
+            {
+                CSharpNodeRegistry::AddManagedActionNode(className);
+                LOG_CORE_INFO("Registered managed BT Action in editor: {}", className);
+            }
+        
+            auto& btConditionClasses = ScriptEngine::s_BTConditionClasses;
+            for (const auto& [className, info] : btConditionClasses)
+            {
+                CSharpNodeRegistry::AddManagedConditionNode(className);
+                LOG_CORE_INFO("Registered managed BT Condition in editor: {}", className);
+            }
+        
+            auto& btDecoratorClasses = ScriptEngine::s_BTDecoratorClasses;
+            for (const auto& [className, info] : btDecoratorClasses)
+            {
+                CSharpNodeRegistry::AddManagedDecoratorNode(className);
+                LOG_CORE_INFO("Registered managed BT Decorator in editor: {}", className);
+            }
+        
+            auto& btBlackboardClasses = ScriptEngine::s_BTBlackboardClasses;
+            for (const auto& [className, info] : btBlackboardClasses)
+            {
+                CSharpNodeRegistry::AddManagedBlackboard(className);
+                LOG_CORE_INFO("Registered managed BT Blackboard in editor: {}", className);
+            }
+        }
+    }
+    
     void RuntimeLayer::OnAttach()
     {
         FramebufferSpecification fbSpec;
@@ -32,7 +68,7 @@ namespace HRealEngine
             return;
         }
         m_ProjectLoaded = true;
-
+        RegisterBehaviorTreeStufs();
         AssetHandle startScene = Project::GetActive()->GetConfig().StartScene;
         if (!startScene)
         {

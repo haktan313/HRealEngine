@@ -62,6 +62,13 @@ namespace HRealEngine
         void DuplicateEntity(Entity entity);
 
         bool DecomposeTransform(const glm::mat4& transform, glm::vec3& outPosition, glm::vec3& rotation, glm::vec3& scale);
+
+        void SetParent(Entity child, Entity parent);
+        void RemoveParent(Entity child);
+        Entity GetParent(Entity entity);
+        std::vector<Entity> GetChildren(Entity entity);
+        bool IsAncestorOf(Entity ancestor, Entity entity);
+        glm::mat4 GetWorldTransform(Entity entity);
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);

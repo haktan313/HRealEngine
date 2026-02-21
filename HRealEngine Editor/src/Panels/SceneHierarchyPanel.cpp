@@ -34,7 +34,15 @@ namespace HRealEngine
         auto& registry = m_Context->GetRegistry();
         auto view = registry.view<TransformComponent, EntityNameComponent>();
         for (auto entity : view)
-            DrawEntityNode(Entity{entity, m_Context.get()});
+        {
+            Entity e{entity, m_Context.get()};
+            bool isChild = false;
+            if (e.HasComponent<ChildrenManagerComponent>())
+                isChild = e.GetComponent<ChildrenManagerComponent>().ParentHandle != 0;
+        
+            if (!isChild)
+                DrawEntityNode(e);
+        }
 
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
             m_SelectedEntity = {};
@@ -45,19 +53,31 @@ namespace HRealEngine
                 m_SelectedEntity = m_Context->CreateEntity("Empty Entity");
             ImGui::EndPopup();
         }
-        
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_ENTITY"))
+            {
+                UUID droppedUUID = *(UUID*)payload->Data;
+                Entity droppedEntity = m_Context->GetEntityByUUID(droppedUUID);
+                if (droppedEntity)
+                    m_Context->RemoveParent(droppedEntity);
+            }
+            ImGui::EndDragDropTarget();
+            
+        }
         ImGui::Separator();
         if (m_SelectedEntity)
         {
             ImGui::Begin("Properties");
             if (m_SelectedEntity)
             {
+                ImGui::Begin("Properties");
                 DrawComponents(m_SelectedEntity);
-                
+                ImGui::End();
             }
             ImGui::End();
         }
-        
         ImGui::End();
     }
 
@@ -69,20 +89,29 @@ namespace HRealEngine
     void SceneHierarchyPanel::DrawEntityNode(Entity entity)
     {
         auto& Tag = entity.GetComponent<EntityNameComponent>().Name;
+
+        bool hasChildren = false;
+        if (entity.HasComponent<ChildrenManagerComponent>())
+            hasChildren = !entity.GetComponent<ChildrenManagerComponent>().Children.empty();
         
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+        if (!hasChildren)
+            flags |= ImGuiTreeNodeFlags_Leaf;
+        
         bool bOpened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, Tag.c_str());
+
+        if (!hasChildren)
+        {
+            ImVec2 itemMin = ImGui::GetItemRectMin();
+            float fontSize = ImGui::GetFontSize();
+            float radius = fontSize * 0.15f;
+            ImVec2 center = ImVec2(itemMin.x + fontSize * 0.5f, itemMin.y + fontSize * 0.5f + ImGui::GetStyle().FramePadding.y);
+            ImGui::GetWindowDrawList()->AddCircleFilled(center, radius, IM_COL32(180, 180, 180, 200));
+        }
+        
         if (ImGui::IsItemClicked())
             m_SelectedEntity = entity;
 
-        bool bDeleted = false;
-        if (ImGui::BeginPopupContextItem())
-        {
-            if (ImGui::MenuItem("Delete Entity"))
-                bDeleted = true;
-            ImGui::EndPopup();
-        }
-        
         if (ImGui::BeginDragDropSource())
         {
             UUID uuid = entity.GetUUID(); 
@@ -90,10 +119,43 @@ namespace HRealEngine
             ImGui::Text("%s", Tag.c_str());
             ImGui::EndDragDropSource();
         }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_ENTITY"))
+            {
+                UUID droppedUUID = *(UUID*)payload->Data;
+                Entity droppedEntity = m_Context->GetEntityByUUID(droppedUUID);
+                if (droppedEntity && droppedEntity != entity)
+                    m_Context->SetParent(droppedEntity, entity);
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        bool bDeleted = false;
+        if (ImGui::BeginPopupContextItem())
+        {
+            if (ImGui::MenuItem("Delete Entity"))
+                bDeleted = true;
+            if (ImGui::MenuItem("Create Child Entity"))
+            {
+                Entity child = m_Context->CreateEntity("Child Entity");
+                m_Context->SetParent(child, entity);
+            }
+            if (entity.HasComponent<ChildrenManagerComponent>() && entity.GetComponent<ChildrenManagerComponent>().ParentHandle != 0)
+                if (ImGui::MenuItem("Unparent"))
+                    m_Context->RemoveParent(entity);
+            ImGui::EndPopup();
+        }
         
         if (bOpened)
         {
-            ImGuiTreeNodeFlags childFlags = ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanAvailWidth;
+            if (hasChildren)
+            {
+                auto children = m_Context->GetChildren(entity);
+                for (auto& child : children)
+                    DrawEntityNode(child);
+            }
             ImGui::TreePop();
         }
 

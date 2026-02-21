@@ -91,6 +91,7 @@ namespace HRealEngine
             entityMap[uuid] = (entt::entity)newEntity;
         }
 
+        CopyComponent<ChildrenManagerComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<TransformComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<TagComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<TextComponent>(dstRegistry, srcRegistry, entityMap);
@@ -151,6 +152,19 @@ namespace HRealEngine
 
     void Scene::DestroyEntity(Entity entity)
     {
+        if (entity.HasComponent<ChildrenManagerComponent>())
+        {
+            auto childrenCopy = entity.GetComponent<ChildrenManagerComponent>().Children;
+            for (UUID childUUID : childrenCopy)
+            {
+                Entity child = GetEntityByUUID(childUUID);
+                if (child)
+                    DestroyEntity(child);
+            }
+        }
+
+        RemoveParent(entity);
+        
         if (m_b2PhysicsEnabled)
             m_Box2DWorld->DestroyEntityPhysics(entity);
         else 
@@ -339,8 +353,12 @@ namespace HRealEngine
             auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
             for (auto entity : view)
             {
-                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                /*auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);*/
+                Entity e{entity, this};
+                auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+                glm::mat4 worldTransform = GetWorldTransform(e);
+                Renderer3D::DrawMesh(worldTransform, meshRenderer, (int)entity);
             }
         }
         Renderer3D::EndScene();
@@ -486,6 +504,97 @@ namespace HRealEngine
         return true;
     }
 
+    void Scene::SetParent(Entity child, Entity parent)
+    {
+        if (child == parent)
+            return;
+        
+        if (IsAncestorOf(child, parent))
+            return;
+        
+        RemoveParent(child);
+
+        if (!child.HasComponent<ChildrenManagerComponent>())
+            child.AddComponent<ChildrenManagerComponent>();
+        auto& childRel = child.GetComponent<ChildrenManagerComponent>();
+        childRel.ParentHandle = parent.GetUUID();
+
+        if (!parent.HasComponent<ChildrenManagerComponent>())
+            parent.AddComponent<ChildrenManagerComponent>();
+        auto& parentRel = parent.GetComponent<ChildrenManagerComponent>();
+        parentRel.Children.push_back(child.GetUUID());
+    }
+
+    void Scene::RemoveParent(Entity child)
+    {
+        if (!child.HasComponent<ChildrenManagerComponent>())
+            return;
+
+        auto& childRel = child.GetComponent<ChildrenManagerComponent>();
+        if (childRel.ParentHandle == 0)
+            return;
+
+        Entity oldParent = GetEntityByUUID(childRel.ParentHandle);
+        if (oldParent)
+        {
+            auto& parentRel = oldParent.GetComponent<ChildrenManagerComponent>();
+            auto& children = parentRel.Children;
+            children.erase(std::remove(children.begin(), children.end(), child.GetUUID()), children.end());
+        }
+
+        childRel.ParentHandle = 0;
+    }
+
+    Entity Scene::GetParent(Entity entity)
+    {
+        if (!entity.HasComponent<ChildrenManagerComponent>())
+            return {};
+        UUID parentUUID = entity.GetComponent<ChildrenManagerComponent>().ParentHandle;
+        if (parentUUID == 0)
+            return {};
+        return GetEntityByUUID(parentUUID);
+    }
+
+    std::vector<Entity> Scene::GetChildren(Entity entity)
+    {
+        std::vector<Entity> result;
+        if (!entity.HasComponent<ChildrenManagerComponent>())
+            return result;
+        
+        auto& rel = entity.GetComponent<ChildrenManagerComponent>();
+        result.reserve(rel.Children.size());
+        for (UUID childUUID : rel.Children)
+        {
+            Entity child = GetEntityByUUID(childUUID);
+            if (child)
+                result.push_back(child);
+        }
+        return result;
+    }
+
+    bool Scene::IsAncestorOf(Entity ancestor, Entity entity)
+    {
+        Entity current = GetParent(entity);
+        while (current)
+        {
+            if (current == ancestor)
+                return true;
+            current = GetParent(current);
+        }
+        return false;
+    }
+
+    glm::mat4 Scene::GetWorldTransform(Entity entity)
+    {
+        glm::mat4 transform = entity.GetComponent<TransformComponent>().GetTransform();
+    
+        Entity parent = GetParent(entity);
+        if (parent)
+            transform = GetWorldTransform(parent) * transform;
+    
+        return transform;
+    }
+
     void Scene::OnPhysicsStart()
     {
         if (m_Box2DWorld)
@@ -512,8 +621,12 @@ namespace HRealEngine
             auto view = m_Registry.view<TransformComponent, MeshRendererComponent>();
             for (auto entity : view)
             {
-                auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
-                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);
+                /*auto [transform, meshRenderer] = view.get<TransformComponent, MeshRendererComponent>(entity);
+                Renderer3D::DrawMesh(transform.GetTransform(), meshRenderer, (int)entity);*/
+                Entity e{entity, this};
+                auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+                glm::mat4 worldTransform = GetWorldTransform(e);
+                Renderer3D::DrawMesh(worldTransform, meshRenderer, (int)entity);
             }
         }
         Renderer3D::EndScene();
@@ -660,6 +773,10 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<EntityIDComponent>(Entity entity, EntityIDComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<ChildrenManagerComponent>(Entity entity, ChildrenManagerComponent& component)
     {
     }
     template<>

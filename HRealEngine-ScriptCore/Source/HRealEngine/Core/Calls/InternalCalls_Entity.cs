@@ -24,5 +24,17 @@ namespace HRealEngine.Calls
         internal extern static bool Entity_HasTag(ulong entityID, string tag);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static ulong Entity_GetHoveredEntity();
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_GetParent(ulong entityID);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_SetParent(ulong childID, ulong parentID);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_RemoveParent(ulong entityID);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static int Entity_GetChildCount(ulong entityID);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_GetChild(ulong entityID, int index);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_AddChild(ulong parentID, ulong childID);
     }
 }
