@@ -1,7 +1,0 @@
-Type: Material
-Shader: shaders/StaticMesh.glsl
-BaseColor: [1, 1, 1]
-AlbedoTextureHandle: 1312069811868287053
-SpecularTextureHandle: 5885954185279832949
-NormalTextureHandle: 2326926188452044375
-Shininess: 32

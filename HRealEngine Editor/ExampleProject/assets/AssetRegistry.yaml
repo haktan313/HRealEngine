@@ -1,0 +1,4 @@
+AssetRegistry:
+  - Handle: 832115492279930486
+    FilePath: DefaultScene.hrs
+    Type: AssetType::Scene

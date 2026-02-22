@@ -1,6 +1,0 @@
-Project:
-  Name: SandboxTest
-  StartScene: 17410086992147688420
-  AssetDirectory: assets
-  AssetRegistryPath: AssetRegistry.yaml
-  ScriptModulePath: Scripts/Binaries/SandboxTest.dll

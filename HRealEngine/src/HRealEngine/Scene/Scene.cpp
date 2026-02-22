@@ -240,8 +240,7 @@ namespace HRealEngine
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
                     m_BehaviorTreeCache[btComponent.BehaviorTreeAsset] = data;
-                    /*bt->SetOwner<Entity>(&entity);
-                    bt->StartTree();*/
+
                     UUID ownerUUID = entity.GetUUID();
                     m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
                     bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);
@@ -249,7 +248,7 @@ namespace HRealEngine
                 }
                 else
                 {
-                    YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);/*m_BehaviorTreeCache[btComponent.BehaviorTreeAsset];*/
+                    YAML::Node& data = m_BehaviorTreeCache.at(btComponent.BehaviorTreeAsset);
                     auto metaData = Project::GetActive()->GetEditorAssetManager()->GetAssetMetadata(btComponent.BehaviorTreeAsset);
                     auto path = Project::GetAssetDirectory() / metaData.FilePath;
                     auto name = metaData.FilePath.stem().string();
@@ -257,8 +256,7 @@ namespace HRealEngine
                     BehaviorTree* bt = Root::CreateBehaviorTree(name, path.string());
                     BTSerializer serializer(bt);
                     serializer.Deserialize(data);
-                    /*bt->SetOwner<Entity>(&entity);
-                    bt->StartTree();*/
+  
                     UUID ownerUUID = entity.GetUUID();
                     m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
                     bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);

@@ -1,0 +1,6 @@
+Project:
+  Name: ExampleProject
+  StartScene: 832115492279930486
+  AssetDirectory: assets
+  AssetRegistryPath: AssetRegistry.yaml
+  ScriptModulePath: Scripts/Binaries/ExampleProject.dll

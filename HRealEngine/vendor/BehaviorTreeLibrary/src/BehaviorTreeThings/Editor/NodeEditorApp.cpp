@@ -825,6 +825,8 @@ void NodeEditorApp::DrawToolbar()
         m_Blackboard = nullptr;
         ClearBuildData();
         std::string filePath = PlatformUtilsBT::OpenFile("Behavior Tree File (*.btree)\0*.btree\0");
+        if (filePath.empty())
+            return;
         BTSerializer serializer(m_BehaviorTree);
         serializer.Deserialize(filePath, this);
         m_CurrentBTFilePath = filePath;

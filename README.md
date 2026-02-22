@@ -7,9 +7,7 @@
 [![Physics](https://img.shields.io/badge/2D%20Physics-Box2D-red.svg)](https://github.com/erincatto/box2d)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**HRealEngine** is a custom game engine written in **C++** with **OpenGL** rendering. It started as a 2D focused engine and has been expanding toward **3D rendering**, **3D physics**, and **AI driven** gameplay systems.
-
-The primary long term goal is to serve as a playground for AI frameworks, including **Behavior Trees**, **Perception Systems**, and **Navigation Meshes**, while remaining a fully functional general purpose engine.
+**HRealEngine** is a custom game engine written in C++ with OpenGL rendering, 2D and 3D physics, and C# scripting. The goal of the engine is to build a strong AI gameplay framework with systems like **Behavior Trees**, **Perception Systems**, and **Navigation Meshes**. It currently features a built in **Behavior Tree** framework with a visual editor, and the remaining systems are actively in development.
 
 ## 🚀 Getting Started
 
