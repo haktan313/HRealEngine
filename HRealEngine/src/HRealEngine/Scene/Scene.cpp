@@ -101,6 +101,8 @@ namespace HRealEngine
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<MeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BehaviorTreeComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<AIControllerComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<PerceivableComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
@@ -824,6 +826,14 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<BehaviorTreeComponent>(Entity entity, BehaviorTreeComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<AIControllerComponent>(Entity entity, AIControllerComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<PerceivableComponent>(Entity entity, PerceivableComponent& component)
     {
     }
     template<>

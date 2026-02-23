@@ -301,6 +301,8 @@ namespace HRealEngine
             ShowAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
             ShowAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
             ShowAddComponentEntry<BehaviorTreeComponent>("Behavior Tree Component");
+            ShowAddComponentEntry<AIControllerComponent>("AI Controller Component");
+            ShowAddComponentEntry<PerceivableComponent>("Perceivable Component");
             ShowAddComponentEntry<CircleRendererComponent>("Circle Renderer");
             ShowAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
             ShowAddComponentEntry<Rigidbody3DComponent>("Rigidbody 3D");
@@ -1189,6 +1191,125 @@ namespace HRealEngine
             {
                 ImGui::SameLine();
                 ImGui::Text("Loaded");
+            }
+        });
+        DrawComponent<AIControllerComponent>("AI Controller Component", entity, [](auto& component)
+        {
+            ImGui::Text("AI Controller");
+            ImGui::DragFloat("Update Interval", &component.UpdateInterval, 0.01f, 0.05f, 2.0f, "%.2f s");
+            
+            ImGui::Separator();
+            
+            ImGui::Checkbox("Sight Enabled", &component.EnabledPerceptions[PercaptionType::Sight]);
+            if (component.EnabledPerceptions[PercaptionType::Sight])
+            {
+                ImGui::Indent();
+                ImGui::DragFloat("Sight Radius", &component.SightSettings.SightRadius, 0.5f, 1.0f, 200.0f);
+                ImGui::DragFloat("Field of View", &component.SightSettings.FieldOfView, 1.0f, 10.0f, 360.0f, "%.0f deg");
+                ImGui::DragFloat("Forget Duration##Sight", &component.SightSettings.ForgetDuration, 0.1f, 0.0f, 30.0f, "%.1f s");
+                
+                if (ImGui::TreeNode("Detectable Types##Sight"))
+                {
+                    const char* typeNames[] = { "Player", "Enemy", "Neutral", "Environment" };
+                    for (int i = 0; i < 4; i++)
+                    {
+                        auto it = std::find(component.SightSettings.DetectableTypes.begin(),
+                            component.SightSettings.DetectableTypes.end(), (PerceivableType)i);
+                        bool found = it != component.SightSettings.DetectableTypes.end();
+                        if (ImGui::Checkbox(typeNames[i], &found))
+                        {
+                            if (found)
+                                component.SightSettings.DetectableTypes.push_back((PerceivableType)i);
+                            else
+                                component.SightSettings.DetectableTypes.erase(it);
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+                ImGui::Unindent();
+            }
+            
+            ImGui::Separator();
+            
+            ImGui::Checkbox("Hearing Enabled", &component.EnabledPerceptions[PercaptionType::Hearing]);
+            if (component.EnabledPerceptions[PercaptionType::Hearing])
+            {
+                ImGui::Indent();
+                ImGui::DragFloat("Hearing Radius", &component.HearingSettings.HearingRadius, 0.5f, 1.0f, 200.0f);
+                ImGui::DragFloat("Forget Duration##Hearing", &component.HearingSettings.ForgetDuration, 0.1f, 0.0f, 30.0f, "%.1f s");
+                
+                if (ImGui::TreeNode("Detectable Types##Hearing"))
+                {
+                    const char* typeNames[] = { "Player", "Enemy", "Neutral", "Environment" };
+                    for (int i = 0; i < 4; i++)
+                    {
+                        auto it = std::find(component.HearingSettings.DetectableTypes.begin(),
+                            component.HearingSettings.DetectableTypes.end(), (PerceivableType)i);
+                        bool found = it != component.HearingSettings.DetectableTypes.end();
+                        if (ImGui::Checkbox(typeNames[i], &found))
+                        {
+                            if (found)
+                                component.HearingSettings.DetectableTypes.push_back((PerceivableType)i);
+                            else
+                                component.HearingSettings.DetectableTypes.erase(it);
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+                ImGui::Unindent();
+            }
+            
+            ImGui::Separator();
+            
+            ImGui::TextDisabled("Current Perceptions: %d", (int)component.CurrentPerceptions.size());
+            ImGui::TextDisabled("Previous Perceptions: %d", (int)component.PreviousPerceptions.size());
+            ImGui::TextDisabled("Forgotten: %d", (int)component.ForgottenPerceptions.size());
+        });
+        DrawComponent<PerceivableComponent>("Perceivable Component", entity, [](auto& component)
+        {
+            ImGui::Checkbox("Is Detectable", &component.bIsDetectable);
+            ImGui::DragInt("Detection Priority", &component.DetectionPriority, 1, 0, 100);
+    
+            ImGui::Separator();
+            
+            if (ImGui::TreeNode("Perceivable Types"))
+            {
+                const char* typeNames[] = { "Player", "Enemy", "Neutral", "Environment" };
+                for (int i = 0; i < 4; i++)
+                {
+                    auto it = std::find(component.Types.begin(), component.Types.end(), (PerceivableType)i);
+                    bool found = it != component.Types.end();
+                    if (ImGui::Checkbox(typeNames[i], &found))
+                    {
+                        if (found)
+                            component.Types.push_back((PerceivableType)i);
+                        else
+                            component.Types.erase(it);
+                    }
+                }
+                ImGui::TreePop();
+            }
+            
+            if (ImGui::TreeNode("Detection Points"))
+            {
+                for (int i = 0; i < (int)component.DetectablePointsOffsets.size(); i++)
+                {
+                    ImGui::PushID(i);
+                    ImGui::DragFloat3(("Point " + std::to_string(i)).c_str(), 
+                        glm::value_ptr(component.DetectablePointsOffsets[i]), 0.1f);
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton("X"))
+                    {
+                        component.DetectablePointsOffsets.erase(component.DetectablePointsOffsets.begin() + i);
+                        ImGui::PopID();
+                        break;
+                    }
+                    ImGui::PopID();
+                }
+                if (ImGui::Button("Add Point"))
+                    component.DetectablePointsOffsets.push_back(glm::vec3(0.0f));
+        
+                ImGui::TreePop();
             }
         });
         DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
