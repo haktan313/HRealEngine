@@ -29,6 +29,7 @@ scripts/Win-GenProjects.bat
 ## 📑 Table of Contents
 
 - [Screenshots](#-screenshots)
+- [Video Demos](#-video-demos)
 - [Features](#-features)
   - [Editor & Workflow](#editor--workflow)
   - [Scripting](#scripting)
@@ -59,8 +60,7 @@ scripts/Win-GenProjects.bat
 | **Lighting** | **Project UI** |
 | <img width="2552" height="1385" alt="Lighting" src="https://github.com/user-attachments/assets/2a6c5d52-2fd5-4770-990a-511ac1253682" /> | <img width="2057" height="1194" alt="Project UI" src="https://github.com/user-attachments/assets/7301902b-b582-48a2-bcca-8b1666992f95" /> |
 
-<details>
-<summary>🎬 Video Demos</summary>
+## 🎬 Video Demos
 
 https://github.com/user-attachments/assets/4c010b09-0b99-43da-9000-b52fa8ad2800
 
@@ -70,7 +70,6 @@ https://github.com/user-attachments/assets/8d94ccb6-fb48-44e6-83d7-c2b3afed06c8
 
 https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
-</details>
 
 ---
 

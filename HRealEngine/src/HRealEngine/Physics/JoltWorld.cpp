@@ -166,7 +166,8 @@ namespace HRealEngine
                 bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
                 JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
                 body->SetUserData(entity.GetUUID());
-                
+                if (boxCollider.bIsTrigger)
+                    body->SetIsSensor(true);
                 auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
                 body_interface->AddBody(body->GetID(), activation);     
                 
@@ -349,7 +350,8 @@ namespace HRealEngine
                 bodySettings.mAllowDynamicOrKinematic = true; // Allow this body to be changed to dynamic or kinematic at runtime (by default only static bodies can be changed to dynamic/kinematic and not the other way around)
                 JPH::Body* body = body_interface->CreateBody(bodySettings); // Note that if we run out of bodies this can return nullptr
                 body->SetUserData(entity.GetUUID());
-                
+                if (boxCollider.bIsTrigger)
+                    body->SetIsSensor(true);
                 auto activation = motionType == JPH::EMotionType::Dynamic || motionType == JPH::EMotionType::Kinematic ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
                 body_interface->AddBody(body->GetID(), activation);     
                 
