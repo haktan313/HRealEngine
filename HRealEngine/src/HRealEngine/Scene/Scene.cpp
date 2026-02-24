@@ -182,6 +182,12 @@ namespace HRealEngine
         m_Registry.destroy(entity);
     }
 
+    void Scene::ReportNoiseEvent(const NoiseEvent& event)
+    {
+        if (m_JoltWorld)
+            m_JoltWorld->ReportNoise(event);
+    }
+
     void Scene::OnRuntimeStart()
     {
         m_bIsRunning = true;

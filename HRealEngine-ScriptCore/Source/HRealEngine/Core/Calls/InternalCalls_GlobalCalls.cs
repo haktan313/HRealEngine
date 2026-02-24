@@ -25,5 +25,8 @@ namespace HRealEngine.Calls
         internal extern static bool Raycast3D(ref Vector3 origin, ref Vector3 direction, ulong[] ignoreEntitiesIDs, float maxDistance, out ulong entityID, out Vector3 point, out Vector3 normal, out float distance, bool debugDraw, float debugDrawDuration);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static RaycastHit[] Raycast3DArray(ref Vector3 origin, ref Vector3 direction, ulong[] ignoreEntitiesIDs, float maxDistance, bool debugDraw, float debugDrawDuration);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static void ReportNoiseEvent(ulong sourceEntityID, Vector3 position, float intensity, float maxRange, int sourceType);
     }
 }

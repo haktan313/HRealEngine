@@ -781,6 +781,62 @@ namespace HRealEngine
     }
 
 
+    void ScriptEngine::OnEntityPerceived(Entity perceiver, UUID targetID, PercaptionType method, const glm::vec3& position)
+    {
+        if (!perceiver.HasComponent<ScriptComponent>())
+            return;
+    
+        Ref<ScriptInstance> instance = GetEntitySriptInstance(perceiver.GetUUID());
+        if (!instance)
+            return;
+    
+        MonoMethod* onPerceived = instance->GetScriptClass()->GetMethod("OnEntityPerceived", 3);
+        if (!onPerceived)
+            return;
+    
+        uint64_t targetIDVal = targetID;
+        int methodVal = (int)method;
+        glm::vec3 pos = position;
+        void* params[3] = { &targetIDVal, &methodVal, &pos };
+        instance->GetScriptClass()->InvokeMethod(instance->GetManagedObject(), onPerceived, params);
+    }
+
+    void ScriptEngine::OnEntityLost(Entity perceiver, UUID targetID, const glm::vec3& lastPosition)
+    {
+        if (!perceiver.HasComponent<ScriptComponent>())
+            return;
+    
+        Ref<ScriptInstance> instance = GetEntitySriptInstance(perceiver.GetUUID());
+        if (!instance)
+            return;
+    
+        MonoMethod* onLost = instance->GetScriptClass()->GetMethod("OnEntityLost", 2);
+        if (!onLost)
+            return;
+    
+        uint64_t targetIDVal = targetID;
+        glm::vec3 pos = lastPosition;
+        void* params[2] = { &targetIDVal, &pos };
+        instance->GetScriptClass()->InvokeMethod(instance->GetManagedObject(), onLost, params);
+    }
+
+    void ScriptEngine::OnEntityForgotten(Entity perceiver, UUID targetID)
+    {
+        if (!perceiver.HasComponent<ScriptComponent>()) 
+            return;
+    
+        Ref<ScriptInstance> instance = GetEntitySriptInstance(perceiver.GetUUID());
+        if (!instance) 
+            return;
+    
+        MonoMethod* onForgotten = instance->GetScriptClass()->GetMethod("OnEntityForgotten", 1);
+        if (!onForgotten) 
+            return;
+    
+        uint64_t targetIDVal = targetID;
+        void* params[1] = { &targetIDVal };
+        instance->GetScriptClass()->InvokeMethod(instance->GetManagedObject(), onForgotten, params);
+    }
 
     MonoObject* ScriptEngine::CreateBTActionInstance(const std::string& className)
     {

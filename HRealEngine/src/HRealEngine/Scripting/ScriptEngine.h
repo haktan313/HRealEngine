@@ -231,6 +231,10 @@ namespace HRealEngine
         friend class ScriptGlue;
 
     public:
+        static void OnEntityPerceived(Entity perceiver, UUID targetID, PercaptionType method, const glm::vec3& position);
+        static void OnEntityLost(Entity perceiver, UUID targetID, const glm::vec3& lastPosition);
+        static void OnEntityForgotten(Entity perceiver, UUID targetID);
+        
         static MonoObject* CreateBTActionInstance(const std::string& className);
         static MonoObject* CreateBTConditionInstance(const std::string& className);
         static MonoObject* CreateBTDecoratorInstance(const std::string& className);

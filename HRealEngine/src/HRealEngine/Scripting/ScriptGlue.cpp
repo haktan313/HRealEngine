@@ -25,6 +25,8 @@ namespace HRealEngine
 {
 #define HRE_ADD_INTERNAL_CALL_GLOBAL(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_GlobalCalls::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_ENTITY(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Entity::" #Name, Name)
+#define HRE_ADD_INTERNAL_CALL_AICONTROLLER(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_AIController::" #Name, Name)
+#define HRE_ADD_INTERNAL_CALL_PERCEIVABLE(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Perceivable::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_TransformComponent::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_RIGIDBODY(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Rigidbody::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_MESHRENDERER(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_MeshRenderer::" #Name, Name)
@@ -192,6 +194,282 @@ namespace HRealEngine
 		return array;
 	}
 	
+	static void ReportNoiseEvent(UUID entityID, glm::vec3* position, float loudness, float maxRange, int sourceType)
+	{
+		auto scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("ReportNoiseEvent: Scene context is null!");
+			return;
+		}
+		NoiseEvent event;
+		event.SourceEntityID = entityID;
+		event.Position = *position;
+		event.Loudness = loudness;
+		event.MaxRange = maxRange;
+		event.SourceType = static_cast<PerceivableType>(sourceType);
+		scene->ReportNoiseEvent(event);
+	}
+	
+
+	struct PercaptionResultManaged
+	{
+	    uint64_t EntityID;
+	    int Type;
+	    int Method;
+	    glm::vec3 SensedPosition;
+	    float TimeSinceLastSensed;
+	};
+	static int AIController_GetCurrentPerceptionCount(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_GetCurrentPerceptionCount: Scene context is null!");
+		    return 0;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity || !entity.HasComponent<AIControllerComponent>())
+	    {
+	    	LOG_CORE_ERROR("AIController_GetCurrentPerceptionCount: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+	    	return 0;
+	    }
+	    return (int)entity.GetComponent<AIControllerComponent>().CurrentPerceptions.size();
+	}
+
+	static int AIController_GetForgottenPerceptionCount(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_GetForgottenPerceptionCount: Scene context is null!");
+	    	return 0;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity || !entity.HasComponent<AIControllerComponent>())
+	    {
+		    LOG_CORE_ERROR("AIController_GetForgottenPerceptionCount: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+	    	return 0;
+	    }
+	    return (int)entity.GetComponent<AIControllerComponent>().ForgottenPerceptions.size();
+	}
+
+	static MonoArray* AIController_GetCurrentPerceptions(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_GetCurrentPerceptions: Scene context is null!");
+		    return nullptr;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity || !entity.HasComponent<AIControllerComponent>())
+	    {
+		    LOG_CORE_ERROR("AIController_GetCurrentPerceptions: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+		    return nullptr;
+	    }
+	    
+	    auto& ai = entity.GetComponent<AIControllerComponent>();
+	    if (ai.CurrentPerceptions.empty())
+	    {
+		    LOG_CORE_INFO("AIController_GetCurrentPerceptions: No current perceptions for entity ID {}", (uint64_t)entityID);
+		    return nullptr;
+	    }
+	    
+	    MonoClass* resultClass = mono_class_from_name(ScriptEngine::GetCoreAssemblyImage(), "HRealEngine", "PerceptionResult");
+	    if (!resultClass)
+	    {
+		    LOG_CORE_ERROR("AIController_GetCurrentPerceptions: Could not find PerceptionResult class!");
+		    return nullptr;
+	    }
+	    
+	    MonoArray* array = mono_array_new(mono_domain_get(), resultClass, (uintptr_t)ai.CurrentPerceptions.size());
+	    for (size_t i = 0; i < ai.CurrentPerceptions.size(); i++)
+	    {
+	        auto& p = ai.CurrentPerceptions[i];
+	        PercaptionResultManaged managed;
+	        managed.EntityID = p.EntityID.ID;
+	        managed.Type = (int)p.Type;
+	        managed.Method = (int)p.PercaptionMethod;
+	        managed.SensedPosition = p.SensedPosition;
+	        managed.TimeSinceLastSensed = p.TimeSinceLastSensed;
+	        
+	        char* elem = mono_array_addr_with_size(array, (int)sizeof(PercaptionResultManaged), (int)i);
+	        memcpy(elem, &managed, sizeof(PercaptionResultManaged));
+	    }
+	    return array;
+	}
+
+	static MonoArray* AIController_GetForgottenPerceptions(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("AIController_GetForgottenPerceptions: Scene context is null!");
+			return nullptr;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<AIControllerComponent>())
+		{
+			LOG_CORE_ERROR("AIController_GetForgottenPerceptions: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+			return nullptr;
+		}
+	    
+		auto& ai = entity.GetComponent<AIControllerComponent>();
+		if (ai.ForgottenPerceptions.empty())
+		{
+			LOG_CORE_INFO("AIController_GetForgottenPerceptions: No forgotten perceptions for entity ID {}", (uint64_t)entityID);
+			return nullptr;
+		}
+	    
+		MonoClass* resultClass = mono_class_from_name(ScriptEngine::GetCoreAssemblyImage(), "HRealEngine", "PerceptionResult");
+		if (!resultClass)
+		{
+			LOG_CORE_ERROR("AIController_GetForgottenPerceptions: Could not find PerceptionResult class!");
+			return nullptr;
+		}
+	    
+	    MonoArray* array = mono_array_new(mono_domain_get(), resultClass, (uintptr_t)ai.ForgottenPerceptions.size());
+	    for (size_t i = 0; i < ai.ForgottenPerceptions.size(); i++)
+	    {
+	        auto& p = ai.ForgottenPerceptions[i];
+	        PercaptionResultManaged managed;
+	        managed.EntityID = p.EntityID.ID;
+	        managed.Type = (int)p.Type;
+	        managed.Method = (int)p.PercaptionMethod;
+	        managed.SensedPosition = p.SensedPosition;
+	        managed.TimeSinceLastSensed = p.TimeSinceLastSensed;
+	        
+	        char* elem = mono_array_addr_with_size(array, (int)sizeof(PercaptionResultManaged), (int)i);
+	        memcpy(elem, &managed, sizeof(PercaptionResultManaged));
+	    }
+	    return array;
+	}
+
+	static bool AIController_IsEntityPerceived(UUID entityID, uint64_t targetEntityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_IsEntityPerceived: Scene context is null!");
+		    return false;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity || !entity.HasComponent<AIControllerComponent>())
+	    {
+		    LOG_CORE_ERROR("AIController_IsEntityPerceived: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+		    return false;
+	    }
+	    
+	    auto& ai = entity.GetComponent<AIControllerComponent>();
+	    for (auto& p : ai.CurrentPerceptions)
+	        if (p.EntityID.ID == targetEntityID)
+	            return true;
+	    return false;
+	}
+
+	static bool AIController_IsEntityForgotten(UUID entityID, uint64_t targetEntityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_IsEntityForgotten: Scene context is null!");
+		    return false;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    if (!entity || !entity.HasComponent<AIControllerComponent>())
+	    {
+		    LOG_CORE_ERROR("AIController_IsEntityForgotten: Invalid entity ID or entity does not have AIControllerComponent! Entity ID: {}", (uint64_t)entityID);
+		    return false;
+	    }
+	    
+	    auto& ai = entity.GetComponent<AIControllerComponent>();
+	    for (auto& f : ai.ForgottenPerceptions)
+	        if (f.EntityID.ID == targetEntityID)
+	            return true;
+	    return false;
+	}
+
+	static void PerceivableComponent_GetType(UUID entityID, int* outType)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    auto& pc = entity.GetComponent<PerceivableComponent>();
+	    *outType = pc.Types.empty() ? 0 : (int)pc.Types[0];
+	}
+
+	static void PerceivableComponent_SetType(UUID entityID, int type)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    auto& pc = entity.GetComponent<PerceivableComponent>();
+	    pc.Types.clear();
+	    pc.Types.push_back((PerceivableType)type);
+	}
+
+	static bool PerceivableComponent_GetIsDetectable(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    return entity.GetComponent<PerceivableComponent>().bIsDetectable;
+	}
+
+	static void PerceivableComponent_SetIsDetectable(UUID entityID, bool isDetectable)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    entity.GetComponent<PerceivableComponent>().bIsDetectable = isDetectable;
+	}
+
+	static int PerceivableComponent_GetDetectablePointCount(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    return (int)entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets.size();
+	}
+
+	static void PerceivableComponent_GetDetectablePoint(UUID entityID, int index, glm::vec3* outPoint)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    auto& offsets = entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets;
+	    if (index >= 0 && index < (int)offsets.size())
+	        *outPoint = offsets[index];
+	    else
+	        *outPoint = glm::vec3(0.0f);
+	}
+
+	static void PerceivableComponent_SetDetectablePoint(UUID entityID, int index, glm::vec3* point)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    auto& offsets = entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets;
+	    if (index >= 0 && index < (int)offsets.size())
+	        offsets[index] = *point;
+	}
+
+	static void PerceivableComponent_AddDetectablePoint(UUID entityID, glm::vec3* point)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets.push_back(*point);
+	}
+
+	static void PerceivableComponent_RemoveDetectablePoint(UUID entityID, int index)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    auto& offsets = entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets;
+	    if (index >= 0 && index < (int)offsets.size())
+	        offsets.erase(offsets.begin() + index);
+	}
+
+	static void PerceivableComponent_ClearDetectablePoints(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    Entity entity = scene->GetEntityByUUID(entityID);
+	    entity.GetComponent<PerceivableComponent>().DetectablePointsOffsets.clear();
+	}
 	
 	static std::array<std::string, 3> s_ComponentTypeNames = {
 		"HRealEngine.BoxCollider3DComponent",
@@ -1065,6 +1343,25 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL_GLOBAL(GetScriptInstance);
 		HRE_ADD_INTERNAL_CALL_GLOBAL(Raycast3D);
 		HRE_ADD_INTERNAL_CALL_GLOBAL(Raycast3DArray);
+		HRE_ADD_INTERNAL_CALL_GLOBAL(ReportNoiseEvent);
+		
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetCurrentPerceptionCount);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetForgottenPerceptionCount);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetCurrentPerceptions);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetForgottenPerceptions);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_IsEntityPerceived);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_IsEntityForgotten);
+		
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetType);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_SetType);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetIsDetectable);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_SetIsDetectable);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetDetectablePointCount);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetDetectablePoint);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_SetDetectablePoint);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_AddDetectablePoint);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_RemoveDetectablePoint);
+		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_ClearDetectablePoints);
 
     	HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddComponent);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddRigidbody3DComponent);

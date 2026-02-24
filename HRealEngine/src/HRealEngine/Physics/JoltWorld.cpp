@@ -1172,6 +1172,28 @@ namespace HRealEngine
             HearingPercaptionsUpdate(ai, tc);
             SightPercaptionsUpdate(ai, tc, forward);
             
+            Entity perceiverEntity{ e, m_Scene };
+            
+            for (auto& curr : ai.CurrentPerceptions)
+            {
+                bool wasPerceived = false;
+                for (auto& prev : ai.PreviousPerceptions)
+                    if (prev.EntityID.ID == curr.EntityID.ID)
+                    {
+                        wasPerceived = true;
+                        break;
+                    }
+                if (!wasPerceived)
+                {
+                    ai.ForgottenPerceptions.erase(std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),[&](const PercaptionResult& f)
+                    {
+                        return f.EntityID.ID == curr.EntityID.ID;
+                    }),ai.ForgottenPerceptions.end());
+        
+                    ScriptEngine::OnEntityPerceived(perceiverEntity, curr.EntityID.ID, curr.PercaptionMethod, curr.SensedPosition);
+                }
+            }
+            
             for (auto& prev : ai.PreviousPerceptions)
             {
                 bool stillPerceived = false;
@@ -1184,6 +1206,8 @@ namespace HRealEngine
                 
                 if (!stillPerceived)
                 {
+                    ScriptEngine::OnEntityLost(perceiverEntity, prev.EntityID.ID, prev.SensedPosition);
+                    
                     bool alreadyForgotten = false;
                     for (auto& f : ai.ForgottenPerceptions)
                         if (f.EntityID.ID == prev.EntityID.ID)
@@ -1200,7 +1224,11 @@ namespace HRealEngine
 
             float forgetDuration = ai.SightSettings.ForgetDuration;
             for (auto& f : ai.ForgottenPerceptions)
+            {
                 f.TimeSinceLastSensed += ai.UpdateInterval;
+                if (f.TimeSinceLastSensed >= forgetDuration)
+                    ScriptEngine::OnEntityForgotten(perceiverEntity, f.EntityID.ID);
+            }
             
             ai.ForgottenPerceptions.erase(
                 std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),

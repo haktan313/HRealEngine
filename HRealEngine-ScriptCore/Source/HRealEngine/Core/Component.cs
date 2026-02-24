@@ -1,4 +1,5 @@
 using HRealEngine.Calls;
+using System.Runtime.InteropServices;
 
 namespace HRealEngine
 {
@@ -6,7 +7,7 @@ namespace HRealEngine
     {
         public Entity entity { get; internal set; }
     }
-
+    
     public class TransformComponent : Component
     {
         public Vector3 Position
@@ -156,6 +157,129 @@ namespace HRealEngine
         public bool GetIsTrigger()
         {
             return InternalCalls_BoxCollider.BoxCollider3DComponent_GetIsTrigger(entity.EntityID);
+        }
+    }
+    
+    public enum PerceivableType
+    {
+        Player = 0,
+        Enemy,
+        Neutral,
+        Environment
+    }
+    public enum PerceptionMethod
+    {
+        Sight = 0,
+        Hearing,
+        Touch
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PerceptionResult
+    {
+        public ulong EntityID;
+        public int Type;           // PerceivableType
+        public int Method;         // PerceptionMethod
+        public Vector3 SensedPosition;
+        public float TimeSinceLastSensed;
+    }
+    public class AIControllerComponent : Component
+    {
+        public int CurrentPerceptionCount()
+        {
+            return InternalCalls_AIController.AIController_GetCurrentPerceptionCount(entity.EntityID);
+        }
+
+        public int ForgottenPerceptionCount()
+        {
+            return InternalCalls_AIController.AIController_GetForgottenPerceptionCount(entity.EntityID);
+        }
+    
+        public PerceptionResult[] GetCurrentPerceptions()
+        {
+            return InternalCalls_AIController.AIController_GetCurrentPerceptions(entity.EntityID);
+        }
+    
+        public PerceptionResult[] GetForgottenPerceptions()
+        {
+            return InternalCalls_AIController.AIController_GetForgottenPerceptions(entity.EntityID);
+        }
+    
+        public bool IsEntityPerceived(ulong targetEntityID)
+        {
+            return InternalCalls_AIController.AIController_IsEntityPerceived(entity.EntityID, targetEntityID);
+        }
+    
+        public bool IsEntityForgotten(ulong targetEntityID)
+        {
+            return InternalCalls_AIController.AIController_IsEntityForgotten(entity.EntityID, targetEntityID);
+        }
+    }
+    
+    public class PerceivableComponent : Component
+    {
+        public PerceivableType Type
+        {
+            get
+            {
+                InternalCalls_Perceivable.PerceivableComponent_GetType(entity.EntityID, out int type);
+                return (PerceivableType)type;
+            }
+            set
+            {
+                InternalCalls_Perceivable.PerceivableComponent_SetType(entity.EntityID, (int)value);
+            }
+        }
+
+        public bool IsDetectable
+        {
+            get
+            {
+                return InternalCalls_Perceivable.PerceivableComponent_GetIsDetectable(entity.EntityID);
+            }
+            set
+            {
+                InternalCalls_Perceivable.PerceivableComponent_SetIsDetectable(entity.EntityID, value);
+            }
+        }
+
+        public int DetectablePointCount()
+        {
+            return InternalCalls_Perceivable.PerceivableComponent_GetDetectablePointCount(entity.EntityID);
+        }
+
+        public Vector3 GetDetectablePoint(int index)
+        {
+            InternalCalls_Perceivable.PerceivableComponent_GetDetectablePoint(entity.EntityID, index, out Vector3 point);
+            return point;
+        }
+
+        public void SetDetectablePoint(int index, Vector3 point)
+        {
+            InternalCalls_Perceivable.PerceivableComponent_SetDetectablePoint(entity.EntityID, index, ref point);
+        }
+
+        public void AddDetectablePoint(Vector3 point)
+        {
+            InternalCalls_Perceivable.PerceivableComponent_AddDetectablePoint(entity.EntityID, ref point);
+        }
+
+        public void RemoveDetectablePoint(int index)
+        {
+            InternalCalls_Perceivable.PerceivableComponent_RemoveDetectablePoint(entity.EntityID, index);
+        }
+
+        public void ClearDetectablePoints()
+        {
+            InternalCalls_Perceivable.PerceivableComponent_ClearDetectablePoints(entity.EntityID);
+        }
+
+        public Vector3[] GetAllDetectablePoints()
+        {
+            int count = DetectablePointCount();
+            Vector3[] points = new Vector3[count];
+            for (int i = 0; i < count; i++)
+                points[i] = GetDetectablePoint(i);
+            return points;
         }
     }
 }

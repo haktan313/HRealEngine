@@ -13,6 +13,10 @@ namespace HRealEngine
         }
         public readonly ulong EntityID;
         
+        public virtual void OnEntityPerceived(ulong entityID, int perceptionMethod, Vector3 position) {}
+        public virtual void OnEntityLost(ulong entityID, Vector3 lastKnownPosition) {}
+        public virtual void OnEntityForgotten(ulong entityID) {}
+        
         public Entity Parent
         {
             get
@@ -157,7 +161,6 @@ namespace HRealEngine
         {
             return GlobalFunctions.Raycast3D(origin, direction, maxDistance, out hit, ignoreEntities, debugDraw, debugDrawDuration);
         }
-
         public RaycastHit[] Raycast3DAll(Vector3 origin, Vector3 direction, float maxDistance, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
         {
             return GlobalFunctions.Raycast3DAll(origin, direction, maxDistance, ignoreEntities, debugDraw, debugDrawDuration);
