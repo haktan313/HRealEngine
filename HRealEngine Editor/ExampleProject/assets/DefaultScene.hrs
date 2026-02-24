@@ -1,27 +1,37 @@
 Scene: Untitled
 Entities:
-  - Entity: 1993855343345353824
+  - Entity: 10324059354334514056
     EntityNameComponent:
-      Name: Player
+      Name: Cameraa
     TransformComponent:
-      Position: [-0.72909546, 0.00036621094, -3.182018]
+      Position: [0, 10.094195, 18.38764]
+      Rotation: [-0.52325356, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.7853982
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 17016785829476591399
+    EntityNameComponent:
+      Name: Light
+    TransformComponent:
+      Position: [0, 1.5573032, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshRendererComponent:
-      PivotOffset: [0, 0, 0]
-      MeshHandle: 0
-      Color: [1, 1, 1, 1]
-      TextureHandle: 0
-      TilingFactor: 1
-      MaterialHandleOverrides:
-        []
-    PerceivableComponent:
-      IsDetectable: true
-      DetectionPriority: 0
-      Types:
-        []
-      DetectablePointsOffsets:
-        []
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 1
+      Radius: 5.3
+      CastShadows: true
   - Entity: 12505543987829569699
     EntityNameComponent:
       Name: Enemy
@@ -52,35 +62,25 @@ Entities:
         ForgetDuration: 5
         DetectableTypes:
           []
-  - Entity: 17016785829476591399
+  - Entity: 1993855343345353824
     EntityNameComponent:
-      Name: Light
+      Name: Player
     TransformComponent:
-      Position: [0, 1.5573032, 0]
+      Position: [-0.72909546, 0.00036621094, -3.182018]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    LightComponent:
-      Type: Point
-      Color: [1, 1, 1]
-      Direction: [0, -1, 0]
-      Intensity: 1
-      Radius: 5.3
-      CastShadows: true
-  - Entity: 10324059354334514056
-    EntityNameComponent:
-      Name: Cameraa
-    TransformComponent:
-      Position: [0, 2.8626626, 5.8522663]
-      Rotation: [-0.52325356, 0, 0]
-      Scale: [1, 1, 1]
-    CameraComponent:
-      PrimaryCamera: true
-      FixedAspectRatio: false
-      Camera:
-        ProjectionType: 0
-        PerspectiveFOV: 0.7853982
-        PerspectiveNear: 0.01
-        PerspectiveFar: 1000
-        OrthographicSize: 10
-        OrthographicNear: -1
-        OrthographicFar: 1
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    PerceivableComponent:
+      IsDetectable: true
+      DetectionPriority: 0
+      Types:
+        []
+      DetectablePointsOffsets:
+        []

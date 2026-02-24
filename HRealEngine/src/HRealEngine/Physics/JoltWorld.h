@@ -60,6 +60,13 @@ namespace HRealEngine
         void CreatePercaptionBodies();
         void DestroyPercaptionBodies();
         void UpdatePercaptionBodies();
+        
+        void UpdateAIControllerBodies();
+        void HearingPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc);
+        void SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc, const glm::vec3& forward);
+        void UpdatePerceivableBodies();
+        
+        void ReportNoise(const NoiseEvent& event);
     private:
         std::vector<DebugLine> m_DebugLines;
         
@@ -209,6 +216,7 @@ namespace HRealEngine
         std::mutex m_EventQueueMutex;
         
         std::vector<PerceptionOverlapEvent> m_PerceptionOverlapEvents;
+        std::vector<NoiseEvent> m_PendingNoiseEvents;
         
         Scene* m_Scene = nullptr;
         JPH::BodyInterface* body_interface;

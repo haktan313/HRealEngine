@@ -6,6 +6,7 @@
 #include "HRealEngine/Scene/Scene.h"
 #include "HRealEngine/Scene/ScriptableEntity.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
+#include "HRealEngine/Utils/PlatformUtils.h"
 
 #include "Physics/PhysicsSystem.h"
 #include "Physics/Body/BodyCreationSettings.h"
@@ -1129,12 +1130,19 @@ namespace HRealEngine
 
     void JoltWorld::UpdatePercaptionBodies()
     {
+        UpdateAIControllerBodies();
+        UpdatePerceivableBodies();
+        m_PendingNoiseEvents.clear();
+    }
+
+    void JoltWorld::UpdateAIControllerBodies()
+    {
         auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
         for (auto e : viewAI)
         {
             auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
             auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
-
+            
             JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
             glm::quat q = glm::quat(tc.Rotation);
             JPH::Quat rot(q.x, q.y, q.z, q.w);
@@ -1149,14 +1157,186 @@ namespace HRealEngine
                 JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
                 body_interface->SetPositionAndRotation(body->GetID(), pos, rot, JPH::EActivation::Activate);
             }
+            
+            ai.TimeSinceLastUpdate += Time::GetDeltaTime();
+            if (ai.TimeSinceLastUpdate < ai.UpdateInterval)
+                continue;
+            ai.TimeSinceLastUpdate = 0.0f;
+
+            ai.PreviousPerceptions = ai.CurrentPerceptions;
+            ai.CurrentPerceptions.clear();
+
+            glm::quat ownerQuat = glm::quat(tc.Rotation);
+            glm::vec3 forward = ownerQuat * glm::vec3(0, 0, -1);
+            
+            HearingPercaptionsUpdate(ai, tc);
+            SightPercaptionsUpdate(ai, tc, forward);
+            
+            for (auto& prev : ai.PreviousPerceptions)
+            {
+                bool stillPerceived = false;
+                for (auto& curr : ai.CurrentPerceptions)
+                    if (curr.EntityID.ID == prev.EntityID.ID)
+                    {
+                        stillPerceived = true;
+                        break;
+                    }
+                
+                if (!stillPerceived)
+                {
+                    bool alreadyForgotten = false;
+                    for (auto& f : ai.ForgottenPerceptions)
+                        if (f.EntityID.ID == prev.EntityID.ID)
+                        {
+                            alreadyForgotten = true; 
+                            break;
+                        }
+                    if (!alreadyForgotten)
+                        ai.ForgottenPerceptions.push_back(prev);
+                }
+            }
+
+            float forgetDuration = ai.SightSettings.ForgetDuration;
+            for (auto& f : ai.ForgottenPerceptions)
+                f.TimeSinceLastSensed += ai.UpdateInterval;
+            
+            ai.ForgottenPerceptions.erase(
+                std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),
+                    [forgetDuration](const PercaptionResult& r) { return r.TimeSinceLastSensed >= forgetDuration; }),
+                ai.ForgottenPerceptions.end());
         }
-        
+    }
+
+    void JoltWorld::HearingPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc)
+    {
+        if (ai.IsHearingEnabled())
+            for (const auto& noise : m_PendingNoiseEvents)
+            {
+                if (noise.SourceEntityID == ai.OwnerEntityID)
+                    continue;
+
+                bool typeMatch = ai.HearingSettings.DetectableTypes.empty();
+                if (!typeMatch)
+                    for (auto& dt : ai.HearingSettings.DetectableTypes)
+                        if (dt == noise.SourceType)
+                        {
+                            typeMatch = true; 
+                            break;
+                        }
+                
+                if (!typeMatch)
+                    continue;
+
+                float dist = glm::length(noise.Position - tc.Position);
+                float effectiveRange = noise.MaxRange > 0.0f ? noise.MaxRange : ai.HearingSettings.HearingRadius;
+                if (dist > effectiveRange)
+                    continue;
+
+                float perceivedLoudness = noise.Loudness * (1.0f - dist / effectiveRange);
+                if (perceivedLoudness < 0.05f)
+                    continue;
+
+                bool alreadyPerceived = false;
+                for (auto& cp : ai.CurrentPerceptions)
+                    if (cp.EntityID.ID == noise.SourceEntityID)
+                    {
+                        alreadyPerceived = true;
+                        break;
+                    }
+
+                if (!alreadyPerceived)
+                {
+                    PercaptionResult result;
+                    result.EntityID.ID = noise.SourceEntityID;
+                    result.Type = noise.SourceType;
+                    result.PercaptionMethod = PercaptionType::Hearing;
+                    result.SensedPosition = noise.Position;
+                    result.TimeSinceLastSensed = 0.0f;
+                    ai.CurrentPerceptions.push_back(result);
+                }
+            }
+    }
+
+    void JoltWorld::SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc,
+        const glm::vec3& forward)
+    {
+        for (const UUID& targetID : ai.OverlappingEntities)
+        {
+            Entity targetEntity = m_Scene->GetEntityByUUID(targetID);
+            if (!targetEntity || !targetEntity.HasComponent<PerceivableComponent>())
+                continue;       
+            
+            auto& percComp = targetEntity.GetComponent<PerceivableComponent>();
+            if (!percComp.bIsDetectable)
+                continue;       
+            
+            auto& targetTC = targetEntity.GetComponent<TransformComponent>();
+            glm::vec3 toTarget = targetTC.Position - tc.Position;
+            float distance = glm::length(toTarget);
+            if (distance < 0.001f)
+                continue;       
+            
+            glm::vec3 dirToTarget = toTarget / distance;        
+            if (ai.IsSightEnabled() && distance <= ai.SightSettings.SightRadius)
+            {
+                bool typeMatch = ai.SightSettings.DetectableTypes.empty();
+                for (auto& dt : ai.SightSettings.DetectableTypes)
+                    for (auto& pt : percComp.Types)
+                        if (dt == pt)
+                        {
+                            typeMatch = true;
+                            break;
+                        }
+                
+                if (!typeMatch)
+                    continue;       
+                
+                float dotProduct = glm::dot(glm::normalize(forward), dirToTarget);
+                float halfFOVcos = glm::cos(glm::radians(ai.SightSettings.FieldOfView * 0.5f));
+                if (dotProduct < halfFOVcos)
+                    continue;       
+                
+                std::vector<uint64_t> ignoreList = { (uint64_t)ai.OwnerEntityID };
+                RaycastHit3D losHit = Raycast(tc.Position, dirToTarget, distance + 0.1f, false, 0.0f, ignoreList);      
+                bool hasLOS = false;
+                
+                if (losHit.Hit && losHit.HitEntityID == targetID)
+                    hasLOS = true;
+                else if (!percComp.DetectablePointsOffsets.empty())
+                    for (auto& offset : percComp.DetectablePointsOffsets)
+                    {
+                        glm::vec3 targetPoint = targetTC.Position + offset;
+                        glm::vec3 dir = glm::normalize(targetPoint - tc.Position);
+                        float dist = glm::length(targetPoint - tc.Position);
+                        RaycastHit3D pointHit = Raycast(tc.Position, dir, dist + 0.1f, false, 0.0f, ignoreList);
+                        if (pointHit.Hit && pointHit.HitEntityID == targetID)
+                        {
+                            hasLOS = true;
+                            break;
+                        }
+                    }       
+                
+                if (hasLOS)
+                {
+                    PercaptionResult result;
+                    result.EntityID.ID = targetID;
+                    result.Type = percComp.Types.empty() ? PerceivableType::Neutral : percComp.Types[0];
+                    result.PercaptionMethod = PercaptionType::Sight;
+                    result.SensedPosition = targetTC.Position;
+                    result.TimeSinceLastSensed = 0.0f;
+                    ai.CurrentPerceptions.push_back(result);
+                }
+            }
+        }
+    }
+
+    void JoltWorld::UpdatePerceivableBodies()
+    {
         auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent, TransformComponent>();
         for (auto e : viewPerc)
         {
             auto& perc = m_Scene->GetRegistry().get<PerceivableComponent>(e);
             auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
-
             if (perc.RuntimeBody)
             {
                 JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
@@ -1164,5 +1344,10 @@ namespace HRealEngine
                 body_interface->SetPosition(body->GetID(), pos, JPH::EActivation::Activate);
             }
         }
+    }
+
+    void JoltWorld::ReportNoise(const NoiseEvent& event)
+    {
+        m_PendingNoiseEvents.push_back(event);
     }
 }

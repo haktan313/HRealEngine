@@ -130,6 +130,14 @@ namespace HRealEngine
         SightConfig() = default;
         SightConfig(const SightConfig&) = default;
     };
+    struct NoiseEvent
+    {
+        UUID SourceEntityID = 0;
+        glm::vec3 Position = glm::vec3(0.0f);
+        float Loudness = 1.0f;
+        float MaxRange = 0.0f;
+        PerceivableType SourceType = PerceivableType::Neutral;
+    };
     struct HearingConfig
     {
         float HearingRadius = 10.0f;
@@ -165,6 +173,7 @@ namespace HRealEngine
         std::unordered_set<UUID> OverlappingEntities; 
         
         float UpdateInterval = 0.5f; // How often the AI controller updates its perceptions and decisions
+        float TimeSinceLastUpdate = 0.0f;
         
         std::vector<PercaptionResult> CurrentPerceptions; 
         std::vector<PercaptionResult> PreviousPerceptions;
