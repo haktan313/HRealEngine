@@ -1188,6 +1188,8 @@ namespace HRealEngine
                     for (auto& f : ai.ForgottenPerceptions)
                         if (f.EntityID.ID == prev.EntityID.ID)
                         {
+                            f.SensedPosition = prev.SensedPosition;
+                            f.TimeSinceLastSensed = 0.0f;
                             alreadyForgotten = true; 
                             break;
                         }
@@ -1215,6 +1217,9 @@ namespace HRealEngine
                 if (noise.SourceEntityID == ai.OwnerEntityID)
                     continue;
 
+                if (ai.OverlappingEntities.find(noise.SourceEntityID) == ai.OverlappingEntities.end())
+                    continue;
+                
                 bool typeMatch = ai.HearingSettings.DetectableTypes.empty();
                 if (!typeMatch)
                     for (auto& dt : ai.HearingSettings.DetectableTypes)

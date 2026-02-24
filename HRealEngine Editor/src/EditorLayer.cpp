@@ -641,6 +641,9 @@ namespace HRealEngine
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
         ImGui::Checkbox("Show Percaption Colliders", &m_ShowPercaptionColliders);
+        ImGui::DragFloat("Percaption Sight Debug Sphere Radius", &m_PercaptionSightDebugSphereRadius, 0.6f);
+        ImGui::DragFloat("Percaption Hearing Debug Sphere Radius", &m_PercaptionHearingDebugSphereRadius, 0.5f);
+        ImGui::DragFloat("Percaption Forgat Debug Sphere Radius", &m_PercaptionForgatDebugSphereRadius, 0.4f);
         m_bSetPhysics2DEnabled = m_ActiveScene->Is2DPhysicsEnabled();
         if (ImGui::Checkbox("Enable 2D Physics", &m_bSetPhysics2DEnabled))
         {
@@ -1028,6 +1031,40 @@ namespace HRealEngine
                 {
                     glm::vec4 hearColor(1.0f, 1.0f, 0.0f, 0.6f);
                     Renderer3D::DrawWireSphere(transform.Position, aiController.HearingSettings.HearingRadius, hearColor);
+                }
+                
+                for (const auto& perception : aiController.CurrentPerceptions)
+                {
+                    Entity targetEntity = m_ActiveScene->GetEntityByUUID(perception.EntityID.ID);
+                    if (!targetEntity || !targetEntity.HasComponent<TransformComponent>())
+                        continue;
+
+                    auto& targetTC = targetEntity.GetComponent<TransformComponent>();
+
+                    if (perception.PercaptionMethod == PercaptionType::Sight)
+                    {
+                        glm::vec4 green(0.0f, 1.0f, 0.0f, 0.8f);
+                        Renderer2D::DrawLine(transform.Position, targetTC.Position, green);
+                        Renderer3D::DrawWireSphere(targetTC.Position, m_PercaptionSightDebugSphereRadius, green, 16);
+                    }
+                    else if (perception.PercaptionMethod == PercaptionType::Hearing)
+                    {
+                        glm::vec4 yellow(1.0f, 1.0f, 0.0f, 0.8f);
+                        Renderer2D::DrawLine(transform.Position, targetTC.Position, yellow);
+                        Renderer3D::DrawWireSphere(targetTC.Position, m_PercaptionHearingDebugSphereRadius, yellow, 16);
+                    }
+                }
+
+                for (const auto& forgotten : aiController.ForgottenPerceptions)
+                {
+                    /*Entity targetEntity = m_ActiveScene->GetEntityByUUID(forgotten.EntityID.ID);
+                    if (!targetEntity || !targetEntity.HasComponent<TransformComponent>())
+                        continue;
+
+                    auto& targetTC = targetEntity.GetComponent<TransformComponent>();*/
+                    glm::vec3 targetPos = forgotten.SensedPosition;
+                    glm::vec4 orange(1.0f, 0.5f, 0.0f, 0.5f);
+                    Renderer3D::DrawWireSphere(targetPos, m_PercaptionForgatDebugSphereRadius, orange, 12);
                 }
             }
         }
