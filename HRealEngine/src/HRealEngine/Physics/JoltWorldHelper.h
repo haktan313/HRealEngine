@@ -23,7 +23,9 @@ namespace HRealEngine
     {
         static constexpr JPH::ObjectLayer NON_MOVING = 0;
         static constexpr JPH::ObjectLayer MOVING = 1;
-        static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
+        static constexpr JPH::ObjectLayer PERCEPTION = 2;
+        static constexpr JPH::ObjectLayer PERCEIVABLE = 3;
+        static constexpr JPH::ObjectLayer NUM_LAYERS = 4;
     };
 
     // Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
@@ -35,7 +37,9 @@ namespace HRealEngine
     {
         static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
         static constexpr JPH::BroadPhaseLayer MOVING(1);
-        static constexpr uint NUM_LAYERS(2);
+        static constexpr JPH::BroadPhaseLayer PERCEPTION(2);
+        static constexpr JPH::BroadPhaseLayer PERCEIVABLE(3);
+        static constexpr uint NUM_LAYERS(4);
     };
 
     
@@ -49,6 +53,8 @@ namespace HRealEngine
             // Create a mapping table from object to broad phase layer
             mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
             mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
+            mObjectToBroadPhase[Layers::PERCEPTION] = BroadPhaseLayers::PERCEPTION;
+            mObjectToBroadPhase[Layers::PERCEIVABLE] = BroadPhaseLayers::PERCEIVABLE;
         }
 
         virtual uint					GetNumBroadPhaseLayers() const override
@@ -69,6 +75,8 @@ namespace HRealEngine
             {
             case (BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
             case (BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:		return "MOVING";
+            case (BroadPhaseLayer::Type)BroadPhaseLayers::PERCEPTION:	return "PERCEPTION";
+            case (BroadPhaseLayer::Type)BroadPhaseLayers::PERCEIVABLE:	return "PERCEIVABLE";
             default:													JPH_ASSERT(false); return "INVALID";
             }
         }
@@ -89,7 +97,12 @@ namespace HRealEngine
             case Layers::NON_MOVING:
                 return inLayer2 == BroadPhaseLayers::MOVING;
             case Layers::MOVING:
-                return true;
+                return inLayer2 == BroadPhaseLayers::NON_MOVING 
+                    || inLayer2 == BroadPhaseLayers::MOVING;
+            case Layers::PERCEPTION:
+                return inLayer2 == BroadPhaseLayers::PERCEIVABLE;
+            case Layers::PERCEIVABLE:
+                return inLayer2 == BroadPhaseLayers::PERCEPTION;
             default:
                 JPH_ASSERT(false);
                 return false;
@@ -108,7 +121,12 @@ namespace HRealEngine
             case Layers::NON_MOVING:
                 return inObject2 == Layers::MOVING; // Non moving only collides with moving
             case Layers::MOVING:
-                return true; // Moving collides with everything
+                return inObject2 == Layers::NON_MOVING 
+                    || inObject2 == Layers::MOVING;
+            case Layers::PERCEPTION:
+                return inObject2 == Layers::PERCEIVABLE;
+            case Layers::PERCEIVABLE:
+                return inObject2 == Layers::PERCEPTION;
             default:
                 JPH_ASSERT(false);
                 return false;

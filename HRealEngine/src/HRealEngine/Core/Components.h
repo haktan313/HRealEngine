@@ -156,7 +156,9 @@ namespace HRealEngine
         std::unordered_map<PercaptionType, bool> EnabledPerceptions; // Which perception types are enabled for this AI controller
         
         SightConfig SightSettings;
+        void* SightRuntimeBody = nullptr;
         HearingConfig HearingSettings;
+        void* HearingRuntimeBody = nullptr;
         
         float UpdateInterval = 0.5f; // How often the AI controller updates its perceptions and decisions
         
@@ -188,6 +190,8 @@ namespace HRealEngine
         std::vector<glm::vec3> DetectablePointsOffsets; // Offsets from the entity's position that can be detected by AI controllers
         
         int DetectionPriority = 0;
+        
+        void* RuntimeBody = nullptr;
         
         PerceivableComponent() = default;
         PerceivableComponent(const PerceivableComponent&) = default;

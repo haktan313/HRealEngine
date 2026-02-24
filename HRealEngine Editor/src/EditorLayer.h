@@ -92,6 +92,7 @@ namespace HRealEngine
         bool m_ViewportFocused = false;
         bool m_ViewportHovered = false;
         bool m_ShowPhysicsColliders = false;
+        bool m_ShowPercaptionColliders = false;
         bool m_bSetPhysics2DEnabled = false;
         bool m_bShowBehaviorTreeEditor = false;
         bool m_bShowProjectBrowser = false;

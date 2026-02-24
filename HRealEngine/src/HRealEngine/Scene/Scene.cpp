@@ -186,16 +186,14 @@ namespace HRealEngine
     {
         m_bIsRunning = true;
         
-       OnPhysicsStart();
-       {
-           ScriptEngine::OnRuntimeStart(this);
-           auto view = m_Registry.view<ScriptComponent>();
-           for (auto e : view)
-           {
-             Entity entity = {e, this};
-             ScriptEngine::OnCreateEntity(entity);
-           }
-       }
+        OnPhysicsStart();
+        ScriptEngine::OnRuntimeStart(this);
+        auto view = m_Registry.view<ScriptComponent>();
+        for (auto e : view)
+        {
+            Entity entity = {e, this};
+            ScriptEngine::OnCreateEntity(entity);
+        }
         StartBTs();
     }
 

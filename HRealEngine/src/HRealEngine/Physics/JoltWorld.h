@@ -56,6 +56,10 @@ namespace HRealEngine
         
         std::vector<DebugLine>& GetDebugLines() { return m_DebugLines; }
         void UpdateDebugLines(float deltaTime);
+        
+        void CreatePercaptionBodies();
+        void DestroyPercaptionBodies();
+        void UpdatePercaptionBodies();
     private:
         std::vector<DebugLine> m_DebugLines;
         
@@ -65,6 +69,12 @@ namespace HRealEngine
             entt::entity B;*/
             UUID EntityA;
             UUID EntityB;
+        };
+        struct PerceptionOverlapEvent
+        {
+            UUID EntityA;
+            UUID EntityB;
+            bool bIsBegin; // true for begin, false for end
         };
         class MyContactListener : public JPH::ContactListener
         {
@@ -140,6 +150,8 @@ namespace HRealEngine
         std::vector<CollisionEvent> m_CollisionBeginEvents;
         std::vector<CollisionEvent> m_CollisionEndEvents;
         std::mutex m_EventQueueMutex;
+        
+        std::vector<PerceptionOverlapEvent> m_PerceptionOverlapEvents;
         
         Scene* m_Scene = nullptr;
         JPH::BodyInterface* body_interface;

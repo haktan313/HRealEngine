@@ -640,6 +640,7 @@ namespace HRealEngine
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+        ImGui::Checkbox("Show Percaption Colliders", &m_ShowPercaptionColliders);
         m_bSetPhysics2DEnabled = m_ActiveScene->Is2DPhysicsEnabled();
         if (ImGui::Checkbox("Enable 2D Physics", &m_bSetPhysics2DEnabled))
         {
@@ -984,6 +985,49 @@ namespace HRealEngine
                     glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0f), pos) * rot4 * glm::scale(glm::mat4(1.0f), scale);
                     
                     Renderer3D::DrawWireCube(colliderTransform, { 0.f, 1.f, 0.f, 1.f });
+                }
+            }
+        }
+        
+        if (m_ShowPercaptionColliders)
+        {
+            auto view = m_ActiveScene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+            for (auto entity : view)
+            {
+                auto [aiController, transform] = view.get<AIControllerComponent, TransformComponent>(entity);
+                
+                if (aiController.IsSightEnabled())
+                {
+                    glm::vec4 sightColor(0.0f, 0.4f, 1.0f, 0.8f);
+                    Renderer3D::DrawWireSphere(transform.Position, aiController.SightSettings.SightRadius, sightColor);
+
+                    // FOV cone
+                    glm::quat q = glm::quat(transform.Rotation);
+                    glm::vec3 forward = q * glm::vec3(0, 0, -1);
+                    float halfFOV = glm::radians(aiController.SightSettings.FieldOfView * 0.5f);
+                    float radius = aiController.SightSettings.SightRadius;
+
+                    glm::vec3 up(0, 1, 0);
+                    glm::vec3 leftDir = glm::angleAxis(halfFOV, up) * forward;
+                    glm::vec3 rightDir = glm::angleAxis(-halfFOV, up) * forward;
+
+                    glm::vec4 coneColor(0.0f, 0.8f, 1.0f, 1.0f);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + leftDir * radius, coneColor);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + rightDir * radius, coneColor);
+
+                    glm::vec3 right = glm::normalize(glm::cross(forward, up));
+                    glm::vec3 topDir = glm::angleAxis(halfFOV, right) * forward;
+                    glm::vec3 bottomDir = glm::angleAxis(-halfFOV, right) * forward;
+                    
+                    glm::vec4 coneColorFaded(0.0f, 0.6f, 1.0f, 0.5f);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + topDir * radius, coneColorFaded);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + bottomDir * radius, coneColorFaded);
+                }
+
+                if (aiController.IsHearingEnabled())
+                {
+                    glm::vec4 hearColor(1.0f, 1.0f, 0.0f, 0.6f);
+                    Renderer3D::DrawWireSphere(transform.Position, aiController.HearingSettings.HearingRadius, hearColor);
                 }
             }
         }

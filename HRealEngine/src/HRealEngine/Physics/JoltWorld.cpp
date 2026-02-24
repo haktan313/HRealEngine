@@ -13,6 +13,7 @@
 #include "Physics/Collision/CollisionCollectorImpl.h"
 #include "Physics/Collision/RayCast.h"
 #include "Physics/Collision/Shape/BoxShape.h"
+#include "Physics/Collision/Shape/SphereShape.h"
 #include "Physics/Collision/Shape/EmptyShape.h"
 #include "Physics/Collision/Shape/RotatedTranslatedShape.h"
 
@@ -69,6 +70,7 @@ namespace HRealEngine
     {
         CreateBoxCollider();
         CreateEmptyBody();
+        CreatePercaptionBodies();
     }
 
     void JoltWorld::CreateBoxCollider()
@@ -667,6 +669,7 @@ namespace HRealEngine
                 }
             }
         }
+        UpdatePercaptionBodies();
     }
     
     void JoltWorld::Step3DWorldForKinematicBodies(Timestep deltaTime)
@@ -778,10 +781,43 @@ namespace HRealEngine
                 rb.RuntimeBody = nullptr;
             }
         }
+        if (entity.HasComponent<AIControllerComponent>())
+        {
+            auto& ai = entity.GetComponent<AIControllerComponent>();
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.SightRuntimeBody = nullptr;
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.HearingRuntimeBody = nullptr;
+            }
+        }
+        if (entity.HasComponent<PerceivableComponent>())
+        {
+            auto& perc = entity.GetComponent<PerceivableComponent>();
+            if (perc.RuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                perc.RuntimeBody = nullptr;
+            }
+        }
     }
 
     void JoltWorld::Stop3DPhysics()
     {
+        DestroyPercaptionBodies();
         ScriptEngine::SetBodyInterface(nullptr);
         m_JoltWorldHelper = nullptr;
     }
@@ -937,5 +973,165 @@ namespace HRealEngine
                 [](const DebugLine& l) { return l.RemainingLifetime < 0.0f; }),
             m_DebugLines.end()
         );
+    }
+
+    void JoltWorld::CreatePercaptionBodies()
+    {
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+        for (auto e : viewAI)
+        {
+            Entity entity{ e, m_Scene };
+            auto& ai = entity.GetComponent<AIControllerComponent>();
+            auto& tc = entity.GetComponent<TransformComponent>();
+            
+            if (ai.IsSightEnabled() && ai.SightSettings.SightRadius > 0.01f)
+            {
+                JPH::SphereShapeSettings sphereSettings(ai.SightSettings.SightRadius);
+                sphereSettings.SetEmbedded();
+                JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+                JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(),
+                    JPH::EMotionType::Kinematic, Layers::PERCEPTION);
+                bodySettings.mIsSensor = true;
+                bodySettings.mAllowSleeping = false;
+
+                JPH::Body* body = body_interface->CreateBody(bodySettings);
+                if (body)
+                {
+                    body->SetUserData(entity.GetUUID());
+                    body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                    ai.SightRuntimeBody = body;
+                    LOG_CORE_INFO("Perception: Sight body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.SightSettings.SightRadius);
+                }
+            }
+            
+            if (ai.IsHearingEnabled() && ai.HearingSettings.HearingRadius > 0.01f)
+            {
+                JPH::SphereShapeSettings sphereSettings(ai.HearingSettings.HearingRadius);
+                sphereSettings.SetEmbedded();
+                JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+                JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(), 
+                    JPH::EMotionType::Kinematic, Layers::PERCEPTION);
+                bodySettings.mIsSensor = true;
+                bodySettings.mAllowSleeping = false;
+
+                JPH::Body* body = body_interface->CreateBody(bodySettings);
+                if (body)
+                {
+                    body->SetUserData(entity.GetUUID());
+                    body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                    ai.HearingRuntimeBody = body;
+                    LOG_CORE_INFO("Perception: Hearing body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.HearingSettings.HearingRadius);
+                }
+            }
+        }
+        
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent, TransformComponent>();
+        for (auto e : viewPerc)
+        {
+            Entity entity{ e, m_Scene };
+            auto& perc = entity.GetComponent<PerceivableComponent>();
+            auto& tc = entity.GetComponent<TransformComponent>();
+
+            if (!perc.bIsDetectable)
+                continue;
+
+            JPH::SphereShapeSettings sphereSettings(0.1f);
+            sphereSettings.SetEmbedded();
+            JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+            JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(),
+                JPH::EMotionType::Kinematic, Layers::PERCEIVABLE);
+            bodySettings.mIsSensor = true;
+            bodySettings.mAllowSleeping = false;
+
+            JPH::Body* body = body_interface->CreateBody(bodySettings);
+            if (body)
+            {
+                body->SetUserData(entity.GetUUID());
+                body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                perc.RuntimeBody = body;
+                LOG_CORE_INFO("Perception: Perceivable body created for entity UUID {}", (uint32_t)entity.GetUUID());
+            }
+        }
+    }
+
+    void JoltWorld::DestroyPercaptionBodies()
+    {
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent>();
+        for (auto e : viewAI)
+        {
+            auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.SightRuntimeBody = nullptr;
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.HearingRuntimeBody = nullptr;
+            }
+        }
+        
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent>();
+        for (auto e : viewPerc)
+        {
+            auto& perc = m_Scene->GetRegistry().get<PerceivableComponent>(e);
+            if (perc.RuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                perc.RuntimeBody = nullptr;
+            }
+        }
+    }
+
+    void JoltWorld::UpdatePercaptionBodies()
+    {
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+        for (auto e : viewAI)
+        {
+            auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
+            auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
+
+            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+            glm::quat q = glm::quat(tc.Rotation);
+            JPH::Quat rot(q.x, q.y, q.z, q.w);
+
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body_interface->SetPositionAndRotation(body->GetID(), pos, rot, JPH::EActivation::Activate);
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body_interface->SetPositionAndRotation(body->GetID(), pos, rot, JPH::EActivation::Activate);
+            }
+        }
+        
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent, TransformComponent>();
+        for (auto e : viewPerc)
+        {
+            auto& perc = m_Scene->GetRegistry().get<PerceivableComponent>(e);
+            auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
+
+            if (perc.RuntimeBody)
+            {
+                JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body_interface->SetPosition(body->GetID(), pos, JPH::EActivation::Activate);
+            }
+        }
     }
 }
