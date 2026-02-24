@@ -1264,6 +1264,7 @@ namespace HRealEngine
             ImGui::TextDisabled("Current Perceptions: %d", (int)component.CurrentPerceptions.size());
             ImGui::TextDisabled("Previous Perceptions: %d", (int)component.PreviousPerceptions.size());
             ImGui::TextDisabled("Forgotten: %d", (int)component.ForgottenPerceptions.size());
+            ImGui::TextDisabled("Overlapping Entities: %d", (int)component.OverlappingEntities.size());
         });
         DrawComponent<PerceivableComponent>("Perceivable Component", entity, [](auto& component)
         {

@@ -5,13 +5,14 @@
 #include "glm/glm.hpp"
 #include "HRealEngine/Core/UUID.h"
 #include "HRealEngine/Renderer/Texture.h"
+#include <filesystem>
+#include <unordered_set>
+#include "HRealEngine/Renderer/Font.h"
 
 #include "glm/ext/matrix_transform.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <filesystem>
 #include <glm/gtx/quaternion.hpp>
 
-#include "HRealEngine/Renderer/Font.h"
 
 
 namespace HRealEngine
@@ -153,12 +154,15 @@ namespace HRealEngine
     };
     struct AIControllerComponent
     {
+        UUID OwnerEntityID = 0;
         std::unordered_map<PercaptionType, bool> EnabledPerceptions; // Which perception types are enabled for this AI controller
         
         SightConfig SightSettings;
         void* SightRuntimeBody = nullptr;
         HearingConfig HearingSettings;
         void* HearingRuntimeBody = nullptr;
+        
+        std::unordered_set<UUID> OverlappingEntities; 
         
         float UpdateInterval = 0.5f; // How often the AI controller updates its perceptions and decisions
         
@@ -184,6 +188,7 @@ namespace HRealEngine
     };
     struct PerceivableComponent
     {
+        UUID OwnerEntityID = 0;
         std::vector<PerceivableType> Types;
         bool bIsDetectable = true;
         

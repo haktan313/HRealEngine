@@ -611,13 +611,16 @@ namespace HRealEngine
     void JoltWorld::UpdateRuntime3D()
     {
         std::vector<CollisionEvent> beginEvents, endEvents;
+        std::vector<PerceptionOverlapEvent> perceptionEvents;
         {
             std::lock_guard<std::mutex> lock(m_EventQueueMutex);
             beginEvents = std::move(m_CollisionBeginEvents);
             endEvents = std::move(m_CollisionEndEvents);
-        
+            perceptionEvents = std::move(m_PerceptionOverlapEvents);
+            
             m_CollisionBeginEvents.clear();
             m_CollisionEndEvents.clear();
+            m_PerceptionOverlapEvents.clear();
         }
         
         for (const auto& ev : beginEvents)
@@ -636,12 +639,14 @@ namespace HRealEngine
                 if (a.HasComponent<NativeScriptComponent>())
                 {
                     auto& nsc = a.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(b);
+                    if (nsc.Instance) 
+                        nsc.Instance->OnCollisionBegin(b);
                 }
                 if (b.HasComponent<NativeScriptComponent>())
                     {
                     auto& nsc = b.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(a);
+                    if (nsc.Instance) 
+                        nsc.Instance->OnCollisionBegin(a);
                 }
             }
         }
@@ -658,15 +663,38 @@ namespace HRealEngine
                     ScriptEngine::OnCollisionEnd(b, a);
 
                 if (a.HasComponent<NativeScriptComponent>())
-                    {
+                {
                     auto& nsc = a.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(b);
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(b);
                 }
                 if (b.HasComponent<NativeScriptComponent>())
-                    {
+                {
                     auto& nsc = b.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(a);
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(a);
                 }
+            }
+        }
+        for (const auto& ev : perceptionEvents)
+        {
+            Entity perceiver = m_Scene->GetEntityByUUID(ev.EntityA);
+            if (!perceiver || !perceiver.HasComponent<AIControllerComponent>())
+                continue;
+
+            auto& ai = perceiver.GetComponent<AIControllerComponent>();
+
+            if (ev.bIsBegin)
+            {
+                if (ev.EntityB == ai.OwnerEntityID)
+                    continue;
+                ai.OverlappingEntities.insert(ev.EntityB);
+                LOG_CORE_WARN("PERCEPTION OVERLAP BEGIN: Perceiver {} detected entity {}", (uint32_t)ev.EntityA, (uint32_t)ev.EntityB);
+            }
+            else
+            {
+                ai.OverlappingEntities.erase(ev.EntityB);
+                LOG_CORE_WARN("PERCEPTION OVERLAP END: Perceiver {} lost entity {}", (uint32_t)ev.EntityA, (uint32_t)ev.EntityB);
             }
         }
         UpdatePercaptionBodies();
@@ -1001,6 +1029,7 @@ namespace HRealEngine
                     body->SetUserData(entity.GetUUID());
                     body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
                     ai.SightRuntimeBody = body;
+                    ai.OwnerEntityID = entity.GetUUID();
                     LOG_CORE_INFO("Perception: Sight body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.SightSettings.SightRadius);
                 }
             }
@@ -1022,6 +1051,7 @@ namespace HRealEngine
                     body->SetUserData(entity.GetUUID());
                     body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
                     ai.HearingRuntimeBody = body;
+                    ai.OwnerEntityID = entity.GetUUID();
                     LOG_CORE_INFO("Perception: Hearing body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.HearingSettings.HearingRadius);
                 }
             }
@@ -1052,6 +1082,7 @@ namespace HRealEngine
                 body->SetUserData(entity.GetUUID());
                 body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
                 perc.RuntimeBody = body;
+                perc.OwnerEntityID = entity.GetUUID();
                 LOG_CORE_INFO("Perception: Perceivable body created for entity UUID {}", (uint32_t)entity.GetUUID());
             }
         }
