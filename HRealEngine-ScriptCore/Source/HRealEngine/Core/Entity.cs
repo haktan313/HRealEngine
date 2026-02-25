@@ -83,6 +83,14 @@ namespace HRealEngine
         {
             return InternalCalls_Entity.Entity_HasTag(EntityID, tag);
         }
+        public void AddTag(string tag) 
+        {
+            InternalCalls_Entity.Entity_AddTag(EntityID, tag);
+        }
+        public void RemoveTag(string tag)
+        {
+            InternalCalls_Entity.Entity_RemoveTag(EntityID, tag);
+        }
         public bool HasComponent<T>() where T : Component, new()
         {
             return InternalCalls_Entity.Entity_HasComponent(EntityID, typeof(T));
@@ -164,6 +172,10 @@ namespace HRealEngine
         public RaycastHit[] Raycast3DAll(Vector3 origin, Vector3 direction, float maxDistance, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
         {
             return GlobalFunctions.Raycast3DAll(origin, direction, maxDistance, ignoreEntities, debugDraw, debugDrawDuration);
+        }
+        public void ReportNoiseEvent(ulong sourceEntityID, Vector3 position, float intensity, float maxRange, int sourceType)
+        {
+            GlobalFunctions.ReportNoiseEvent(sourceEntityID, position, intensity, maxRange, sourceType);
         }
     }
 }

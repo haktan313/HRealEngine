@@ -631,6 +631,43 @@ namespace HRealEngine
 		mono_free(tagCStr);
 		return hasTag;
 	}
+	
+	static void Entity_AddTag(UUID entityID, MonoString* tag)
+	{		
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+			{
+			LOG_CORE_ERROR("AddTag: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)		
+		{
+			LOG_CORE_ERROR("AddTag: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		auto tagCStr = mono_string_to_utf8(tag);
+		entity.AddTag(tagCStr);
+		mono_free(tagCStr);
+	}
+	
+	static void Entity_RemoveTag(UUID entityID, MonoString* tag)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("RemoveTag: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity)		
+		{
+			LOG_CORE_ERROR("RemoveTag: Invalid entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		auto tagCStr = mono_string_to_utf8(tag);
+		entity.RemoveTag(tagCStr);
+	}
 
     static uint64_t Entity_FindEntityByName(MonoString* name)
     {
@@ -1371,6 +1408,8 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_SetName);
         HRE_ADD_INTERNAL_CALL_ENTITY(Entity_HasComponent);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_HasTag);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_AddTag);
+		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_RemoveTag);
     	HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetHoveredEntity);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_GetParent);
 		HRE_ADD_INTERNAL_CALL_ENTITY(Entity_SetParent);

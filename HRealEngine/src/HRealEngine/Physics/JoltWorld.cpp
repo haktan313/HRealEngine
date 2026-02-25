@@ -1132,15 +1132,25 @@ namespace HRealEngine
     {
         UpdateAIControllerBodies();
         UpdatePerceivableBodies();
-        m_PendingNoiseEvents.clear();
+        //m_PendingNoiseEvents.clear();
+        float now = Time::GetTime();
+        float maxInterval = m_MaxIntervalForNoiseEvent;
+        m_PendingNoiseEvents.erase(std::remove_if(m_PendingNoiseEvents.begin(), m_PendingNoiseEvents.end(),[now, maxInterval](const NoiseEvent& n)
+        {
+            return now - n.Timestamp > maxInterval;
+        }),m_PendingNoiseEvents.end());
     }
 
     void JoltWorld::UpdateAIControllerBodies()
     {
+        m_MaxIntervalForNoiseEvent = 0.5f;
         auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
         for (auto e : viewAI)
         {
             auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
+            if (ai.UpdateInterval > m_MaxIntervalForNoiseEvent)
+                m_MaxIntervalForNoiseEvent = ai.UpdateInterval;
+            
             auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
             
             JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
@@ -1230,10 +1240,10 @@ namespace HRealEngine
                     ScriptEngine::OnEntityForgotten(perceiverEntity, f.EntityID.ID);
             }
             
-            ai.ForgottenPerceptions.erase(
-                std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),
-                    [forgetDuration](const PercaptionResult& r) { return r.TimeSinceLastSensed >= forgetDuration; }),
-                ai.ForgottenPerceptions.end());
+            ai.ForgottenPerceptions.erase(std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),[forgetDuration](const PercaptionResult& r)
+            {
+                return r.TimeSinceLastSensed >= forgetDuration;
+            }),ai.ForgottenPerceptions.end());
         }
     }
 
@@ -1242,6 +1252,9 @@ namespace HRealEngine
         if (ai.IsHearingEnabled())
             for (const auto& noise : m_PendingNoiseEvents)
             {
+                if (noise.Timestamp < (Time::GetTime() - ai.UpdateInterval))
+                    continue;
+                
                 if (noise.SourceEntityID == ai.OwnerEntityID)
                     continue;
 
@@ -1381,6 +1394,8 @@ namespace HRealEngine
 
     void JoltWorld::ReportNoise(const NoiseEvent& event)
     {
-        m_PendingNoiseEvents.push_back(event);
+        NoiseEvent ev = event;
+        ev.Timestamp = Time::GetTime();
+        m_PendingNoiseEvents.push_back(ev);
     }
 }

@@ -214,6 +214,7 @@ namespace HRealEngine
         std::vector<CollisionEvent> m_CollisionBeginEvents;
         std::vector<CollisionEvent> m_CollisionEndEvents;
         std::mutex m_EventQueueMutex;
+        float m_MaxIntervalForNoiseEvent = 0.5f;
         
         std::vector<PerceptionOverlapEvent> m_PerceptionOverlapEvents;
         std::vector<NoiseEvent> m_PendingNoiseEvents;

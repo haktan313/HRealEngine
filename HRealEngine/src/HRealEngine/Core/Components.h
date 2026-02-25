@@ -137,6 +137,7 @@ namespace HRealEngine
         float Loudness = 1.0f;
         float MaxRange = 0.0f;
         PerceivableType SourceType = PerceivableType::Neutral;
+        float Timestamp = 0.0f;
     };
     struct HearingConfig
     {

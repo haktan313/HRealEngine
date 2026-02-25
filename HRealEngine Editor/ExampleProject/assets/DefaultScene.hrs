@@ -1,5 +1,24 @@
 Scene: Untitled
 Entities:
+  - Entity: 4360067964910127501
+    EntityNameComponent:
+      Name: Ground
+    TransformComponent:
+      Position: [0, -1.1418322, 0]
+      Rotation: [0, 0, 0]
+      Scale: [21.080801, 1, 33.59822]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [0.5, 0.5, 0.5]
+      IsTrigger: false
   - Entity: 10324059354334514056
     EntityNameComponent:
       Name: Cameraa
@@ -22,21 +41,21 @@ Entities:
     EntityNameComponent:
       Name: Light
     TransformComponent:
-      Position: [0, 1.5573032, 0]
+      Position: [0, 5.9611077, 5.0620985]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:
       Type: Point
       Color: [1, 1, 1]
       Direction: [0, -1, 0]
-      Intensity: 1
-      Radius: 5.3
+      Intensity: 1.4
+      Radius: 15.6
       CastShadows: true
   - Entity: 12505543987829569699
     EntityNameComponent:
       Name: Enemy
     TransformComponent:
-      Position: [0.0017054534, 0, 0.025375336]
+      Position: [0.0017054528, 0, 0.025375336]
       Rotation: [0, 0.06710818, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
@@ -56,17 +75,19 @@ Entities:
         FieldOfView: 90
         ForgetDuration: 5
         DetectableTypes:
-          []
+          - 0
       HearingConfig:
         HearingRadius: 10
         ForgetDuration: 5
         DetectableTypes:
-          []
+          - 0
+    ScriptComponent:
+      ClassName: ExampleProject.Enemy_Example
   - Entity: 1993855343345353824
     EntityNameComponent:
       Name: Player
     TransformComponent:
-      Position: [-0.72909546, 0.00036621094, -3.182018]
+      Position: [-4.616856, 0.43285304, 9.235662]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
@@ -81,6 +102,24 @@ Entities:
       IsDetectable: true
       DetectionPriority: 0
       Types:
-        []
+        - 0
       DetectablePointsOffsets:
         []
+    ScriptComponent:
+      ClassName: ExampleProject.Player_Example
+    Rigidbody3DComponent:
+      BodyType: Dynamic
+      LockPositionX: false
+      LockPositionY: false
+      LockPositionZ: false
+      LockRotationX: false
+      LockRotationY: false
+      LockRotationZ: false
+      FixedRotation: false
+      Friction: 0.05
+      Restitution: 0
+      Convex Radius: 0.02
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [0.5, 0.5, 0.5]
+      IsTrigger: false
