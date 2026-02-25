@@ -33,6 +33,21 @@ const std::string& HBlackboard::GetStringValue(const std::string& key) const
     return EmptyGetStringValue;
 }
 
+uint64_t HBlackboard::GetUInt64Value(const std::string& key) const
+{
+    if (m_UInt64Values.find(key) != m_UInt64Values.end())
+        return m_UInt64Values.at(key);
+    return 0;
+}
+
+void HBlackboard::SetUInt64Value(const std::string& key, uint64_t value)
+{
+    if (m_UInt64Values.find(key) != m_UInt64Values.end())
+        m_UInt64Values[key] = value;
+    //m_bValuesChanged = true;
+    NotifyValuesChanged();
+}
+
 void HBlackboard::SetBoolValue(const std::string& key, bool value)
 {
     if (m_BoolValues.find(key) != m_BoolValues.end())
@@ -132,4 +147,9 @@ void HBlackboard::CreateFloatValue(const std::string& key, float value)
 void HBlackboard::CreateStringValue(const std::string& key, const std::string& value)
 {
     m_StringValues[key] = value;
+}
+
+void HBlackboard::CreateUInt64Value(const std::string& key, uint64_t value)
+{
+    m_UInt64Values[key] = value;
 }

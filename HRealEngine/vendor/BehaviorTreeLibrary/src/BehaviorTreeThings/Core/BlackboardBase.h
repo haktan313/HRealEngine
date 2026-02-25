@@ -15,6 +15,7 @@ public:
     int GetIntValue(const std::string& key) const;
     float GetFloatValue(const std::string& key) const;
     const std::string& GetStringValue(const std::string& key) const;
+    uint64_t GetUInt64Value(const std::string& key) const;
 
     bool IsValuesChanged() const { return m_bValuesChanged; }
     void ClearValuesChangedFlag() { m_bValuesChanged = false; }
@@ -23,6 +24,7 @@ public:
     const std::unordered_map<std::string, int>& GetIntValues() const { return m_IntValues; }
     const std::unordered_map<std::string, float>& GetFloatValues() const { return m_FloatValues; }
     const std::unordered_map<std::string, std::string>& GetStringValues() const { return m_StringValues; }
+    const std::unordered_map<std::string, uint64_t>& GetUInt64Values() const { return m_UInt64Values; }
     
     void SetBoolValue(const std::string& key, bool value);
     void SetBoolValues(const std::unordered_map<std::string, bool>& values) { m_BoolValues = values; }
@@ -32,11 +34,14 @@ public:
     void SetFloatValues(const std::unordered_map<std::string, float>& values) { m_FloatValues = values; }
     void SetStringValue(const std::string& key, const std::string& value);
     void SetStringValues(const std::unordered_map<std::string, std::string>& values) { m_StringValues = values; }
+    void SetUInt64Value(const std::string& key, uint64_t value);
+    void SetUInt64Values(const std::unordered_map<std::string, uint64_t>& values) { m_UInt64Values = values; }
 
     bool HasBoolValue(const std::string& key) const { return m_BoolValues.find(key) != m_BoolValues.end(); }
     bool HasIntValue(const std::string& key) const { return m_IntValues.find(key) != m_IntValues.end(); }
     bool HasFloatValue(const std::string& key) const { return m_FloatValues.find(key) != m_FloatValues.end(); }
     bool HasStringValue(const std::string& key) const { return m_StringValues.find(key) != m_StringValues.end(); }
+    bool HasUInt64Value(const std::string& key) const { return m_UInt64Values.find(key) != m_UInt64Values.end(); }
     
     virtual void DrawImGui();
 
@@ -47,7 +52,8 @@ protected:
     void CreateIntValue(const std::string& key, int value);
     void CreateFloatValue(const std::string& key, float value);
     void CreateStringValue(const std::string& key, const std::string& value);
-
+    void CreateUInt64Value(const std::string& key, uint64_t value);
+    
     void NotifyValuesChanged() 
     { 
         m_bValuesChanged = true; 
@@ -59,6 +65,7 @@ private:
     std::unordered_map<std::string, int> m_IntValues;
     std::unordered_map<std::string, float> m_FloatValues;
     std::unordered_map<std::string, std::string> m_StringValues;
+    std::unordered_map<std::string, uint64_t> m_UInt64Values;
 
     bool m_bValuesChanged = false;
 

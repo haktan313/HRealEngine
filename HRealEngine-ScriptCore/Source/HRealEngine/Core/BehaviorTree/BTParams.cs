@@ -24,7 +24,8 @@ namespace HRealEngine.BehaviorTree
             Float = 0,
             Int = 1,
             Bool = 2,
-            String = 3
+            String = 3,
+            ULong = 4
         }
 
         public KeyType Type;

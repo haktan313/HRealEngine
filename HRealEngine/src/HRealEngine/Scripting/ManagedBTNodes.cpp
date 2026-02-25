@@ -118,6 +118,21 @@ namespace HRealEngine
             for (int i = 0; i < (int)keys.size() && i < (int)vals.size(); i++)
                 CreateStringValue(keys[i], vals[i]);
         }
+        // ULong
+        {
+            auto keys = getStringArray("GetUlongKeys");
+            MonoMethod* valsMethod = findMethod(klass, "GetUlongVals");
+            if (valsMethod && !keys.empty())
+            {
+                MonoArray* valsArr = (MonoArray*)mono_runtime_invoke(valsMethod, m_ManagedInstance, nullptr, nullptr);
+                if (valsArr)
+                    for (int i = 0; i < (int)keys.size(); i++)
+                    {
+                        uint64_t val = mono_array_get(valsArr, uint64_t, i);
+                        CreateUInt64Value(keys[i], val);
+                    }
+            }
+        }
 
         LOG_CORE_INFO("ManagedBTBlackboard synced: {} bools, {} ints, {} floats, {} strings", GetBoolValues().size(), GetIntValues().size(), GetFloatValues().size(), GetStringValues().size());
     }
@@ -192,6 +207,19 @@ namespace HRealEngine
                 MonoString* valueStr = mono_string_new(domain, value.c_str());
                 void* args[2] = { keyStr, valueStr };
                 mono_runtime_invoke(setStringMethod, m_ManagedInstance, args, nullptr);
+            }
+        }
+        
+        // ULong values
+        MonoMethod* setUlongMethod = findMethod(klass, "SetUlong", 2);
+        if (setUlongMethod)
+        {
+            for (const auto& [key, value] : GetUInt64Values())
+            {
+                MonoString* keyStr = mono_string_new(domain, key.c_str());
+                uint64_t monoValue = value;
+                void* args[2] = { keyStr, &monoValue };
+                mono_runtime_invoke(setUlongMethod, m_ManagedInstance, args, nullptr);
             }
         }
 

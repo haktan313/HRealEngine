@@ -60,6 +60,15 @@ struct Params
             value = std::string(buffer);
         }
     }
+    void DrawUInt64Value(const std::string& label, uint64_t& value)
+    {
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "%llu", value);
+        if (ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
+        {
+            value = strtoull(buffer, nullptr, 10);
+        }
+    }
     void DrawBlackboardFloatKeySelector(const std::string& label, std::string& key, HBlackboard* blackboard)
     {
         const char* preview = key.empty() ? "Select float key..." : key.c_str();
@@ -128,6 +137,23 @@ struct Params
             ImGui::EndCombo();
         }
     }
+    void DrawBlackboardUInt64KeySelector(const std::string& label, std::string& key, HBlackboard* blackboard)
+    {
+        const char* preview = key.empty() ? "Select uint64 key..." : key.c_str();
+        if (ImGui::BeginCombo(label.c_str(), preview))
+        {
+            if (blackboard)
+                for (const auto& [bbKey, value] : blackboard->GetUInt64Values())
+                {
+                    bool isSelected = (key == bbKey);
+                    if (ImGui::Selectable(bbKey.c_str(), isSelected))
+                        key = bbKey;
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+            ImGui::EndCombo();
+        }
+    }
     
     virtual void Serialize(YAML::Emitter& out) const {}
     virtual void Deserialize(const YAML::Node& node) {}
@@ -148,6 +174,10 @@ struct Params
     {
         out << YAML::Key << name << YAML::Value << value;
     }
+    void SerializeUInt64(const std::string& name, uint64_t value, YAML::Emitter& out) const
+    {
+        out << YAML::Key << name << YAML::Value << value;
+    }
     
     void SerializeBlackboardFloatKey(const std::string& name, const HBlackboardKeyValue& key, YAML::Emitter& out) const 
     {
@@ -162,6 +192,10 @@ struct Params
         out << YAML::Key << name << YAML::Value << key;
     }
     void SerializeBlackboardStringKey(const std::string& name, const HBlackboardKeyValue& key, YAML::Emitter& out) const 
+    {
+        out << YAML::Key << name << YAML::Value << key;
+    }
+    void SerializeBlackboardUInt64Key(const std::string& name, const HBlackboardKeyValue& key, YAML::Emitter& out) const 
     {
         out << YAML::Key << name << YAML::Value << key;
     }
@@ -190,5 +224,10 @@ struct Params
     {
         if (node[name])
             key = node[name].as<std::string>();
+    }
+    void DeserializeUInt64(const YAML::Node& node, const std::string& name, uint64_t& value)
+    {
+        if (node[name])
+            value = node[name].as<uint64_t>();
     }
 };
