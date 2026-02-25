@@ -171,7 +171,7 @@ namespace HRealEngine
         HearingConfig HearingSettings;
         void* HearingRuntimeBody = nullptr;
         
-        std::unordered_set<UUID> OverlappingEntities; 
+        std::unordered_map<UUID, int> OverlappingEntities;
         
         float UpdateInterval = 0.5f; // How often the AI controller updates its perceptions and decisions
         float TimeSinceLastUpdate = 0.0f;

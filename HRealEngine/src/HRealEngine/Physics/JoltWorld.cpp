@@ -689,13 +689,18 @@ namespace HRealEngine
             {
                 if (ev.EntityB == ai.OwnerEntityID)
                     continue;
-                ai.OverlappingEntities.insert(ev.EntityB);
+                ai.OverlappingEntities[ev.EntityB]++;
                 LOG_CORE_WARN("PERCEPTION OVERLAP BEGIN: Perceiver {} detected entity {}", (uint32_t)ev.EntityA, (uint32_t)ev.EntityB);
             }
             else
             {
-                ai.OverlappingEntities.erase(ev.EntityB);
-                LOG_CORE_WARN("PERCEPTION OVERLAP END: Perceiver {} lost entity {}", (uint32_t)ev.EntityA, (uint32_t)ev.EntityB);
+                auto it = ai.OverlappingEntities.find(ev.EntityB);
+                if (it != ai.OverlappingEntities.end())
+                {
+                    it->second--;
+                    if (it->second <= 0)
+                        ai.OverlappingEntities.erase(it);
+                }
             }
         }
         UpdatePercaptionBodies();
@@ -1306,7 +1311,7 @@ namespace HRealEngine
     void JoltWorld::SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc,
         const glm::vec3& forward)
     {
-        for (const UUID& targetID : ai.OverlappingEntities)
+        for (const auto& [targetID, count] : ai.OverlappingEntities)
         {
             Entity targetEntity = m_Scene->GetEntityByUUID(targetID);
             if (!targetEntity || !targetEntity.HasComponent<PerceivableComponent>())
