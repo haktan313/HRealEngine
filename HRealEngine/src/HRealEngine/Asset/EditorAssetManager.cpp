@@ -38,7 +38,7 @@ namespace HRealEngine
     {
         if (!IsAssetHandleValid(assetHandle))
         {
-            LOG_CORE_ERROR("Invalid asset handle: {}", (int)assetHandle);
+            //LOG_CORE_ERROR("Invalid asset handle: {}", (int)assetHandle);
             return nullptr;
         }
         Ref<Asset> asset;

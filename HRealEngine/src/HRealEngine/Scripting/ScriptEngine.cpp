@@ -519,9 +519,12 @@ namespace HRealEngine
     void ScriptEngine::OnDestroyEntity(Entity entity)
     {
         UUID entityID = entity.GetUUID();
-        Ref<ScriptInstance> instance = s_Data->EntityInstances[entityID];
-        instance->InvokeOnDestroy();
-        s_Data->EntityInstances.erase(entityID);
+        auto it = s_Data->EntityInstances.find(entityID);
+        if (it != s_Data->EntityInstances.end() && it->second)
+        {
+            it->second->InvokeOnDestroy();
+            s_Data->EntityInstances.erase(it);
+        }
         s_Data->EntityScriptFieldMaps.erase(entityID);
     }
 

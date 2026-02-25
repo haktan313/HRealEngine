@@ -71,6 +71,7 @@ namespace HRealEngine
         std::vector<Entity> GetChildren(Entity entity);
         bool IsAncestorOf(Entity ancestor, Entity entity);
         glm::mat4 GetWorldTransform(Entity entity);
+        BehaviorTree* GetEntityBehaviorTree(Entity entity);
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);

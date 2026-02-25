@@ -27,6 +27,7 @@ namespace HRealEngine
 #define HRE_ADD_INTERNAL_CALL_ENTITY(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Entity::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_AICONTROLLER(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_AIController::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_PERCEIVABLE(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Perceivable::" #Name, Name)
+#define HRE_ADD_INTERNAL_CALL_BEHAVIORTREECOMPONENT(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_BehaviorTree::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_TRANSFORMCOMPONENT(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_TransformComponent::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_RIGIDBODY(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_Rigidbody::" #Name, Name)
 #define HRE_ADD_INTERNAL_CALL_MESHRENDERER(Name) mono_add_internal_call("HRealEngine.Calls.InternalCalls_MeshRenderer::" #Name, Name)
@@ -388,6 +389,67 @@ namespace HRealEngine
 	        if (f.EntityID.ID == targetEntityID)
 	            return true;
 	    return false;
+	}
+	
+	static bool AIController_HasBehaviorTree(UUID entityID)
+	{
+	    Scene* scene = ScriptEngine::GetSceneContext();
+	    if (!scene)
+	    {
+		    LOG_CORE_ERROR("AIController_HasBehaviorTree: Scene context is null!");
+		    return false;
+	    }
+	    Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<BehaviorTreeComponent>())
+		{
+			LOG_CORE_ERROR("AIController_HasBehaviorTree: Invalid entity ID or entity does not have BehaviorTreeComponent! Entity ID: {}", (uint64_t)entityID);
+			return false;
+		}
+		auto btAsset = entity.GetComponent<BehaviorTreeComponent>().BehaviorTreeAsset;
+		return btAsset != -1;
+	}
+
+	static MonoObject* AIController_GetBlackboard(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("AIController_GetBlackboard: Scene context is null!");
+			return nullptr;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<BehaviorTreeComponent>())
+		{
+			LOG_CORE_ERROR("AIController_GetBlackboard: Invalid entity or no BehaviorTreeComponent! Entity ID: {}", (uint64_t)entityID);
+			return nullptr;
+		}
+		auto bt = scene->GetEntityBehaviorTree(entity);
+		if (!bt)
+		{
+			LOG_CORE_ERROR("AIController_GetBlackboard: Behavior tree is null for entity {}", (uint64_t)entityID);
+			return nullptr;
+		}
+    
+		HBlackboard* rawBlackboard = bt->GetBlackboardRaw();
+		if (!rawBlackboard)
+		{
+			LOG_CORE_ERROR("AIController_GetBlackboard: Blackboard is null for entity {}", (uint64_t)entityID);
+			return nullptr;
+		}
+		
+		auto* managedBB = dynamic_cast<ManagedBTBlackboard*>(rawBlackboard);
+		if (managedBB && managedBB->GetManagedInstance())
+		{
+			return managedBB->GetManagedInstance();
+		}
+
+		LOG_CORE_ERROR("AIController_GetBlackboard: Blackboard is not a ManagedBTBlackboard for entity {}", (uint64_t)entityID);
+		return nullptr;
+	}
+
+	static MonoObject* BehaviorTreeComponent_GetBlackboard(UUID entityID)
+	{
+	    return AIController_GetBlackboard(entityID);
 	}
 
 	static void PerceivableComponent_GetType(UUID entityID, int* outType)
@@ -1388,6 +1450,10 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetForgottenPerceptions);
 		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_IsEntityPerceived);
 		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_IsEntityForgotten);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_HasBehaviorTree);
+		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetBlackboard);
+		
+		HRE_ADD_INTERNAL_CALL_BEHAVIORTREECOMPONENT(BehaviorTreeComponent_GetBlackboard);
 		
 		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetType);
 		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_SetType);
@@ -1478,4 +1544,9 @@ namespace HRealEngine
         HRE_ADD_INTERNAL_CALL_TEXTCOMPONENT(TextComponent_SetLineSpacing);
 		
     }
+
+	MonoObject* ScriptGlue::InstantiateClass(MonoClass* monoClass)
+	{
+		return ScriptEngine::InstantiateClass(monoClass);
+	}
 }

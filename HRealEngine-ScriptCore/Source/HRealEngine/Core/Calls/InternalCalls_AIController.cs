@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using HRealEngine.BehaviorTree;
 
 namespace HRealEngine.Calls
 {
@@ -16,5 +17,9 @@ namespace HRealEngine.Calls
         internal extern static bool AIController_IsEntityPerceived(ulong entityID, ulong targetEntityID);
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool AIController_IsEntityForgotten(ulong entityID, ulong targetEntityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static bool AIController_HasBehaviorTree(ulong entityID);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static BTBlackboard AIController_GetBlackboard(ulong entityID);
     }
 }

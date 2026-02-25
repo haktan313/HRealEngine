@@ -1,4 +1,5 @@
 #pragma once
+#include "ScriptEngine.h"
 
 namespace HRealEngine
 {
@@ -7,5 +8,6 @@ namespace HRealEngine
     public:
         static void RegisterComponents();
         static void RegisterFunctions();
+        static MonoObject* InstantiateClass(MonoClass* monoClass);
     };
 }

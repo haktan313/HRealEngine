@@ -1,5 +1,6 @@
 using HRealEngine.Calls;
 using System.Runtime.InteropServices;
+using HRealEngine.BehaviorTree;
 
 namespace HRealEngine
 {
@@ -212,6 +213,23 @@ namespace HRealEngine
         public bool IsEntityForgotten(ulong targetEntityID)
         {
             return InternalCalls_AIController.AIController_IsEntityForgotten(entity.EntityID, targetEntityID);
+        }
+        
+        public bool HasBehaviorTree()
+        {
+            return InternalCalls_AIController.AIController_HasBehaviorTree(entity.EntityID);
+        }
+        public BTBlackboard GetBlackboard()
+        {
+            return InternalCalls_AIController.AIController_GetBlackboard(entity.EntityID);
+        }
+    }
+    
+    public class BehaviorTreeComponent : Component
+    {
+        public BTBlackboard GetBlackboard()
+        {
+            return InternalCalls_BehaviorTree.BehaviorTreeComponent_GetBlackboard(entity.EntityID);
         }
     }
     

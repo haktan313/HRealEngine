@@ -602,6 +602,26 @@ namespace HRealEngine
         return transform;
     }
 
+    BehaviorTree* Scene::GetEntityBehaviorTree(Entity entity)
+    {
+        if (!entity || !entity.HasComponent<BehaviorTreeComponent>())
+            return nullptr;
+
+        auto& btComp = entity.GetComponent<BehaviorTreeComponent>();
+        if (btComp.BehaviorTreeAsset == 0)
+            return nullptr;
+
+        UUID entityUUID = entity.GetUUID();
+
+        for (auto* bt : Root::GetBehaviorTrees())
+        {
+            UUID* ownerPtr = bt->GetOwner<UUID>();
+            if (ownerPtr && *ownerPtr == entityUUID)
+                return bt;
+        }
+        return nullptr;
+    }
+
     void Scene::OnPhysicsStart()
     {
         if (m_Box2DWorld)
