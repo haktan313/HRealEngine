@@ -1237,7 +1237,6 @@ namespace HRealEngine
                 ImGui::Indent();
                 ImGui::DragFloat("Hearing Radius", &component.HearingSettings.HearingRadius, 0.5f, 1.0f, 200.0f);
                 ImGui::DragFloat("Forget Duration##Hearing", &component.HearingSettings.ForgetDuration, 0.1f, 0.0f, 30.0f, "%.1f s");
-                ImGui::DragFloat("Noise Event Lifetime", &component.HearingSettings.m_NoiseEventLifetime, 0.1f, 0.1f, 10.0f, "%.1f s");
                 
                 if (ImGui::TreeNode("Detectable Types##Hearing"))
                 {
