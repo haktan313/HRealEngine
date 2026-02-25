@@ -54,10 +54,14 @@ namespace HRealEngine
             bool result = InternalCalls_GlobalCalls.Raycast3D(ref origin, ref direction, ignoreEntities, maxDistance, out hit.EntityID, out hit.Point, out hit.Normal, out hit.Distance, debugDraw, debugDrawDuration);
             return result;
         }
-
         public static RaycastHit[] Raycast3DAll(Vector3 origin, Vector3 direction, float maxDistance, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
         {
             return InternalCalls_GlobalCalls.Raycast3DArray(ref origin, ref direction, ignoreEntities, maxDistance, debugDraw, debugDrawDuration);
+        }
+        
+        public static void ReportNoiseEvent(ulong SourceEntityID, Vector3 position, float loudness, float maxRange, int sourceType)
+        {
+            InternalCalls_GlobalCalls.ReportNoiseEvent(SourceEntityID, position, loudness, maxRange, sourceType);
         }
     }
 }

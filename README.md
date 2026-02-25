@@ -7,7 +7,7 @@
 [![Physics](https://img.shields.io/badge/2D%20Physics-Box2D-red.svg)](https://github.com/erincatto/box2d)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**HRealEngine** is a custom game engine written in C++ with OpenGL rendering, 2D and 3D physics, and C# scripting. The goal of the engine is to build a strong AI gameplay framework with systems like **Behavior Trees**, **Perception Systems**, and **Navigation Meshes**. It currently features a built in **Behavior Tree** framework with a visual editor, and the remaining systems are actively in development.
+**HRealEngine** is a custom game engine written in C++ with OpenGL rendering, 2D and 3D physics, and C# scripting. The goal of the engine is to build a strong AI gameplay framework with systems like **Behavior Trees**, **Perception Systems**, and **Navigation Meshes**. It currently features a built in **Behavior Tree** framework with a visual editor, an **AI Perception System** with **sight** and **hearing** senses. Navigation Meshes are actively in development.
 
 ## 🚀 Getting Started
 
@@ -34,6 +34,7 @@ scripts/Win-GenProjects.bat
   - [Editor & Workflow](#editor--workflow)
   - [Scripting](#scripting)
   - [Behavior Tree System](#behavior-tree-system)
+  - [AI Perception System](#ai-perception-system)
   - [Physics](#physics)
   - [Rendering](#rendering)
   - [Asset System](#asset-system)
@@ -41,6 +42,7 @@ scripts/Win-GenProjects.bat
   - [Core](#core)
 - [Behavior Tree Integration](#-behavior-tree-integration)
 - [Behavior Tree Usage (C#)](#-behavior-tree-usage-c)
+- [AI Perception System](#ai-perception-system)
 - [Project Setup (C# Workflow)](#-project-setup-c-workflow)
 - [Code Examples](#-code-examples)
 - [Roadmap](#-roadmap)
@@ -89,6 +91,7 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Script lifecycle events for entities (C#):
   - `BeginPlay`, `Tick`, `OnDestroy`
   - `OnOverlapBegin`, `OnOverlapEnd`
+  - `OnEntityPerceived`, `OnEntityLost`, `OnEntityForgotten` (AI Perception callbacks)
   - Entity lifetime utilities (`Destroy`, etc.)
 - Behavior Tree support in C#. Create custom Action, Decorator, Condition nodes and Blackboards
 - Additional C# capabilities:
@@ -105,6 +108,21 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Custom node creation in both **C++** and **C#**
 - Runtime debug visualization
 - See [Behavior Tree Integration](#-behavior-tree-integration) for details
+
+### AI Perception System
+- Unreal like **AI perception** framework built on top of **Jolt Physics**
+- **AIControllerComponent** with configurable **sight** and **hearing** senses
+- **PerceivableComponent** to mark entities as detectable targets
+- **Sight sense**: Field of view angle, sight radius, line of sight raycasts with detectable point offsets
+- **Hearing sense**: Noise event system with loudness, range, and attenuation
+- Dedicated physics layers **(PERCEPTION / PERCEIVABLE)** isolated from gameplay physics
+- Throttled updates with configurable **UpdateInterval** per AI controller
+- Perception lifecycle callbacks exposed to C# scripts:
+    - **OnEntityPerceived** — first detection (with perception method and position)
+    - **OnEntityLost** — target leaves perception range
+    - **OnEntityForgotten** — target fully forgotten after ForgetDuration
+- Type filtering: Both senses support filtering by **PerceivableType** (Player, Enemy, Neutral, Environment)
+- Perception query API in C#: `GetCurrentPerceptions()`, `GetForgottenPerceptions()`, `IsEntityPerceived()`, `IsEntityForgotten()`
 
 ### Physics
 - **2D Physics (Box2D)**
@@ -154,6 +172,8 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 
 ---
 
+## 
+
 ## 🌲 Behavior Tree Integration
 
 > The integration is complete. As an ongoing project, there may still be minor bugs or edge cases.
@@ -194,6 +214,53 @@ Derive from `BTCondition` and create a parameter class from `BTConditionParams`.
 
 ---
 
+## 👁 AI Perception System
+> The perception system provides Unreal like AI sensing capabilities. AI entities can detect targets through sight (FOV + line of sight) and hearing (noise events).
+
+### Setup
+1. Add an **AIControllerComponent** to your AI entity
+2. Enable desired senses (Sight, Hearing) and configure their parameters
+3. Add a **PerceivableComponent** to any entity that should be detectable
+4. Set the perceivable entity's Type (Player, Enemy, Neutral, Environment) and optionally add **DetectablePointOffsets** for more accurate line of sight checks
+
+### How It Works
+- **Sight**: The system creates sphere trigger bodies on the `PERCEPTION` physics layer. When a `PERCEIVABLE` entity overlaps this sphere, the AI checks FOV angle (dot product) and performs line of sight raycasts. If the center raycast is blocked, fallback raycasts are attempted against **DetectablePointOffsets** on the target.
+- **Hearing**: Similar to **sight**, a sphere trigger body is created on the `PERCEPTION` layer. Only noise events from entities already overlapping this sphere are processed. The system then applies type filtering, distance based loudness attenuation, and adds qualifying sources to **CurrentPerceptions**.
+- **Lifecycle**: Each AI controller ticks at its own **UpdateInterval**. Every tick, it builds a fresh **CurrentPerceptions** list and diffs against the previous tick to fire `OnEntityPerceived`, `OnEntityLost`, and `OnEntityForgotten` callbacks.
+
+### C# Callbacks
+- Override these virtual methods on your Entity script to respond to perception events:
+```csharp
+    public class EnemyAI : Entity
+    {
+        public override void OnEntityPerceived(ulong entityID, int perceptionMethod, Vector3 position)
+        {
+            // perceptionMethod: 0 = Sight, 1 = Hearing
+            Console.WriteLine($"Detected entity {entityID} via {(perceptionMethod == 0 ? "Sight" : "Hearing")} at {position}");
+        }
+
+        public override void OnEntityLost(ulong entityID, Vector3 lastKnownPosition)
+        {
+            Console.WriteLine($"Lost sight of entity {entityID}, last seen at {lastKnownPosition}");
+        }
+
+        public override void OnEntityForgotten(ulong entityID)
+        {
+            Console.WriteLine($"Completely forgot about entity {entityID}");
+        }
+    }
+```
+### Reporting Noise C#
+```csharp
+// Emit a noise event at the current entity's position
+Entity.ReportNoise(
+    position: transform.Position,
+    loudness: 1.0f,
+    maxRange: 15.0f,
+    sourceType: PerceivableType.Player);
+```
+---
+
 ## 🛠 Project Setup (C# Workflow)
 
 ### 1. Create a New Project
@@ -214,6 +281,85 @@ Derive from `BTCondition` and create a parameter class from `BTConditionParams`.
 ---
 
 ## 📝 Code Examples
+
+<details>
+<summary><b>Sight Percaption Update</b></summary>
+
+```cpp
+    void JoltWorld::SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc,
+        const glm::vec3& forward)
+    {
+        for (const UUID& targetID : ai.OverlappingEntities)
+        {
+            Entity targetEntity = m_Scene->GetEntityByUUID(targetID);
+            if (!targetEntity || !targetEntity.HasComponent<PerceivableComponent>())
+                continue;       
+            
+            auto& percComp = targetEntity.GetComponent<PerceivableComponent>();
+            if (!percComp.bIsDetectable)
+                continue;       
+            
+            auto& targetTC = targetEntity.GetComponent<TransformComponent>();
+            glm::vec3 toTarget = targetTC.Position - tc.Position;
+            float distance = glm::length(toTarget);
+            if (distance < 0.001f)
+                continue;       
+            
+            glm::vec3 dirToTarget = toTarget / distance;        
+            if (ai.IsSightEnabled() && distance <= ai.SightSettings.SightRadius)
+            {
+                bool typeMatch = ai.SightSettings.DetectableTypes.empty();
+                for (auto& dt : ai.SightSettings.DetectableTypes)
+                    for (auto& pt : percComp.Types)
+                        if (dt == pt)
+                        {
+                            typeMatch = true;
+                            break;
+                        }
+                
+                if (!typeMatch)
+                    continue;       
+                
+                float dotProduct = glm::dot(glm::normalize(forward), dirToTarget);
+                float halfFOVcos = glm::cos(glm::radians(ai.SightSettings.FieldOfView * 0.5f));
+                if (dotProduct < halfFOVcos)
+                    continue;       
+                
+                std::vector<uint64_t> ignoreList = { (uint64_t)ai.OwnerEntityID };
+                RaycastHit3D losHit = Raycast(tc.Position, dirToTarget, distance + 0.1f, false, 0.0f, ignoreList);      
+                bool hasLOS = false;
+                
+                if (losHit.Hit && losHit.HitEntityID == targetID)
+                    hasLOS = true;
+                else if (!percComp.DetectablePointsOffsets.empty())
+                    for (auto& offset : percComp.DetectablePointsOffsets)
+                    {
+                        glm::vec3 targetPoint = targetTC.Position + offset;
+                        glm::vec3 dir = glm::normalize(targetPoint - tc.Position);
+                        float dist = glm::length(targetPoint - tc.Position);
+                        RaycastHit3D pointHit = Raycast(tc.Position, dir, dist + 0.1f, false, 0.0f, ignoreList);
+                        if (pointHit.Hit && pointHit.HitEntityID == targetID)
+                        {
+                            hasLOS = true;
+                            break;
+                        }
+                    }       
+                
+                if (hasLOS)
+                {
+                    PercaptionResult result;
+                    result.EntityID.ID = targetID;
+                    result.Type = percComp.Types.empty() ? PerceivableType::Neutral : percComp.Types[0];
+                    result.PercaptionMethod = PercaptionType::Sight;
+                    result.SensedPosition = targetTC.Position;
+                    result.TimeSinceLastSensed = 0.0f;
+                    ai.CurrentPerceptions.push_back(result);
+                }
+            }
+        }
+    }
+```
+</details>
 
 <details>
 <summary><b>Blackboard (C#)</b></summary>

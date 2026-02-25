@@ -5,13 +5,14 @@
 #include "glm/glm.hpp"
 #include "HRealEngine/Core/UUID.h"
 #include "HRealEngine/Renderer/Texture.h"
+#include <filesystem>
+#include <unordered_set>
+#include "HRealEngine/Renderer/Font.h"
 
 #include "glm/ext/matrix_transform.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <filesystem>
 #include <glm/gtx/quaternion.hpp>
 
-#include "HRealEngine/Renderer/Font.h"
 
 
 namespace HRealEngine
@@ -114,6 +115,101 @@ namespace HRealEngine
         
         BehaviorTreeComponent() = default;
         BehaviorTreeComponent(const BehaviorTreeComponent&) = default;
+    };
+    
+    enum class PercaptionType { Sight = 0, Hearing, Touch };
+    enum class PerceivableType { Player = 0, Enemy, Neutral, Environment };
+    struct SightConfig
+    {
+        float SightRadius = 10.0f;
+        float FieldOfView = 90.0f; // In degrees
+        float ForgetDuration = 5.0f; // How long an entity remains in memory after being sensed
+        
+        std::vector<PerceivableType> DetectableTypes; // Types of entities that can be detected by sight
+        
+        SightConfig() = default;
+        SightConfig(const SightConfig&) = default;
+    };
+    struct NoiseEvent
+    {
+        UUID SourceEntityID = 0;
+        glm::vec3 Position = glm::vec3(0.0f);
+        float Loudness = 1.0f;
+        float MaxRange = 0.0f;
+        PerceivableType SourceType = PerceivableType::Neutral;
+        float Timestamp = 0.0f;
+    };
+    struct HearingConfig
+    {
+        float HearingRadius = 10.0f;
+        float ForgetDuration = 5.0f; // How long an entity remains in memory after being sensed
+        
+        std::vector<PerceivableType> DetectableTypes; // Types of entities that can be detected by hearing
+        
+        HearingConfig() = default;
+        HearingConfig(const HearingConfig&) = default;
+    };
+    struct PercaptionResult
+    {
+        EntityIDComponent EntityID;
+        PerceivableType Type;
+        PercaptionType PercaptionMethod;
+        
+        glm::vec3 SensedPosition;
+        float TimeSinceLastSensed = 0.0f;
+        
+        PercaptionResult() = default;
+        PercaptionResult(const PercaptionResult&) = default;
+    };
+    struct AIControllerComponent
+    {
+        UUID OwnerEntityID = 0;
+        std::unordered_map<PercaptionType, bool> EnabledPerceptions; // Which perception types are enabled for this AI controller
+        
+        SightConfig SightSettings;
+        void* SightRuntimeBody = nullptr;
+        HearingConfig HearingSettings;
+        void* HearingRuntimeBody = nullptr;
+        
+        std::unordered_map<UUID, int> OverlappingEntities;
+        
+        float UpdateInterval = 0.5f; // How often the AI controller updates its perceptions and decisions
+        float TimeSinceLastUpdate = 0.0f;
+        
+        std::vector<PercaptionResult> CurrentPerceptions; 
+        std::vector<PercaptionResult> PreviousPerceptions;
+        std::vector<PercaptionResult> ForgottenPerceptions;
+        
+        AIControllerComponent() = default;
+        AIControllerComponent(const AIControllerComponent&) = default;
+        
+        bool IsSightEnabled() const 
+        { 
+            auto it = EnabledPerceptions.find(PercaptionType::Sight);
+            return it != EnabledPerceptions.end() && it->second;
+        }
+        bool IsHearingEnabled() const 
+        { 
+            auto it = EnabledPerceptions.find(PercaptionType::Hearing);
+            return it != EnabledPerceptions.end() && it->second;
+        }
+        void SetSightEnabled(bool enabled) { EnabledPerceptions[PercaptionType::Sight] = enabled; }
+        void SetHearingEnabled(bool enabled) { EnabledPerceptions[PercaptionType::Hearing] = enabled; }
+    };
+    struct PerceivableComponent
+    {
+        UUID OwnerEntityID = 0;
+        std::vector<PerceivableType> Types;
+        bool bIsDetectable = true;
+        
+        std::vector<glm::vec3> DetectablePointsOffsets; // Offsets from the entity's position that can be detected by AI controllers
+        
+        int DetectionPriority = 0;
+        
+        void* RuntimeBody = nullptr;
+        
+        PerceivableComponent() = default;
+        PerceivableComponent(const PerceivableComponent&) = default;
     };
 
     struct EntityNameComponent
@@ -276,6 +372,8 @@ namespace HRealEngine
         SpriteRendererComponent,
         MeshRendererComponent,
         BehaviorTreeComponent,
+        AIControllerComponent,
+        PerceivableComponent,
         CircleRendererComponent,
         NativeScriptComponent,
         ScriptComponent,

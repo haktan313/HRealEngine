@@ -5,6 +5,7 @@
 
 #include "HRealEngine/Asset/Asset.h"
 #include "HRealEngine/Camera/EditorCamera.h"
+#include "HRealEngine/Core/Components.h"
 #include "HRealEngine/Core/Timestep.h"
 
 namespace YAML
@@ -32,6 +33,7 @@ namespace HRealEngine
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
         void CreatePhysicsWorld();
         void DestroyEntity(Entity entity);
+        void ReportNoiseEvent(const NoiseEvent& event);
         entt::registry& GetRegistry() { return m_Registry; }
         
         virtual AssetType GetType() const override { return AssetType::Scene; }

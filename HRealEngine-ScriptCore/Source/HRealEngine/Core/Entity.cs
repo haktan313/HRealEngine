@@ -13,6 +13,10 @@ namespace HRealEngine
         }
         public readonly ulong EntityID;
         
+        public virtual void OnEntityPerceived(ulong entityID, int perceptionMethod, Vector3 position) {}
+        public virtual void OnEntityLost(ulong entityID, Vector3 lastKnownPosition) {}
+        public virtual void OnEntityForgotten(ulong entityID) {}
+        
         public Entity Parent
         {
             get
@@ -78,6 +82,14 @@ namespace HRealEngine
         public bool HasTag(string tag)
         {
             return InternalCalls_Entity.Entity_HasTag(EntityID, tag);
+        }
+        public void AddTag(string tag) 
+        {
+            InternalCalls_Entity.Entity_AddTag(EntityID, tag);
+        }
+        public void RemoveTag(string tag)
+        {
+            InternalCalls_Entity.Entity_RemoveTag(EntityID, tag);
         }
         public bool HasComponent<T>() where T : Component, new()
         {
@@ -157,10 +169,13 @@ namespace HRealEngine
         {
             return GlobalFunctions.Raycast3D(origin, direction, maxDistance, out hit, ignoreEntities, debugDraw, debugDrawDuration);
         }
-
         public RaycastHit[] Raycast3DAll(Vector3 origin, Vector3 direction, float maxDistance, ulong[] ignoreEntities = null, bool debugDraw = false, float debugDrawDuration = 0.0f)
         {
             return GlobalFunctions.Raycast3DAll(origin, direction, maxDistance, ignoreEntities, debugDraw, debugDrawDuration);
+        }
+        public void ReportNoiseEvent(ulong sourceEntityID, Vector3 position, float intensity, float maxRange, int sourceType)
+        {
+            GlobalFunctions.ReportNoiseEvent(sourceEntityID, position, intensity, maxRange, sourceType);
         }
     }
 }

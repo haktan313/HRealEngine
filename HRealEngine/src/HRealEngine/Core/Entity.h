@@ -58,6 +58,21 @@ namespace HRealEngine
             const auto& tags = GetComponent<TagComponent>().Tags;
             return std::find(tags.begin(), tags.end(), tag) != tags.end();
         }
+        void AddTag(const std::string& tag)
+        {
+            if (!HasComponent<TagComponent>())
+                AddComponent<TagComponent>();
+            auto& tags = GetComponent<TagComponent>().Tags;
+            if (std::find(tags.begin(), tags.end(), tag) == tags.end())
+                tags.push_back(tag);
+        }
+        void RemoveTag(const std::string& tag)
+        {
+            if (!HasComponent<TagComponent>())                
+                return;
+            auto& tags = GetComponent<TagComponent>().Tags;
+            tags.erase(std::remove(tags.begin(), tags.end(), tag), tags.end());
+        }
         
         operator bool() const { return m_EntityHandle != entt::null; }
         operator entt::entity() const { return m_EntityHandle; }

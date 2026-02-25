@@ -70,10 +70,10 @@ namespace HRealEngine
         return (idx == 1) ? GL_NEAREST : GL_LINEAR;
     }
 
-    static Ref<Font> s_Font;
+    //static Ref<Font> s_Font;
     EditorLayer::EditorLayer() : Layer("EditorLayer"), m_OrthCameraController(1280.0f / 720.0f, true)
     {
-        s_Font = Font::GetDefault();
+        //s_Font = Font::GetDefault();
     }
 
     void EditorLayer::RegisterBehaviorTreeStufs()
@@ -640,6 +640,10 @@ namespace HRealEngine
 
         ImGui::Begin("Settings");
         ImGui::Checkbox("Show Physics Colliders", &m_ShowPhysicsColliders);
+        ImGui::Checkbox("Show Percaption Colliders", &m_ShowPercaptionColliders);
+        ImGui::DragFloat("Percaption Sight Debug Sphere Radius", &m_PercaptionSightDebugSphereRadius, 0.6f);
+        ImGui::DragFloat("Percaption Hearing Debug Sphere Radius", &m_PercaptionHearingDebugSphereRadius, 0.5f);
+        ImGui::DragFloat("Percaption Forgat Debug Sphere Radius", &m_PercaptionForgatDebugSphereRadius, 0.4f);
         m_bSetPhysics2DEnabled = m_ActiveScene->Is2DPhysicsEnabled();
         if (ImGui::Checkbox("Enable 2D Physics", &m_bSetPhysics2DEnabled))
         {
@@ -659,7 +663,7 @@ namespace HRealEngine
         
         Renderer::SetDebugView(debugView);
 
-        ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512,512 }, {0, 1}, {1, 0});
+        //ImGui::Image((ImTextureID)s_Font->GetAtlasTexture()->GetRendererID(), { 512,512 }, {0, 1}, {1, 0});
         
         ImGui::End();
 
@@ -984,6 +988,83 @@ namespace HRealEngine
                     glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0f), pos) * rot4 * glm::scale(glm::mat4(1.0f), scale);
                     
                     Renderer3D::DrawWireCube(colliderTransform, { 0.f, 1.f, 0.f, 1.f });
+                }
+            }
+        }
+        
+        if (m_ShowPercaptionColliders)
+        {
+            auto view = m_ActiveScene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+            for (auto entity : view)
+            {
+                auto [aiController, transform] = view.get<AIControllerComponent, TransformComponent>(entity);
+                
+                if (aiController.IsSightEnabled())
+                {
+                    glm::vec4 sightColor(0.0f, 0.4f, 1.0f, 0.8f);
+                    Renderer3D::DrawWireSphere(transform.Position, aiController.SightSettings.SightRadius, sightColor);
+
+                    // FOV cone
+                    glm::quat q = glm::quat(transform.Rotation);
+                    glm::vec3 forward = q * glm::vec3(0, 0, -1);
+                    float halfFOV = glm::radians(aiController.SightSettings.FieldOfView * 0.5f);
+                    float radius = aiController.SightSettings.SightRadius;
+
+                    glm::vec3 up(0, 1, 0);
+                    glm::vec3 leftDir = glm::angleAxis(halfFOV, up) * forward;
+                    glm::vec3 rightDir = glm::angleAxis(-halfFOV, up) * forward;
+
+                    glm::vec4 coneColor(0.0f, 0.8f, 1.0f, 1.0f);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + leftDir * radius, coneColor);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + rightDir * radius, coneColor);
+
+                    glm::vec3 right = glm::normalize(glm::cross(forward, up));
+                    glm::vec3 topDir = glm::angleAxis(halfFOV, right) * forward;
+                    glm::vec3 bottomDir = glm::angleAxis(-halfFOV, right) * forward;
+                    
+                    glm::vec4 coneColorFaded(0.0f, 0.6f, 1.0f, 0.5f);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + topDir * radius, coneColorFaded);
+                    Renderer2D::DrawLine(transform.Position, transform.Position + bottomDir * radius, coneColorFaded);
+                }
+
+                if (aiController.IsHearingEnabled())
+                {
+                    glm::vec4 hearColor(1.0f, 1.0f, 0.0f, 0.6f);
+                    Renderer3D::DrawWireSphere(transform.Position, aiController.HearingSettings.HearingRadius, hearColor);
+                }
+                
+                for (const auto& perception : aiController.CurrentPerceptions)
+                {
+                    Entity targetEntity = m_ActiveScene->GetEntityByUUID(perception.EntityID.ID);
+                    if (!targetEntity || !targetEntity.HasComponent<TransformComponent>())
+                        continue;
+
+                    auto& targetTC = targetEntity.GetComponent<TransformComponent>();
+
+                    if (perception.PercaptionMethod == PercaptionType::Sight)
+                    {
+                        glm::vec4 green(0.0f, 1.0f, 0.0f, 0.8f);
+                        Renderer2D::DrawLine(transform.Position, targetTC.Position, green);
+                        Renderer3D::DrawWireSphere(targetTC.Position, m_PercaptionSightDebugSphereRadius, green, 16);
+                    }
+                    else if (perception.PercaptionMethod == PercaptionType::Hearing)
+                    {
+                        glm::vec4 yellow(1.0f, 1.0f, 0.0f, 0.8f);
+                        Renderer2D::DrawLine(transform.Position, targetTC.Position, yellow);
+                        Renderer3D::DrawWireSphere(targetTC.Position, m_PercaptionHearingDebugSphereRadius, yellow, 16);
+                    }
+                }
+
+                for (const auto& forgotten : aiController.ForgottenPerceptions)
+                {
+                    /*Entity targetEntity = m_ActiveScene->GetEntityByUUID(forgotten.EntityID.ID);
+                    if (!targetEntity || !targetEntity.HasComponent<TransformComponent>())
+                        continue;
+
+                    auto& targetTC = targetEntity.GetComponent<TransformComponent>();*/
+                    glm::vec3 targetPos = forgotten.SensedPosition;
+                    glm::vec4 orange(1.0f, 0.5f, 0.0f, 0.5f);
+                    Renderer3D::DrawWireSphere(targetPos, m_PercaptionForgatDebugSphereRadius, orange, 12);
                 }
             }
         }

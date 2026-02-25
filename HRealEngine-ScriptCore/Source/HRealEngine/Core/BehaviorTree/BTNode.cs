@@ -80,5 +80,10 @@ namespace HRealEngine.BehaviorTree
         {
             return GlobalFunctions.Raycast3DAll(origin, direction, maxDistance, ignoreEntities, debugDraw, debugDrawDuration);
         }
+
+        public void ReportNoiseEvent(ulong SourceEntityID, Vector3 position, float loudness, float maxRange, int sourceType)
+        {
+            GlobalFunctions.ReportNoiseEvent(SourceEntityID, position, loudness, maxRange, sourceType);
+        }
     }
 }

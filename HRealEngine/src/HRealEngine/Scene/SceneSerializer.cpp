@@ -274,6 +274,61 @@ namespace HRealEngine
             out << YAML::Key << "BehaviorTreeHandle" << YAML::Value << bt.BehaviorTreeAsset;
             out << YAML::EndMap;
         }
+        if (entity.HasComponent<AIControllerComponent>())
+        {
+            out << YAML::Key << "AIControllerComponent";
+            out << YAML::BeginMap;
+            auto& ai = entity.GetComponent<AIControllerComponent>();
+            
+            out << YAML::Key << "UpdateInterval" << YAML::Value << ai.UpdateInterval;
+            
+            out << YAML::Key << "SightEnabled" << YAML::Value << ai.EnabledPerceptions[PercaptionType::Sight];
+            out << YAML::Key << "HearingEnabled" << YAML::Value << ai.EnabledPerceptions[PercaptionType::Hearing];
+            
+            out << YAML::Key << "SightConfig";
+            out << YAML::BeginMap;
+            out << YAML::Key << "SightRadius" << YAML::Value << ai.SightSettings.SightRadius;
+            out << YAML::Key << "FieldOfView" << YAML::Value << ai.SightSettings.FieldOfView;
+            out << YAML::Key << "ForgetDuration" << YAML::Value << ai.SightSettings.ForgetDuration;
+            out << YAML::Key << "DetectableTypes" << YAML::Value << YAML::BeginSeq;
+            for (auto type : ai.SightSettings.DetectableTypes)
+                out << (int)type;
+            out << YAML::EndSeq;
+            out << YAML::EndMap;
+            
+            out << YAML::Key << "HearingConfig";
+            out << YAML::BeginMap;
+            out << YAML::Key << "HearingRadius" << YAML::Value << ai.HearingSettings.HearingRadius;
+            out << YAML::Key << "ForgetDuration" << YAML::Value << ai.HearingSettings.ForgetDuration;
+            out << YAML::Key << "DetectableTypes" << YAML::Value << YAML::BeginSeq;
+            for (auto type : ai.HearingSettings.DetectableTypes)
+                out << (int)type;
+            out << YAML::EndSeq;
+            out << YAML::EndMap;
+            
+            out << YAML::EndMap;
+        }
+        if (entity.HasComponent<PerceivableComponent>())
+        {
+            out << YAML::Key << "PerceivableComponent";
+            out << YAML::BeginMap;
+            auto& perc = entity.GetComponent<PerceivableComponent>();
+            
+            out << YAML::Key << "IsDetectable" << YAML::Value << perc.bIsDetectable;
+            out << YAML::Key << "DetectionPriority" << YAML::Value << perc.DetectionPriority;
+            
+            out << YAML::Key << "Types" << YAML::Value << YAML::BeginSeq;
+            for (auto type : perc.Types)
+                out << (int)type;
+            out << YAML::EndSeq;
+            
+            out << YAML::Key << "DetectablePointsOffsets" << YAML::Value << YAML::BeginSeq;
+            for (auto& offset : perc.DetectablePointsOffsets)
+                out << offset;
+            out << YAML::EndSeq;
+            
+            out << YAML::EndMap;
+        }
         if (entity.HasComponent<CircleRendererComponent>())
         {
             auto& circle = entity.GetComponent<CircleRendererComponent>();
@@ -665,6 +720,58 @@ namespace HRealEngine
                     auto& bt = deserializedEntity.AddComponent<BehaviorTreeComponent>();
                     if (btComponent["BehaviorTreeHandle"])
                         bt.BehaviorTreeAsset = btComponent["BehaviorTreeHandle"].as<AssetHandle>();
+                }
+                if (auto aiComponent = entity["AIControllerComponent"])
+                {
+                    auto& ai = deserializedEntity.AddComponent<AIControllerComponent>();
+                    
+                    if (aiComponent["UpdateInterval"])
+                        ai.UpdateInterval = aiComponent["UpdateInterval"].as<float>();
+                    
+                    ai.EnabledPerceptions[PercaptionType::Sight] = aiComponent["SightEnabled"].as<bool>();
+                    ai.EnabledPerceptions[PercaptionType::Hearing] = aiComponent["HearingEnabled"].as<bool>();
+                    
+                    if (auto sightCfg = aiComponent["SightConfig"])
+                    {
+                        ai.SightSettings.SightRadius = sightCfg["SightRadius"].as<float>();
+                        ai.SightSettings.FieldOfView = sightCfg["FieldOfView"].as<float>();
+                        ai.SightSettings.ForgetDuration = sightCfg["ForgetDuration"].as<float>();
+                        if (sightCfg["DetectableTypes"] && sightCfg["DetectableTypes"].IsSequence())
+                        {
+                            for (auto n : sightCfg["DetectableTypes"])
+                                ai.SightSettings.DetectableTypes.push_back((PerceivableType)n.as<int>());
+                        }
+                    }
+                    
+                    if (auto hearingCfg = aiComponent["HearingConfig"])
+                    {
+                        ai.HearingSettings.HearingRadius = hearingCfg["HearingRadius"].as<float>();
+                        ai.HearingSettings.ForgetDuration = hearingCfg["ForgetDuration"].as<float>();
+                        if (hearingCfg["DetectableTypes"] && hearingCfg["DetectableTypes"].IsSequence())
+                        {
+                            for (auto n : hearingCfg["DetectableTypes"])
+                                ai.HearingSettings.DetectableTypes.push_back((PerceivableType)n.as<int>());
+                        }
+                    }
+                }
+                if (auto percComponent = entity["PerceivableComponent"])
+                {
+                    auto& perc = deserializedEntity.AddComponent<PerceivableComponent>();
+                    
+                    perc.bIsDetectable = percComponent["IsDetectable"].as<bool>();
+                    perc.DetectionPriority = percComponent["DetectionPriority"].as<int>();
+                    
+                    if (percComponent["Types"] && percComponent["Types"].IsSequence())
+                    {
+                        for (auto n : percComponent["Types"])
+                            perc.Types.push_back((PerceivableType)n.as<int>());
+                    }
+                    
+                    if (percComponent["DetectablePointsOffsets"] && percComponent["DetectablePointsOffsets"].IsSequence())
+                    {
+                        for (auto n : percComponent["DetectablePointsOffsets"])
+                            perc.DetectablePointsOffsets.push_back(n.as<glm::vec3>());
+                    }
                 }
                 if (auto circleRendererComponent = entity["CircleRendererComponent"])
                 {

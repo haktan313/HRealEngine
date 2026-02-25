@@ -101,6 +101,8 @@ namespace HRealEngine
         CopyComponent<SpriteRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<MeshRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<BehaviorTreeComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<AIControllerComponent>(dstRegistry, srcRegistry, entityMap);
+        CopyComponent<PerceivableComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<CircleRendererComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<NativeScriptComponent>(dstRegistry, srcRegistry, entityMap);
         CopyComponent<Rigidbody2DComponent>(dstRegistry, srcRegistry, entityMap);
@@ -180,20 +182,24 @@ namespace HRealEngine
         m_Registry.destroy(entity);
     }
 
+    void Scene::ReportNoiseEvent(const NoiseEvent& event)
+    {
+        if (m_JoltWorld)
+            m_JoltWorld->ReportNoise(event);
+    }
+
     void Scene::OnRuntimeStart()
     {
         m_bIsRunning = true;
         
-       OnPhysicsStart();
-       {
-           ScriptEngine::OnRuntimeStart(this);
-           auto view = m_Registry.view<ScriptComponent>();
-           for (auto e : view)
-           {
-             Entity entity = {e, this};
-             ScriptEngine::OnCreateEntity(entity);
-           }
-       }
+        OnPhysicsStart();
+        ScriptEngine::OnRuntimeStart(this);
+        auto view = m_Registry.view<ScriptComponent>();
+        for (auto e : view)
+        {
+            Entity entity = {e, this};
+            ScriptEngine::OnCreateEntity(entity);
+        }
         StartBTs();
     }
 
@@ -824,6 +830,14 @@ namespace HRealEngine
     }
     template<>
     void Scene::OnComponentAdded<BehaviorTreeComponent>(Entity entity, BehaviorTreeComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<AIControllerComponent>(Entity entity, AIControllerComponent& component)
+    {
+    }
+    template<>
+    void Scene::OnComponentAdded<PerceivableComponent>(Entity entity, PerceivableComponent& component)
     {
     }
     template<>

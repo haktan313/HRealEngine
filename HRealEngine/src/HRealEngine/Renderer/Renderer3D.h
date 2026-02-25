@@ -49,5 +49,7 @@ namespace HRealEngine
 
         static void EndPointShadowAtlas();
         static void EndPointShadowCaster();
+        
+        static void DrawWireSphere(const glm::vec3& center, float radius, const glm::vec4& color, int segments = 32);
     };
 }

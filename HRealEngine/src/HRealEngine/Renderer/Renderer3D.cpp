@@ -952,4 +952,34 @@ namespace HRealEngine
         Flush();
         StartBatch();
     }
+
+    void Renderer3D::DrawWireSphere(const glm::vec3& center, float radius, const glm::vec4& color, int segments)
+    {
+        const float step = glm::two_pi<float>() / (float)segments;
+        
+        for (int i = 0; i < segments; i++)
+        {
+            float a0 = step * i;
+            float a1 = step * (i + 1);
+            glm::vec3 p0 = center + glm::vec3(cos(a0) * radius, sin(a0) * radius, 0.0f);
+            glm::vec3 p1 = center + glm::vec3(cos(a1) * radius, sin(a1) * radius, 0.0f);
+            Renderer2D::DrawLine(p0, p1, color);
+        }
+        for (int i = 0; i < segments; i++)
+        {
+            float a0 = step * i;
+            float a1 = step * (i + 1);
+            glm::vec3 p0 = center + glm::vec3(cos(a0) * radius, 0.0f, sin(a0) * radius);
+            glm::vec3 p1 = center + glm::vec3(cos(a1) * radius, 0.0f, sin(a1) * radius);
+            Renderer2D::DrawLine(p0, p1, color);
+        }
+        for (int i = 0; i < segments; i++)
+        {
+            float a0 = step * i;
+            float a1 = step * (i + 1);
+            glm::vec3 p0 = center + glm::vec3(0.0f, cos(a0) * radius, sin(a0) * radius);
+            glm::vec3 p1 = center + glm::vec3(0.0f, cos(a1) * radius, sin(a1) * radius);
+            Renderer2D::DrawLine(p0, p1, color);
+        }
+    }
 }

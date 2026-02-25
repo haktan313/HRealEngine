@@ -56,6 +56,17 @@ namespace HRealEngine
         
         std::vector<DebugLine>& GetDebugLines() { return m_DebugLines; }
         void UpdateDebugLines(float deltaTime);
+        
+        void CreatePercaptionBodies();
+        void DestroyPercaptionBodies();
+        void UpdatePercaptionBodies();
+        
+        void UpdateAIControllerBodies();
+        void HearingPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc);
+        void SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc, const glm::vec3& forward);
+        void UpdatePerceivableBodies();
+        
+        void ReportNoise(const NoiseEvent& event);
     private:
         std::vector<DebugLine> m_DebugLines;
         
@@ -65,6 +76,12 @@ namespace HRealEngine
             entt::entity B;*/
             UUID EntityA;
             UUID EntityB;
+        };
+        struct PerceptionOverlapEvent
+        {
+            UUID EntityA;
+            UUID EntityB;
+            bool bIsBegin; // true for begin, false for end
         };
         class MyContactListener : public JPH::ContactListener
         {
@@ -90,12 +107,34 @@ namespace HRealEngine
                 UUID entity1ID = (UUID)inBody1.GetUserData();
                 UUID entity2ID = (UUID)inBody2.GetUserData();
 
-                if (entity1ID != 0 && entity2ID != 0)
+                if (entity1ID == 0 || entity2ID == 0)
+                    return;
+                
+                auto layer1 = inBody1.GetObjectLayer();
+                auto layer2 = inBody2.GetObjectLayer();
+                
+                bool bisPerceptionOverlap = (layer1 == Layers::PERCEPTION && layer2 == Layers::PERCEIVABLE) || (layer1 == Layers::PERCEIVABLE && layer2 == Layers::PERCEPTION);
+                /*if (entity1ID != 0 && entity2ID != 0)
                 {
                     std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
                     m_JoltWorld->m_CollisionBeginEvents.push_back({ entity1ID, entity2ID });
                 }
-                std::cout << "A contact was added" << std::endl;
+                std::cout << "A contact was added" << std::endl;*/
+                if (bisPerceptionOverlap)
+                {
+                    UUID perceiverID = layer1 == Layers::PERCEPTION ? entity1ID : entity2ID;
+                    UUID perceivedID = layer1 == Layers::PERCEPTION ? entity2ID : entity1ID;
+
+                    std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
+                    m_JoltWorld->m_PerceptionOverlapEvents.push_back({ perceiverID, perceivedID, true });
+                    std::cout << "A contact was added for percaption system" << std::endl;
+                }
+                else
+                {
+                    std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
+                    m_JoltWorld->m_CollisionBeginEvents.push_back({ entity1ID, entity2ID });
+                    std::cout << "A contact was added" << std::endl;
+                }
             }
 
             virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2,
@@ -122,12 +161,47 @@ namespace HRealEngine
                 if (m_Scene->GetRegistry().valid(entity1) && m_Scene->GetRegistry().valid(entity2))
                     m_JoltWorld->m_CollisionEndEvents.push_back({ entity1,  entity2 });
                 std::cout << "A contact was removed" << std::endl;*/
-                const JPH::BodyInterface &bi = m_JoltWorld->physics_system.GetBodyInterfaceNoLock();
+                /*const JPH::BodyInterface &bi = m_JoltWorld->physics_system.GetBodyInterfaceNoLock();
     
                 UUID entity1ID = (UUID)bi.GetUserData(inSubShapePair.GetBody1ID());
                 UUID entity2ID = (UUID)bi.GetUserData(inSubShapePair.GetBody2ID());
 
                 if (entity1ID != 0 && entity2ID != 0)
+                {
+                    std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
+                    m_JoltWorld->m_CollisionEndEvents.push_back({ entity1ID, entity2ID });
+                }*/
+                const JPH::BodyLockInterfaceNoLock &lockInterface = m_JoltWorld->physics_system.GetBodyLockInterfaceNoLock();
+
+                JPH::BodyLockRead lock1(lockInterface, inSubShapePair.GetBody1ID());
+                JPH::BodyLockRead lock2(lockInterface, inSubShapePair.GetBody2ID());
+
+                if (!lock1.Succeeded() || !lock2.Succeeded())
+                    return;
+
+                const JPH::Body &body1 = lock1.GetBody();
+                const JPH::Body &body2 = lock2.GetBody();
+
+                UUID entity1ID = (UUID)body1.GetUserData();
+                UUID entity2ID = (UUID)body2.GetUserData();
+
+                if (entity1ID == 0 || entity2ID == 0)
+                    return;
+
+                auto layer1 = body1.GetObjectLayer();
+                auto layer2 = body2.GetObjectLayer();
+
+                bool isPerceptionContact = (layer1 == Layers::PERCEPTION && layer2 == Layers::PERCEIVABLE) || (layer1 == Layers::PERCEIVABLE && layer2 == Layers::PERCEPTION);
+
+                if (isPerceptionContact)
+                {
+                    UUID perceiverID = (layer1 == Layers::PERCEPTION) ? entity1ID : entity2ID;
+                    UUID perceivedID = (layer1 == Layers::PERCEPTION) ? entity2ID : entity1ID;
+
+                    std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
+                    m_JoltWorld->m_PerceptionOverlapEvents.push_back({ perceiverID, perceivedID, false });
+                }
+                else
                 {
                     std::lock_guard<std::mutex> lock(m_JoltWorld->m_EventQueueMutex);
                     m_JoltWorld->m_CollisionEndEvents.push_back({ entity1ID, entity2ID });
@@ -140,6 +214,10 @@ namespace HRealEngine
         std::vector<CollisionEvent> m_CollisionBeginEvents;
         std::vector<CollisionEvent> m_CollisionEndEvents;
         std::mutex m_EventQueueMutex;
+        float m_MaxIntervalForNoiseEvent = 0.5f;
+        
+        std::vector<PerceptionOverlapEvent> m_PerceptionOverlapEvents;
+        std::vector<NoiseEvent> m_PendingNoiseEvents;
         
         Scene* m_Scene = nullptr;
         JPH::BodyInterface* body_interface;

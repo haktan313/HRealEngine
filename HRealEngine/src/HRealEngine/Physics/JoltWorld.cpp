@@ -6,6 +6,7 @@
 #include "HRealEngine/Scene/Scene.h"
 #include "HRealEngine/Scene/ScriptableEntity.h"
 #include "HRealEngine/Scripting/ScriptEngine.h"
+#include "HRealEngine/Utils/PlatformUtils.h"
 
 #include "Physics/PhysicsSystem.h"
 #include "Physics/Body/BodyCreationSettings.h"
@@ -13,6 +14,7 @@
 #include "Physics/Collision/CollisionCollectorImpl.h"
 #include "Physics/Collision/RayCast.h"
 #include "Physics/Collision/Shape/BoxShape.h"
+#include "Physics/Collision/Shape/SphereShape.h"
 #include "Physics/Collision/Shape/EmptyShape.h"
 #include "Physics/Collision/Shape/RotatedTranslatedShape.h"
 
@@ -69,6 +71,7 @@ namespace HRealEngine
     {
         CreateBoxCollider();
         CreateEmptyBody();
+        CreatePercaptionBodies();
     }
 
     void JoltWorld::CreateBoxCollider()
@@ -609,13 +612,16 @@ namespace HRealEngine
     void JoltWorld::UpdateRuntime3D()
     {
         std::vector<CollisionEvent> beginEvents, endEvents;
+        std::vector<PerceptionOverlapEvent> perceptionEvents;
         {
             std::lock_guard<std::mutex> lock(m_EventQueueMutex);
             beginEvents = std::move(m_CollisionBeginEvents);
             endEvents = std::move(m_CollisionEndEvents);
-        
+            perceptionEvents = std::move(m_PerceptionOverlapEvents);
+            
             m_CollisionBeginEvents.clear();
             m_CollisionEndEvents.clear();
+            m_PerceptionOverlapEvents.clear();
         }
         
         for (const auto& ev : beginEvents)
@@ -634,12 +640,14 @@ namespace HRealEngine
                 if (a.HasComponent<NativeScriptComponent>())
                 {
                     auto& nsc = a.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(b);
+                    if (nsc.Instance) 
+                        nsc.Instance->OnCollisionBegin(b);
                 }
                 if (b.HasComponent<NativeScriptComponent>())
                     {
                     auto& nsc = b.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionBegin(a);
+                    if (nsc.Instance) 
+                        nsc.Instance->OnCollisionBegin(a);
                 }
             }
         }
@@ -656,17 +664,46 @@ namespace HRealEngine
                     ScriptEngine::OnCollisionEnd(b, a);
 
                 if (a.HasComponent<NativeScriptComponent>())
-                    {
+                {
                     auto& nsc = a.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(b);
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(b);
                 }
                 if (b.HasComponent<NativeScriptComponent>())
-                    {
+                {
                     auto& nsc = b.GetComponent<NativeScriptComponent>();
-                    if (nsc.Instance) nsc.Instance->OnCollisionEnd(a);
+                    if (nsc.Instance)
+                        nsc.Instance->OnCollisionEnd(a);
                 }
             }
         }
+        for (const auto& ev : perceptionEvents)
+        {
+            Entity perceiver = m_Scene->GetEntityByUUID(ev.EntityA);
+            if (!perceiver || !perceiver.HasComponent<AIControllerComponent>())
+                continue;
+
+            auto& ai = perceiver.GetComponent<AIControllerComponent>();
+
+            if (ev.bIsBegin)
+            {
+                if (ev.EntityB == ai.OwnerEntityID)
+                    continue;
+                ai.OverlappingEntities[ev.EntityB]++;
+                LOG_CORE_WARN("PERCEPTION OVERLAP BEGIN: Perceiver {} detected entity {}", (uint32_t)ev.EntityA, (uint32_t)ev.EntityB);
+            }
+            else
+            {
+                auto it = ai.OverlappingEntities.find(ev.EntityB);
+                if (it != ai.OverlappingEntities.end())
+                {
+                    it->second--;
+                    if (it->second <= 0)
+                        ai.OverlappingEntities.erase(it);
+                }
+            }
+        }
+        UpdatePercaptionBodies();
     }
     
     void JoltWorld::Step3DWorldForKinematicBodies(Timestep deltaTime)
@@ -778,10 +815,43 @@ namespace HRealEngine
                 rb.RuntimeBody = nullptr;
             }
         }
+        if (entity.HasComponent<AIControllerComponent>())
+        {
+            auto& ai = entity.GetComponent<AIControllerComponent>();
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.SightRuntimeBody = nullptr;
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.HearingRuntimeBody = nullptr;
+            }
+        }
+        if (entity.HasComponent<PerceivableComponent>())
+        {
+            auto& perc = entity.GetComponent<PerceivableComponent>();
+            if (perc.RuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                perc.RuntimeBody = nullptr;
+            }
+        }
     }
 
     void JoltWorld::Stop3DPhysics()
     {
+        DestroyPercaptionBodies();
         ScriptEngine::SetBodyInterface(nullptr);
         m_JoltWorldHelper = nullptr;
     }
@@ -937,5 +1007,400 @@ namespace HRealEngine
                 [](const DebugLine& l) { return l.RemainingLifetime < 0.0f; }),
             m_DebugLines.end()
         );
+    }
+
+    void JoltWorld::CreatePercaptionBodies()
+    {
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+        for (auto e : viewAI)
+        {
+            Entity entity{ e, m_Scene };
+            auto& ai = entity.GetComponent<AIControllerComponent>();
+            auto& tc = entity.GetComponent<TransformComponent>();
+            
+            if (ai.IsSightEnabled() && ai.SightSettings.SightRadius > 0.01f)
+            {
+                JPH::SphereShapeSettings sphereSettings(ai.SightSettings.SightRadius);
+                sphereSettings.SetEmbedded();
+                JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+                JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(),
+                    JPH::EMotionType::Kinematic, Layers::PERCEPTION);
+                bodySettings.mIsSensor = true;
+                bodySettings.mAllowSleeping = false;
+
+                JPH::Body* body = body_interface->CreateBody(bodySettings);
+                if (body)
+                {
+                    body->SetUserData(entity.GetUUID());
+                    body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                    ai.SightRuntimeBody = body;
+                    ai.OwnerEntityID = entity.GetUUID();
+                    LOG_CORE_INFO("Perception: Sight body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.SightSettings.SightRadius);
+                }
+            }
+            
+            if (ai.IsHearingEnabled() && ai.HearingSettings.HearingRadius > 0.01f)
+            {
+                JPH::SphereShapeSettings sphereSettings(ai.HearingSettings.HearingRadius);
+                sphereSettings.SetEmbedded();
+                JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+                JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(), 
+                    JPH::EMotionType::Kinematic, Layers::PERCEPTION);
+                bodySettings.mIsSensor = true;
+                bodySettings.mAllowSleeping = false;
+
+                JPH::Body* body = body_interface->CreateBody(bodySettings);
+                if (body)
+                {
+                    body->SetUserData(entity.GetUUID());
+                    body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                    ai.HearingRuntimeBody = body;
+                    ai.OwnerEntityID = entity.GetUUID();
+                    LOG_CORE_INFO("Perception: Hearing body created for entity UUID {} (radius: {})",(uint32_t)entity.GetUUID(), ai.HearingSettings.HearingRadius);
+                }
+            }
+        }
+        
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent, TransformComponent>();
+        for (auto e : viewPerc)
+        {
+            Entity entity{ e, m_Scene };
+            auto& perc = entity.GetComponent<PerceivableComponent>();
+            auto& tc = entity.GetComponent<TransformComponent>();
+
+            if (!perc.bIsDetectable)
+                continue;
+
+            JPH::SphereShapeSettings sphereSettings(0.1f);
+            sphereSettings.SetEmbedded();
+            JPH::ShapeRefC shape = sphereSettings.Create().Get();
+
+            JPH::BodyCreationSettings bodySettings(shape, JPH::RVec3(tc.Position.x, tc.Position.y, tc.Position.z), JPH::Quat::sIdentity(),
+                JPH::EMotionType::Kinematic, Layers::PERCEIVABLE);
+            bodySettings.mIsSensor = true;
+            bodySettings.mAllowSleeping = false;
+
+            JPH::Body* body = body_interface->CreateBody(bodySettings);
+            if (body)
+            {
+                body->SetUserData(entity.GetUUID());
+                body_interface->AddBody(body->GetID(), JPH::EActivation::Activate);
+                perc.RuntimeBody = body;
+                perc.OwnerEntityID = entity.GetUUID();
+                LOG_CORE_INFO("Perception: Perceivable body created for entity UUID {}", (uint32_t)entity.GetUUID());
+            }
+        }
+    }
+
+    void JoltWorld::DestroyPercaptionBodies()
+    {
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent>();
+        for (auto e : viewAI)
+        {
+            auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.SightRuntimeBody = nullptr;
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                ai.HearingRuntimeBody = nullptr;
+            }
+        }
+        
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent>();
+        for (auto e : viewPerc)
+        {
+            auto& perc = m_Scene->GetRegistry().get<PerceivableComponent>(e);
+            if (perc.RuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body->SetUserData(0);
+                body_interface->RemoveBody(body->GetID());
+                body_interface->DestroyBody(body->GetID());
+                perc.RuntimeBody = nullptr;
+            }
+        }
+    }
+
+    void JoltWorld::UpdatePercaptionBodies()
+    {
+        UpdateAIControllerBodies();
+        UpdatePerceivableBodies();
+        //m_PendingNoiseEvents.clear();
+        float now = Time::GetTime();
+        float maxInterval = m_MaxIntervalForNoiseEvent;
+        m_PendingNoiseEvents.erase(std::remove_if(m_PendingNoiseEvents.begin(), m_PendingNoiseEvents.end(),[now, maxInterval](const NoiseEvent& n)
+        {
+            return now - n.Timestamp > maxInterval;
+        }),m_PendingNoiseEvents.end());
+    }
+
+    void JoltWorld::UpdateAIControllerBodies()
+    {
+        m_MaxIntervalForNoiseEvent = 0.5f;
+        auto viewAI = m_Scene->GetRegistry().view<AIControllerComponent, TransformComponent>();
+        for (auto e : viewAI)
+        {
+            auto& ai = m_Scene->GetRegistry().get<AIControllerComponent>(e);
+            if (ai.UpdateInterval > m_MaxIntervalForNoiseEvent)
+                m_MaxIntervalForNoiseEvent = ai.UpdateInterval;
+            
+            auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
+            
+            JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+            glm::quat q = glm::quat(tc.Rotation);
+            JPH::Quat rot(q.x, q.y, q.z, q.w);
+
+            if (ai.SightRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.SightRuntimeBody;
+                body_interface->SetPositionAndRotation(body->GetID(), pos, rot, JPH::EActivation::Activate);
+            }
+            if (ai.HearingRuntimeBody)
+            {
+                JPH::Body* body = (JPH::Body*)ai.HearingRuntimeBody;
+                body_interface->SetPositionAndRotation(body->GetID(), pos, rot, JPH::EActivation::Activate);
+            }
+            
+            ai.TimeSinceLastUpdate += Time::GetDeltaTime();
+            if (ai.TimeSinceLastUpdate < ai.UpdateInterval)
+                continue;
+            ai.TimeSinceLastUpdate = 0.0f;
+
+            ai.PreviousPerceptions = ai.CurrentPerceptions;
+            ai.CurrentPerceptions.clear();
+
+            glm::quat ownerQuat = glm::quat(tc.Rotation);
+            glm::vec3 forward = ownerQuat * glm::vec3(0, 0, -1);
+            
+            HearingPercaptionsUpdate(ai, tc);
+            SightPercaptionsUpdate(ai, tc, forward);
+            
+            Entity perceiverEntity{ e, m_Scene };
+            
+            for (auto& curr : ai.CurrentPerceptions)
+            {
+                bool wasPerceived = false;
+                for (auto& prev : ai.PreviousPerceptions)
+                    if (prev.EntityID.ID == curr.EntityID.ID)
+                    {
+                        wasPerceived = true;
+                        break;
+                    }
+                if (!wasPerceived)
+                {
+                    ai.ForgottenPerceptions.erase(std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),[&](const PercaptionResult& f)
+                    {
+                        return f.EntityID.ID == curr.EntityID.ID;
+                    }),ai.ForgottenPerceptions.end());
+        
+                    ScriptEngine::OnEntityPerceived(perceiverEntity, curr.EntityID.ID, curr.PercaptionMethod, curr.SensedPosition);
+                }
+            }
+            
+            for (auto& prev : ai.PreviousPerceptions)
+            {
+                bool stillPerceived = false;
+                for (auto& curr : ai.CurrentPerceptions)
+                    if (curr.EntityID.ID == prev.EntityID.ID)
+                    {
+                        stillPerceived = true;
+                        break;
+                    }
+                
+                if (!stillPerceived)
+                {
+                    ScriptEngine::OnEntityLost(perceiverEntity, prev.EntityID.ID, prev.SensedPosition);
+                    
+                    bool alreadyForgotten = false;
+                    for (auto& f : ai.ForgottenPerceptions)
+                        if (f.EntityID.ID == prev.EntityID.ID)
+                        {
+                            f.SensedPosition = prev.SensedPosition;
+                            f.TimeSinceLastSensed = 0.0f;
+                            alreadyForgotten = true; 
+                            break;
+                        }
+                    if (!alreadyForgotten)
+                        ai.ForgottenPerceptions.push_back(prev);
+                }
+            }
+
+            float forgetDuration = ai.SightSettings.ForgetDuration;
+            for (auto& f : ai.ForgottenPerceptions)
+            {
+                f.TimeSinceLastSensed += ai.UpdateInterval;
+                if (f.TimeSinceLastSensed >= forgetDuration)
+                    ScriptEngine::OnEntityForgotten(perceiverEntity, f.EntityID.ID);
+            }
+            
+            ai.ForgottenPerceptions.erase(std::remove_if(ai.ForgottenPerceptions.begin(), ai.ForgottenPerceptions.end(),[forgetDuration](const PercaptionResult& r)
+            {
+                return r.TimeSinceLastSensed >= forgetDuration;
+            }),ai.ForgottenPerceptions.end());
+        }
+    }
+
+    void JoltWorld::HearingPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc)
+    {
+        if (ai.IsHearingEnabled())
+            for (const auto& noise : m_PendingNoiseEvents)
+            {
+                if (noise.Timestamp < (Time::GetTime() - ai.UpdateInterval))
+                    continue;
+                
+                if (noise.SourceEntityID == ai.OwnerEntityID)
+                    continue;
+
+                if (ai.OverlappingEntities.find(noise.SourceEntityID) == ai.OverlappingEntities.end())
+                    continue;
+                
+                bool typeMatch = ai.HearingSettings.DetectableTypes.empty();
+                if (!typeMatch)
+                    for (auto& dt : ai.HearingSettings.DetectableTypes)
+                        if (dt == noise.SourceType)
+                        {
+                            typeMatch = true; 
+                            break;
+                        }
+                
+                if (!typeMatch)
+                    continue;
+
+                float dist = glm::length(noise.Position - tc.Position);
+                float effectiveRange = noise.MaxRange > 0.0f ? noise.MaxRange : ai.HearingSettings.HearingRadius;
+                if (dist > effectiveRange)
+                    continue;
+
+                float perceivedLoudness = noise.Loudness * (1.0f - dist / effectiveRange);
+                if (perceivedLoudness < 0.05f)
+                    continue;
+
+                bool alreadyPerceived = false;
+                for (auto& cp : ai.CurrentPerceptions)
+                    if (cp.EntityID.ID == noise.SourceEntityID)
+                    {
+                        alreadyPerceived = true;
+                        break;
+                    }
+
+                if (!alreadyPerceived)
+                {
+                    PercaptionResult result;
+                    result.EntityID.ID = noise.SourceEntityID;
+                    result.Type = noise.SourceType;
+                    result.PercaptionMethod = PercaptionType::Hearing;
+                    result.SensedPosition = noise.Position;
+                    result.TimeSinceLastSensed = 0.0f;
+                    ai.CurrentPerceptions.push_back(result);
+                }
+            }
+    }
+
+    void JoltWorld::SightPercaptionsUpdate(AIControllerComponent& ai, const TransformComponent& tc,
+        const glm::vec3& forward)
+    {
+        for (const auto& [targetID, count] : ai.OverlappingEntities)
+        {
+            Entity targetEntity = m_Scene->GetEntityByUUID(targetID);
+            if (!targetEntity || !targetEntity.HasComponent<PerceivableComponent>())
+                continue;       
+            
+            auto& percComp = targetEntity.GetComponent<PerceivableComponent>();
+            if (!percComp.bIsDetectable)
+                continue;       
+            
+            auto& targetTC = targetEntity.GetComponent<TransformComponent>();
+            glm::vec3 toTarget = targetTC.Position - tc.Position;
+            float distance = glm::length(toTarget);
+            if (distance < 0.001f)
+                continue;       
+            
+            glm::vec3 dirToTarget = toTarget / distance;        
+            if (ai.IsSightEnabled() && distance <= ai.SightSettings.SightRadius)
+            {
+                bool typeMatch = ai.SightSettings.DetectableTypes.empty();
+                for (auto& dt : ai.SightSettings.DetectableTypes)
+                    for (auto& pt : percComp.Types)
+                        if (dt == pt)
+                        {
+                            typeMatch = true;
+                            break;
+                        }
+                
+                if (!typeMatch)
+                    continue;       
+                
+                float dotProduct = glm::dot(glm::normalize(forward), dirToTarget);
+                float halfFOVcos = glm::cos(glm::radians(ai.SightSettings.FieldOfView * 0.5f));
+                if (dotProduct < halfFOVcos)
+                    continue;       
+                
+                std::vector<uint64_t> ignoreList = { (uint64_t)ai.OwnerEntityID };
+                RaycastHit3D losHit = Raycast(tc.Position, dirToTarget, distance + 0.1f, false, 0.0f, ignoreList);      
+                bool hasLOS = false;
+                
+                if (losHit.Hit && losHit.HitEntityID == targetID)
+                    hasLOS = true;
+                else if (!percComp.DetectablePointsOffsets.empty())
+                    for (auto& offset : percComp.DetectablePointsOffsets)
+                    {
+                        glm::vec3 targetPoint = targetTC.Position + offset;
+                        glm::vec3 dir = glm::normalize(targetPoint - tc.Position);
+                        float dist = glm::length(targetPoint - tc.Position);
+                        RaycastHit3D pointHit = Raycast(tc.Position, dir, dist + 0.1f, false, 0.0f, ignoreList);
+                        if (pointHit.Hit && pointHit.HitEntityID == targetID)
+                        {
+                            hasLOS = true;
+                            break;
+                        }
+                    }       
+                
+                if (hasLOS)
+                {
+                    PercaptionResult result;
+                    result.EntityID.ID = targetID;
+                    result.Type = percComp.Types.empty() ? PerceivableType::Neutral : percComp.Types[0];
+                    result.PercaptionMethod = PercaptionType::Sight;
+                    result.SensedPosition = targetTC.Position;
+                    result.TimeSinceLastSensed = 0.0f;
+                    ai.CurrentPerceptions.push_back(result);
+                }
+            }
+        }
+    }
+
+    void JoltWorld::UpdatePerceivableBodies()
+    {
+        auto viewPerc = m_Scene->GetRegistry().view<PerceivableComponent, TransformComponent>();
+        for (auto e : viewPerc)
+        {
+            auto& perc = m_Scene->GetRegistry().get<PerceivableComponent>(e);
+            auto& tc = m_Scene->GetRegistry().get<TransformComponent>(e);
+            if (perc.RuntimeBody)
+            {
+                JPH::RVec3 pos(tc.Position.x, tc.Position.y, tc.Position.z);
+                JPH::Body* body = (JPH::Body*)perc.RuntimeBody;
+                body_interface->SetPosition(body->GetID(), pos, JPH::EActivation::Activate);
+            }
+        }
+    }
+
+    void JoltWorld::ReportNoise(const NoiseEvent& event)
+    {
+        NoiseEvent ev = event;
+        ev.Timestamp = Time::GetTime();
+        m_PendingNoiseEvents.push_back(ev);
     }
 }
