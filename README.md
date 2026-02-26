@@ -831,9 +831,8 @@ void Scene::GameContactListener::EndContact(b2Contact* contact)
 
 ## 🗺 Roadmap
 
-- [ ] Unreal-like Perception System
-- [ ] Animation system
 - [ ] Custom Navigation Mesh library
+- [ ] Animation system
 
 ---
 
