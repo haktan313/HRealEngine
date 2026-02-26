@@ -11,11 +11,11 @@ AssetRegistry:
   - Handle: 10056156879534379119
     FilePath: layertest.hrs
     Type: AssetType::Scene
-  - Handle: 16700984949016440456
-    FilePath: Imported/Pwenguen/Textures/embedded_0.png
-    Type: AssetType::Texture
   - Handle: 850648979645116055
     FilePath: Imported/Pwenguen/Textures/embedded_1.png
+    Type: AssetType::Texture
+  - Handle: 16700984949016440456
+    FilePath: Imported/Pwenguen/Textures/embedded_0.png
     Type: AssetType::Texture
   - Handle: 17871744544860760220
     FilePath: Imported/Pwenguen/Materials/Pwenguen_penguen_material.hmat

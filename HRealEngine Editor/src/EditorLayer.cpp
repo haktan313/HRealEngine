@@ -1422,7 +1422,7 @@ namespace HRealEngine
                 LOG_CORE_ERROR("Failed to create relative path for scene: {}", absPath.string());
                 return;
             }
-            
+            m_ActiveScene->SetSceneName(absPath.stem().string());
             SerializeScene(m_ActiveScene, relativePath);
             m_EditorScenePath = relativePath;
 

@@ -72,6 +72,8 @@ namespace HRealEngine
         bool IsAncestorOf(Entity ancestor, Entity entity);
         glm::mat4 GetWorldTransform(Entity entity);
         BehaviorTree* GetEntityBehaviorTree(Entity entity);
+        std::string GetSceneName() const { return m_SceneName; }
+        void SetSceneName(const std::string& name) { m_SceneName = name; }
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
@@ -86,6 +88,8 @@ namespace HRealEngine
         bool m_bIsRunning = false;
         bool m_bIsPaused = false;
         int m_StepFrames = 0;
+        
+        std::string m_SceneName = "Untitled";
 
         std::unordered_map<UUID, entt::entity> m_EntityMap;
 

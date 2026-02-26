@@ -1,3 +1,5 @@
-Scene: Untitled
+Scene: DefaultScene
+SceneSettings:
+  Physic: 3D
 Entities:
   []

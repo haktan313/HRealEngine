@@ -491,7 +491,11 @@ namespace HRealEngine
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
-        out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+        out << YAML::Key << "Scene" << YAML::Value << sceneRef->GetSceneName();
+        out << YAML::Key << "SceneSettings";
+        out << YAML::Value << YAML::BeginMap;
+        out << YAML::Key << "Physic" << YAML::Value << (sceneRef->Is2DPhysicsEnabled() ? "2D" : "3D");
+        out << YAML::EndMap;
         out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
         sceneRef->GetRegistry().view<EntityNameComponent>().each([&](auto entityHandle, auto& nameComponent)
         {
@@ -531,6 +535,16 @@ namespace HRealEngine
         if (!data["Scene"])
             return false;
         std::string sceneName = data["Scene"].as<std::string>();
+        sceneRef->SetSceneName(sceneName);
+        
+        bool bIs2D = false;
+        auto sceneSettings = data["SceneSettings"];
+        if (sceneSettings)        
+        {
+            std::string physic = sceneSettings["Physic"].as<std::string>();
+            bIs2D = physic == "2D";
+        }
+        sceneRef->Set2DPhysicsEnabled(bIs2D);
         
         auto entities = data["Entities"];
         if (entities)
