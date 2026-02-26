@@ -42,7 +42,7 @@ scripts/Win-GenProjects.bat
   - [Core](#core)
 - [Behavior Tree Integration](#-behavior-tree-integration)
 - [Behavior Tree Usage (C#)](#-behavior-tree-usage-c)
-- [AI Perception System Integration and Usage](#ai-perception-system-integration-and-usage)
+- [AI Perception System Integration and Usage](#-ai-perception-system-integration-and-usage)
 - [Project Setup (C# Workflow)](#-project-setup-c-workflow)
 - [Code Examples](#-code-examples)
 - [Roadmap](#-roadmap)
