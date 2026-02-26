@@ -451,6 +451,35 @@ namespace HRealEngine
 	{
 	    return AIController_GetBlackboard(entityID);
 	}
+	
+	static void Blackboard_NotifyValuesChanged(UUID entityID)
+	{
+		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Blackboard_NotifyValuesChanged: Scene context is null!");
+			return;
+		}
+		Entity entity = scene->GetEntityByUUID(entityID);
+		if (!entity || !entity.HasComponent<BehaviorTreeComponent>())
+		{
+			LOG_CORE_ERROR("Blackboard_NotifyValuesChanged: Invalid entity or no BehaviorTreeComponent! Entity ID: {}", (uint64_t)entityID);
+			return;
+		}
+		auto bt = scene->GetEntityBehaviorTree(entity);
+		if (!bt)
+		{
+			LOG_CORE_ERROR("Blackboard_NotifyValuesChanged: Behavior tree is null for entity {}", (uint64_t)entityID);
+			return;
+		}
+		HBlackboard* bb = bt->GetBlackboardRaw();
+		if (!bb)
+		{
+			LOG_CORE_ERROR("Blackboard_NotifyValuesChanged: Blackboard is null for entity {}", (uint64_t)entityID);
+			return;
+		}
+		ScriptGlue::NotifyBlackboardValuesChanged(*bb);
+	}
 
 	static void PerceivableComponent_GetType(UUID entityID, int* outType)
 	{
@@ -1454,6 +1483,7 @@ namespace HRealEngine
 		HRE_ADD_INTERNAL_CALL_AICONTROLLER(AIController_GetBlackboard);
 		
 		HRE_ADD_INTERNAL_CALL_BEHAVIORTREECOMPONENT(BehaviorTreeComponent_GetBlackboard);
+		HRE_ADD_INTERNAL_CALL_BEHAVIORTREECOMPONENT(Blackboard_NotifyValuesChanged);
 		
 		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_GetType);
 		HRE_ADD_INTERNAL_CALL_PERCEIVABLE(PerceivableComponent_SetType);
@@ -1548,5 +1578,10 @@ namespace HRealEngine
 	MonoObject* ScriptGlue::InstantiateClass(MonoClass* monoClass)
 	{
 		return ScriptEngine::InstantiateClass(monoClass);
+	}
+
+	void ScriptGlue::NotifyBlackboardValuesChanged(HBlackboard& blackboard)
+	{
+		blackboard.MarkValuesChanged();
 	}
 }

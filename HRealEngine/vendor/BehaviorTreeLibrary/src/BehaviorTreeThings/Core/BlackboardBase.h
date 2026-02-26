@@ -47,6 +47,7 @@ public:
 
     using OnValuesChangedCallback = std::function<void(HBlackboard*)>;
     void SetOnValuesChangedCallback(OnValuesChangedCallback callback) { m_OnValuesChangedCallback = callback; }
+    void MarkValuesChanged() { m_bValuesChanged = true; }
 protected:
     void CreateBoolValue(const std::string& key, bool value);
     void CreateIntValue(const std::string& key, int value);

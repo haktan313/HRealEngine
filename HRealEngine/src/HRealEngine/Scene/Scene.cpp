@@ -251,6 +251,17 @@ namespace HRealEngine
                     m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
                     bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);
                     bt->StartTree();
+                    if (auto* managedBB = dynamic_cast<ManagedBTBlackboard*>(bt->GetBlackboardRaw()))
+                        if (MonoObject* bbInstance = managedBB->GetManagedInstance())
+                        {
+                            MonoClass* bbClass = mono_object_get_class(bbInstance);
+                            MonoClassField* field = mono_class_get_field_from_name(bbClass, "ownerEntityID");
+                            if (field)
+                            {
+                                uint64_t id = (uint64_t)ownerUUID;
+                                mono_field_set_value(bbInstance, field, &id);
+                            }
+                        }
                 }
                 else
                 {
@@ -267,6 +278,17 @@ namespace HRealEngine
                     m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset] = ownerUUID;
                     bt->SetOwner<UUID>(&m_BTOwnerUUIDs[btComponent.BehaviorTreeAsset]);
                     bt->StartTree();
+                    if (auto* managedBB = dynamic_cast<ManagedBTBlackboard*>(bt->GetBlackboardRaw()))
+                        if (MonoObject* bbInstance = managedBB->GetManagedInstance())
+                        {
+                            MonoClass* bbClass = mono_object_get_class(bbInstance);
+                            MonoClassField* field = mono_class_get_field_from_name(bbClass, "ownerEntityID");
+                            if (field)
+                            {
+                                uint64_t id = (uint64_t)ownerUUID;
+                                mono_field_set_value(bbInstance, field, &id);
+                            }
+                        }
                 }
             }
         }

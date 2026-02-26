@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using HRealEngine.Calls;
 
 namespace HRealEngine.BehaviorTree
 {
     public class BTBlackboard
     {
+        internal ulong ownerEntityID = 0;
+        
         private Dictionary<string, bool> boolValues = new Dictionary<string, bool>();
         private Dictionary<string, int> intValues = new Dictionary<string, int>();
         private Dictionary<string, float> floatValues = new Dictionary<string, float>();
@@ -16,11 +19,35 @@ namespace HRealEngine.BehaviorTree
         public string GetString(string key) { return stringValues.ContainsKey(key) ? stringValues[key] : ""; }
         public ulong GetUlong(string key) { return ulongValues.ContainsKey(key) ? ulongValues[key] : 0UL; }
 
-        public void SetBool(string key, bool value) { boolValues[key] = value; }
-        public void SetInt(string key, int value) { intValues[key] = value; }
-        public void SetFloat(string key, float value) { floatValues[key] = value; }
-        public void SetString(string key, string value) { stringValues[key] = value; }
-        public void SetUlong(string key, ulong value) { ulongValues[key] = value; }
+        public void SetBool(string key, bool value)
+        {
+            boolValues[key] = value;
+            InternalCalls_BehaviorTree.Blackboard_NotifyValuesChanged(ownerEntityID);
+        }
+
+        public void SetInt(string key, int value)
+        {
+            intValues[key] = value;
+            InternalCalls_BehaviorTree.Blackboard_NotifyValuesChanged(ownerEntityID);
+        }
+
+        public void SetFloat(string key, float value)
+        {
+            floatValues[key] = value;
+            InternalCalls_BehaviorTree.Blackboard_NotifyValuesChanged(ownerEntityID);
+        }
+
+        public void SetString(string key, string value)
+        {
+            stringValues[key] = value;
+            InternalCalls_BehaviorTree.Blackboard_NotifyValuesChanged(ownerEntityID);
+        }
+
+        public void SetUlong(string key, ulong value)
+        {
+            ulongValues[key] = value;
+            InternalCalls_BehaviorTree.Blackboard_NotifyValuesChanged(ownerEntityID);
+        }
 
         public bool HasBool(string key) { return boolValues.ContainsKey(key); }
         public bool HasInt(string key) { return intValues.ContainsKey(key); }
