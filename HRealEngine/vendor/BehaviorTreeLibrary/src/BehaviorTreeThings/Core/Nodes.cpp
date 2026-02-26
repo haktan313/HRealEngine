@@ -75,7 +75,7 @@ HBlackboard& HNode::GetBlackboard() const
 
 bool HNode::CheckConditionsSelfMode(HNode* node, const std::vector<std::unique_ptr<HCondition>>& conditionNodes)
 {
-    if (!conditionNodes.empty())
+    /*if (!conditionNodes.empty())
         for (auto& condition : conditionNodes)
         {
             if (condition->GetLastStatus() != NodeStatus::RUNNING && !GetBlackboard().IsValuesChanged())
@@ -98,6 +98,36 @@ bool HNode::CheckConditionsSelfMode(HNode* node, const std::vector<std::unique_p
             {
                 node->OnAbort();
                 return false;
+            }
+        }
+    return true;*/
+    if (!conditionNodes.empty())
+        for (auto& condition : conditionNodes)
+        {
+            if (condition->GetPriorityMode() == PriorityType::None)
+                continue;
+            
+            // Always re-evaluate if priority is Self or Both
+            if (condition->GetPriorityMode() == PriorityType::Self || condition->GetPriorityMode() == PriorityType::Both)
+            {
+                NodeStatus conditionStatus = condition.get()->Tick();
+                condition->SetLastStatus(conditionStatus);
+                if (conditionStatus == NodeStatus::FAILURE)
+                {
+                    node->OnAbort();
+                    return false;
+                }
+            }
+            // For LowerPriority only, keep the caching behavior
+            else if (condition->GetLastStatus() != NodeStatus::RUNNING && !GetBlackboard().IsValuesChanged())
+            {
+                continue;
+            }
+            else
+            {
+                condition->SetLastStatus(NodeStatus::RUNNING);
+                NodeStatus conditionStatus = condition.get()->Tick();
+                condition->SetLastStatus(conditionStatus);
             }
         }
     return true;

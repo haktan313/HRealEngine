@@ -1007,6 +1007,11 @@ void BTSerializer::DeserializeNodeRecursive(const YAML::Node& nodeData, Behavior
             builder.selector(name);
         else
             builder.sequence(name);
+        
+        if (nodeData["Conditions"])
+            for (auto condData : nodeData["Conditions"])
+                DeserializeCondition(condData, builder);
+    
         if (nodeData["Children"])
             for (auto child : nodeData["Children"])
                 DeserializeNodeRecursive(child, builder);
@@ -1027,7 +1032,7 @@ void BTSerializer::DeserializeNodeRecursive(const YAML::Node& nodeData, Behavior
         }
     }
 
-    if (nodeData["Conditions"])
+    if (type != "Composite" && nodeData["Conditions"])
         for (auto condData : nodeData["Conditions"])
             DeserializeCondition(condData, builder);
 }
@@ -1060,6 +1065,16 @@ void BTSerializer::DeserializeCondition(const YAML::Node& condData, BehaviorTree
         if (condData["Priority"])
         {
             std::string pStr = condData["Priority"].as<std::string>();
+            if (pStr == "Self")
+                priority = PriorityType::Self;
+            else if (pStr == "LowerPriority")
+                priority = PriorityType::LowerPriority;
+            else if (pStr == "Both")
+                priority = PriorityType::Both;
+        }
+        else if (condData["Params"] && condData["Params"]["Priority"])
+        {
+            std::string pStr = condData["Params"]["Priority"].as<std::string>();
             if (pStr == "Self")
                 priority = PriorityType::Self;
             else if (pStr == "LowerPriority")

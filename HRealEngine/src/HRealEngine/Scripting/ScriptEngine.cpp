@@ -913,7 +913,7 @@ namespace HRealEngine
             args[0] = blackboardInstance;
             args[1] = &entityID;
         
-            LOG_CORE_INFO("Calling Initialize method with blackboard: {}, entityID: {}", (void*)blackboardInstance, (uint64_t)entityID);
+            //LOG_CORE_INFO("Calling Initialize method with blackboard: {}, entityID: {}", (void*)blackboardInstance, (uint64_t)entityID);
         
             MonoObject* exception = nullptr;
             mono_runtime_invoke(initMethod, nodeInstance, args, &exception);
