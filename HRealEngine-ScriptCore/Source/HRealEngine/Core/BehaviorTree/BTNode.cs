@@ -1,3 +1,5 @@
+using HRealEngine.Calls;
+
 namespace HRealEngine.BehaviorTree
 {
     public enum NodeStatus
@@ -28,7 +30,11 @@ namespace HRealEngine.BehaviorTree
             {
                 if (cachedOwner == null || cachedOwner.EntityID != ownerEntityID)
                 {
-                    cachedOwner = new Entity(ownerEntityID);
+                    object scriptInstance = InternalCalls_GlobalCalls.GetScriptInstance(ownerEntityID);
+                    if (scriptInstance is Entity entity)
+                        cachedOwner = entity;
+                    else
+                        cachedOwner = new Entity(ownerEntityID);
                 }
                 return cachedOwner;
             }
