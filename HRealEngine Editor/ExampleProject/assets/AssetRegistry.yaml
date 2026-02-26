@@ -2,3 +2,30 @@ AssetRegistry:
   - Handle: 832115492279930486
     FilePath: DefaultScene.hrs
     Type: AssetType::Scene
+  - Handle: 12672722317266902339
+    FilePath: 2dphysics.hrs
+    Type: AssetType::Scene
+  - Handle: 6942680717231447039
+    FilePath: 3dtestobj.hrs
+    Type: AssetType::Scene
+  - Handle: 10056156879534379119
+    FilePath: layertest.hrs
+    Type: AssetType::Scene
+  - Handle: 16700984949016440456
+    FilePath: Imported/Pwenguen/Textures/embedded_0.png
+    Type: AssetType::Texture
+  - Handle: 850648979645116055
+    FilePath: Imported/Pwenguen/Textures/embedded_1.png
+    Type: AssetType::Texture
+  - Handle: 17871744544860760220
+    FilePath: Imported/Pwenguen/Materials/Pwenguen_penguen_material.hmat
+    Type: AssetType::Material
+  - Handle: 10496615112496763436
+    FilePath: Imported/Pwenguen/Materials/Pwenguen_penguenhat_material.hmat
+    Type: AssetType::Material
+  - Handle: 11749064439638783414
+    FilePath: Pwenguen.hmesh
+    Type: AssetType::Mesh
+  - Handle: 385768046750664392
+    FilePath: 3dPhysicTest.hrs
+    Type: AssetType::Scene

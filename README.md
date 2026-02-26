@@ -52,25 +52,27 @@ scripts/Win-GenProjects.bat
 
 ## 📸 Screenshots
 
-| Behavior Tree Editor | Behavior Tree Runtime Debug |
+| Behavior Tree and Percaption | Behavior Tree and Perception Runtime Debug |
 |---|---|
-| <img width="1911" height="1025" alt="Behavior Tree Editor" src="https://github.com/user-attachments/assets/e0bd364a-96fc-4e4e-948b-18770dc65a2d" /> | <img width="1904" height="1025" alt="Behavior Tree Runtime Debug" src="https://github.com/user-attachments/assets/91a8c784-79d0-4525-895d-98a4ed19e446" /> |
-| **3D Rendering** | **OBJ Mesh** |
-| <img width="1913" height="1137" alt="3D Rendering" src="https://github.com/user-attachments/assets/8a9c1386-550d-4038-b17b-8183d732b641" /> | <img width="1894" height="1141" alt="OBJ Mesh" src="https://github.com/user-attachments/assets/4f5b43d3-7c31-4e98-a4a6-6c5ec470f71d" /> |
-| **2D Rendering** | **Asset Registry** |
-| <img width="2555" height="1386" alt="2D Rendering" src="https://github.com/user-attachments/assets/821f02a4-56d2-4494-86b3-265eb5e2189d" /> | <img width="1324" height="937" alt="Asset Registry" src="https://github.com/user-attachments/assets/61ad632f-7c6c-4ee9-8fea-8b7d2a2a99f6" /> |
+| <img width="2556" height="1387" alt="BehaviorTreeAndPercaptionDebug" src="https://github.com/user-attachments/assets/5534108e-5f0b-43bf-b9b6-a3a15e173d04" /> | <img width="2550" height="1385" alt="BehaviorTreeRuntimeDebugAndPercaptionDebug" src="https://github.com/user-attachments/assets/2bd6cd7a-eb9d-4f72-af0b-4d08c8600827" /> |
+| **3D Rendering (FBX, GLB, OBJ and Cube Batching)** | **2D Rendering** |
+| <img width="2544" height="1385" alt="3DRenderonMesh" src="https://github.com/user-attachments/assets/1d8d85db-2a45-4a9e-930f-6655e3dbbc12" /> | <img width="2556" height="1394" alt="2DRendering" src="https://github.com/user-attachments/assets/db475d51-2655-407c-b307-56dc82e944f6" /> |
 | **Lighting** | **Project UI** |
 | <img width="2552" height="1385" alt="Lighting" src="https://github.com/user-attachments/assets/2a6c5d52-2fd5-4770-990a-511ac1253682" /> | <img width="2057" height="1194" alt="Project UI" src="https://github.com/user-attachments/assets/7301902b-b582-48a2-bcca-8b1666992f95" /> |
 
 ## 🎬 Video Demos
 
-https://github.com/user-attachments/assets/4c010b09-0b99-43da-9000-b52fa8ad2800
+https://github.com/user-attachments/assets/72026fa1-6948-4b36-8498-b53c4516fdb8
 
-https://github.com/user-attachments/assets/07c87738-2202-4d6c-8949-1bdc5601b3f6
 
-https://github.com/user-attachments/assets/8d94ccb6-fb48-44e6-83d7-c2b3afed06c8
+https://github.com/user-attachments/assets/e94239b3-2a18-4912-888e-6bcaaf38cf1a
 
-https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
+
+https://github.com/user-attachments/assets/48c53b9b-6a1b-4a75-bd9f-0d1ec41d6af4
+
+
+https://github.com/user-attachments/assets/a84249d3-d87b-4e3e-9e0d-67815e860a7f
+
 
 
 ---
@@ -118,9 +120,9 @@ https://github.com/user-attachments/assets/47cb6072-ca52-478f-9e62-6ded3dbc4675
 - Dedicated physics layers **(PERCEPTION / PERCEIVABLE)** isolated from gameplay physics
 - Throttled updates with configurable **UpdateInterval** per AI controller
 - Perception lifecycle callbacks exposed to C# scripts:
-    - **OnEntityPerceived** — first detection (with perception method and position)
-    - **OnEntityLost** — target leaves perception range
-    - **OnEntityForgotten** — target fully forgotten after ForgetDuration
+  - **OnEntityPerceived** — first detection (with perception method and position)
+  - **OnEntityLost** — target leaves perception range
+  - **OnEntityForgotten** — target fully forgotten after ForgetDuration
 - Type filtering: Both senses support filtering by **PerceivableType** (Player, Enemy, Neutral, Environment)
 - Perception query API in C#: `GetCurrentPerceptions()`, `GetForgottenPerceptions()`, `IsEntityPerceived()`, `IsEntityForgotten()`
 

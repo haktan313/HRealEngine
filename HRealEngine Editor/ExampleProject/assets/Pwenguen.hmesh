@@ -1,0 +1,15 @@
+Type: StaticMesh
+Source: Imported/Pwenguen/Source/Pwenguen.glb
+Cooked: cache/Pwenguen.hmeshbin
+BoundsMin: [-0.633728, 0.000113163, -0.504076]
+BoundsMax: [0.632522, 1.59483, 0.503987]
+Import:
+  Triangulate: true
+  GenSmoothNormals: true
+  CalcTangents: true
+  FlipUVs: false
+  Scale: 1.0
+MaterialHandles:
+  - 17871744544860760220
+  - 10496615112496763436
+  - 0

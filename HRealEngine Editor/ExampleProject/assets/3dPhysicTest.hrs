@@ -1,0 +1,105 @@
+Scene: Untitled
+Entities:
+  - Entity: 11446587212895922875
+    EntityNameComponent:
+      Name: Block
+    TransformComponent:
+      Position: [0.8867436, 1.0145539, -0.0011881087]
+      Rotation: [0, 0.010557543, 0]
+      Scale: [1.5746241, 0.38162777, 1.8042502]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [0.5, 0.5, 0.5]
+      IsTrigger: false
+  - Entity: 9876345609051848381
+    EntityNameComponent:
+      Name: Ground
+    TransformComponent:
+      Position: [0, -1.9787179, 0]
+      Rotation: [0, 0, 0]
+      Scale: [8.497553, 0.30397865, 11.506018]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [0.5, 0.5, 0.5]
+      IsTrigger: false
+  - Entity: 4264010834870695124
+    EntityNameComponent:
+      Name: Light
+    TransformComponent:
+      Position: [0, 3.0837336, 6.710866]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 2.2
+      Radius: 13
+      CastShadows: true
+  - Entity: 11858996095591554191
+    EntityNameComponent:
+      Name: Character
+    TransformComponent:
+      Position: [0, 3.1391165, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      PivotOffset: [0, 0.75, 0]
+      MeshHandle: 11749064439638783414
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 17871744544860760220
+        - 10496615112496763436
+        - 0
+    Rigidbody3DComponent:
+      BodyType: Dynamic
+      LockPositionX: false
+      LockPositionY: false
+      LockPositionZ: false
+      LockRotationX: false
+      LockRotationY: false
+      LockRotationZ: false
+      FixedRotation: false
+      Friction: 0.05
+      Restitution: 0
+      Convex Radius: 0.02
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [0.5, 0.75, 0.5]
+      IsTrigger: false
+  - Entity: 2079772449556977840
+    EntityNameComponent:
+      Name: Camera
+    TransformComponent:
+      Position: [0, 3.2909908, 11.014008]
+      Rotation: [-0.35396668, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.0471976
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1

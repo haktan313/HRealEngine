@@ -1,0 +1,224 @@
+Scene: Untitled
+Entities:
+  - Entity: 5925817816104526436
+    EntityNameComponent:
+      Name: LightWhite
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [-5.7392254, 2.9127753, 6.8999243]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [1, 1, 1]
+      Direction: [0, -1, 0]
+      Intensity: 2.6
+      Radius: 13.7
+      CastShadows: true
+  - Entity: 15121850108385962197
+    EntityNameComponent:
+      Name: LightDirectionalPink
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [0.2507167, 0, -4.944351]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Directional
+      Color: [1, 0, 0.76868343]
+      Direction: [-0.23, -0.51, 0.1]
+      Intensity: 0.2
+      Radius: 1
+      CastShadows: true
+  - Entity: 5914020284527656264
+    EntityNameComponent:
+      Name: LightRed
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [-3.1492567, 2.8910394, 3.328796]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0.85765123, 0.2228062, 0.2228062]
+      Direction: [0, -1, 0]
+      Intensity: 2.9
+      Radius: 9.2
+      CastShadows: true
+  - Entity: 3635060232250787184
+    EntityNameComponent:
+      Name: LightGreen
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [2.115148, 0.99610984, 1.6467438]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0, 1, 0.54092526]
+      Direction: [0, -1, 0]
+      Intensity: 2
+      Radius: 7.6
+      CastShadows: true
+  - Entity: 17946033611301411440
+    EntityNameComponent:
+      Name: LightBlue
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [4.5982084, 2.3059888, 4.97651]
+      Rotation: [2.5675806e-06, 0, 1.5419067e-06]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: Point
+      Color: [0, 0.37010694, 1]
+      Direction: [-0.08, -0.25, -0.27]
+      Intensity: 0.6
+      Radius: 18.2
+      CastShadows: true
+  - Entity: 17578333643475291096
+    EntityNameComponent:
+      Name: Box
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [1.9157617, 0.98185265, 0.8531421]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [0.83629894, 0.38689986, 0.38689986, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 8541079047686451945
+    EntityNameComponent:
+      Name: Camera
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [0, 4.2982345, 7.7275877]
+      Rotation: [-0.72732043, 0, 0]
+      Scale: [1, 0.9999999, 0.9999999]
+    CameraComponent:
+      PrimaryCamera: true
+      FixedAspectRatio: false
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.3089969
+        PerspectiveNear: 0.01
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+  - Entity: 13144157712970970766
+    EntityNameComponent:
+      Name: Wall
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [-1.111809, 1.524144, -1.9755859]
+      Rotation: [0, 0, 0]
+      Scale: [63.86835, 6.1650925, 0.41331267]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    Rigidbody3DComponent:
+      BodyType: Static
+      LockPositionX: false
+      LockPositionY: false
+      LockPositionZ: false
+      LockRotationX: false
+      LockRotationY: false
+      LockRotationZ: false
+      FixedRotation: false
+      Friction: 0.05
+      Restitution: 0
+      Convex Radius: 0.02
+  - Entity: 2493219481796066299
+    EntityNameComponent:
+      Name: Pwenguen
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [-2.5083213, -0.6911025, 1.2659364]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2, 2]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 11749064439638783414
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        - 17871744544860760220
+        - 10496615112496763436
+        - 0
+  - Entity: 6632952075898137711
+    EntityNameComponent:
+      Name: Rectangle
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [3.6830125, -1.8821832e-07, -0.35703468]
+      Rotation: [-0.042774543, -0.2072836, 5.0439834e-08]
+      Scale: [1.5875239, 0.9842009, 1.4166582]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+  - Entity: 4252773359772711178
+    EntityNameComponent:
+      Name: Ground
+    TagComponent:
+      Tags:
+        []
+    TransformComponent:
+      Position: [-0.57018054, -1.342015, -0.2564274]
+      Rotation: [0, 0, 0]
+      Scale: [70.5503, 1, 21.540089]
+    MeshRendererComponent:
+      PivotOffset: [0, 0, 0]
+      MeshHandle: 0
+      Color: [1, 1, 1, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      MaterialHandleOverrides:
+        []
+    Rigidbody3DComponent:
+      BodyType: Static
+      LockPositionX: false
+      LockPositionY: false
+      LockPositionZ: false
+      LockRotationX: false
+      LockRotationY: false
+      LockRotationZ: false
+      FixedRotation: false
+      Friction: 0.05
+      Restitution: 0
+      Convex Radius: 0.02
