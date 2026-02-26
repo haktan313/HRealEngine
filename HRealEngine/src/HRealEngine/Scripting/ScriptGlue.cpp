@@ -53,6 +53,11 @@ namespace HRealEngine
 	static void DestroyEntity(UUID entityID)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("DestroyEntity: Scene context is null!");
+			return;
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		if (!entity)
 			return;
@@ -116,6 +121,11 @@ namespace HRealEngine
 			LOG_CORE_ERROR("Raycast3D: Scene context is null!");
 			return false;
 		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Raycast3D: Cannot perform 3D raycast when 2D physics is enabled!");
+			return false;
+		}
 		JoltWorld* joltWorld = scene->GetJoltWorld();
 		if (!joltWorld)
 		{
@@ -158,6 +168,11 @@ namespace HRealEngine
 		if (!scene)
 		{
 			LOG_CORE_ERROR("Raycast3DArray: Scene context is null!");
+			return nullptr;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Raycast3DArray: Cannot perform 3D raycast when 2D physics is enabled!");
 			return nullptr;
 		}
 		JoltWorld* joltWorld = scene->GetJoltWorld();
@@ -590,8 +605,18 @@ namespace HRealEngine
 			
 			if (componentName == s_ComponentTypeNames[0])
 			{
-				entity.AddComponent<BoxCollider3DComponent>();
 				Scene* scene = ScriptEngine::GetSceneContext();
+				if (!scene)
+				{
+					LOG_CORE_ERROR("Entity_AddComponent: Scene context is null!");
+					return;
+				}
+				if (scene->Is2DPhysicsEnabled())
+				{
+					LOG_CORE_ERROR("Entity_AddComponent: Cannot add 3D BoxCollider when 2D physics is enabled!");
+					return;
+				}
+				entity.AddComponent<BoxCollider3DComponent>();
 				JoltWorld* joltWorld = scene->GetJoltWorld();
 				if (joltWorld)
 					joltWorld->CreateBodyForEntity(entity);
@@ -600,8 +625,18 @@ namespace HRealEngine
 				entity.AddComponent<MeshRendererComponent>();
 			else if (componentName == s_ComponentTypeNames[2])
 			{
-				entity.AddComponent<Rigidbody3DComponent>();
 				Scene* scene = ScriptEngine::GetSceneContext();
+				if (!scene)
+				{
+					LOG_CORE_ERROR("Entity_AddComponent: Scene context is null!");
+					return;
+				}
+				if (scene->Is2DPhysicsEnabled())				
+				{
+					LOG_CORE_ERROR("Entity_AddComponent: Cannot add 3D Rigidbody when 2D physics is enabled!");
+					return;
+				}
+				entity.AddComponent<Rigidbody3DComponent>();
 				JoltWorld* joltWorld = scene->GetJoltWorld();
 				if (joltWorld)
 					joltWorld->CreateBodyForEntity(entity);
@@ -617,6 +652,11 @@ namespace HRealEngine
 		if (!scene)
 		{
 			LOG_CORE_ERROR("Entity_AddRigidbody3DComponent: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Entity_AddRigidbody3DComponent: Cannot add 3D Rigidbody when 2D physics is enabled!");
 			return;
 		}
 		Entity entity = scene->GetEntityByUUID(entityID);
@@ -639,6 +679,11 @@ namespace HRealEngine
 		if (!scene)
 		{
 			LOG_CORE_ERROR("Entity_AddBoxCollider3DComponent: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Entity_AddBoxCollider3DComponent: Cannot add 3D BoxCollider when 2D physics is enabled!");
 			return;
 		}
 		Entity entity = scene->GetEntityByUUID(entityID);
@@ -905,6 +950,16 @@ namespace HRealEngine
 	    static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("Rigidbody2DComponent_ApplyLinearImpulse: Scene context is null!");
+			return;
+		}
+		if (!scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Rigidbody2DComponent_ApplyLinearImpulse: 2D physics is not enabled in the current scene!");
+			return;
+		}
         Entity entity = scene->GetEntityByUUID(entityID);
         auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -914,6 +969,16 @@ namespace HRealEngine
     static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impulse, bool wake)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("Rigidbody2DComponent_ApplyLinearImpulseToCenter: Scene context is null!");
+			return;
+		}
+		if (!scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("Rigidbody2DComponent_ApplyLinearImpulseToCenter: 2D physics is not enabled in the current scene!");
+			return;
+		}
         Entity entity = scene->GetEntityByUUID(entityID);
         auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
         b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -923,6 +988,16 @@ namespace HRealEngine
     static void Rigidbody3DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec3* impulse)
     {
         Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_ApplyLinearImpulseToCenter: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_ApplyLinearImpulseToCenter: 3D physics is not enabled in the current scene!");
+			return;
+		}
         Entity entity = scene->GetEntityByUUID(entityID);
         auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
         JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
@@ -933,6 +1008,16 @@ namespace HRealEngine
 	static void Rigidbody3DComponent_SetLinearVelocity(UUID entityID, glm::vec3* velocity)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetLinearVelocity: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetLinearVelocity: 3D physics is not enabled in the current scene!");
+			return;
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
 		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
@@ -943,6 +1028,16 @@ namespace HRealEngine
 	static void Rigidbody3DComponent_GetLinearVelocity(UUID entityID, glm::vec3* outVelocity)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetLinearVelocity: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())	
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetLinearVelocity: 3D physics is not enabled in the current scene!");
+			return;
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
 		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
@@ -954,6 +1049,16 @@ namespace HRealEngine
 	static void Rigidbody3DComponent_SetRotationDegrees(UUID entityID, glm::vec3* eulerDeg)
     {
     	Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetRotationDegrees: Scene context is null!");
+			return;		
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetRotationDegrees: 3D physics is not enabled in the current scene!");
+			return;		
+		}
     	Entity entity = scene->GetEntityByUUID(entityID);
     	auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
     	JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
@@ -969,6 +1074,16 @@ namespace HRealEngine
 	static void Rigidbody3DComponent_GetRotationDegrees(UUID entityID, glm::vec3* outRotation)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetRotationDegrees: Scene context is null!");
+			return;		
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetRotationDegrees: 3D physics is not enabled in the current scene!");
+			return;		
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
 		JPH::Body* body = (JPH::Body*)rb3d.RuntimeBody;
@@ -982,6 +1097,16 @@ namespace HRealEngine
 	static void Rigidbody3DComponent_SetBodyType(UUID entityID, int bodyType)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		 if (!scene)		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetBodyType: Scene context is null!");
+			return;		
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_SetBodyType: 3D physics is not enabled in the current scene!");
+			return;		
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
 		rb3d.Type = static_cast<Rigidbody3DComponent::BodyType>(bodyType);
@@ -993,6 +1118,16 @@ namespace HRealEngine
 	static int Rigidbody3DComponent_GetBodyType(UUID entityID)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetBodyType: Scene context is null!");
+			return 0;		
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("Rigidbody3DComponent_GetBodyType: 3D physics is not enabled in the current scene!");
+			return 0;		
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		auto& rb3d = entity.GetComponent<Rigidbody3DComponent>();
 		return static_cast<int>(rb3d.Type);
@@ -1072,6 +1207,16 @@ namespace HRealEngine
 	static void BoxCollider3DComponent_SetSize(UUID entityID, glm::vec3* size)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetSize: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetSize: 3D physics is not enabled in the current scene!");
+			return;
+		}
 		Entity entity = scene->GetEntityByUUID(entityID);
 		if (!entity)
 		{
@@ -1093,6 +1238,16 @@ namespace HRealEngine
 	static glm::vec3 BoxCollider3DComponent_GetSize(UUID entityID)
     {
 	    Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetSize: Scene context is null!");
+			return glm::vec3(0.0f);
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetSize: 3D physics is not enabled in the current scene!");
+			return glm::vec3(0.0f);
+		}
 	    Entity entity = scene->GetEntityByUUID(entityID);
 	    if (!entity)
 	    {
@@ -1111,6 +1266,16 @@ namespace HRealEngine
 	static void BoxCollider3DComponent_SetOffset(UUID entityID, glm::vec3* offset)
 	{
 	    Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)		
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())		
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetOffset: 3D physics is not enabled in the current scene!");
+			return;
+		}
 	    Entity entity = scene->GetEntityByUUID(entityID);
 	    if (!entity)
 	    {
@@ -1132,6 +1297,16 @@ namespace HRealEngine
 	static glm::vec3 BoxCollider3DComponent_GetOffset(UUID entityID)
 	{
 	    Scene* scene = ScriptEngine::GetSceneContext();
+		if (!scene)
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetOffset: Scene context is null!");
+			return glm::vec3(0.0f);
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetOffset: 3D physics is not enabled in the current scene!");
+			return glm::vec3(0.0f);
+		}
 	    Entity entity = scene->GetEntityByUUID(entityID);
 	    if (!entity)
 	    {
@@ -1153,6 +1328,11 @@ namespace HRealEngine
 		if (!scene)
 		{
 			LOG_CORE_ERROR("BoxCollider3DComponent_SetIsTrigger: Scene context is null!");
+			return;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_SetIsTrigger: 3D physics is not enabled in the current scene!");
 			return;
 		}
 		Entity entity = scene->GetEntityByUUID(entityID);
@@ -1179,6 +1359,11 @@ namespace HRealEngine
 		if (!scene)
 		{
 			LOG_CORE_ERROR("BoxCollider3DComponent_GetIsTrigger: Scene context is null!");
+			return false;
+		}
+		if (scene->Is2DPhysicsEnabled())
+		{
+			LOG_CORE_ERROR("BoxCollider3DComponent_GetIsTrigger: 3D physics is not enabled in the current scene!");
 			return false;
 		}
 		Entity entity = scene->GetEntityByUUID(entityID);
