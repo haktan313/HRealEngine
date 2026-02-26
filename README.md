@@ -42,7 +42,7 @@ scripts/Win-GenProjects.bat
   - [Core](#core)
 - [Behavior Tree Integration](#-behavior-tree-integration)
 - [Behavior Tree Usage (C#)](#-behavior-tree-usage-c)
-- [AI Perception System](#ai-perception-system)
+- [AI Perception System Integration and Usage](#ai-perception-system-integration-and-usage)
 - [Project Setup (C# Workflow)](#-project-setup-c-workflow)
 - [Code Examples](#-code-examples)
 - [Roadmap](#-roadmap)
@@ -216,7 +216,7 @@ Derive from `BTCondition` and create a parameter class from `BTConditionParams`.
 
 ---
 
-## 👁 AI Perception System
+## 👁 AI Perception System Integration and Usage
 > The perception system provides Unreal like AI sensing capabilities. AI entities can detect targets through sight (FOV + line of sight) and hearing (noise events).
 
 ### Setup
