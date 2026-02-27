@@ -214,13 +214,25 @@ namespace HRealEngine
 
     void Scene::OnSimulationStart()
     {
+        m_bIsRunning = true;
+        
         OnPhysicsStart();
+        ScriptEngine::OnRuntimeStart(this);
+        auto view = m_Registry.view<ScriptComponent>();
+        for (auto e : view)
+        {
+            Entity entity = {e, this};
+            ScriptEngine::OnCreateEntity(entity);
+        }
         StartBTs();
     }
 
     void Scene::OnSimulationStop()
     {
+        m_bIsRunning = false;
+        
         OnPhysicsStop();
+        ScriptEngine::OnRuntimeStop();
         StopBTs();
     }
 

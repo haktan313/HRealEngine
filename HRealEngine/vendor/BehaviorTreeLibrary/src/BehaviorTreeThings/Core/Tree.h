@@ -129,9 +129,15 @@ public:
             condition->SetTree(m_Tree);
             condition->SetPriorityMode(priority);
             condition->SetType(HNodeType::Condition);
+            m_LastCreatedCondition = condition.get();
             m_LastCreatedNode->AddConditionNode(std::move(condition));
         }
         return *this;
+    }
+    void setLastConditionAlwaysReevaluate(bool alwaysReevaluate)
+    {
+        if (m_LastCreatedCondition)
+            m_LastCreatedCondition->SetAlwaysReevaluate(alwaysReevaluate);
     }
     template<typename DecoratorNodeType, typename... Args>
     BehaviorTreeBuilder& decorator(Args&&... args)
@@ -149,6 +155,7 @@ public:
 private:
     BehaviorTree* m_Tree;
     HNode* m_LastCreatedNode = nullptr;
+    HCondition* m_LastCreatedCondition = nullptr;
     std::unique_ptr<HDecorator> m_CurrentDecorator;
     std::vector<HNode*> m_NodeStack;
     

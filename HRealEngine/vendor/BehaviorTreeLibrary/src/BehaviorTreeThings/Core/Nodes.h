@@ -141,12 +141,13 @@ struct ParamsForCondition : Params
     virtual void DrawImGui(HBlackboard* blackboard) override {}
 
     PriorityType Priority = PriorityType::None;
+    bool AlwaysReevaluate = false;
 };
 class HCondition : public HNode
 {
 public:
     HCondition(const std::string& name, const ParamsForCondition& params = ParamsForCondition{})
-        : HNode(name), m_PriorityMode(PriorityType::None), m_LastStatus(NodeStatus::RUNNING) {}
+        : HNode(name), m_PriorityMode(PriorityType::None), m_LastStatus(NodeStatus::RUNNING), m_bAlwaysReevaluate(false) {}
 
     virtual void OnStart() override {}
     virtual bool CheckCondition() = 0;
@@ -157,14 +158,18 @@ public:
 
     PriorityType GetPriorityMode() const { return m_PriorityMode; }
     NodeStatus GetLastStatus() const { return m_LastStatus; }
+    bool GetAlwaysReevaluate() const { return m_bAlwaysReevaluate; }
 private:
     PriorityType m_PriorityMode;
     NodeStatus m_LastStatus;
-
+    bool m_bAlwaysReevaluate;
+    
     NodeStatus Update() override final { return CheckCondition() ? NodeStatus::SUCCESS : NodeStatus::FAILURE; }
     void SetPriorityMode(PriorityType priority) { m_PriorityMode = priority; }
+    void SetAlwaysReevaluate(bool alwaysReevaluate) { m_bAlwaysReevaluate = alwaysReevaluate; }
     friend class BehaviorTreeBuilder;
     friend class BehaviorTree;
+    friend class BTSerializer;
 };
 
 struct ParamsForDecorator : public Params

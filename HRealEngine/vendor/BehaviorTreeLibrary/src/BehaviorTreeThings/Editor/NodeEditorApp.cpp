@@ -467,7 +467,13 @@ void NodeEditorApp::DrawConditionNodeParameters(int nodeKey, const std::string& 
     {
         auto parameter = m_NodeToConditionParams.find(nodeKey);
         if (parameter != m_NodeToConditionParams.end() && parameter->second)
+        {
             parameter->second->DrawImGui(m_Blackboard.get());
+            ImGui::Separator();
+            ImGui::Checkbox("Always Reevaluate", &parameter->second->AlwaysReevaluate);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("When enabled, this condition is re-evaluated every frame.\nWhen disabled, it only re-evaluates when blackboard values change.");
+        }
     }
 }
 

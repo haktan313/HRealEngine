@@ -55,7 +55,7 @@ namespace HRealEngine
             builder.condition<HRealEngine::ManagedBTCondition>(baseParams.Priority, className, className, paramsInstance);
         };
 
-        conditionInfo.BuildFromYAML = [className](BehaviorTreeBuilder& builder, const std::string& instanceName, const YAML::Node& paramsNode, PriorityType priority)
+        conditionInfo.BuildFromYAML = [className](BehaviorTreeBuilder& builder, const std::string& instanceName, const YAML::Node& paramsNode, PriorityType priority, bool alwaysReevaluate)
         {
             MonoObject* paramsInstance = HRealEngine::ScriptEngine::CreateBTParameterInstance(className);
             
@@ -65,6 +65,7 @@ namespace HRealEngine
             }
             
             builder.condition<HRealEngine::ManagedBTCondition>(priority, instanceName, className, paramsInstance);
+            builder.setLastConditionAlwaysReevaluate(alwaysReevaluate);
         };
         
         s_ConditionClassInfoMap.emplace(className, std::move(conditionInfo));

@@ -154,6 +154,10 @@ namespace HRealEngine
                 }
                 
                 ScriptEngine::DrawBTParametersImGui(it->second, m_Blackboard.get());
+                ImGui::Separator();
+                ImGui::Checkbox("Always Reevaluate", &parameter->second->AlwaysReevaluate);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("When enabled, this condition is re-evaluated every frame.\nWhen disabled, it only re-evaluates when blackboard values change.");
             }
         }
         else
@@ -169,6 +173,10 @@ namespace HRealEngine
                     parameter->second->Priority = static_cast<PriorityType>(currentPriority);
                 
                 parameter->second->DrawImGui(m_Blackboard.get());
+                ImGui::Separator();
+                ImGui::Checkbox("Always Reevaluate", &parameter->second->AlwaysReevaluate);
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("When enabled, this condition is re-evaluated every frame.\nWhen disabled, it only re-evaluates when blackboard values change.");
             }
         }
     }

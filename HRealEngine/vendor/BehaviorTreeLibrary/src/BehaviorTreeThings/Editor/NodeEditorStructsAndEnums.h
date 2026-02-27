@@ -49,7 +49,7 @@ struct ConditionClassInfo
     std::string Name;
     std::function<void(BehaviorTreeBuilder&, ParamsForCondition&)> BuildFn;
     std::function<std::unique_ptr<ParamsForCondition>()> CreateParamsFn;
-    std::function<void(BehaviorTreeBuilder&, const std::string&, const YAML::Node&, PriorityType)> BuildFromYAML;
+    std::function<void(BehaviorTreeBuilder&, const std::string&, const YAML::Node&, PriorityType, bool)> BuildFromYAML;
 };
 struct BlackboardClassInfo
 {

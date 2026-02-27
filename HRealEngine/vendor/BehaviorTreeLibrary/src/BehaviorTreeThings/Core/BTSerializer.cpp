@@ -111,10 +111,22 @@ void BTSerializer::SyncEditorParamsToRuntime()
         }
 
         void* managedCondParams = editorApp->GetManagedConditionParams(nodeKey);
-        if (managedCondParams)
+        auto nativeCondIt = editorApp->m_NodeToConditionParams.find(nodeKey);
+
+        for (auto* cond : runtimeNode->GetConditionNodesRaw())
         {
-            for (auto* cond : runtimeNode->GetConditionNodesRaw())
+            if (managedCondParams)
                 NodeEditorApp::s_RuntimeNodeSyncer(cond, managedCondParams);
+
+            if (nativeCondIt != editorApp->m_NodeToConditionParams.end() && nativeCondIt->second)
+            {
+                auto* hcond = dynamic_cast<HCondition*>(cond);
+                if (hcond)
+                {
+                    hcond->SetAlwaysReevaluate(nativeCondIt->second->AlwaysReevaluate);
+                    hcond->SetPriorityMode(nativeCondIt->second->Priority);
+                }
+            }
         }
     }
 }
@@ -287,6 +299,9 @@ bool BTSerializer::DeserializeData(const YAML::Node& data, NodeEditorApp* editor
                 
                                 editorApp->m_NodeToConditionParams[nodeKey]->Priority = p;
                             }
+                            
+                            if (c["Params"]["AlwaysReevaluate"])
+                                editorApp->m_NodeToConditionParams[nodeKey]->AlwaysReevaluate = c["Params"]["AlwaysReevaluate"].as<bool>();
     
                             EditorCondition econd(c["Name"].as<std::string>());
                             econd.ClassName = className;
@@ -470,6 +485,9 @@ bool BTSerializer::DeserializeEditorGraphOnly(const YAML::Node& data, NodeEditor
                         editorApp->m_NodeToConditionParams[nodeKey]->Priority = priortyType;
                     }
 
+                    if (c["Params"] && c["Params"]["AlwaysReevaluate"])
+                        editorApp->m_NodeToConditionParams[nodeKey]->AlwaysReevaluate = c["Params"]["AlwaysReevaluate"].as<bool>();
+                    
                     EditorCondition econd(c["Name"].as<std::string>());
                     econd.ClassName = className;
                     econd.Params = editorApp->m_NodeToConditionParams[nodeKey].get();
@@ -830,6 +848,11 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
                 out << YAML::Value << PriorityToString(cond.Params->Priority);
             else
                 out << YAML::Value << "None";
+            out << YAML::Key << "AlwaysReevaluate" << YAML::Value;
+            if (cond.Params)
+                out << YAML::Value << cond.Params->AlwaysReevaluate;
+            else
+                out << YAML::Value << true;
             /*if (cond.Params)
                 cond.Params->Serialize(out);*/
             /*bool serialized = false;
@@ -846,6 +869,7 @@ void BTSerializer::SerializeEditorData(YAML::Emitter& out)
                 if (!serialized && cond.Params)
                 {
                     out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond.Params->Priority);
+                    out << YAML::Key << "AlwaysReevaluate" << YAML::Value << cond.Params->AlwaysReevaluate;
                     cond.Params->Serialize(out);
                 }
             }
@@ -955,7 +979,10 @@ void BTSerializer::SerializeNode(YAML::Emitter& out, const HNode* node)
     {
         auto* cond = dynamic_cast<const HCondition*>(node);
         if (cond)
+        {
             out << YAML::Key << "Priority" << YAML::Value << PriorityToString(cond->GetPriorityMode());
+            out << YAML::Key << "AlwaysReevaluate" << YAML::Value << cond->GetAlwaysReevaluate();
+        }
     }
 
     out << YAML::Key << "Params" << YAML::Value;
@@ -1083,7 +1110,12 @@ void BTSerializer::DeserializeCondition(const YAML::Node& condData, BehaviorTree
                 priority = PriorityType::Both;
         }
 
+        bool alwaysReevaluate = true; // default: true (tick every frame)
+        if (condData["AlwaysReevaluate"])
+            alwaysReevaluate = condData["AlwaysReevaluate"].as<bool>();
+
         const YAML::Node& paramsNode = condData["Params"];
-        it->second.BuildFromYAML(builder, name, paramsNode, priority);
+        std::cout << "Deserializing condition: " << name << " with priority: " << PriorityToString(priority) << " and alwaysReevaluate: " << alwaysReevaluate << std::endl;
+        it->second.BuildFromYAML(builder, name, paramsNode, priority, alwaysReevaluate);
     }
 }

@@ -64,12 +64,14 @@ public:
         {
             auto& params = static_cast<ParamsStruct&>(baseParams);
             builder.condition<ConditionClass>(baseParams.Priority, name, params);
+            builder.setLastConditionAlwaysReevaluate(params.AlwaysReevaluate);
         };
-        conditionInfo.BuildFromYAML = [](BehaviorTreeBuilder& builder, const std::string& instanceName, const YAML::Node& paramsNode, PriorityType priority)
+        conditionInfo.BuildFromYAML = [](BehaviorTreeBuilder& builder, const std::string& instanceName, const YAML::Node& paramsNode, PriorityType priority, bool alwaysReevaluate)
         {
             ParamsStruct p;
             p.Deserialize(paramsNode);
             builder.condition<ConditionClass>(priority, instanceName, p);
+            builder.setLastConditionAlwaysReevaluate(alwaysReevaluate);
         };
         s_ConditionClassInfoMap.emplace(name, std::move(conditionInfo));
     }

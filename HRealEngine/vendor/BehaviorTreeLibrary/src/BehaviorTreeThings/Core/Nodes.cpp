@@ -119,7 +119,7 @@ bool HNode::CheckConditionsSelfMode(HNode* node, const std::vector<std::unique_p
                 }
             }
             // For LowerPriority only, keep the caching behavior
-            else if (condition->GetLastStatus() != NodeStatus::RUNNING && !GetBlackboard().IsValuesChanged())
+            else if (!condition->GetAlwaysReevaluate() && condition->GetLastStatus() != NodeStatus::RUNNING && !GetBlackboard().IsValuesChanged())
             {
                 continue;
             }
@@ -144,7 +144,8 @@ void HNode::CheckConditionsLowerPriorityMode(int& currentChildIndex, HNode* node
             auto& child = childrens[i];
             for (auto& condition : child->GetConditionNodesUnique())
             {
-                if (condition->GetLastStatus() != NodeStatus::RUNNING && !GetBlackboard().IsValuesChanged())
+                bool shouldReevaluate = condition->GetAlwaysReevaluate() || condition->GetLastStatus() == NodeStatus::RUNNING || GetBlackboard().IsValuesChanged();
+                if (!shouldReevaluate)
                 {
                     if ((condition->GetPriorityMode() == PriorityType::LowerPriority || condition->GetPriorityMode() == PriorityType::Both)
                     && condition->GetLastStatus() == NodeStatus::SUCCESS)

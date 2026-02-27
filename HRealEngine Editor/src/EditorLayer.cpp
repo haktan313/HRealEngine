@@ -1677,9 +1677,15 @@ namespace HRealEngine
                 && bToolbarEnabled)
             {
                 if (m_SceneState == SceneState::Editor)
+                {
+                    Application::Get().CreateGameModeData();
                     OnSceneSimulate();
+                }
                 else if (m_SceneState == SceneState::Simulate)
+                {
+                    Application::Get().DestroyGameModeData();
                     OnSceneStop();
+                }
             }
         }
 
