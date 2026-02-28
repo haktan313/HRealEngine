@@ -112,6 +112,9 @@ namespace HRealEngine
             m_PendingSceneHandle = 0;
             m_ActiveScene->OnRuntimeStop();
                 
+            //Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);
+            auto eam = Project::GetActive()->GetEditorAssetManager();
+            eam->ReloadAsset(handle);
             Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);
             if (nextSceneAsset)
             {
@@ -163,32 +166,42 @@ namespace HRealEngine
 
     void RuntimeLayer::OnImGuiRender()
     {
-        Dockspace();
+        const ImGuiViewport* vp = ImGui::GetMainViewport();
+
+        ImGui::SetNextWindowPos(vp->Pos);
+        ImGui::SetNextWindowSize(vp->Size);
+        ImGui::SetNextWindowViewport(vp->ID);
 
         ImGuiWindowFlags flags =
+            ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus |
             ImGuiWindowFlags_NoScrollbar |
             ImGuiWindowFlags_NoScrollWithMouse;
 
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        
-        ImGui::Begin("Game View");
-        
-        ImVec2 viewportMinRegion = ImGui::GetWindowContentRegionMin();
-        ImVec2 viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-        ImVec2 windowPos = ImGui::GetWindowPos();
 
-        m_ViewportBounds[0] = { viewportMinRegion.x + windowPos.x, viewportMinRegion.y + windowPos.y };
-        m_ViewportBounds[1] = { viewportMaxRegion.x + windowPos.x, viewportMaxRegion.y + windowPos.y };
+        ImGui::Begin("RuntimeViewport", nullptr, flags);
         
+        m_ViewportBounds[0] = { vp->Pos.x, vp->Pos.y };
+        m_ViewportBounds[1] = { vp->Pos.x + vp->Size.x, vp->Pos.y + vp->Size.y };
+
         ImVec2 size = ImGui::GetContentRegionAvail();
         if (size.x > 0 && size.y > 0)
             m_ViewportSize = { size.x, size.y };
 
         uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
-        ImGui::Image((void*)(intptr_t)textureID, size, ImVec2(0,1), ImVec2(1,0));
-        
+        ImGui::Image((void*)(intptr_t)textureID, size, ImVec2(0, 1), ImVec2(1, 0));
+
         ImGui::End();
-        ImGui::PopStyleVar();
+
+        ImGui::PopStyleVar(3);
     }
 
     void RuntimeLayer::OnEvent(EventBase& eventRef)
@@ -200,41 +213,6 @@ namespace HRealEngine
             return false;
         });
         dispatcher.Dispatch<SceneChangeEvent>(BIND_EVENT_FN(RuntimeLayer::OnSceneChange));
-    }
-
-    void RuntimeLayer::Dockspace()
-    {
-        static bool dockspaceOpen = true;
-        static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
-
-        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-        const ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->Pos);
-        ImGui::SetNextWindowSize(viewport->Size);
-        ImGui::SetNextWindowViewport(viewport->ID); 
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                       ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoMove |
-                       ImGuiWindowFlags_NoBringToFrontOnFocus | 
-                       ImGuiWindowFlags_NoNavFocus;
-
-        ImGui::Begin("DockSpaceRoot", &dockspaceOpen, windowFlags);
-        ImGui::PopStyleVar(2);
-        
-        ImGuiID dockspaceID = ImGui::GetID("GameDockSpace");
-        ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
-
-        static bool first_time = true;
-        if (first_time)
-        {
-            first_time = false;
-            ImGui::DockBuilderRemoveNode(dockspaceID);
-            ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_DockSpace);
-            ImGui::DockBuilderDockWindow("Game View", dockspaceID);
-            ImGui::DockBuilderFinish(dockspaceID);
-        }
-        ImGui::End();
     }
     
     bool RuntimeLayer::OnSceneChange(SceneChangeEvent& event)

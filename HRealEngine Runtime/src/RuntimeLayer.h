@@ -20,7 +20,6 @@ namespace HRealEngine
         void OnUpdate(Timestep timestep) override;
         void OnImGuiRender() override;
         void OnEvent(EventBase& eventRef) override;
-        void Dockspace();
 
         bool OnSceneChange(SceneChangeEvent& event);
 
