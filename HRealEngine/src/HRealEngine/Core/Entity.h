@@ -48,7 +48,12 @@ namespace HRealEngine
             m_Scene->GetRegistry().remove<T>(m_EntityHandle);
         }
 
-        UUID GetUUID() { return GetComponent<EntityIDComponent>().ID; }
+        UUID GetUUID()
+        {
+            if (!HasComponent<EntityIDComponent>())
+                return 0;
+            return GetComponent<EntityIDComponent>().ID;
+        }
         const std::string& GetName() { return GetComponent<EntityNameComponent>().Name; }
         void Destroy() { m_Scene->DestroyEntity(*this); }
         bool HasTag(const std::string& tag) 

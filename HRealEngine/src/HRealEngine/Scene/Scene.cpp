@@ -172,6 +172,8 @@ namespace HRealEngine
         else 
             m_JoltWorld->DestroyEntityPhysics(entity);
         
+        DestroyBT(entity);
+        
         if (entity.HasComponent<ScriptComponent>())
         {
             auto& scriptComponent = entity.GetComponent<ScriptComponent>();
@@ -180,6 +182,21 @@ namespace HRealEngine
         }
         m_EntityMap.erase(entity.GetUUID());
         m_Registry.destroy(entity);
+    }
+
+    void Scene::DestroyBT(Entity entity)
+    {
+        if (entity.HasComponent<BehaviorTreeComponent>())
+        {
+            auto& btComponent = entity.GetComponent<BehaviorTreeComponent>();
+            if (btComponent.BehaviorTreeAsset)
+            {
+                auto bt = GetEntityBehaviorTree(entity);
+                Root::DestroyBehaviorTree(bt);
+                m_BehaviorTreeCache.erase(btComponent.BehaviorTreeAsset);
+                m_BTOwnerUUIDs.erase(btComponent.BehaviorTreeAsset);
+            }
+        }
     }
 
     void Scene::ReportNoiseEvent(const NoiseEvent& event)

@@ -307,6 +307,9 @@ namespace HRealEngine
                 }
                 m_ActiveScene->OnRuntimeStop();
                 
+                //Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);
+                auto eam = Project::GetActive()->GetEditorAssetManager();
+                eam->ReloadAsset(handle);
                 Ref<Scene> nextSceneAsset = AssetManager::GetAsset<Scene>(handle);
                 if (nextSceneAsset)
                 {
@@ -1386,7 +1389,9 @@ namespace HRealEngine
         }*/
         /*Ref<Scene> readOnlyScene = AssetManager::GetAsset<Scene>(assetHandle);
         Ref<Scene> newScene = Scene::Copy(readOnlyScene);*/
-        Ref<Scene> scene = AssetManager::GetAsset<Scene>(assetHandle);
+        //Ref<Scene> scene = AssetManager::GetAsset<Scene>(assetHandle);
+        auto eam = Project::GetActive()->GetEditorAssetManager();
+        Ref<Scene> scene = std::dynamic_pointer_cast<Scene>(eam->ReloadAsset(assetHandle));
         if (!scene)
             return;
         /*m_EditorScene = newScene;

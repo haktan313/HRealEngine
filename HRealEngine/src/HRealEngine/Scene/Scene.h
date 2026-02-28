@@ -33,6 +33,7 @@ namespace HRealEngine
         Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
         void CreatePhysicsWorld();
         void DestroyEntity(Entity entity);
+        void DestroyBT(Entity entity);
         void ReportNoiseEvent(const NoiseEvent& event);
         entt::registry& GetRegistry() { return m_Registry; }
         
