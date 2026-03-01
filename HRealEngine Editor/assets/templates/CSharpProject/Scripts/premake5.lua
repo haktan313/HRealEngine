@@ -30,6 +30,7 @@ project (wsName)
     objdir ("Intermediates")
 
     files {
+        "src/**.cs",
         "Source/**.cs",
         "Properties/**.cs"
     }

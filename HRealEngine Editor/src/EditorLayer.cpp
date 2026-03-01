@@ -1274,7 +1274,13 @@ namespace HRealEngine
             LOG_CORE_INFO("[Build] Starting build for project '{0}' to: {1}", projectName, buildDir.string());
             
             std::filesystem::path rootDir = std::filesystem::current_path().parent_path(); 
+#if defined(HREALENGINE_DEBUG)
+            std::filesystem::path runtimeSrcDir = rootDir / "bin" / "Debug-windows-x86_64" / "HRealEngine Runtime";
+#elif defined(HREALENGINE_DIST)
+            std::filesystem::path runtimeSrcDir = rootDir / "bin" / "Dist-windows-x86_64" / "HRealEngine Runtime";
+#else
             std::filesystem::path runtimeSrcDir = rootDir / "bin" / "Release-windows-x86_64" / "HRealEngine Runtime";
+#endif
 
             if (!std::filesystem::exists(runtimeSrcDir))
             {
